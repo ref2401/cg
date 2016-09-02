@@ -6,14 +6,12 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Microsoft {
-namespace VisualStudio {
-namespace CppUnitTestFramework {
+
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
 template<> inline std::wstring ToString<cg::float_3>(const cg::float_3& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
-
 
 namespace unittest {
 
@@ -21,14 +19,14 @@ TEST_CLASS(Vector_unittest)
 {
 public:
 
-	//TEST_METHOD(static_members)
-	//{
-	//	Assert::AreEqual(float_3(0, 0, 0), float_3::zero);
-	//	Assert::AreEqual(float_3(1, 0, 0), float_3::unit_x);
-	//	Assert::AreEqual(float_3(0, 1, 0), float_3::unit_y);
-	//	Assert::AreEqual(float_3(0, 0, 1), float_3::unit_z);
-	//	Assert::AreEqual(float_3(1, 1, 1), float_3::unit_xyz);
-	//}
+	TEST_METHOD(static_members)
+	{
+		Assert::AreEqual(float_3(0, 0, 0), float_3::zero);
+		Assert::AreEqual(float_3(1, 0, 0), float_3::unit_x);
+		Assert::AreEqual(float_3(0, 1, 0), float_3::unit_y);
+		Assert::AreEqual(float_3(0, 0, 1), float_3::unit_z);
+		Assert::AreEqual(float_3(1, 1, 1), float_3::unit_xyz);
+	}
 
 	TEST_METHOD(ctors)
 	{
