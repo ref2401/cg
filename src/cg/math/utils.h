@@ -22,7 +22,6 @@ inline bool approx_equal(T lhs, T rhs, T max_abs = 1e-5f)
 }
 
 
-
 } // namespace cg
 
 #endif // CG_MATH_UTILS_H_

@@ -17,5 +17,8 @@
     <ClInclude Include="math\vector.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="math\utils.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

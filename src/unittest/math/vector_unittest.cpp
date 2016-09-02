@@ -48,7 +48,7 @@ public:
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z));
 	}
 
-	TEST_METHOD(assignment)
+	TEST_METHOD(assignments)
 	{
 		float_3 v = float_3(5, 6, 7);
 
@@ -63,7 +63,60 @@ public:
 		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z));
 	}
 
-	TEST_METHOD(operator_equal)
+	TEST_METHOD(compound_assignment_operators)
+	{
+		float_3 v(1, 2, 3);
+		(v += 5) += 5;
+		Assert::AreEqual(float_3(11, 12, 13), v);
+
+		(v -= 7) -= 3;
+		Assert::AreEqual(float_3(1, 2, 3), v);
+
+		(v *= 2) *= 3;
+		Assert::AreEqual(float_3(6, 12, 18), v);
+
+		(v /= 3) /= 2;
+		Assert::AreEqual(float_3(1, 2, 3), v);
+
+		(v += v) += v;
+		Assert::AreEqual(float_3(4, 8, 12), v);
+
+		v -= v;
+		Assert::AreEqual(float_3::zero, v);
+	}
+
+	TEST_METHOD(unary_operators)
+	{
+		float_3 v(1, 2, 3);
+		
+		Assert::AreEqual(float_3(-1, -2, -3), -v);
+		Assert::AreEqual(float_3(1, 2, 3), -(-v));
+	}
+
+	TEST_METHOD(binary_operators)
+	{
+		float_3 v(1, 2, 3);
+
+		// operator+
+		Assert::AreEqual(float_3(11, 12, 13), v + 10);
+		Assert::AreEqual(float_3(11, 12, 13), 10 + v);
+		Assert::AreEqual(float_3(1.11f, 2.22f, 3.33f), v + float_3(0.11f, 0.22f, 0.33f));
+
+		// operator-
+		Assert::AreEqual(float_3(0, 1, 2), v - 1);
+		Assert::AreEqual(float_3(0, -1, -2), 1 - v);
+		Assert::AreEqual(float_3::zero, v - float_3(1, 2, 3));
+
+		// operator*
+		Assert::AreEqual(float_3(10, 20, 30), v * 10);
+		Assert::AreEqual(float_3(10, 20, 30), 10 * v);
+		
+		// operator/
+		Assert::AreEqual(float_3(0.5, 1, 1.5), v / 2);
+		Assert::AreEqual(float_3::zero, 0 / v);
+	}
+
+	TEST_METHOD(equal_operator)
 	{
 		float_3 v(1, 2, 3);
 
