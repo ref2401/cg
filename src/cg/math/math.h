@@ -1,13 +1,10 @@
 #ifndef CG_MATH_MATH_H_
 #define CG_MATH_MATH_H_
 
-namespace cg {
+#include "cg/math/utils.h"
+#include "cg/math/vector.h"
 
-	inline int mul(int a, int b)
-	{
-		return a * b;
-	}
+using cg::float_3;
 
-} // namespace cg
 
 #endif // CG_MATH_MATH_H_

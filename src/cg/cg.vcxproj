@@ -120,9 +120,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\math.cpp" />
+    <ClCompile Include="math\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\math.h" />
+    <ClInclude Include="math\vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

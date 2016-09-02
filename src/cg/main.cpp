@@ -4,6 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Hello world " << cg::mul(2, 2);
+	std::cout << "Hello world ";
 	return 1;
 }
