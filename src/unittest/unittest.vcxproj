@@ -161,7 +161,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="math\utils_unittest.cpp" />
-    <ClCompile Include="math\vector_unittest.cpp" />
+    <ClCompile Include="math\float_3_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">

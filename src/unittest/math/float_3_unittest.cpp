@@ -1,5 +1,6 @@
 #include "cg/math/math.h"
 
+#include <cmath>
 #include <string>
 #include <utility>
 #include "CppUnitTest.h"
@@ -15,7 +16,7 @@ template<> inline std::wstring ToString<cg::float_3>(const cg::float_3& t) { RET
 
 namespace unittest {
 
-TEST_CLASS(Vector_unittest)
+TEST_CLASS(Float_3_unittest)
 {
 public:
 
@@ -136,6 +137,32 @@ public:
 
 		Assert::AreEqual(v, v);
 		Assert::AreEqual(v, float_3(1, 2, 3));
+	}
+
+	TEST_METHOD(dot_product)
+	{
+		float_3 u(2, 3, 4);
+		float_3 v(4, 5, 6);
+		float_3 w(7, 8 ,9);
+
+		Assert::AreEqual(2.f*4 + 3*5 + 4*6, cg::dot(u, v));
+		Assert::AreEqual(0.f, cg::dot(u, float_3::zero));
+		Assert::AreEqual(cg::len_square(u), cg::dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(cg::dot(u, v), cg::dot(v, u), L"U * V = V * U");
+		Assert::AreEqual(cg::dot(2*u, v), 2 * cg::dot(u, v), L"(aU) * V = a(U * V)");
+		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
+	}
+
+	TEST_METHOD(len_and_len_square)
+	{
+		float_3 u(2, 3, 4);
+		float_3 v(4, 5, 6);
+
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4, cg::len_square(u));
+		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4), cg::len(u));
+
+		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");
+		Assert::IsTrue(cg::approx_equal(cg::len(u + v), cg::len(u) + cg::len(v), 0.1f), L"|U + V| <= |U| + |V|");
 	}
 };
 

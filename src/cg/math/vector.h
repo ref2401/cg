@@ -1,6 +1,7 @@
 #ifndef CG_MATH_VECTOR_H_
 #define CG_MATH_VECTOR_H_
 
+#include <cmath>
 #include <ostream>
 #include <type_traits>
 #include "cg/math/utils.h"
@@ -239,6 +240,25 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float_3& v)
 {
 	out << "float_3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
+}
+
+
+// Calculates a dot product of the given vectors.
+inline float dot(const float_3& lhs, const float_3& rhs)
+{
+	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
+}
+
+// Calculates the squared length of v.
+inline float len_square(const float_3& v)
+{
+	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
+}
+
+// Calculates the length of v.
+inline float len(const float_3& v)
+{
+	return std::sqrt(cg::len_square(v));
 }
 
 
