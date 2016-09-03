@@ -1,7 +1,10 @@
 #ifndef CG_MATH_VECTOR_H_
 #define CG_MATH_VECTOR_H_
 
+#include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <algorithm>
 #include <ostream>
 #include <type_traits>
 #include "cg/math/utils.h"
@@ -242,6 +245,27 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float_3& v)
 	return out;
 }
 
+
+// Constrains vector v to lie between two further vectors.
+// The function processes each component of the vector separately.
+// Params:
+//		v = The value to constrain
+//		v_min =	The lower end of the range into which to constrain v.
+//		v_max = The upper end of the range into which to constrain v.
+inline float_3 clamp(const float_3& v, 
+	const float_3& v_min = float_3::zero, const float_3& v_max = float_3::unit_xyz)
+{
+	assert(v_min.x <= v_max.x);
+	assert(v_min.y <= v_max.y);
+	assert(v_min.z <= v_max.z);
+
+	return float_3(
+		std::min(v_max.x, std::max(v_min.x, v.x)),
+		std::min(v_max.y, std::max(v_min.y, v.y)),
+		std::min(v_max.z, std::max(v_min.z, v.z))
+	);
+}
+
 // Calculates the cross product of of the given vectors.
 inline float_3 cross(const float_3& lhs, const float_3& rhs)
 {
@@ -270,6 +294,41 @@ inline float len(const float_3& v)
 	return std::sqrt(len_square(v));
 }
 
+// Linearly interpolates between two values.
+// Params:
+//		lhs = The start of the range in which to interpolate.
+//		rhs = The end of the range in which to interpolate.
+//		factor = The value to use to interpolate between lhs & rhs.
+//		factor has to lie within the range [0 .. 1].
+inline float_3 lerp(const float_3& lhs, const float_3 rhs, float factor)
+{
+	assert(0.f <= factor && factor <= 1.f);
+	return lhs + factor * (rhs - lhs);
+}
+
+// Returns new vector which is normalized(unit length) copy of the given one.
+inline float_3 normalize(const float_3& v)
+{
+	float l2 = len_square(v);
+	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
+
+	float factor = 1.f / sqrt(l2);
+	return v * factor;
+}
+
+// Returns rgb color volor
+// (31 .. 24) bytes are ignored.
+// red: (23 .. 16) bytes. 
+// green: (15 .. 8) bytes. 
+// blue: (7 .. 1) bytes.
+inline float_3 rgb(uint32_t val)
+{
+	return float_3(
+		((val >> 16) & 0xFF) / 255.f,
+		((val >> 8) & 0xFF) / 255.f,
+		(val & 0xFF) / 255.f
+	);
+}
 
 } // namespace cg
 

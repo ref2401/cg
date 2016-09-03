@@ -139,6 +139,23 @@ public:
 		Assert::AreEqual(v, float_3(1, 2, 3));
 	}
 
+
+	TEST_METHOD(clamp)
+	{
+		float_3 lo(-5, -7, -9);
+		float_3 hi(5, 7, 9);
+		float_3 v(2, 3, 4);
+		
+		Assert::AreEqual(lo, cg::clamp(float_3(-9, -10, -11), lo, hi));
+		Assert::AreEqual(v, cg::clamp(v, lo, hi));
+		Assert::AreEqual(hi, cg::clamp(float_3(9, 10, 11), lo, hi));
+
+		// default lo and hi
+		Assert::AreEqual(float_3::zero, cg::clamp(float_3(-5)));
+		Assert::AreEqual(float_3(0.5), cg::clamp(float_3(0.5)));
+		Assert::AreEqual(float_3::unit_xyz, cg::clamp(float_3(5)));
+	}
+
 	TEST_METHOD(cross_product)
 	{
 		float_3 u(1, 2, 3);
@@ -211,6 +228,44 @@ public:
 
 		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");
 		Assert::IsTrue(cg::approx_equal(cg::len(u + v), cg::len(u) + cg::len(v), 0.1f), L"|U + V| <= |U| + |V|");
+	}
+
+	TEST_METHOD(lerp)
+	{
+		Assert::AreEqual(float_3(0.), cg::lerp(float_3::zero, float_3::unit_xyz, 0.));
+		Assert::AreEqual(float_3(0.6f), cg::lerp(float_3::zero, float_3::unit_xyz, 0.6f));
+		Assert::AreEqual(float_3(1.), cg::lerp(float_3::zero, float_3::unit_xyz, 1.));
+
+		float_3 v(24);
+		Assert::AreEqual(v, cg::lerp(v, v, 0.4f));
+		Assert::AreEqual(v, cg::lerp(v, v, 0.7f));
+
+	}
+
+	TEST_METHOD(normalize)
+	{
+		Assert::AreEqual(float_3::zero, cg::normalize(float_3::zero));
+		Assert::AreEqual(float_3::unit_x, cg::normalize(float_3::unit_x));
+		Assert::AreEqual(float_3::unit_y, cg::normalize(float_3::unit_y));
+		Assert::AreEqual(float_3::unit_z, cg::normalize(float_3::unit_z));
+
+		Assert::AreEqual(float_3::unit_x, cg::normalize(float_3(24, 0, 0)));
+		Assert::AreEqual(float_3::unit_y, cg::normalize(float_3(0, 24, 0)));
+		Assert::AreEqual(float_3::unit_z, cg::normalize(float_3(0, 0, 24)));
+
+		float_3 u(-8, 6, 24);
+		Assert::IsTrue(cg::approx_equal(1.f, cg::len(cg::normalize(u))));
+	}
+
+	TEST_METHOD(rgb)
+	{
+		Assert::AreEqual(float_3::zero, cg::rgb(0));
+		Assert::AreEqual(float_3::unit_x, cg::rgb(0xff'00'00));
+		Assert::AreEqual(float_3::unit_y, cg::rgb(0x00'ff'00));
+		Assert::AreEqual(float_3::unit_z, cg::rgb(0x00'00'ff));
+		Assert::AreEqual(float_3::unit_xyz, cg::rgb(0xffffff));
+
+		Assert::AreEqual(float_3(0xa1 / 255.f, 0xb2 / 255.f, 0xe3 / 255.f), cg::rgb(0xa1'b2'e3));
 	}
 };
 
