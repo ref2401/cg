@@ -32,20 +32,30 @@ public:
 	{
 		float_3 v0;
 		Assert::IsTrue((v0.x == 0) && (v0.y == 0) && (v0.z == 0));
+		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0));
+		Assert::IsTrue((v0.width == 0) && (v0.height == 0) && (v0.depth == 0));
 
 		float_3 v1 = float_3(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24));
+		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24));
+		Assert::IsTrue((v1.width == 24) && (v1.height == 24) && (v1.depth == 24));
 
 		float_3 v3 = float_3(1, 2, 3);
 		Assert::IsTrue((v3.x == 1) && (v3.y == 2) && (v3.z == 3));
+		Assert::IsTrue((v3.r == 1) && (v3.g == 2) && (v3.b == 3));
+		Assert::IsTrue((v3.width == 1) && (v3.height == 2) && (v3.depth == 3));
 
 		// copy ctor
 		float_3 vc = v3;
 		Assert::IsTrue((vc.x == v3.x) && (vc.y == v3.y) && (vc.z == v3.z));
+		Assert::IsTrue((vc.r == v3.r) && (vc.g == v3.g) && (vc.b == v3.b));
+		Assert::IsTrue((vc.width == v3.width) && (vc.height == v3.height) && (vc.depth == v3.depth));
 
 		// move ctor
 		float_3 vm = std::move(v3);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z));
+		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b));
+		Assert::IsTrue((vm.width == vc.width) && (vm.height == vc.height) && (vm.depth == vc.depth));
 	}
 
 	TEST_METHOD(assignments)

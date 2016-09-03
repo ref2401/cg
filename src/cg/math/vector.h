@@ -16,7 +16,7 @@ struct float_3 {
 	static const float_3 unit_xyz;
 
 
-	float_3() = default;
+	float_3();
 
 	explicit float_3(float v);
 
@@ -46,10 +46,28 @@ struct float_3 {
 	float_3& operator/=(const Numeric& val);
 
 
-	float x = 0;
-	float y = 0;
-	float z = 0;
+	union {
+		struct {
+			float x;
+			float y;
+			float z;
+		};
+
+		struct {
+			float r;
+			float g;
+			float b;
+		};
+
+		struct {
+			float width;
+			float height;
+			float depth;
+		};
+	};
 };
+
+inline float_3::float_3() : x(0), y(0), z(0) {}
 
 inline float_3::float_3(float v) : x(v), y(v), z(v) {}
 
