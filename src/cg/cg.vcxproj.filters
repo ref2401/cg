@@ -14,10 +14,13 @@
     <ClInclude Include="math\math.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="math\vector.h">
+    <ClInclude Include="math\utils.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="math\utils.h">
+    <ClInclude Include="math\float_3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\float_4.h">
       <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>

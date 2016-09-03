@@ -7,10 +7,18 @@
     <ClCompile Include="math\float_3_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="math\float_4_unittest.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
       <UniqueIdentifier>{2076d25b-fb36-4785-91fe-f46b6f01b7b4}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="math\math_unittest_utils.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

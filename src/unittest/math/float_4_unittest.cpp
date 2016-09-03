@@ -1,0 +1,227 @@
+#include "cg/math/math.h"
+
+#include <cmath>
+#include <utility>
+#include "unittest/math/math_unittest_utils.h"
+#include "CppUnitTest.h"
+
+using cg::float_3;
+using cg::float_4;
+
+
+namespace unittest {
+
+TEST_CLASS(Float_4_unittests) {
+public:
+
+	TEST_METHOD(static_members)
+	{
+		Assert::AreEqual(float_4(0, 0, 0, 0), float_4::zero);
+		Assert::AreEqual(float_4(1, 0, 0, 0), float_4::unit_x);
+		Assert::AreEqual(float_4(0, 1, 0, 0), float_4::unit_y);
+		Assert::AreEqual(float_4(0, 0, 1, 0), float_4::unit_z);
+		Assert::AreEqual(float_4(0, 0, 0, 1), float_4::unit_w);
+		Assert::AreEqual(float_4(1, 1, 1, 1), float_4::unit_xyzw);
+	}
+
+	TEST_METHOD(ctors) 
+	{
+		float_4 v0;
+		Assert::IsTrue((v0.x == 0) && (v0.y == 0) && (v0.z == 0) && (v0.w == 0));
+		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0) && (v0.a == 0));
+
+		float_4 v1(24);
+		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24) && (v1.w == 24));
+		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24) && (v1.w == 24));
+
+		float_4 v4(1, 2, 3, 4);
+		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3) && (v4.w == 4));
+		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3) && (v4.a == 4));
+
+		// copy ctor
+		float_4 vc = v4;
+		Assert::IsTrue((vc.x == v4.x) && (vc.y == v4.y) && (vc.z == v4.z) && (vc.w == v4.w));
+		Assert::IsTrue((vc.r == v4.r) && (vc.g == v4.g) && (vc.b == v4.b) && (vc.a == v4.a));
+
+		// move ctor
+		float_4 vm = std::move(v4);
+		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z) && (vm.w == vc.w));
+		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b) && (vm.a == vc.a));
+	}
+
+	TEST_METHOD(assignments)
+	{
+		float_4 v (5, 6, 7, 8);
+
+		// copy assignment
+		float_4 vc;
+		vc = v;
+		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y) && (vc.z == v.z) && (vc.w == v.w));
+		Assert::IsTrue((vc.r == v.r) && (vc.g == v.g) && (vc.b == v.b) && (vc.a == v.a));
+
+		// move assignment
+		float_4 vm;
+		vm = std::move(v);
+		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z) && (vm.w == v.w));
+		Assert::IsTrue((vm.r == v.r) && (vm.g == v.g) && (vm.b == v.b) && (vm.a == v.a));
+	}
+
+	TEST_METHOD(compound_assignment_operators)
+	{
+		float_4 v(1, 2, 3, 4);
+		(v += 5) += 5;
+		Assert::AreEqual(float_4(11, 12, 13, 14), v);
+
+		(v -= 7) -= 3;
+		Assert::AreEqual(float_4(1, 2, 3, 4), v);
+
+		(v *= 2) *= 3;
+		Assert::AreEqual(float_4(6, 12, 18, 24), v);
+
+		(v /= 3) /= 2;
+		Assert::AreEqual(float_4(1, 2, 3, 4), v);
+
+		(v += v) += v;
+		Assert::AreEqual(float_4(4, 8, 12, 16), v);
+
+		v -= v;
+		Assert::AreEqual(float_4::zero, v);
+	}
+
+	TEST_METHOD(xyz_and_rgb)
+	{
+		float_4 v(1, 2, 3, 4);
+
+		Assert::AreEqual(float_3(1, 2, 3), v.xyz());
+		Assert::AreEqual(float_3(1, 2, 3), v.rgb());
+	}
+
+	
+	TEST_METHOD(binary_operators)
+	{
+		float_4 v(1, 2, 3, 4);
+
+		// operator+
+		Assert::AreEqual(float_4(11, 12, 13, 14), v + 10);
+		Assert::AreEqual(float_4(11, 12, 13, 14), 10 + v);
+		Assert::AreEqual(float_4(1.11f, 2.22f, 3.33f, 4.44f), v + float_4(0.11f, 0.22f, 0.33f, 0.44f));
+
+		// operator-
+		Assert::AreEqual(float_4(0, 1, 2, 3), v - 1);
+		Assert::AreEqual(float_4(0, -1, -2, -3), 1 - v);
+		Assert::AreEqual(float_4::zero, v - float_4(1, 2, 3, 4));
+
+		// operator*
+		Assert::AreEqual(float_4(10, 20, 30, 40), v * 10);
+		Assert::AreEqual(float_4(10, 20, 30, 40), 10 * v);
+
+		// operator/
+		Assert::AreEqual(float_4(0.5, 1, 1.5, 2), v / 2);
+		Assert::AreEqual(float_4::zero, 0 / v);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		float_4 v(1, 2, 3, 4);
+
+		Assert::AreNotEqual(v, float_4(100, 2, 3, 4));
+		Assert::AreNotEqual(v, float_4(1, 100, 3, 4));
+		Assert::AreNotEqual(v, float_4(1, 2, 100, 4));
+		Assert::AreNotEqual(v, float_4(1, 2, 3, 100));
+
+		Assert::AreEqual(v, v);
+		Assert::AreEqual(v, float_4(1, 2, 3, 4));
+	}
+
+	TEST_METHOD(clamp)
+	{
+		float_4 lo(-5, -7, -9, -11);
+		float_4 hi(5, 7, 9, 11);
+		float_4 v(2, 3, 4, 5);
+
+		Assert::AreEqual(lo, cg::clamp(float_4(-9, -10, -11, -12), lo, hi));
+		Assert::AreEqual(v, cg::clamp(v, lo, hi));
+		Assert::AreEqual(hi, cg::clamp(float_4(9, 10, 11, 12), lo, hi));
+
+		// default lo and hi
+		Assert::AreEqual(float_4::zero, cg::clamp(float_4(-5)));
+		Assert::AreEqual(float_4(0.5), cg::clamp(float_4(0.5)));
+		Assert::AreEqual(float_4::unit_xyzw, cg::clamp(float_4(5)));
+	}
+
+	TEST_METHOD(dot_product)
+	{
+		float_4 u(2, 3, 4, 5);
+		float_4 v(5, 6, 7, 8);
+		float_4 w(9, 10, 11, 12);
+
+		Assert::AreEqual(2.f*5 + 3*6 + 4*7 + 5*8, cg::dot(u, v));
+		Assert::AreEqual(0.f, cg::dot(u, float_4::zero));
+		Assert::AreEqual(cg::len_square(u), cg::dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(cg::dot(u, v), cg::dot(v, u), L"U * V = V * U");
+		Assert::AreEqual(cg::dot(2 * u, v), 2 * cg::dot(u, v), L"(aU) * V = a(U * V)");
+		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
+	}
+
+	TEST_METHOD(len_and_len_square)
+	{
+		float_4 u(2, 3, 4, 5);
+		float_4 v(4, 5, 6, 7);
+
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4 + 5*5, cg::len_square(u));
+		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4 + 5*5), cg::len(u));
+
+		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");
+		Assert::IsTrue(cg::approx_equal(cg::len(u + v), cg::len(u) + cg::len(v), 0.1f), L"|U + V| <= |U| + |V|");
+	}
+
+	TEST_METHOD(lerp)
+	{
+		Assert::AreEqual(float_4(0.0f), cg::lerp(float_4::zero, float_4::unit_xyzw, 0.0f));
+		Assert::AreEqual(float_4(0.6f), cg::lerp(float_4::zero, float_4::unit_xyzw, 0.6f));
+		Assert::AreEqual(float_4(1.0f), cg::lerp(float_4::zero, float_4::unit_xyzw, 1.0f));
+
+		float_4 v(24);
+		Assert::AreEqual(v, cg::lerp(v, v, 0.4f));
+		Assert::AreEqual(v, cg::lerp(v, v, 0.7f));
+	}
+
+	TEST_METHOD(normalize)
+	{
+		Assert::AreEqual(float_4::zero, cg::normalize(float_4::zero));
+		Assert::AreEqual(float_4::unit_x, cg::normalize(float_4::unit_x));
+		Assert::AreEqual(float_4::unit_y, cg::normalize(float_4::unit_y));
+		Assert::AreEqual(float_4::unit_z, cg::normalize(float_4::unit_z));
+		Assert::AreEqual(float_4::unit_w, cg::normalize(float_4::unit_w));
+
+		Assert::AreEqual(float_4::unit_x, cg::normalize(float_4(24, 0, 0, 0)));
+		Assert::AreEqual(float_4::unit_y, cg::normalize(float_4(0, 24, 0, 0)));
+		Assert::AreEqual(float_4::unit_z, cg::normalize(float_4(0, 0, 24, 0)));
+		Assert::AreEqual(float_4::unit_w, cg::normalize(float_4(0, 0, 0, 24)));
+
+		float_4 u(-8, 6, 24, -0.1);
+		Assert::IsTrue(cg::approx_equal(1.f, cg::len(cg::normalize(u))));
+	}
+
+	TEST_METHOD(rgba)
+	{
+		Assert::AreEqual(float_4::zero, cg::rgba(0));
+		Assert::AreEqual(float_4::unit_x, cg::rgba(0xff'00'00'00));
+		Assert::AreEqual(float_4::unit_y, cg::rgba(0x00'ff'00'00));
+		Assert::AreEqual(float_4::unit_z, cg::rgba(0x00'00'ff'00));
+		Assert::AreEqual(float_4::unit_w, cg::rgba(0x00'00'00'ff));
+		Assert::AreEqual(float_4::unit_xyzw, cg::rgba(0xffffffff));
+
+		Assert::AreEqual(float_4(0xA1 / 255.f, 0xB2 / 255.f, 0xE3 / 255.f, 0x18 / 255.f), cg::rgba(0xa1'b2'e3'18));
+	}
+
+	TEST_METHOD(unary_operators)
+	{
+		float_4 v(1, 2, 3, 4);
+
+		Assert::AreEqual(float_4(-1, -2, -3, -4), -v);
+		Assert::AreEqual(float_4(1, 2, 3, 4), -(-v));
+	}
+};
+
+} // namespace unittest

@@ -1,23 +1,16 @@
 #include "cg/math/math.h"
 
 #include <cmath>
-#include <string>
 #include <utility>
+#include "unittest/math/math_unittest_utils.h"
 #include "CppUnitTest.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using cg::float_3;
 
-
-namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
-
-template<> inline std::wstring ToString<cg::float_3>(const cg::float_3& t) { RETURN_WIDE_STRING(t); }
-
-}}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 namespace unittest {
 
-TEST_CLASS(Float_3_unittest)
-{
+TEST_CLASS(Float_3_unittest) {
 public:
 
 	TEST_METHOD(static_members)
@@ -36,12 +29,12 @@ public:
 		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0));
 		Assert::IsTrue((v0.width == 0) && (v0.height == 0) && (v0.depth == 0));
 
-		float_3 v1 = float_3(24);
+		float_3 v1(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24));
 		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24));
 		Assert::IsTrue((v1.width == 24) && (v1.height == 24) && (v1.depth == 24));
 
-		float_3 v3 = float_3(1, 2, 3);
+		float_3 v3(1, 2, 3);
 		Assert::IsTrue((v3.x == 1) && (v3.y == 2) && (v3.z == 3));
 		Assert::IsTrue((v3.r == 1) && (v3.g == 2) && (v3.b == 3));
 		Assert::IsTrue((v3.width == 1) && (v3.height == 2) && (v3.depth == 3));
@@ -61,17 +54,21 @@ public:
 
 	TEST_METHOD(assignments)
 	{
-		float_3 v = float_3(5, 6, 7);
+		float_3 v(5, 6, 7);
 
 		// copy assignment
 		float_3 vc;
 		vc = v;
 		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y) && (vc.z == v.z));
+		Assert::IsTrue((vc.r == v.r) && (vc.g == v.g) && (vc.b == v.b));
+		Assert::IsTrue((vc.width == v.width) && (vc.height == v.height) && (vc.depth == v.depth));
 
 		// move assignment
 		float_3 vm;
 		vm = std::move(v);
 		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z));
+		Assert::IsTrue((vm.r == v.r) && (vm.g == v.g) && (vm.b == v.b));
+		Assert::IsTrue((vm.width == v.width) && (vm.height == v.height) && (vm.depth == v.depth));
 	}
 
 	TEST_METHOD(compound_assignment_operators)
@@ -96,13 +93,6 @@ public:
 		Assert::AreEqual(float_3::zero, v);
 	}
 
-	TEST_METHOD(unary_operators)
-	{
-		float_3 v(1, 2, 3);
-		
-		Assert::AreEqual(float_3(-1, -2, -3), -v);
-		Assert::AreEqual(float_3(1, 2, 3), -(-v));
-	}
 
 	TEST_METHOD(binary_operators)
 	{
@@ -138,7 +128,6 @@ public:
 		Assert::AreEqual(v, v);
 		Assert::AreEqual(v, float_3(1, 2, 3));
 	}
-
 
 	TEST_METHOD(clamp)
 	{
@@ -232,14 +221,13 @@ public:
 
 	TEST_METHOD(lerp)
 	{
-		Assert::AreEqual(float_3(0.), cg::lerp(float_3::zero, float_3::unit_xyz, 0.));
+		Assert::AreEqual(float_3(0.0f), cg::lerp(float_3::zero, float_3::unit_xyz, 0.0f));
 		Assert::AreEqual(float_3(0.6f), cg::lerp(float_3::zero, float_3::unit_xyz, 0.6f));
-		Assert::AreEqual(float_3(1.), cg::lerp(float_3::zero, float_3::unit_xyz, 1.));
+		Assert::AreEqual(float_3(1.0f), cg::lerp(float_3::zero, float_3::unit_xyz, 1.0f));
 
 		float_3 v(24);
 		Assert::AreEqual(v, cg::lerp(v, v, 0.4f));
 		Assert::AreEqual(v, cg::lerp(v, v, 0.7f));
-
 	}
 
 	TEST_METHOD(normalize)
@@ -267,6 +255,15 @@ public:
 
 		Assert::AreEqual(float_3(0xa1 / 255.f, 0xb2 / 255.f, 0xe3 / 255.f), cg::rgb(0xa1'b2'e3));
 	}
+
+	TEST_METHOD(unary_operators)
+	{
+		float_3 v(1, 2, 3);
+
+		Assert::AreEqual(float_3(-1, -2, -3), -v);
+		Assert::AreEqual(float_3(1, 2, 3), -(-v));
+	}
+
 };
 
 } // unittest
