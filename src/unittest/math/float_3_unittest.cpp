@@ -139,6 +139,54 @@ public:
 		Assert::AreEqual(v, float_3(1, 2, 3));
 	}
 
+	TEST_METHOD(cross_product)
+	{
+		float_3 u(1, 2, 3);
+		float_3 v(4, 5, -6);
+		float_3 w(7, -8, 9);
+
+		Assert::AreEqual(cg::cross(u, v), cg::cross(-v, u), L"U x V = -V x U");
+		
+		Assert::AreEqual(
+			cg::cross((5 * u) + (7 * v), w), 
+			5 * cross(u, w) + 7 * cross(v, w), 
+			L"(aU + bV) x W = a(U x W) + b(V x W)");
+		
+		Assert::AreEqual(
+			cg::cross(u + v, w), 
+			cg::cross(u, w) + cg::cross(v, w), 
+			L"(U + V) x W = U x W + V x W");
+
+		Assert::AreEqual(
+			cg::cross(w, u + v), 
+			cg::cross(w, u) + cg::cross(w, v), 
+			L"W x (U + V) = W x U + W x V");
+		
+		Assert::AreEqual(
+			cg::cross(u, cg::cross(v, w)), 
+			(cg::dot(u, w) * v) - (cg::dot(u, v) * w), 
+			L"U x (V x W) = (U * W) * V - (U * V) * W");
+
+		auto r1 = 5 * cg::cross(u, v);
+		auto r2 = cg::cross(5 * u, v);
+		auto r3 = cg::cross(u, 5 * v);
+		Assert::IsTrue(r1 == r2 && r2 == r3, L"(aU) x V = U x (aV) = a(U x V)");
+
+		// scalar triple product
+		float s1 = cg::dot(cg::cross(u, v), w);		// (U x V)*W
+		float s2 = cg::dot(cg::cross(v, w), u);		// (V x W)*U
+		float s3 = cg::dot(cg::cross(w, u), v);		// (W x U)*V
+		Assert::IsTrue(s1 == s2 && s2 == s3);
+		Assert::AreEqual(s1, cg::dot(-cg::cross(v, u), w), L"(U x V)*W = -(V x U)*W");
+		Assert::AreEqual(s2, cg::dot(-cg::cross(w, v), u), L"(V x W)*U = -(W x V)*U");
+		Assert::AreEqual(s3, cg::dot(-cg::cross(u, w), v), L"(W x U)*V = -(U x W)*V");
+
+		auto uv = cg::cross(u, v);
+		Assert::AreEqual(0.f, cg::dot(uv, u));
+		Assert::AreEqual(0.f,  cg::dot(uv, v));
+		Assert::AreEqual(float_3::zero, cg::cross(u, u));
+	}
+
 	TEST_METHOD(dot_product)
 	{
 		float_3 u(2, 3, 4);

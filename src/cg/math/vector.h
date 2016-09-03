@@ -242,8 +242,17 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float_3& v)
 	return out;
 }
 
+// Calculates the cross product of of the given vectors.
+inline float_3 cross(const float_3& lhs, const float_3& rhs)
+{
+	return float_3(
+		(lhs.y *rhs.z) - (lhs.z * rhs.y),
+		(lhs.z * rhs.x) - (lhs.x * rhs.z),
+		(lhs.x * rhs.y) - (lhs.y * rhs.x)
+	);
+}
 
-// Calculates a dot product of the given vectors.
+// Calculates the dot product of the given vectors.
 inline float dot(const float_3& lhs, const float_3& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
@@ -258,7 +267,7 @@ inline float len_square(const float_3& v)
 // Calculates the length of v.
 inline float len(const float_3& v)
 {
-	return std::sqrt(cg::len_square(v));
+	return std::sqrt(len_square(v));
 }
 
 
