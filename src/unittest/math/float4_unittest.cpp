@@ -11,7 +11,7 @@ using cg::float4;
 
 namespace unittest {
 
-TEST_CLASS(Float4_unittests) {
+TEST_CLASS(Float4_unittest) {
 public:
 
 	TEST_METHOD(static_members)

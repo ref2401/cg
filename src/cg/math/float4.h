@@ -8,12 +8,12 @@
 namespace cg {
 
 struct float4 {
-	static const float4 zero;
 	static const float4 unit_x;
 	static const float4 unit_y;
 	static const float4 unit_z;
 	static const float4 unit_w;
 	static const float4 unit_xyzw;
+	static const float4 zero;
 
 
 	float4();
@@ -32,7 +32,7 @@ struct float4 {
 	float3 rgb() const;
 
 
-	// Adds val to every component of the vector.
+	// Adds val to each component of the vector.
 	template<typename Numeric>
 	float4& operator+=(const Numeric& val);
 
@@ -46,11 +46,11 @@ struct float4 {
 	// Subtracts  the specified vector v this vector.
 	float4& operator-=(const float4& val);
 
-	// Multiplies every component of the vector by val.
+	// Multiplies each component of the vector by val.
 	template<typename Numeric>
 	float4& operator*=(const Numeric& val);
 
-	// Devides every component of the vector by val.
+	// Devides each component of the vector by val.
 	template<typename Numeric>
 	float4& operator/=(const Numeric& val);
 
@@ -163,9 +163,8 @@ inline bool operator!=(const float4& lhs, const float4& rhs)
 	return !(lhs == rhs);
 }
 
-// operator+
 template<typename Numeric>
-inline float4 operator+(float4 v, Numeric val)
+inline float4 operator+(float4 v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -173,7 +172,7 @@ inline float4 operator+(float4 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float4 operator+(Numeric val, float4 v)
+inline float4 operator+(const Numeric& val, float4 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -185,9 +184,8 @@ inline float4 operator+(float4 lhs, const float4& rhs)
 	return lhs += rhs;
 }
 
-// operator-
 template<typename Numeric>
-inline float4 operator-(float4 v, Numeric val)
+inline float4 operator-(float4 v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -195,7 +193,7 @@ inline float4 operator-(float4 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float4 operator-(Numeric val, float4 v)
+inline float4 operator-(const Numeric& val, float4 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -207,15 +205,13 @@ inline float4 operator-(float4 lhs, const float4& rhs)
 	return lhs -= rhs;
 }
 
-// unary operator-
 inline float4 operator-(const float4& v)
 {
 	return float4(-v.x, -v.y, -v.z, -v.w);
 }
 
-//operator*
 template<typename Numeric>
-inline float4 operator*(float4 v, Numeric val)
+inline float4 operator*(float4 v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -223,16 +219,15 @@ inline float4 operator*(float4 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float4 operator*(Numeric val, float4 v)
+inline float4 operator*(const Numeric& val, float4 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
 	return v *= val;
 }
 
-// operator/
 template<typename Numeric>
-inline float4 operator/(float4 v, Numeric val)
+inline float4 operator/(float4 v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -240,20 +235,20 @@ inline float4 operator/(float4 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float4 operator/(Numeric val, float4 v)
+inline float4 operator/(const Numeric& val, float4 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
 	return float4(val / v.x, val / v.y, val / v.z, val / v.w);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const cg::float4& v)
+inline std::ostream& operator<<(std::ostream& out, const float4& v)
 {
 	out << "float_4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;
 }
 
-inline std::wostream& operator<<(std::wostream& out, const cg::float4& v)
+inline std::wostream& operator<<(std::wostream& out, const float4& v)
 {
 	out << "float_4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;

@@ -3,6 +3,7 @@
 
 #include "cg/math/float3.h"
 #include "cg/math/float4.h"
+#include "cg/math/quat.h"
 #include "cg/math/utils.h"
 
 

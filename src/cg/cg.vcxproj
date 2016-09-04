@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="math\float4.h" />
     <ClInclude Include="math\math.h" />
+    <ClInclude Include="math\quat.h" />
     <ClInclude Include="math\utils.h" />
     <ClInclude Include="math\float3.h" />
   </ItemGroup>

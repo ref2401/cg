@@ -10,6 +10,9 @@
     <ClCompile Include="math\float4_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="math\quat_unittest.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
