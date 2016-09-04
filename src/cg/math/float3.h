@@ -1,5 +1,5 @@
-#ifndef CG_MATH_FLOAT_3_H_
-#define CG_MATH_FLOAT_3_H_
+#ifndef CG_MATH_FLOAT3_H_
+#define CG_MATH_FLOAT3_H_
 
 #include <cassert>
 #include <cmath>
@@ -12,42 +12,42 @@
 
 namespace cg {
 
-struct float_3 {
-	static const float_3 zero;
-	static const float_3 unit_x;
-	static const float_3 unit_y;
-	static const float_3 unit_z;
-	static const float_3 unit_xyz;
+struct float3 {
+	static const float3 zero;
+	static const float3 unit_x;
+	static const float3 unit_y;
+	static const float3 unit_z;
+	static const float3 unit_xyz;
 
 
-	float_3();
+	float3();
 
-	explicit float_3(float val);
+	explicit float3(float val);
 
-	float_3(float x, float y, float z);
+	float3(float x, float y, float z);
 
 
 	// Adds val to every component of the vector.
 	template<typename Numeric>
-	float_3& operator+=(const Numeric& val);
+	float3& operator+=(const Numeric& val);
 
 	// Adds the specified vector v to this vector.
-	float_3& operator+=(const float_3& val);
+	float3& operator+=(const float3& val);
 
 	// Subtracts val from every component of the vector.
 	template<typename Numeric>
-	float_3& operator-=(const Numeric& val);
+	float3& operator-=(const Numeric& val);
 
 	// Subtracts  the specified vector v this vector.
-	float_3& operator-=(const float_3& val);
+	float3& operator-=(const float3& val);
 
 	// Multiplies every component of the vector by val.
 	template<typename Numeric>
-	float_3& operator*=(const Numeric& val);
+	float3& operator*=(const Numeric& val);
 
 	// Devides every component of the vector by val.
 	template<typename Numeric>
-	float_3& operator/=(const Numeric& val);
+	float3& operator/=(const Numeric& val);
 
 
 	union {
@@ -57,15 +57,15 @@ struct float_3 {
 	};
 };
 
-inline float_3::float_3() : x(0), y(0), z(0) {}
+inline float3::float3() : x(0), y(0), z(0) {}
 
-inline float_3::float_3(float val) : x(val), y(val), z(val) {}
+inline float3::float3(float val) : x(val), y(val), z(val) {}
 
-inline float_3::float_3(float x, float y, float z) : x(x), y(y), z(z) {}
+inline float3::float3(float x, float y, float z) : x(x), y(y), z(z) {}
 
 
 template<typename Numeric>
-inline float_3& float_3::operator+=(const Numeric& val)
+inline float3& float3::operator+=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -75,7 +75,7 @@ inline float_3& float_3::operator+=(const Numeric& val)
 	return *this;
 }
 
-inline float_3& float_3::operator+=(const float_3& v)
+inline float3& float3::operator+=(const float3& v)
 {
 	x += v.x;
 	y += v.y;
@@ -84,7 +84,7 @@ inline float_3& float_3::operator+=(const float_3& v)
 }
 
 template<typename Numeric>
-inline float_3& float_3::operator-=(const Numeric& val)
+inline float3& float3::operator-=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -94,7 +94,7 @@ inline float_3& float_3::operator-=(const Numeric& val)
 	return *this;
 }
 
-inline float_3& float_3::operator-=(const float_3& v)
+inline float3& float3::operator-=(const float3& v)
 {
 	x -= v.x;
 	y -= v.y;
@@ -103,7 +103,7 @@ inline float_3& float_3::operator-=(const float_3& v)
 }
 
 template<typename Numeric>
-inline float_3& float_3::operator*=(const Numeric& val)
+inline float3& float3::operator*=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -114,7 +114,7 @@ inline float_3& float_3::operator*=(const Numeric& val)
 }
 
 template<typename Numeric>
-inline float_3& float_3::operator/=(const Numeric& val)
+inline float3& float3::operator/=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -125,21 +125,21 @@ inline float_3& float_3::operator/=(const Numeric& val)
 }
 
 
-inline bool operator==(const float_3& lhs, const float_3& rhs)
+inline bool operator==(const float3& lhs, const float3& rhs)
 {
 	return approx_equal(lhs.x, rhs.x)
 		&& approx_equal(lhs.y, rhs.y)
 		&& approx_equal(lhs.z, rhs.z);
 }
 
-inline bool operator!=(const float_3& lhs, const float_3& rhs)
+inline bool operator!=(const float3& lhs, const float3& rhs)
 {
 	return !(lhs == rhs);
 }
 
 // operator+
 template<typename Numeric>
-inline float_3 operator+(float_3 v, Numeric val)
+inline float3 operator+(float3 v, Numeric val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -147,21 +147,21 @@ inline float_3 operator+(float_3 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float_3 operator+(Numeric val, float_3 v)
+inline float3 operator+(Numeric val, float3 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
 	return v += val;
 }
 
-inline float_3 operator+(float_3 lhs, const float_3& rhs)
+inline float3 operator+(float3 lhs, const float3& rhs)
 {
 	return lhs += rhs;
 }
 
 // operator-
 template<typename Numeric>
-inline float_3 operator-(float_3 v, Numeric val)
+inline float3 operator-(float3 v, Numeric val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -169,27 +169,27 @@ inline float_3 operator-(float_3 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float_3 operator-(Numeric val, float_3 v)
+inline float3 operator-(Numeric val, float3 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return float_3(val - v.x, val - v.y, val - v.z);
+	return float3(val - v.x, val - v.y, val - v.z);
 }
 
-inline float_3 operator-(float_3 lhs, const float_3& rhs)
+inline float3 operator-(float3 lhs, const float3& rhs)
 {
 	return lhs -= rhs;
 }
 
 // unary operator-
-inline float_3 operator-(const float_3& v)
+inline float3 operator-(const float3& v)
 {
-	return float_3(-v.x, -v.y, -v.z);
+	return float3(-v.x, -v.y, -v.z);
 }
 
 //operator*
 template<typename Numeric>
-inline float_3 operator*(float_3 v, Numeric val)
+inline float3 operator*(float3 v, Numeric val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -197,7 +197,7 @@ inline float_3 operator*(float_3 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float_3 operator*(Numeric val, float_3 v)
+inline float3 operator*(Numeric val, float3 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -206,7 +206,7 @@ inline float_3 operator*(Numeric val, float_3 v)
 
 // operator/
 template<typename Numeric>
-inline float_3 operator/(float_3 v, Numeric val)
+inline float3 operator/(float3 v, Numeric val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
@@ -214,20 +214,20 @@ inline float_3 operator/(float_3 v, Numeric val)
 }
 
 template<typename Numeric>
-inline float_3 operator/(Numeric val, float_3 v)
+inline float3 operator/(Numeric val, float3 v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return float_3(val / v.x, val / v.y, val / v.z);
+	return float3(val / v.x, val / v.y, val / v.z);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const cg::float_3& v)
+inline std::ostream& operator<<(std::ostream& out, const cg::float3& v)
 {
 	out << "float_3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
 }
 
-inline std::wostream& operator<<(std::wostream& out, const cg::float_3& v)
+inline std::wostream& operator<<(std::wostream& out, const cg::float3& v)
 {
 	out << "float_3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
@@ -240,14 +240,14 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float_3& v)
 //		v = The value to constrain
 //		v_min =	The lower end of the range into which to constrain v.
 //		v_max = The upper end of the range into which to constrain v.
-inline float_3 clamp(const float_3& v, 
-	const float_3& v_lo = float_3::zero, const float_3& v_hi = float_3::unit_xyz)
+inline float3 clamp(const float3& v, 
+	const float3& v_lo = float3::zero, const float3& v_hi = float3::unit_xyz)
 {
 	assert(v_lo.x <= v_hi.x);
 	assert(v_lo.y <= v_hi.y);
 	assert(v_lo.z <= v_hi.z);
 
-	return float_3(
+	return float3(
 		std::min(v_hi.x, std::max(v_lo.x, v.x)),
 		std::min(v_hi.y, std::max(v_lo.y, v.y)),
 		std::min(v_hi.z, std::max(v_lo.z, v.z))
@@ -255,9 +255,9 @@ inline float_3 clamp(const float_3& v,
 }
 
 // Calculates the cross product of of the given vectors.
-inline float_3 cross(const float_3& lhs, const float_3& rhs)
+inline float3 cross(const float3& lhs, const float3& rhs)
 {
-	return float_3(
+	return float3(
 		(lhs.y *rhs.z) - (lhs.z * rhs.y),
 		(lhs.z * rhs.x) - (lhs.x * rhs.z),
 		(lhs.x * rhs.y) - (lhs.y * rhs.x)
@@ -265,19 +265,19 @@ inline float_3 cross(const float_3& lhs, const float_3& rhs)
 }
 
 // Calculates the dot product of the given vectors.
-inline float dot(const float_3& lhs, const float_3& rhs)
+inline float dot(const float3& lhs, const float3& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
 }
 
 // Calculates the squared length of v.
-inline float len_square(const float_3& v)
+inline float len_square(const float3& v)
 {
 	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
 }
 
 // Calculates the length of v.
-inline float len(const float_3& v)
+inline float len(const float3& v)
 {
 	return std::sqrt(len_square(v));
 }
@@ -288,14 +288,14 @@ inline float len(const float_3& v)
 //		rhs = The end of the range in which to interpolate.
 //		factor = The value to use to interpolate between lhs & rhs.
 //		factor has to lie within the range [0 .. 1].
-inline float_3 lerp(const float_3& lhs, const float_3 rhs, float factor)
+inline float3 lerp(const float3& lhs, const float3 rhs, float factor)
 {
 	assert(0.f <= factor && factor <= 1.f);
 	return lhs + factor * (rhs - lhs);
 }
 
 // Returns new vector which is normalized(unit length) copy of the given one.
-inline float_3 normalize(const float_3& v)
+inline float3 normalize(const float3& v)
 {
 	float l2 = len_square(v);
 	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
@@ -309,9 +309,9 @@ inline float_3 normalize(const float_3& v)
 // red: (23 .. 16) bytes. 
 // green: (15 .. 8) bytes. 
 // blue: (7 .. 1) bytes.
-inline float_3 rgb(uint32_t val)
+inline float3 rgb(uint32_t val)
 {
-	return float_3(
+	return float3(
 		((val >> 16) & 0xFF) / 255.f,
 		((val >> 8) & 0xFF) / 255.f,
 		(val & 0xFF) / 255.f
@@ -320,4 +320,4 @@ inline float_3 rgb(uint32_t val)
 
 } // namespace cg
 
-#endif // CG_MATH_FLOAT_3_H_
+#endif // CG_MATH_FLOAT3_H_

@@ -122,10 +122,10 @@
     <ClCompile Include="math\math.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\float_4.h" />
+    <ClInclude Include="math\float4.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\utils.h" />
-    <ClInclude Include="math\float_3.h" />
+    <ClInclude Include="math\float3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

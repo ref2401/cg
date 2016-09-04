@@ -17,10 +17,10 @@
     <ClInclude Include="math\utils.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="math\float_3.h">
+    <ClInclude Include="math\float3.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="math\float_4.h">
+    <ClInclude Include="math\float4.h">
       <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>

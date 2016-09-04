@@ -4,10 +4,10 @@
     <ClCompile Include="math\utils_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="math\float_3_unittest.cpp">
+    <ClCompile Include="math\float3_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="math\float_4_unittest.cpp">
+    <ClCompile Include="math\float4_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
