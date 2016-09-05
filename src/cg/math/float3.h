@@ -275,6 +275,12 @@ inline float len(const float3& v)
 	return std::sqrt(len_squared(v));
 }
 
+// Checks whether the specified vector is normalized.
+inline bool is_normalized(const float3& v)
+{
+	return approx_equal(len_squared(v), 1.f);
+}
+
 // Linearly interpolates between two values.
 // Params:
 //		lhs = The start of the range in which to interpolate.

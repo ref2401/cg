@@ -224,6 +224,12 @@ inline quat inverse(const quat& q)
 	return conjugate(q) * scalar;
 }
 
+// Checks whether the specified quaternion is normalized.
+inline bool is_normalized(const quat& q)
+{
+	return approx_equal(len_squared(q), 1.f);
+}
+
 // Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
 inline quat normalize(const quat& q)
 {
@@ -234,6 +240,9 @@ inline quat normalize(const quat& q)
 	float factor = 1.f / sqrt(l2);
 	return q * factor;
 }
+
+
+//quat slert(const quat& q, const quat& r);
 
 } // namespace cg
 

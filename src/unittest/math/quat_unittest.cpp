@@ -135,6 +135,20 @@ public:
 		Assert::AreEqual(quat::identity, inverse(q) * q);
 	}
 
+	TEST_METHOD(is_normalized)
+	{
+		using cg::is_normalized;
+		using cg::len;
+
+		Assert::IsTrue(is_normalized(quat::i));
+		Assert::IsTrue(is_normalized(quat::j));
+		Assert::IsTrue(is_normalized(quat::k));
+		Assert::IsTrue(is_normalized(quat::identity));
+
+		quat q(1, 2, 3, 4);
+		Assert::IsTrue(len(q) > 1 && (!is_normalized(q)));
+	}
+
 	TEST_METHOD(len_and_len_squared)
 	{
 		quat q(2, 3, 4, 5);

@@ -165,6 +165,20 @@ public:
 		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
 	}
 
+	TEST_METHOD(is_normalized)
+	{
+		using cg::is_normalized;
+		using cg::len;
+
+		Assert::IsTrue(is_normalized(float4::unit_x));
+		Assert::IsTrue(is_normalized(float4::unit_y));
+		Assert::IsTrue(is_normalized(float4::unit_z));
+		Assert::IsTrue(is_normalized(float4::unit_w));
+
+		float4 v(1, 2, 3, 4);
+		Assert::IsTrue(len(v) > 1 && (!is_normalized(v)));
+	}
+
 	TEST_METHOD(len_and_len_squared)
 	{
 		float4 u(2, 3, 4, 5);
