@@ -164,32 +164,32 @@ inline bool operator!=(const float4& lhs, const float4& rhs)
 }
 
 template<typename Numeric>
-inline float4 operator+(float4 v, const Numeric& val)
+inline float4 operator+(const float4& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v += val;
+	return float4(v.x + val, v.y + val, v.z + val, v.w + val);
 }
 
 template<typename Numeric>
-inline float4 operator+(const Numeric& val, float4 v)
+inline float4 operator+(const Numeric& val, const float4& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v += val;
+	return float4(v.x + val, v.y + val, v.z + val, v.w + val);
 }
 
-inline float4 operator+(float4 lhs, const float4& rhs)
+inline float4 operator+(const float4& lhs, const float4& rhs)
 {
-	return lhs += rhs;
+	return float4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
 }
 
 template<typename Numeric>
-inline float4 operator-(float4 v, const Numeric& val)
+inline float4 operator-(const float4& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v -= val;
+	return float4(v.x - val, v.y - val, v.z - val, v.w - val);
 }
 
 template<typename Numeric>
@@ -202,7 +202,7 @@ inline float4 operator-(const Numeric& val, float4 v)
 
 inline float4 operator-(float4 lhs, const float4& rhs)
 {
-	return lhs -= rhs;
+	return float4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
 }
 
 inline float4 operator-(const float4& v)
@@ -211,31 +211,31 @@ inline float4 operator-(const float4& v)
 }
 
 template<typename Numeric>
-inline float4 operator*(float4 v, const Numeric& val)
+inline float4 operator*(const float4& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v *= val;
+	return float4(v.x * val, v.y * val, v.z * val, v.w * val);
 }
 
 template<typename Numeric>
-inline float4 operator*(const Numeric& val, float4 v)
+inline float4 operator*(const Numeric& val, const float4& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v *= val;
+	return float4(v.x * val, v.y * val, v.z * val, v.w * val);
 }
 
 template<typename Numeric>
-inline float4 operator/(float4 v, const Numeric& val)
+inline float4 operator/(const float4& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v /= val;
+	return float4(v.x / val, v.y / val, v.z / val, v.w / val);
 }
 
 template<typename Numeric>
-inline float4 operator/(const Numeric& val, float4 v)
+inline float4 operator/(const Numeric& val, const float4& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");

@@ -137,84 +137,81 @@ inline bool operator!=(const float3& lhs, const float3& rhs)
 	return !(lhs == rhs);
 }
 
-// operator+
+
+
 template<typename Numeric>
-inline float3 operator+(float3 v, const Numeric& val)
+inline float3 operator+(const float3& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v += val;
+	return float3(v.x + val, v.y + val, v.z + val);
 }
 
 template<typename Numeric>
-inline float3 operator+(const Numeric& val, float3 v)
+inline float3 operator+(const Numeric& val, const float3& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v += val;
+	return float3(v.x + val, v.y + val, v.z + val);
 }
 
-inline float3 operator+(float3 lhs, const float3& rhs)
+inline float3 operator+(const float3& lhs, const float3& rhs)
 {
-	return lhs += rhs;
+	return float3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
-// operator-
 template<typename Numeric>
-inline float3 operator-(float3 v, const Numeric& val)
+inline float3 operator-(const float3& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v -= val;
+	return float3(v.x - val, v.y - val, v.z - val);
 }
 
 template<typename Numeric>
-inline float3 operator-(const Numeric& val, float3 v)
+inline float3 operator-(const Numeric& val, const float3& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
 	return float3(val - v.x, val - v.y, val - v.z);
 }
 
-inline float3 operator-(float3 lhs, const float3& rhs)
+inline float3 operator-(const float3& lhs, const float3& rhs)
 {
-	return lhs -= rhs;
+	return float3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
-// unary operator-
 inline float3 operator-(const float3& v)
 {
 	return float3(-v.x, -v.y, -v.z);
 }
 
-//operator*
 template<typename Numeric>
-inline float3 operator*(float3 v, const Numeric& val)
+inline float3 operator*(const float3& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v *= val;
+	return float3(v.x * val, v.y * val, v.z * val);
 }
 
 template<typename Numeric>
-inline float3 operator*(const Numeric& val, float3 v)
+inline float3 operator*(const Numeric& val, const float3& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v *= val;
+	return float3(v.x * val, v.y * val, v.z * val);
 }
 
-// operator/
 template<typename Numeric>
-inline float3 operator/(float3 v, const Numeric& val)
+inline float3 operator/(const float3& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");
-	return v /= val;
+	return float3(v.x / val, v.y / val, v.z / val);
 }
 
 template<typename Numeric>
-inline float3 operator/(const Numeric& val, float3 v)
+inline float3 operator/(const Numeric& val, const float3& v)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or floating point value.");

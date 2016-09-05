@@ -105,11 +105,13 @@ public:
 		Assert::AreEqual(float4(11, 12, 13, 14), v + 10);
 		Assert::AreEqual(float4(11, 12, 13, 14), 10 + v);
 		Assert::AreEqual(float4(1.11f, 2.22f, 3.33f, 4.44f), v + float4(0.11f, 0.22f, 0.33f, 0.44f));
+		Assert::AreEqual(float4(1.11f, 2.22f, 3.33f, 4.44f), float4(0.11f, 0.22f, 0.33f, 0.44f) + v);
 
 		// operator-
 		Assert::AreEqual(float4(0, 1, 2, 3), v - 1);
 		Assert::AreEqual(float4(0, -1, -2, -3), 1 - v);
 		Assert::AreEqual(float4::zero, v - float4(1, 2, 3, 4));
+		Assert::AreEqual(float4::zero, float4(1, 2, 3, 4) - v);
 
 		// operator*
 		Assert::AreEqual(float4(10, 20, 30, 40), v * 10);

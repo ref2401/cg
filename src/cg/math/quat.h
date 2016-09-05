@@ -121,10 +121,24 @@ inline bool operator!=(const quat& lhs, const quat& rhs)
 }
 
 //template<typename Numeric>
-//inline quat operator+(const quat& q, const Numeric& val)
+//inline quat operator*(quat q, const Numeric& val)
 //{
-//
+//	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
+//		"Numeric type must be an integer or floating point value.");
+//	q *= val;
+//	return q;
 //}
+//
+//template<typename Numeric>
+//inline quat operator*(const Numeric& val, quat q)
+//{
+//	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
+//		"Numeric type must be an integer or floating point value.");
+//	q *= val;
+//	return q;
+//}
+//
+//inline quat operator*(quat lhs, const 
 
 inline std::ostream& operator<<(std::ostream& out, const quat& q)
 {
