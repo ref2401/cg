@@ -95,6 +95,21 @@ public:
 		Assert::AreEqual(p * q * r, (p1 *= q) *= r);
 	}
 
+	TEST_METHOD(conjugate)
+	{
+		using cg::approx_equal;
+		using cg::conjugate;
+		using cg::len;
+
+		quat q(2, 3, 4, 1);
+		quat r(6, 7, 8, 5);
+
+		Assert::IsTrue(approx_equal(len(q), len(conjugate(q))), L"|q*| = |q|");
+		Assert::AreEqual(q, conjugate(conjugate(q)), L"(q*)* = q");
+		Assert::AreEqual(conjugate(q + r), conjugate(q) + conjugate(r), L"(q + r)* = q* + r*");
+		Assert::AreEqual(conjugate(q * r), conjugate(r) * conjugate(q), L"(qr)* = r*q*");
+	}
+
 	TEST_METHOD(equal_operator)
 	{
 		quat v(1, 2, 3, 4);
@@ -106,6 +121,54 @@ public:
 
 		Assert::AreEqual(v, v);
 		Assert::AreEqual(v, quat(1, 2, 3, 4));
+	}
+
+	TEST_METHOD(inverse)
+	{
+		using cg::inverse;
+
+		Assert::AreEqual(quat::identity, inverse(quat::identity));
+
+		quat q = quat(2, 3, 4, 5);
+
+		Assert::AreEqual(quat::identity, q * inverse(q));
+		Assert::AreEqual(quat::identity, inverse(q) * q);
+	}
+
+	TEST_METHOD(len_and_len_squared)
+	{
+		quat q(2, 3, 4, 5);
+		quat p(4, 5, 6, 7);
+
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4 + 5*5, cg::len_squared(q));
+		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4 + 5*5), cg::len(q));
+
+		Assert::AreEqual(2*cg::len(q), cg::len(2*q), L"|aQ| = |a| * |Q|");
+		
+		Assert::IsTrue(
+			cg::approx_equal(cg::len(q + p), 
+			cg::len(q) + cg::len(p), 0.1f), 
+			L"|Q + P| <= |Q| + |P|");
+		
+		Assert::IsTrue(
+			cg::approx_equal(cg::len(q * p), 
+			cg::len(q) * cg::len(p)), 
+			L"|QP| = |Q| * |P|");
+	}
+
+	TEST_METHOD(normalize)
+	{
+		using cg::approx_equal;
+		using cg::len;
+		using cg::normalize;
+
+		Assert::AreEqual(quat::zero, normalize(quat::zero));
+		Assert::AreEqual(quat::identity, normalize(quat::identity));
+
+		quat q = quat(6, 7, -8, 0);
+		Assert::IsTrue(approx_equal( 1.f, len(normalize(q)) ));
+
+		
 	}
 
 	TEST_METHOD(unary_operators)

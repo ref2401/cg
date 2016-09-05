@@ -122,19 +122,6 @@ public:
 		Assert::AreEqual(float4::zero, 0 / v);
 	}
 
-	TEST_METHOD(equal_operator)
-	{
-		float4 v(1, 2, 3, 4);
-
-		Assert::AreNotEqual(v, float4(100, 2, 3, 4));
-		Assert::AreNotEqual(v, float4(1, 100, 3, 4));
-		Assert::AreNotEqual(v, float4(1, 2, 100, 4));
-		Assert::AreNotEqual(v, float4(1, 2, 3, 100));
-
-		Assert::AreEqual(v, v);
-		Assert::AreEqual(v, float4(1, 2, 3, 4));
-	}
-
 	TEST_METHOD(clamp)
 	{
 		float4 lo(-5, -7, -9, -11);
@@ -151,6 +138,19 @@ public:
 		Assert::AreEqual(float4::unit_xyzw, cg::clamp(float4(5)));
 	}
 
+	TEST_METHOD(equal_operator)
+	{
+		float4 v(1, 2, 3, 4);
+
+		Assert::AreNotEqual(v, float4(100, 2, 3, 4));
+		Assert::AreNotEqual(v, float4(1, 100, 3, 4));
+		Assert::AreNotEqual(v, float4(1, 2, 100, 4));
+		Assert::AreNotEqual(v, float4(1, 2, 3, 100));
+
+		Assert::AreEqual(v, v);
+		Assert::AreEqual(v, float4(1, 2, 3, 4));
+	}
+
 	TEST_METHOD(dot_product)
 	{
 		float4 u(2, 3, 4, 5);
@@ -159,18 +159,18 @@ public:
 
 		Assert::AreEqual(2.f*5 + 3*6 + 4*7 + 5*8, cg::dot(u, v));
 		Assert::AreEqual(0.f, cg::dot(u, float4::zero));
-		Assert::AreEqual(cg::len_square(u), cg::dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(cg::len_squared(u), cg::dot(u, u), L"U * U = |U| * |U|");
 		Assert::AreEqual(cg::dot(u, v), cg::dot(v, u), L"U * V = V * U");
 		Assert::AreEqual(cg::dot(2 * u, v), 2 * cg::dot(u, v), L"(aU) * V = a(U * V)");
 		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
 	}
 
-	TEST_METHOD(len_and_len_square)
+	TEST_METHOD(len_and_len_squared)
 	{
 		float4 u(2, 3, 4, 5);
 		float4 v(4, 5, 6, 7);
 
-		Assert::AreEqual(2.f*2 + 3*3 + 4*4 + 5*5, cg::len_square(u));
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4 + 5*5, cg::len_squared(u));
 		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4 + 5*5), cg::len(u));
 
 		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");

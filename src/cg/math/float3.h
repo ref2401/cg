@@ -268,7 +268,7 @@ inline float dot(const float3& lhs, const float3& rhs)
 }
 
 // Calculates the squared length of v.
-inline float len_square(const float3& v)
+inline float len_squared(const float3& v)
 {
 	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
 }
@@ -276,7 +276,7 @@ inline float len_square(const float3& v)
 // Calculates the length of v.
 inline float len(const float3& v)
 {
-	return std::sqrt(len_square(v));
+	return std::sqrt(len_squared(v));
 }
 
 // Linearly interpolates between two values.
@@ -294,7 +294,7 @@ inline float3 lerp(const float3& lhs, const float3 rhs, float factor)
 // Returns new vector which is normalized(unit length) copy of the given one.
 inline float3 normalize(const float3& v)
 {
-	float l2 = len_square(v);
+	float l2 = len_squared(v);
 	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
 
 	float factor = 1.f / sqrt(l2);

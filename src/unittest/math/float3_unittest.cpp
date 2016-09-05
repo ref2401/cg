@@ -119,6 +119,22 @@ public:
 		Assert::AreEqual(float3::zero, 0 / v);
 	}
 
+	TEST_METHOD(clamp)
+	{
+		float3 lo(-5, -7, -9);
+		float3 hi(5, 7, 9);
+		float3 v(2, 3, 4);
+
+		Assert::AreEqual(lo, cg::clamp(float3(-9, -10, -11), lo, hi));
+		Assert::AreEqual(v, cg::clamp(v, lo, hi));
+		Assert::AreEqual(hi, cg::clamp(float3(9, 10, 11), lo, hi));
+
+		// default lo and hi
+		Assert::AreEqual(float3::zero, cg::clamp(float3(-5)));
+		Assert::AreEqual(float3(0.5), cg::clamp(float3(0.5)));
+		Assert::AreEqual(float3::unit_xyz, cg::clamp(float3(5)));
+	}
+
 	TEST_METHOD(equal_operator)
 	{
 		float3 v(1, 2, 3);
@@ -129,22 +145,6 @@ public:
 
 		Assert::AreEqual(v, v);
 		Assert::AreEqual(v, float3(1, 2, 3));
-	}
-
-	TEST_METHOD(clamp)
-	{
-		float3 lo(-5, -7, -9);
-		float3 hi(5, 7, 9);
-		float3 v(2, 3, 4);
-		
-		Assert::AreEqual(lo, cg::clamp(float3(-9, -10, -11), lo, hi));
-		Assert::AreEqual(v, cg::clamp(v, lo, hi));
-		Assert::AreEqual(hi, cg::clamp(float3(9, 10, 11), lo, hi));
-
-		// default lo and hi
-		Assert::AreEqual(float3::zero, cg::clamp(float3(-5)));
-		Assert::AreEqual(float3(0.5), cg::clamp(float3(0.5)));
-		Assert::AreEqual(float3::unit_xyz, cg::clamp(float3(5)));
 	}
 
 	TEST_METHOD(cross_product)
@@ -203,18 +203,18 @@ public:
 
 		Assert::AreEqual(2.f*4 + 3*5 + 4*6, cg::dot(u, v));
 		Assert::AreEqual(0.f, cg::dot(u, float3::zero));
-		Assert::AreEqual(cg::len_square(u), cg::dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(cg::len_squared(u), cg::dot(u, u), L"U * U = |U| * |U|");
 		Assert::AreEqual(cg::dot(u, v), cg::dot(v, u), L"U * V = V * U");
 		Assert::AreEqual(cg::dot(2*u, v), 2 * cg::dot(u, v), L"(aU) * V = a(U * V)");
 		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
 	}
 
-	TEST_METHOD(len_and_len_square)
+	TEST_METHOD(len_and_len_squared)
 	{
 		float3 u(2, 3, 4);
 		float3 v(4, 5, 6);
 
-		Assert::AreEqual(2.f*2 + 3*3 + 4*4, cg::len_square(u));
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4, cg::len_squared(u));
 		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4), cg::len(u));
 
 		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");

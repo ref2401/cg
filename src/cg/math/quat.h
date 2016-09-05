@@ -1,6 +1,7 @@
 #ifndef CG_MATH_QUAT_H_
 #define CG_MATH_QUAT_H_
 
+#include <cassert>
 #include <ostream>
 #include <type_traits>
 #include "cg/math/float3.h"
@@ -192,6 +193,46 @@ inline std::wostream& operator<<(std::wostream& out, const quat& q)
 {
 	out << "quat(" << q.x << ", " << q.y << ", " << q.z << ", " << q.a << ")";
 	return out;
+}
+
+
+// Gets the conjugation result of the given quaternion.
+inline quat conjugate(const quat& q) 
+{
+	return quat(-q.x, -q.y, -q.z, q.a);
+}
+
+// Calculates the squared length of q.
+inline float len_squared(const quat& q)
+{
+	return (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.a * q.a);
+}
+
+// Calculates the length of q.
+inline float len(const quat& q)
+{
+	return std::sqrt(len_squared(q));
+}
+
+// Computes the inverse(reciprocal) of the given quaternion. q* / (|q|^2)
+inline quat inverse(const quat& q)
+{
+	float l2 = len_squared(q);
+	assert(!approx_equal(l2, 0.f)); // A quaternion with len = 0 isn't invertible.
+
+	float scalar = 1.f / l2;
+	return conjugate(q) * scalar;
+}
+
+// Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
+inline quat normalize(const quat& q)
+{
+	float l2 = len_squared(q);
+
+	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return q;
+
+	float factor = 1.f / sqrt(l2);
+	return q * factor;
 }
 
 } // namespace cg
