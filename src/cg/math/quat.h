@@ -241,8 +241,8 @@ inline quat normalize(const quat& q)
 	return q * factor;
 }
 
-
-//quat slert(const quat& q, const quat& r);
+// Performs spherical-interpolation between unit quaternions (geometrical slerp).
+quat slerp(const quat& q, const quat& r, float factor);
 
 } // namespace cg
 

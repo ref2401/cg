@@ -112,15 +112,15 @@ public:
 
 	TEST_METHOD(equal_operator)
 	{
-		quat v(1, 2, 3, 4);
+		quat q(1, 2, 3, 4);
 
-		Assert::AreNotEqual(v, quat(100, 2, 3, 4));
-		Assert::AreNotEqual(v, quat(1, 100, 3, 4));
-		Assert::AreNotEqual(v, quat(1, 2, 100, 4));
-		Assert::AreNotEqual(v, quat(1, 2, 3, 100));
+		Assert::AreNotEqual(q, quat(100, 2, 3, 4));
+		Assert::AreNotEqual(q, quat(1, 100, 3, 4));
+		Assert::AreNotEqual(q, quat(1, 2, 100, 4));
+		Assert::AreNotEqual(q, quat(1, 2, 3, 100));
 
-		Assert::AreEqual(v, v);
-		Assert::AreEqual(v, quat(1, 2, 3, 4));
+		Assert::AreEqual(q, q);
+		Assert::AreEqual(q, quat(1, 2, 3, 4));
 	}
 
 	TEST_METHOD(inverse)
@@ -152,7 +152,7 @@ public:
 	TEST_METHOD(len_and_len_squared)
 	{
 		quat q(2, 3, 4, 5);
-		quat p(4, 5, 6, 7);
+		quat r(4, 5, 6, 7);
 
 		Assert::AreEqual(2.f*2 + 3*3 + 4*4 + 5*5, cg::len_squared(q));
 		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4 + 5*5), cg::len(q));
@@ -160,13 +160,13 @@ public:
 		Assert::AreEqual(2*cg::len(q), cg::len(2*q), L"|aQ| = |a| * |Q|");
 		
 		Assert::IsTrue(
-			cg::approx_equal(cg::len(q + p), 
-			cg::len(q) + cg::len(p), 0.1f), 
+			cg::approx_equal(cg::len(q + r), 
+			cg::len(q) + cg::len(r), 0.1f), 
 			L"|Q + P| <= |Q| + |P|");
 		
 		Assert::IsTrue(
-			cg::approx_equal(cg::len(q * p), 
-			cg::len(q) * cg::len(p)), 
+			cg::approx_equal(cg::len(q * r), 
+			cg::len(q) * cg::len(r)), 
 			L"|QP| = |Q| * |P|");
 	}
 
@@ -183,6 +183,17 @@ public:
 		Assert::IsTrue(approx_equal( 1.f, len(normalize(q)) ));
 
 		
+	}
+
+	TEST_METHOD(slerp)
+	{
+		using cg::normalize;
+		using cg::slerp;
+
+		quat q = normalize(quat(1, 2, 3, 4));
+		quat r = normalize(quat(5, 6, 7, 8));
+		Assert::AreEqual(q, slerp(q, r, 0.f));
+		Assert::AreEqual(r, slerp(q, r, 1.f));
 	}
 
 	TEST_METHOD(unary_operators)
