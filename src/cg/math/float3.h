@@ -240,14 +240,10 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float3& v)
 inline float3 clamp(const float3& v, 
 	const float3& v_lo = float3::zero, const float3& v_hi = float3::unit_xyz)
 {
-	assert(v_lo.x <= v_hi.x);
-	assert(v_lo.y <= v_hi.y);
-	assert(v_lo.z <= v_hi.z);
-
 	return float3(
-		std::min(v_hi.x, std::max(v_lo.x, v.x)),
-		std::min(v_hi.y, std::max(v_lo.y, v.y)),
-		std::min(v_hi.z, std::max(v_lo.z, v.z))
+		clamp(v.x, v_lo.x, v_hi.x),
+		clamp(v.y, v_lo.y, v_hi.y),
+		clamp(v.z, v_lo.z, v_hi.z)
 	);
 }
 

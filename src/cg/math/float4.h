@@ -264,16 +264,11 @@ inline std::wostream& operator<<(std::wostream& out, const float4& v)
 inline float4 clamp(const float4& v,
 	const float4& v_lo = float4::zero, const float4& v_hi = float4::unit_xyzw)
 {
-	assert(v_lo.x <= v_hi.x);
-	assert(v_lo.y <= v_hi.y);
-	assert(v_lo.z <= v_hi.z);
-	assert(v_lo.w <= v_hi.w);
-
 	return float4(
-		std::min(v_hi.x, std::max(v_lo.x, v.x)),
-		std::min(v_hi.y, std::max(v_lo.y, v.y)),
-		std::min(v_hi.z, std::max(v_lo.z, v.z)),
-		std::min(v_hi.w, std::max(v_lo.w, v.w))
+		clamp(v.x, v_lo.x, v_hi.x),
+		clamp(v.y, v_lo.y, v_hi.y),
+		clamp(v.z, v_lo.z, v_hi.z),
+		clamp(v.w, v_lo.w, v_hi.w)
 	);
 }
 

@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 #include <type_traits>
 
 
@@ -21,6 +22,16 @@ inline bool approx_equal(T lhs, T rhs, T max_abs = 1e-5f)
 	return std::abs(lhs - rhs) <= max_abs;
 }
 
+// Clamps v into the given bounds [lo, hi].
+template<typename Numeric>
+inline Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi)
+{
+	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
+		"Numeric type must be an integer or floating point value.");
+	assert(lo <= hi);
+	
+	return std::min(hi, std::max(lo, v));
+}
 
 } // namespace cg
 
