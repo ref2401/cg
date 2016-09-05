@@ -78,7 +78,7 @@ template<typename Numeric>
 inline quat& quat::operator*=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	x *= val;
 	y *= val;
 	z *= val;
@@ -104,7 +104,7 @@ template<typename Numeric>
 inline quat& quat::operator/=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	x /= val;
 	y /= val;
 	z /= val;
@@ -145,7 +145,7 @@ template<typename Numeric>
 inline quat operator*(const quat& q, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
@@ -153,7 +153,7 @@ template<typename Numeric>
 inline quat operator*(const Numeric& val, const quat& q)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
@@ -171,7 +171,7 @@ template<typename Numeric>
 inline quat operator/(const quat& q, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	return quat(q.x / val, q.y / val, q.z / val, q.a / val);
 }
 
@@ -179,7 +179,7 @@ template<typename Numeric>
 inline quat operator/(const Numeric& val, const quat& q)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	return quat(val / q.x, val / q.y, val / q.z, val / q.a);
 }
 

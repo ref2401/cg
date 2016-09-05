@@ -30,6 +30,8 @@ const quat quat::k(0, 0, 1, 0);
 const quat quat::identity(0, 0, 0, 1);
 const quat quat::zero(0, 0, 0, 0);
 
+const uint2 uint2::zero(0);
+
 
 quat slerp(const quat& q, const quat& r, float factor)
 {

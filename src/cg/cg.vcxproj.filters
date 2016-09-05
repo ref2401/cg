@@ -29,5 +29,8 @@
     <ClInclude Include="math\float2.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="math\uint2.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

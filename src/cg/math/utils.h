@@ -27,7 +27,7 @@ template<typename Numeric>
 inline Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or floating point value.");
+		"Numeric type must be an integer or a floating point value.");
 	assert(lo <= hi);
 	
 	return std::min(hi, std::max(lo, v));
