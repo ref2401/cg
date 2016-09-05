@@ -244,13 +244,13 @@ inline float4 operator/(const Numeric& val, const float4& v)
 
 inline std::ostream& operator<<(std::ostream& out, const float4& v)
 {
-	out << "float_4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+	out << "float4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;
 }
 
 inline std::wostream& operator<<(std::wostream& out, const float4& v)
 {
-	out << "float_4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+	out << "float4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;
 }
 
@@ -259,8 +259,8 @@ inline std::wostream& operator<<(std::wostream& out, const float4& v)
 // The function processes each component of the vector separately.
 // Params:
 //		v = The value to constrain
-//		v_min =	The lower end of the range into which to constrain v.
-//		v_max = The upper end of the range into which to constrain v.
+//		v_lo =	The lower end of the range into which to constrain v.
+//		v_hi = The upper end of the range into which to constrain v.
 inline float4 clamp(const float4& v,
 	const float4& v_lo = float4::zero, const float4& v_hi = float4::unit_xyzw)
 {

@@ -26,5 +26,8 @@
     <ClInclude Include="math\quat.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="math\float2.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

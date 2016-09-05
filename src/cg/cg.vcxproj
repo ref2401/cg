@@ -122,6 +122,7 @@
     <ClCompile Include="math\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="math\float2.h" />
     <ClInclude Include="math\float4.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\quat.h" />

@@ -121,18 +121,20 @@ public:
 
 	TEST_METHOD(clamp)
 	{
+		using cg::clamp;
+
 		float3 lo(-5, -7, -9);
 		float3 hi(5, 7, 9);
 		float3 v(2, 3, 4);
 
-		Assert::AreEqual(lo, cg::clamp(float3(-9, -10, -11), lo, hi));
-		Assert::AreEqual(v, cg::clamp(v, lo, hi));
-		Assert::AreEqual(hi, cg::clamp(float3(9, 10, 11), lo, hi));
+		Assert::AreEqual(lo, clamp(float3(-9, -10, -11), lo, hi));
+		Assert::AreEqual(v, clamp(v, lo, hi));
+		Assert::AreEqual(hi, clamp(float3(9, 10, 11), lo, hi));
 
 		// default lo and hi
-		Assert::AreEqual(float3::zero, cg::clamp(float3(-5)));
-		Assert::AreEqual(float3(0.5), cg::clamp(float3(0.5)));
-		Assert::AreEqual(float3::unit_xyz, cg::clamp(float3(5)));
+		Assert::AreEqual(float3::zero, clamp(float3(-5)));
+		Assert::AreEqual(float3(0.5), clamp(float3(0.5)));
+		Assert::AreEqual(float3::unit_xyz, clamp(float3(5)));
 	}
 
 	TEST_METHOD(equal_operator)
@@ -197,16 +199,19 @@ public:
 
 	TEST_METHOD(dot_product)
 	{
+		using cg::dot;
+		using cg::len_squared;
+
 		float3 u(2, 3, 4);
 		float3 v(4, 5, 6);
 		float3 w(7, 8 ,9);
 
-		Assert::AreEqual(2.f*4 + 3*5 + 4*6, cg::dot(u, v));
-		Assert::AreEqual(0.f, cg::dot(u, float3::zero));
-		Assert::AreEqual(cg::len_squared(u), cg::dot(u, u), L"U * U = |U| * |U|");
-		Assert::AreEqual(cg::dot(u, v), cg::dot(v, u), L"U * V = V * U");
-		Assert::AreEqual(cg::dot(2*u, v), 2 * cg::dot(u, v), L"(aU) * V = a(U * V)");
-		Assert::AreEqual(cg::dot(u + v, w), cg::dot(u, w) + cg::dot(v, w), L"(U + V)*W = U*W + V*W");
+		Assert::AreEqual(2.f*4 + 3*5 + 4*6, dot(u, v));
+		Assert::AreEqual(0.f, dot(u, float3::zero));
+		Assert::AreEqual(len_squared(u), dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(dot(u, v), dot(v, u), L"U * V = V * U");
+		Assert::AreEqual(dot(2*u, v), 2 * dot(u, v), L"(aU) * V = a(U * V)");
+		Assert::AreEqual(dot(u + v, w), dot(u, w) + dot(v, w), L"(U + V)*W = U*W + V*W");
 	}
 
 	TEST_METHOD(is_normalized)
@@ -224,40 +229,50 @@ public:
 
 	TEST_METHOD(len_and_len_squared)
 	{
+		using cg::approx_equal;
+		using cg::len;
+		using cg::len_squared;
+
 		float3 u(2, 3, 4);
 		float3 v(4, 5, 6);
 
-		Assert::AreEqual(2.f*2 + 3*3 + 4*4, cg::len_squared(u));
-		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4), cg::len(u));
+		Assert::AreEqual(2.f*2 + 3*3 + 4*4, len_squared(u));
+		Assert::AreEqual(std::sqrt(2.f*2 + 3*3 + 4*4), len(u));
 
-		Assert::AreEqual(2 * cg::len(u), cg::len(2 * u), L"|aU| = |a| * |U|");
-		Assert::IsTrue(cg::approx_equal(cg::len(u + v), cg::len(u) + cg::len(v), 0.1f), L"|U + V| <= |U| + |V|");
+		Assert::AreEqual(2 * len(u), len(2 * u), L"|aU| = |a| * |U|");
+		Assert::IsTrue(approx_equal(len(u + v), len(u) + len(v), 0.1f), L"|U + V| <= |U| + |V|");
 	}
 
 	TEST_METHOD(lerp)
 	{
-		Assert::AreEqual(float3(0.0f), cg::lerp(float3::zero, float3::unit_xyz, 0.0f));
-		Assert::AreEqual(float3(0.6f), cg::lerp(float3::zero, float3::unit_xyz, 0.6f));
-		Assert::AreEqual(float3(1.0f), cg::lerp(float3::zero, float3::unit_xyz, 1.0f));
+		using cg::lerp;
+
+		Assert::AreEqual(float3(0.0f), lerp(float3::zero, float3::unit_xyz, 0.0f));
+		Assert::AreEqual(float3(0.6f), lerp(float3::zero, float3::unit_xyz, 0.6f));
+		Assert::AreEqual(float3(1.0f), lerp(float3::zero, float3::unit_xyz, 1.0f));
 
 		float3 v(24);
-		Assert::AreEqual(v, cg::lerp(v, v, 0.4f));
-		Assert::AreEqual(v, cg::lerp(v, v, 0.7f));
+		Assert::AreEqual(v, lerp(v, v, 0.4f));
+		Assert::AreEqual(v, lerp(v, v, 0.7f));
 	}
 
 	TEST_METHOD(normalize)
 	{
-		Assert::AreEqual(float3::zero, cg::normalize(float3::zero));
-		Assert::AreEqual(float3::unit_x, cg::normalize(float3::unit_x));
-		Assert::AreEqual(float3::unit_y, cg::normalize(float3::unit_y));
-		Assert::AreEqual(float3::unit_z, cg::normalize(float3::unit_z));
+		using cg::approx_equal;
+		using cg::len;
+		using cg::normalize;
 
-		Assert::AreEqual(float3::unit_x, cg::normalize(float3(24, 0, 0)));
-		Assert::AreEqual(float3::unit_y, cg::normalize(float3(0, 24, 0)));
-		Assert::AreEqual(float3::unit_z, cg::normalize(float3(0, 0, 24)));
+		Assert::AreEqual(float3::zero, normalize(float3::zero));
+		Assert::AreEqual(float3::unit_x, normalize(float3::unit_x));
+		Assert::AreEqual(float3::unit_y, normalize(float3::unit_y));
+		Assert::AreEqual(float3::unit_z, normalize(float3::unit_z));
+
+		Assert::AreEqual(float3::unit_x, normalize(float3(24, 0, 0)));
+		Assert::AreEqual(float3::unit_y, normalize(float3(0, 24, 0)));
+		Assert::AreEqual(float3::unit_z, normalize(float3(0, 0, 24)));
 
 		float3 u(-8, 6, 24);
-		Assert::IsTrue(cg::approx_equal(1.f, cg::len(cg::normalize(u))));
+		Assert::IsTrue(approx_equal(1.f, len(normalize(u))));
 	}
 
 	TEST_METHOD(rgb)
@@ -278,7 +293,6 @@ public:
 		Assert::AreEqual(float3(-1, -2, -3), -v);
 		Assert::AreEqual(float3(1, 2, 3), -(-v));
 	}
-
 };
 
 } // unittest
