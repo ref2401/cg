@@ -154,6 +154,63 @@ public:
 		
 		Assert::IsTrue(m == mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 	}
+
+	TEST_METHOD(ox_oy_oz)
+	{
+		using cg::float3;
+
+		mat4 m(
+			0, 1, 2, 3,  
+			4, 5, 6, 7,  
+			8, 9, 10, 11,  
+			12, 13, 14, 15);
+		
+		Assert::AreEqual(float3(0, 4, 8), m.ox());
+		Assert::AreEqual(float3(1, 5, 9), m.oy());
+		Assert::AreEqual(float3(2, 6, 10), m.oz());
+
+		m.set_ox(float3(21, 22, 23));
+		m.set_oy(float3(24, 25, 26));
+		m.set_oz(float3(27, 28, 29));
+		Assert::AreEqual(mat4(21, 24, 27, 3,  22, 25, 28, 7,  23, 26, 29, 11,  12, 13, 14, 15), m);
+	}
+
+	TEST_METHOD(trace)
+	{
+		using cg::trace;
+		using cg::transpose;
+
+		Assert::AreEqual(0.f, trace(mat4::zero));
+		Assert::AreEqual(4.f, trace(mat4::identity));
+		
+		mat4 m(0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15);
+		mat4 l(5, 7, -9, 0, 3, 4, 4, 3, 9, 8, 7, 6, 1, 2, 1, 2);
+
+		Assert::AreEqual(0.f + 5 + 10 + 15, trace(m));
+
+		Assert::AreEqual(trace(m * l), trace(l * m));
+		Assert::AreEqual(trace(m), trace(transpose(m)));
+	}
+
+	TEST_METHOD(transpose)
+	{
+		using cg::transpose;
+
+		Assert::AreEqual(mat4::zero, transpose(mat4::zero));
+		Assert::AreEqual(mat4::zero, transpose(mat4::zero));
+
+		mat4 m = mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		mat4 n = mat4(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
+		mat4 mt = mat4(1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16);
+		
+		Assert::AreEqual(mt, transpose(m));
+		Assert::AreEqual(m, transpose(transpose(m)));
+
+		// transpose properties
+		Assert::AreEqual(transpose(5.f * m), 5.f * transpose(m));
+		Assert::AreEqual(transpose(m + n), transpose(m) + transpose(n));
+		Assert::AreEqual(transpose(m * n), transpose(n) * transpose(m), L"(MN)^T == (N)^T * (M)^T");
+	}
 };
 
 } // namespace unittest

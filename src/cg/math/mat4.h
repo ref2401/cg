@@ -4,6 +4,9 @@
 #include <cassert>
 #include <ostream>
 #include <type_traits>
+#include "cg/math/float3.h"
+#include "cg/math/float2.h"
+#include "cg/math/float4.h"
 #include "cg/math/utils.h"
 
 
@@ -20,6 +23,25 @@ struct mat4 {
 		float m10, float m11, float m12, float m13,
 		float m20, float m21, float m22, float m23,
 		float m30, float m31, float m32, float m33);
+
+
+	// Returns ox vectoc of a 3D space basis.
+	float3 ox() const;
+
+	// Sets the ox vector of a 3D space basis.
+	void set_ox(const float3& v);
+
+	// Returns oy vectoc of a 3D space basis.
+	float3 oy() const;
+
+	// Sets the oy vector of a 3D space basis.
+	void set_oy(const float3& v);
+
+	// Returns oz vectoc of a 3D space basis.
+	float3 oz() const;
+
+	// Sets the oz vector of a 3D space basis.
+	void set_oz(const float3& v);
 
 
 	// Adds the matrix m to this matrix.
@@ -142,6 +164,43 @@ inline mat4& mat4::operator/=(const Numeric& val)
 	m20 /= val; m21 /= val; m22 /= val; m23 /= val;
 	m30 /= val; m31 /= val; m32 /= val; m33 /= val;
 	return *this;
+}
+
+
+inline float3 mat4::ox() const
+{
+	return float3(m00, m10, m20);
+}
+
+inline void mat4::set_ox(const float3& v)
+{
+	m00 = v.x;
+	m10 = v.y;
+	m20 = v.z;
+}
+
+inline float3 mat4::oy() const
+{
+	return float3(m01, m11, m21);
+}
+
+inline void mat4::set_oy(const float3& v)
+{
+	m01 = v.x;
+	m11 = v.y;
+	m21 = v.z;
+}
+
+inline float3 mat4::oz() const
+{
+	return float3(m02, m12, m22);
+}
+
+inline void mat4::set_oz(const float3& v)
+{
+	m02 = v.x;
+	m12 = v.y;
+	m22 = v.z;
 }
 
 
@@ -280,6 +339,23 @@ inline std::wostream& operator<<(std::wostream& out, const mat4& m)
 		<< m.m30 << ", " << m.m31 << ", " << m.m32 << ", " << m.m33 << ")";
 
 	return out;
+}
+
+// Calculates the sum of the elements on the main diagonal. tr(M).
+inline float trace(const mat4& m)
+{
+	return m.m00 + m.m11 + m.m22 + m.m33;
+}
+
+// Reflects the matrix over its main diagonal to obtain transposed matrix.
+inline mat4 transpose(const mat4& m)
+{
+	return mat4(
+		m.m00, m.m10, m.m20, m.m30,
+		m.m01, m.m11, m.m21, m.m31,
+		m.m02, m.m12, m.m22, m.m32,
+		m.m03, m.m13, m.m23, m.m33
+	);
 }
 
 } // namespace cg
