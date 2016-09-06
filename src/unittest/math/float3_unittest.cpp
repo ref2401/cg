@@ -93,6 +93,16 @@ public:
 		Assert::AreEqual(float3::zero, v);
 	}
 
+	TEST_METHOD(xy_uv)
+	{
+		using cg::float2;
+
+		float3 v(1, 2, 3);
+
+		Assert::AreEqual(float2(1, 2), v.xy());
+		Assert::AreEqual(float2(1, 2), v.uv());
+	}
+
 
 	TEST_METHOD(binary_operators)
 	{

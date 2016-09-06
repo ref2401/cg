@@ -5,7 +5,6 @@
 #include "unittest/math/math_unittest_utils.h"
 #include "CppUnitTest.h"
 
-using cg::float3;
 using cg::float4;
 
 
@@ -88,10 +87,15 @@ public:
 		Assert::AreEqual(float4::zero, v);
 	}
 
-	TEST_METHOD(xyz_and_rgb)
+	TEST_METHOD(xy_uv_xyz_and_rgb)
 	{
+		using cg::float2;
+		using cg::float3;
+
 		float4 v(1, 2, 3, 4);
 
+		Assert::AreEqual(float2(1, 2), v.xy());
+		Assert::AreEqual(float2(1, 2), v.uv());
 		Assert::AreEqual(float3(1, 2, 3), v.xyz());
 		Assert::AreEqual(float3(1, 2, 3), v.rgb());
 	}

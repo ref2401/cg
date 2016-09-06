@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <ostream>
 #include <type_traits>
+#include "cg/math/float2.h"
 #include "cg/math/utils.h"
 
 
@@ -24,6 +25,13 @@ struct float3 {
 	explicit float3(float val);
 
 	float3(float x, float y, float z);
+
+
+	// Returns the first two components of this vector.
+	float2 xy() const;
+
+	// Returns the first two components of this vector.
+	float2 uv() const;
 
 
 	// Adds val to every component of the vector.
@@ -61,6 +69,17 @@ inline float3::float3() : x(0), y(0), z(0) {}
 inline float3::float3(float val) : x(val), y(val), z(val) {}
 
 inline float3::float3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+
+inline float2 float3::xy() const
+{
+	return float2(x, y);
+}
+
+inline float2 float3::uv() const
+{
+	return float2(x, y);
+}
 
 
 template<typename Numeric>

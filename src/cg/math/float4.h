@@ -2,8 +2,10 @@
 #define CG_MATH_FLOAT4_H_
 
 #include <type_traits>
+#include "cg/math/float2.h"
 #include "cg/math/float3.h"
 #include "cg/math/utils.h"
+
 
 namespace cg {
 
@@ -25,11 +27,17 @@ struct float4 {
 	float4(float x, float y, float z, float w);
 
 
+	// Returns the first two components of this vector.
+	float2 xy() const;
+
 	// Returns the first three components of this vector.
 	float3 xyz() const;
 
 	// Returns the first three components of this vector.
 	float3 rgb() const;
+
+	// Returns the first two components of this vector.
+	float2 uv() const;
 
 
 	// Adds val to each component of the vector.
@@ -71,6 +79,11 @@ inline float4::float4(const float3& v3, float w)
 inline float4::float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
 
+inline float2 float4::xy() const
+{
+	return float2(x, y);
+}
+
 inline float3 float4::xyz() const
 {
 	return float3(x, y, z);
@@ -79,6 +92,11 @@ inline float3 float4::xyz() const
 inline float3 float4::rgb() const
 {
 	return float3(r, g, b);
+}
+
+inline float2 float4::uv() const
+{
+	return float2(x, y);
 }
 
 

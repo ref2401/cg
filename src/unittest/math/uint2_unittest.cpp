@@ -107,6 +107,18 @@ public:
 		Assert::AreEqual(v, uint2(1, 2));
 	}
 
+	TEST_METHOD(greater_than)
+	{
+		using cg::greater_than;
+
+		Assert::IsFalse(greater_than(uint2(0, 5), 1));
+		Assert::IsFalse(greater_than(uint2(1, 5), 1));
+		Assert::IsFalse(greater_than(uint2(4, 0), 1));
+		Assert::IsFalse(greater_than(uint2(4, 1), 1));
+
+		Assert::IsTrue(greater_than(uint2(4, 5), 1));
+	}
+
 	TEST_METHOD(square)
 	{
 		Assert::AreEqual(0u, uint2::zero.square());

@@ -208,6 +208,13 @@ inline std::wostream& operator<<(std::wostream& out, const uint2& v)
 	return out;
 }
 
+
+// Checks whether each component of v is greater than the specified value val.
+inline bool greater_than(const uint2& v, uint32_t val)
+{
+	return (v.x > val) && (v.y > val);
+}
+
 } // namespace cg
 
 #endif // CG_MATH_UINT2_H_
