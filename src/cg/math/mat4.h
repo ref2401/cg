@@ -341,6 +341,29 @@ inline std::wostream& operator<<(std::wostream& out, const mat4& m)
 	return out;
 }
 
+
+// Puts the matrix m into a float array in a column major order.
+inline float* put_in_column_major_order(const mat4& m, float* arr)
+{
+	arr[0] = m.m00; arr[1] = m.m10; arr[2] = m.m20; arr[3] = m.m30;
+	arr[4] = m.m01; arr[5] = m.m11; arr[6] = m.m21; arr[7] = m.m31;
+	arr[8] = m.m02; arr[9] = m.m12; arr[10] = m.m22; arr[11] = m.m32;
+	arr[12] = m.m03; arr[13] = m.m13; arr[14] = m.m23; arr[15] = m.m33;
+
+	return arr;
+}
+
+// Puts the matrix m into a float array in a row major order.
+inline float* put_in_row_major_order(const mat4& m, float* arr)
+{
+	arr[0] = m.m00; arr[1] = m.m01; arr[2] = m.m02; arr[3] = m.m03;
+	arr[4] = m.m10; arr[5] = m.m11; arr[6] = m.m12; arr[7] = m.m13;
+	arr[8] = m.m20; arr[9] = m.m21; arr[10] = m.m22; arr[11] = m.m23;
+	arr[12] = m.m30; arr[13] = m.m31; arr[14] = m.m32; arr[15] = m.m33;
+
+	return arr;
+}
+
 // Calculates the sum of the elements on the main diagonal. tr(M).
 inline float trace(const mat4& m)
 {

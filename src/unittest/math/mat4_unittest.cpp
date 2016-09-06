@@ -1,5 +1,7 @@
 #include "cg/math/mat4.h"
 
+#include <algorithm>
+#include <type_traits>
 #include <utility>
 #include "unittest/math/math_unittest_utils.h"
 
@@ -173,6 +175,35 @@ public:
 		m.set_oy(float3(24, 25, 26));
 		m.set_oz(float3(27, 28, 29));
 		Assert::AreEqual(mat4(21, 24, 27, 3,  22, 25, 28, 7,  23, 26, 29, 11,  12, 13, 14, 15), m);
+	}
+
+
+	TEST_METHOD(put_in_column_major_row_major_order)
+	{
+		using cg::put_in_column_major_order;
+		using cg::put_in_row_major_order;
+
+		mat4 m(0, 1, 2, 3,  
+			4, 5, 6, 7,  
+			8, 9, 10, 11,  
+			12, 13, 14, 15);
+
+		float *p, arr[16];
+		constexpr size_t count = std::extent<decltype(arr)>::value;
+	
+		// column-major order
+		float col[count] = { 0, 4, 8, 12,  1, 5, 9, 13,  2, 6, 10, 14,  3, 7, 11, 15 };
+
+		p = put_in_column_major_order(m, arr);
+		Assert::AreEqual<float*>(p, arr);
+		Assert::IsTrue(std::equal(col, col + count - 1, arr));
+
+		// row-major order
+		float row[count] = { 0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15 };
+		
+		p = put_in_row_major_order(m, arr);
+		Assert::AreEqual<float*>(p, arr);
+		Assert::IsTrue(std::equal(row, row + count - 1, arr));
 	}
 
 	TEST_METHOD(trace)
