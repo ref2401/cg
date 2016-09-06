@@ -47,7 +47,7 @@ public:
 		Assert::AreEqual(quat(5, 6, 7, 8), q);
 
 		// NOTE(ref2401): Hamilton product compaund assignment operator 
-		// is tested in the binary_operator test method.
+		// is tested in the binary_operators test method.
 	}
 
 

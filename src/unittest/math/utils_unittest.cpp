@@ -14,6 +14,12 @@ public:
 	{
 		using cg::approx_equal;
 
+		// integral values
+		Assert::IsTrue(approx_equal(1, 1));
+		Assert::IsFalse(approx_equal(1, 2));
+		Assert::IsFalse(approx_equal(1, 2, 1000)); // max_abs does not matter.
+
+		// floating point values
 		Assert::IsTrue(approx_equal(1.f, 1.f));
 		Assert::IsTrue(approx_equal(2., 2.));
 		Assert::IsTrue(approx_equal(3.l, 3.l));

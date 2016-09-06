@@ -121,6 +121,8 @@ inline uint2& uint2::operator*=(uint32_t val)
 
 inline uint2& uint2::operator/=(uint32_t val)
 {
+	assert(val != 0);
+
 	x /= val;
 	y /= val;
 	return *this;
@@ -188,6 +190,8 @@ inline uint2 operator*(uint32_t val, const uint2& v)
 
 inline uint2 operator/(const uint2& v, uint32_t val)
 {
+	assert(val != 0);
+
 	return uint2(v.x / val, v.y / val);
 }
 

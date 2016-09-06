@@ -111,6 +111,8 @@ inline float2& float2::operator/=(const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or a floating point value.");
+	assert(!approx_equal(val, 0));
+
 	x /= val;
 	y /= val;
 	return *this;
@@ -196,6 +198,8 @@ inline float2 operator/(const float2& v, const Numeric& val)
 {
 	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
 		"Numeric type must be an integer or a floating point value.");
+	assert(!approx_equal(val, 0));
+
 	return float2(v.x / val, v.y / val);
 }
 

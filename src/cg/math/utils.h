@@ -9,17 +9,53 @@
 
 namespace cg {
 
+namespace internal {
+
+// Approx_equal_helper resolvses to different operator() overloads
+// which depends on whether the Numeric type is floating point or intergral.
+// If Numeric is neither an integer nor a floating point value then compilation fails.
+template<typename Numeric,
+	bool is_floating_point = std::is_floating_point<Numeric>::value,
+	bool is_integral = std::is_integral<Numeric>::value>
+	struct Approx_equal_helper;
+
+template<typename Numeric>
+struct Approx_equal_helper<Numeric, false, true> {
+	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs)
+	{
+		return lhs == rhs;
+	}
+};
+
+template<typename Numeric>
+struct Approx_equal_helper<Numeric, true, false> {
+	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs)
+	{
+		assert(std::isfinite(lhs));
+		assert(std::isfinite(rhs));
+		assert(std::isfinite(max_abs));
+
+		return std::abs(lhs - rhs) <= max_abs;
+	}
+};
+
+} // namespace internal
+
 // Determines whether lhs is approximately equal to rhs 
 // admitting a maximum absolute difference max_abs.
-template<typename T>
-inline bool approx_equal(T lhs, T rhs, T max_abs = 1e-5f)
+// If Numeric is an integral value then max_abs doesn't matter.
+template<typename Numeric>
+inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f)
 {
-	static_assert(std::is_floating_point<T>::value, "T must be a floating point value.");
-	assert(std::isfinite(lhs));
-	assert(std::isfinite(rhs));
-	assert(std::isfinite(max_abs));
+	//static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
+	//	"Numeric type must be an integer or a floating point value.");
+	//assert(std::isfinite(lhs));
+	//assert(std::isfinite(rhs));
+	//assert(std::isfinite(max_abs));
 
-	return std::abs(lhs - rhs) <= max_abs;
+	//return std::abs(lhs - rhs) <= max_abs;
+	cg::internal::Approx_equal_helper<Numeric> aeh;
+	return aeh(lhs, rhs, max_abs);
 }
 
 // Clamps v into the given bounds [lo, hi].
