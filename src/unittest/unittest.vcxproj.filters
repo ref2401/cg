@@ -25,6 +25,9 @@
     <ClCompile Include="math\mat3_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="math\transform_unittest.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
