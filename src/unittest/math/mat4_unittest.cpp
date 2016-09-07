@@ -1,5 +1,6 @@
 #include "cg/math/mat4.h"
 
+#include <cmath>
 #include <algorithm>
 #include <type_traits>
 #include <utility>
@@ -101,6 +102,26 @@ public:
 		Assert::AreEqual(expectedAB, (mA *= mB));
 	}
 
+	TEST_METHOD(ox_oy_oz)
+	{
+		using cg::float3;
+
+		mat4 m(
+			0, 1, 2, 3,
+			4, 5, 6, 7,
+			8, 9, 10, 11,
+			12, 13, 14, 15);
+
+		Assert::AreEqual(float3(0, 4, 8), m.ox());
+		Assert::AreEqual(float3(1, 5, 9), m.oy());
+		Assert::AreEqual(float3(2, 6, 10), m.oz());
+
+		m.set_ox(float3(21, 22, 23));
+		m.set_oy(float3(24, 25, 26));
+		m.set_oz(float3(27, 28, 29));
+		Assert::AreEqual(mat4(21, 24, 27, 3, 22, 25, 28, 7, 23, 26, 29, 11, 12, 13, 14, 15), m);
+	}
+
 
 	TEST_METHOD(binary_operators)
 	{
@@ -157,26 +178,69 @@ public:
 		Assert::IsTrue(m == mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 	}
 
-	TEST_METHOD(ox_oy_oz)
+	TEST_METHOD(det)
 	{
-		using cg::float3;
+		using cg::det;
+		using cg::transpose;
 
-		mat4 m(
-			0, 1, 2, 3,  
-			4, 5, 6, 7,  
-			8, 9, 10, 11,  
-			12, 13, 14, 15);
-		
-		Assert::AreEqual(float3(0, 4, 8), m.ox());
-		Assert::AreEqual(float3(1, 5, 9), m.oy());
-		Assert::AreEqual(float3(2, 6, 10), m.oz());
+		Assert::AreEqual(0.f, det(mat4::zero));
+		Assert::AreEqual(1.f, det(mat4::identity));
+		Assert::AreEqual(0.f, det(mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+		Assert::AreEqual(5703.f, det(mat4(5, 3, -5, 2, 18, 7, -3, 6, 24, -2, 9, 4, 2, 3, 4, 11)));
 
-		m.set_ox(float3(21, 22, 23));
-		m.set_oy(float3(24, 25, 26));
-		m.set_oz(float3(27, 28, 29));
-		Assert::AreEqual(mat4(21, 24, 27, 3,  22, 25, 28, 7,  23, 26, 29, 11,  12, 13, 14, 15), m);
+		mat4 m(1, 2, 3, 9, -3, 1, 0, 8, -2, 7, -3, 6, 5, 3, -5, 2);
+		mat4 n(0, -3, 4, 5, 6, 7, -1, 9, 2, -16, 4, 9, -1, 0, 5, 8);
+
+		Assert::AreEqual(det(m * n), det(m) * det(n));
+		Assert::AreEqual(det(5.f * m), std::pow(5.f, 4)* det(m), L"|aM| = a^4 * |M|");
+		Assert::AreEqual(det(m), det(transpose(m)));
 	}
 
+	TEST_METHOD(inverse)
+	{
+		using cg::inverse;
+		using cg::transpose;
+
+		Assert::AreEqual(mat4::identity, inverse(mat4::identity));
+
+		mat4 m(5, 7, -9, 0, 3, 4, 4, 3, 9, 8, 7, 6, 1, 2, 1, 2);
+		mat4 n(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
+
+		Assert::AreEqual(mat4::identity, m * inverse(m));
+		Assert::AreEqual(m, inverse(inverse(m)));
+		Assert::AreEqual(transpose(inverse(m)), inverse(transpose(m)));
+		Assert::AreEqual(inverse(m * n), inverse(n) * inverse(m));
+	}
+
+	TEST_METHOD(mul)
+	{
+		using cg::float2;
+		using cg::float3;
+		using cg::float4;
+		using cg::mul;
+
+
+		mat4 m(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
+		mat4 n(5, 7, -9, 0, 3, 4, 4, 3, 9, 8, 7, 6, 1, 2, 1, 2);
+		float4 v(1, 2, 3, 4);
+
+		Assert::AreEqual(float4::zero, mul(mat4::zero, v));
+		Assert::AreEqual(v, mul(mat4::identity, v));
+		Assert::AreEqual(mul(m * n, v), mul(m, mul(n, v)), L"(MN)u == M(Nu)");
+		Assert::AreEqual(mul(m + n, v), mul(m, v) + mul(n, v), L"(M + N)u == Mu + Nu");
+
+		float4 v1 = -5.f * mul(m, v);
+		float4 v2 = mul(-5.f * m, v);
+		float4 v3 = mul(m, -5.f * v);
+		Assert::IsTrue(v1 == v2 && v2 == v3);
+
+		float2 u2 = v.xy();
+		float3 u3 = v.xyz();
+		auto res2 = mul(m, u2, v.z, v.w);
+		auto res3 = mul(m, u3, v.w);
+		auto res4 = mul(m, v);
+		Assert::IsTrue(res2 == res3 && res3 == res4);
+	}
 
 	TEST_METHOD(put_in_column_major_row_major_order)
 	{

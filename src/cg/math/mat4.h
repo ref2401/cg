@@ -90,6 +90,21 @@ std::ostream& operator<<(std::ostream& out, const mat4& m);
 
 std::wostream& operator<<(std::wostream& out, const mat4& m);
 
+//  Calculates the determinant of the matrix m.
+float det(const mat4& m);
+
+// Computes the inverse of the matrix.
+mat4 inverse(const mat4& m);
+
+// Multiplies matrix by the column vector float4(v.x, v.y, z, w). 
+float4 mul(const mat4& m, const float2& v, float z = 0.f, float w = 1.f);
+
+// Multiplies matrix by the column vector float4(v.x, v.y, v.z, w). 
+float4 mul(const mat4& m, const float3& v, float w = 1.f);
+
+// Multiplies the given matrix by the column vector. 
+float4 mul(const mat4& m, const float4& v);
+
 // Puts the matrix m into a float array in a column major order.
 float* put_in_column_major_order(const mat4& m, float* arr);
 
@@ -101,8 +116,6 @@ float trace(const mat4& m);
 
 // Reflects the matrix over its main diagonal to obtain transposed matrix.
 mat4 transpose(const mat4& m);
-
-
 
 
 
@@ -360,7 +373,40 @@ inline std::wostream& operator<<(std::wostream& out, const mat4& m)
 	return out;
 }
 
+inline float det(const mat4& m)
+{
+	// find all the required first minors of m.
+	float minor00 = m.m11*m.m22*m.m33 + m.m12*m.m23*m.m31 + m.m13*m.m21*m.m32 
+		- m.m13*m.m22*m.m31 - m.m12*m.m21*m.m33 - m.m11*m.m23*m.m32;
+	float minor01 = m.m10*m.m22*m.m33 + m.m12*m.m23*m.m30 + m.m13*m.m20*m.m32
+		- m.m13*m.m22*m.m30 - m.m12*m.m20*m.m33 - m.m10*m.m23*m.m32;
+	float minor02 = m.m10*m.m21*m.m33 + m.m11*m.m23*m.m30 + m.m13*m.m20*m.m31
+		- m.m13*m.m21*m.m30 - m.m11*m.m20*m.m33 - m.m10*m.m23*m.m31;
+	float minor03 = m.m10*m.m21*m.m32 + m.m11*m.m22*m.m30 + m.m12*m.m20*m.m31
+		- m.m12*m.m21*m.m30 - m.m11*m.m20*m.m32 - m.m10*m.m22*m.m31;
 
+	return m.m00 * minor00 - m.m01 * minor01 + m.m02 * minor02 - m.m03 * minor03;
+}
+
+inline float4 mul(const mat4& m, const float2& v, float z, float w)
+{
+	return mul(m, float4(v.x, v.y, z, w));
+}
+
+inline float4 mul(const mat4& m, const float3& v, float w)
+{
+	return mul(m, float4(v.x, v.y, v.z, w));
+}
+
+inline float4 mul(const mat4& m, const float4& v)
+{
+	return float4(
+		(m.m00 * v.x) + (m.m01 * v.y) + (m.m02 * v.z) + (m.m03 * v.w),
+		(m.m10 * v.x) + (m.m11 * v.y) + (m.m12 * v.z) + (m.m13 * v.w),
+		(m.m20 * v.x) + (m.m21 * v.y) + (m.m22 * v.z) + (m.m23 * v.w),
+		(m.m30 * v.x) + (m.m31 * v.y) + (m.m32 * v.z) + (m.m33 * v.w)
+	);
+}
 
 inline float* put_in_column_major_order(const mat4& m, float* arr)
 {
