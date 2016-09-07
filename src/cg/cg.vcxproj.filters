@@ -35,5 +35,8 @@
     <ClInclude Include="math\mat4.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="math\mat3.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

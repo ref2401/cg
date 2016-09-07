@@ -3,14 +3,16 @@
 
 #include <cassert>
 #include <ostream>
-#include "cg/math/float3.h"
 #include "cg/math/float2.h"
+#include "cg/math/float3.h"
 #include "cg/math/float4.h"
 #include "cg/math/utils.h"
 
 
 namespace cg {
 
+// mat4 is described by 4x4 scalars orderer in a rectangular fashion.
+// Each scalar has two indices: row index, column index.
 struct mat4 {
 	static const mat4 identity;
 	static const mat4 zero;

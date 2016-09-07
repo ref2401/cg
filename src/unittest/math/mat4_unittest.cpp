@@ -154,6 +154,24 @@ public:
 		Assert::AreEqual(expectedAB, mA * mB);
 	}
 
+	TEST_METHOD(det)
+	{
+		using cg::det;
+		using cg::transpose;
+
+		Assert::AreEqual(0.f, det(mat4::zero));
+		Assert::AreEqual(1.f, det(mat4::identity));
+		Assert::AreEqual(0.f, det(mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
+		Assert::AreEqual(5703.f, det(mat4(5, 3, -5, 2, 18, 7, -3, 6, 24, -2, 9, 4, 2, 3, 4, 11)));
+
+		mat4 m(1, 2, 3, 9, -3, 1, 0, 8, -2, 7, -3, 6, 5, 3, -5, 2);
+		mat4 n(0, -3, 4, 5, 6, 7, -1, 9, 2, -16, 4, 9, -1, 0, 5, 8);
+
+		Assert::AreEqual(det(m * n), det(m) * det(n));
+		Assert::AreEqual(det(5.f * m), std::pow(5.f, 4)* det(m), L"|aM| = a^4 * |M|");
+		Assert::AreEqual(det(m), det(transpose(m)));
+	}
+
 	TEST_METHOD(equal_operator)
 	{
 		mat4 m(0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15);
@@ -176,24 +194,6 @@ public:
 		Assert::IsTrue(m != mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 100));
 		
 		Assert::IsTrue(m == mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-	}
-
-	TEST_METHOD(det)
-	{
-		using cg::det;
-		using cg::transpose;
-
-		Assert::AreEqual(0.f, det(mat4::zero));
-		Assert::AreEqual(1.f, det(mat4::identity));
-		Assert::AreEqual(0.f, det(mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)));
-		Assert::AreEqual(5703.f, det(mat4(5, 3, -5, 2, 18, 7, -3, 6, 24, -2, 9, 4, 2, 3, 4, 11)));
-
-		mat4 m(1, 2, 3, 9, -3, 1, 0, 8, -2, 7, -3, 6, 5, 3, -5, 2);
-		mat4 n(0, -3, 4, 5, 6, 7, -1, 9, 2, -16, 4, 9, -1, 0, 5, 8);
-
-		Assert::AreEqual(det(m * n), det(m) * det(n));
-		Assert::AreEqual(det(5.f * m), std::pow(5.f, 4)* det(m), L"|aM| = a^4 * |M|");
-		Assert::AreEqual(det(m), det(transpose(m)));
 	}
 
 	TEST_METHOD(inverse)
@@ -294,9 +294,9 @@ public:
 		Assert::AreEqual(mat4::zero, transpose(mat4::zero));
 		Assert::AreEqual(mat4::zero, transpose(mat4::zero));
 
-		mat4 m = mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-		mat4 n = mat4(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
-		mat4 mt = mat4(1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16);
+		mat4 m(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		mat4 n(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
+		mat4 mt(1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16);
 		
 		Assert::AreEqual(mt, transpose(m));
 		Assert::AreEqual(m, transpose(transpose(m)));

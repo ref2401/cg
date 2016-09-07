@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="math\float2_unittest.cpp" />
     <ClCompile Include="math\float4_unittest.cpp" />
+    <ClCompile Include="math\mat3_unittest.cpp" />
     <ClCompile Include="math\mat4_unittest.cpp" />
     <ClCompile Include="math\quat_unittest.cpp" />
     <ClCompile Include="math\uint2_unittest.cpp" />

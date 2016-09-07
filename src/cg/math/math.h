@@ -4,6 +4,7 @@
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
 #include "cg/math/float4.h"
+#include "cg/math/mat3.h"
 #include "cg/math/mat4.h"
 #include "cg/math/quat.h"
 #include "cg/math/uint2.h"

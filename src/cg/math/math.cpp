@@ -24,6 +24,9 @@ const float4 float4::unit_w(0, 0, 0, 1);
 const float4 float4::unit_xyzw(1);
 const float4 float4::zero(0);
 
+const mat3 mat3::identity(1, 0, 0, 0, 1, 0, 0, 0, 1);
+const mat3 mat3::zero;
+
 const mat4 mat4::identity(1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1);
 const mat4 mat4::zero;
 
@@ -35,6 +38,35 @@ const quat quat::zero(0, 0, 0, 0);
 
 const uint2 uint2::zero(0);
 
+
+mat3 inverse(const mat3& m)
+{
+	// inverse is found by Cramer’s rule.
+
+	// Check whether m is a singular matix
+	float d = det(m);
+	assert(!approx_equal(d, 0.f));
+
+	// construct the adjugate matrix.
+	// cofactor00 cofactor10 cofactor20
+	// cofactor01 cofactor11 cofactor21
+	// cofactor02 cofactor12 cofactor22
+	mat3 adj;
+	adj.m00 = m.m11*m.m22 - m.m12*m.m21;
+	adj.m01 = -(m.m01*m.m22 - m.m02*m.m21);
+	adj.m02 = m.m01*m.m12 - m.m02*m.m11;
+
+	adj.m10 = -(m.m10*m.m22 - m.m12*m.m20);
+	adj.m11 = m.m00*m.m22 - m.m02*m.m20;
+	adj.m12 = -(m.m00*m.m12 - m.m02*m.m10);
+
+	adj.m20 = m.m10*m.m21 - m.m11*m.m20;
+	adj.m21 = -(m.m00*m.m21 - m.m01*m.m20);
+	adj.m22 = m.m00*m.m11 - m.m01*m.m10;
+
+	float inv_d = 1.f / d;
+	return adj * inv_d;
+}
 
 mat4 inverse(const mat4& m)
 {
