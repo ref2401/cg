@@ -1,7 +1,8 @@
 #ifndef CG_MATH_FLOAT4_H_
 #define CG_MATH_FLOAT4_H_
 
-#include <type_traits>
+#include <cassert>
+#include <ostream>
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
 #include "cg/math/utils.h"
@@ -41,26 +42,22 @@ struct float4 {
 
 
 	// Adds val to each component of the vector.
-	template<typename Numeric>
-	float4& operator+=(const Numeric& val);
+	float4& operator+=(float val);
 
 	// Adds the specified vector v to this vector.
 	float4& operator+=(const float4& val);
 
 	// Subtracts val from every component of the vector.
-	template<typename Numeric>
-	float4& operator-=(const Numeric& val);
+	float4& operator-=(float val);
 
 	// Subtracts  the specified vector v this vector.
 	float4& operator-=(const float4& val);
 
 	// Multiplies each component of the vector by val.
-	template<typename Numeric>
-	float4& operator*=(const Numeric& val);
+	float4& operator*=(float val);
 
 	// Devides each component of the vector by val.
-	template<typename Numeric>
-	float4& operator/=(const Numeric& val);
+	float4& operator/=(float val);
 
 
 	union {
@@ -68,6 +65,89 @@ struct float4 {
 		struct { float r, g, b, a; };
 	};
 };
+
+// Checks whether lhs is equal to rhs.
+bool operator==(const float4& lhs, const float4& rhs);
+
+// Checks whether lhs is not equal to rhs.
+bool operator!=(const float4& lhs, const float4& rhs);
+
+// Adds val to each component of v.
+float4 operator+(const float4& v, float val);
+
+// Adds val to each component of v.
+float4 operator+(float val, const float4& v);
+
+// Adds rhs vector to lhs.
+float4 operator+(const float4& lhs, const float4& rhs);
+
+// Subtracts val from each component of v.
+float4 operator-(const float4& v, float val);
+
+// Subtracts each component of v from val.
+float4 operator-(float val, float4 v);
+
+// Subtracts rhs vector from lhs.
+float4 operator-(float4 lhs, const float4& rhs);
+
+// Negates each component of v.
+float4 operator-(const float4& v);
+
+// Multiplies each component of v by val.
+float4 operator*(const float4& v, float val);
+
+// Multiplies each component of v by val.
+float4 operator*(float val, const float4& v);
+
+// Devides each component of v by val.
+float4 operator/(const float4& v, const float val);
+
+// Devides val by each component of v.
+float4 operator/(float val, const float4& v);
+
+std::ostream& operator<<(std::ostream& out, const float4& v);
+
+std::wostream& operator<<(std::wostream& out, const float4& v);
+
+// Constrains vector v to lie between two further vectors.
+// The function processes each component of the vector separately.
+// Params:
+//		v = The value to constrain
+//		v_lo =	The lower end of the range into which to constrain v.
+//		v_hi = The upper end of the range into which to constrain v.
+float4 clamp(const float4& v, const float4& v_lo = float4::zero, const float4& v_hi = float4::unit_xyzw);
+
+// Calculates the dot product of the given vectors.
+float dot(const float4& lhs, const float4& rhs);
+
+// Checks whether the specified vector is normalized.
+bool is_normalized(const float4& v);
+
+// Calculates the squared length of v.
+float len_squared(const float4& v);
+
+// Calculates the length of v.
+float len(const float4& v);
+
+// Linearly interpolates between two values.
+// Params:
+//		lhs = The start of the range in which to interpolate.
+//		rhs = The end of the range in which to interpolate.
+//		factor = The value to use to interpolate between lhs & rhs.
+//		factor has to lie within the range [0 .. 1].
+float4 lerp(const float4& lhs, const float4 rhs, float factor);
+
+// Returns new vector which is normalized(unit length) copy of the given one.
+float4 normalize(const float4& v);
+
+// Returns rgb color volor
+// red: (32..24) bytes, 
+// green : (23..16) bytes,
+// blue : (15..8) bytes,
+// alpha : (7..0) bytes
+float4 rgba(uint32_t val);
+
+
 
 inline float4::float4() : x(0), y(0), z(0), w(0) {}
 
@@ -100,11 +180,8 @@ inline float2 float4::uv() const
 }
 
 
-template<typename Numeric>
-inline float4& float4::operator+=(const Numeric& val)
+inline float4& float4::operator+=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	x += val;
 	y += val;
 	z += val;
@@ -121,11 +198,8 @@ inline float4& float4::operator+=(const float4& v)
 	return *this;
 }
 
-template<typename Numeric>
-inline float4& float4::operator-=(const Numeric& val)
+inline float4& float4::operator-=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	x -= val;
 	y -= val;
 	z -= val;
@@ -142,11 +216,8 @@ inline float4& float4::operator-=(const float4& v)
 	return *this;
 }
 
-template<typename Numeric>
-inline float4& float4::operator*=(const Numeric& val)
+inline float4& float4::operator*=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	x *= val;
 	y *= val;
 	z *= val;
@@ -154,12 +225,9 @@ inline float4& float4::operator*=(const Numeric& val)
 	return *this;
 }
 
-template<typename Numeric>
-inline float4& float4::operator/=(const Numeric& val)
+inline float4& float4::operator/=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	x /= val;
 	y /= val;
@@ -183,19 +251,13 @@ inline bool operator!=(const float4& lhs, const float4& rhs)
 	return !(lhs == rhs);
 }
 
-template<typename Numeric>
-inline float4 operator+(const float4& v, const Numeric& val)
+inline float4 operator+(const float4& v, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(v.x + val, v.y + val, v.z + val, v.w + val);
 }
 
-template<typename Numeric>
-inline float4 operator+(const Numeric& val, const float4& v)
+inline float4 operator+(float val, const float4& v)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(v.x + val, v.y + val, v.z + val, v.w + val);
 }
 
@@ -204,19 +266,13 @@ inline float4 operator+(const float4& lhs, const float4& rhs)
 	return float4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
 }
 
-template<typename Numeric>
-inline float4 operator-(const float4& v, const Numeric& val)
+inline float4 operator-(const float4& v, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(v.x - val, v.y - val, v.z - val, v.w - val);
 }
 
-template<typename Numeric>
-inline float4 operator-(const Numeric& val, float4 v)
+inline float4 operator-(float val, float4 v)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(val - v.x, val - v.y, val - v.z, val - v.w);
 }
 
@@ -230,37 +286,25 @@ inline float4 operator-(const float4& v)
 	return float4(-v.x, -v.y, -v.z, -v.w);
 }
 
-template<typename Numeric>
-inline float4 operator*(const float4& v, const Numeric& val)
+inline float4 operator*(const float4& v, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(v.x * val, v.y * val, v.z * val, v.w * val);
 }
 
-template<typename Numeric>
-inline float4 operator*(const Numeric& val, const float4& v)
+inline float4 operator*(float val, const float4& v)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(v.x * val, v.y * val, v.z * val, v.w * val);
 }
 
-template<typename Numeric>
-inline float4 operator/(const float4& v, const Numeric& val)
+inline float4 operator/(const float4& v, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	return float4(v.x / val, v.y / val, v.z / val, v.w / val);
 }
 
-template<typename Numeric>
-inline float4 operator/(const Numeric& val, const float4& v)
+inline float4 operator/(float val, const float4& v)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return float4(val / v.x, val / v.y, val / v.z, val / v.w);
 }
 
@@ -276,15 +320,7 @@ inline std::wostream& operator<<(std::wostream& out, const float4& v)
 	return out;
 }
 
-
-// Constrains vector v to lie between two further vectors.
-// The function processes each component of the vector separately.
-// Params:
-//		v = The value to constrain
-//		v_lo =	The lower end of the range into which to constrain v.
-//		v_hi = The upper end of the range into which to constrain v.
-inline float4 clamp(const float4& v,
-	const float4& v_lo = float4::zero, const float4& v_hi = float4::unit_xyzw)
+inline float4 clamp(const float4& v, const float4& v_lo, const float4& v_hi)
 {
 	return float4(
 		clamp(v.x, v_lo.x, v_hi.x),
@@ -294,43 +330,32 @@ inline float4 clamp(const float4& v,
 	);
 }
 
-// Calculates the dot product of the given vectors.
 inline float dot(const float4& lhs, const float4& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);
 }
 
-// Calculates the squared length of v.
-inline float len_squared(const float4& v)
-{
-	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w);
-}
-
-// Calculates the length of v.
-inline float len(const float4& v)
-{
-	return std::sqrt(len_squared(v));
-}
-
-// Checks whether the specified vector is normalized.
 inline bool is_normalized(const float4& v)
 {
 	return approx_equal(len_squared(v), 1.f);
 }
 
-// Linearly interpolates between two values.
-// Params:
-//		lhs = The start of the range in which to interpolate.
-//		rhs = The end of the range in which to interpolate.
-//		factor = The value to use to interpolate between lhs & rhs.
-//		factor has to lie within the range [0 .. 1].
+inline float len_squared(const float4& v)
+{
+	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w);
+}
+
+inline float len(const float4& v)
+{
+	return std::sqrt(len_squared(v));
+}
+
 inline float4 lerp(const float4& lhs, const float4 rhs, float factor)
 {
 	assert(0.f <= factor && factor <= 1.f);
 	return lhs + factor * (rhs - lhs);
 }
 
-// Returns new vector which is normalized(unit length) copy of the given one.
 inline float4 normalize(const float4& v)
 {
 	float l2 = len_squared(v);
@@ -340,11 +365,6 @@ inline float4 normalize(const float4& v)
 	return v * factor;
 }
 
-// Returns rgb color volor
-// red: (32..24) bytes, 
-// green : (23..16) bytes,
-// blue : (15..8) bytes,
-// alpha : (7..0) bytes
 inline float4 rgba(uint32_t val)
 {
 	return float4(

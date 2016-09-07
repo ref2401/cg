@@ -63,7 +63,7 @@ quat slerp(const quat& q, const quat& r, float factor)
 		f1 = std::sin(factor * omega) * inv_sin;
 	}
 
-	return f0 * q + f1 * q1;
+	return normalize(f0 * q + f1 * q1);
 }
 
 } // namespace cg

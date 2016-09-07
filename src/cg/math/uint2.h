@@ -54,6 +54,51 @@ struct uint2 {
 	};
 };
 
+// Checks whether lhs is equal to rhs.
+bool operator==(const uint2& lhs, const uint2& rhs);
+
+// Checks whether lhs is not equal to rhs.
+bool operator!=(const uint2& lhs, const uint2& rhs);
+
+// Adds val to each component of v.
+uint2 operator+(const uint2& v, uint32_t val);
+
+// Adds val to each component of v.
+uint2 operator+(uint32_t val, const uint2& v);
+
+// Adds rhs vector to lhs.
+uint2 operator+(const uint2& lhs, const uint2& rhs);
+
+// Subtracts val from each component of v.
+uint2 operator-(const uint2& v, uint32_t val);
+
+// Subtracts each component of v from val.
+uint2 operator-(uint32_t val, const uint2& v);
+
+// Subtracts rhs vector from lhs.
+uint2 operator-(const uint2& lhs, const uint2& rhs);
+
+// Multiplies each component of v by val.
+uint2 operator*(const uint2& v, uint32_t val);
+
+// Multiplies each component of v by val.
+uint2 operator*(uint32_t val, const uint2& v);
+
+// Devides each component of v by val.
+uint2 operator/(const uint2& v, uint32_t val);
+
+// Devides val by each component of v.
+uint2 operator/(uint32_t val, const uint2& v);
+
+std::ostream& operator<<(std::ostream& out, const uint2& v);
+
+std::wostream& operator<<(std::wostream& out, const uint2& v);
+
+// Checks whether each component of v is greater than the specified value val.
+bool greater_than(const uint2& v, uint32_t val);
+
+
+
 inline uint2::uint2() : x(0), y(0) {}
 
 inline uint2::uint2(uint32_t v) : x(v), y(v) {}
@@ -213,7 +258,6 @@ inline std::wostream& operator<<(std::wostream& out, const uint2& v)
 }
 
 
-// Checks whether each component of v is greater than the specified value val.
 inline bool greater_than(const uint2& v, uint32_t val)
 {
 	return (v.x > val) && (v.y > val);

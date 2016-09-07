@@ -187,6 +187,7 @@ public:
 
 	TEST_METHOD(slerp)
 	{
+		using cg::is_normalized;
 		using cg::normalize;
 		using cg::slerp;
 
@@ -194,6 +195,9 @@ public:
 		quat r = normalize(quat(5, 6, 7, 8));
 		Assert::AreEqual(q, slerp(q, r, 0.f));
 		Assert::AreEqual(r, slerp(q, r, 1.f));
+
+		quat qs = slerp(q, r, 0.5f);
+		Assert::IsTrue(is_normalized(qs));
 	}
 
 	TEST_METHOD(unary_operators)

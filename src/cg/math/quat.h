@@ -36,20 +36,60 @@ struct quat {
 	quat& operator-=(const quat& q);
 
 	// Multiplies each component of this quaternion by val.
-	template<typename Numeric>
-	quat& operator*=(const Numeric& val);
+	quat& operator*=(float val);
 
 	// Calculates the Hamilton product of this and the specified quaterions.
 	// Stores the result in this quaternion.
 	quat& operator*=(const quat& q);
 
 	// Devides each component of this quaternion by val.
-	template<typename Numeric>
-	quat& operator/=(const Numeric& val);
+	quat& operator/=(float val);
 
 
 	float x, y, z, a;
 };
+
+// Multiplies each component of q by val.
+quat operator*(const quat& q, float val);
+
+// Multiplies each component of q by val.
+quat operator*(float val, const quat& q);
+
+// Calculates the Hamilton product of lsh and rhs quaternions.
+quat operator*(const quat& lhs, const quat& rhs);
+
+// Devides each component of q by val.
+quat operator/(const quat& q, float val);
+
+// Devides val by each component of q.
+quat operator/(float val, const quat& q);
+
+std::ostream& operator<<(std::ostream& out, const quat& q);
+
+std::wostream& operator<<(std::wostream& out, const quat& q);
+
+// Gets the conjugation result of the given quaternion.
+quat conjugate(const quat& q);
+
+// Computes the inverse(reciprocal) of the given quaternion. q* / (|q|^2)
+quat inverse(const quat& q);
+
+// Checks whether the specified quaternion is normalized.
+bool is_normalized(const quat& q);
+
+// Calculates the squared length of q.
+float len_squared(const quat& q);
+
+// Calculates the length of q.
+float len(const quat& q);
+
+// Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
+quat normalize(const quat& q);
+
+// Performs spherical-interpolation between unit quaternions (geometrical slerp).
+quat slerp(const quat& q, const quat& r, float factor);
+
+
 
 inline quat::quat(float x, float y, float z, float a) : x(x), y(y), z(z), a(a) {}
 
@@ -74,11 +114,8 @@ inline quat& quat::operator-=(const quat& q)
 	return *this;
 }
 
-template<typename Numeric>
-inline quat& quat::operator*=(const Numeric& val)
+inline quat& quat::operator*=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	x *= val;
 	y *= val;
 	z *= val;
@@ -100,12 +137,9 @@ inline quat& quat::operator*=(const quat& q)
 	return *this;
 }
 
-template<typename Numeric>
-inline quat& quat::operator/=(const Numeric& val)
+inline quat& quat::operator/=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	x /= val;
 	y /= val;
@@ -143,19 +177,13 @@ inline quat operator-(const quat& q)
 	return quat(-q.x, -q.y, -q.z, -q.a);
 }
 
-template<typename Numeric>
-inline quat operator*(const quat& q, const Numeric& val)
+inline quat operator*(const quat& q, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
-template<typename Numeric>
-inline quat operator*(const Numeric& val, const quat& q)
+inline quat operator*(float val, const quat& q)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
@@ -169,21 +197,15 @@ inline quat operator*(const quat& lhs, const quat& rhs)
 	);
 }
 
-template<typename Numeric>
-inline quat operator/(const quat& q, const Numeric& val)
+inline quat operator/(const quat& q, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	return quat(q.x / val, q.y / val, q.z / val, q.a / val);
 }
 
-template<typename Numeric>
-inline quat operator/(const Numeric& val, const quat& q)
+inline quat operator/(float val, const quat& q)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
 	return quat(val / q.x, val / q.y, val / q.z, val / q.a);
 }
 
@@ -200,25 +222,11 @@ inline std::wostream& operator<<(std::wostream& out, const quat& q)
 }
 
 
-// Gets the conjugation result of the given quaternion.
 inline quat conjugate(const quat& q) 
 {
 	return quat(-q.x, -q.y, -q.z, q.a);
 }
 
-// Calculates the squared length of q.
-inline float len_squared(const quat& q)
-{
-	return (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.a * q.a);
-}
-
-// Calculates the length of q.
-inline float len(const quat& q)
-{
-	return std::sqrt(len_squared(q));
-}
-
-// Computes the inverse(reciprocal) of the given quaternion. q* / (|q|^2)
 inline quat inverse(const quat& q)
 {
 	float l2 = len_squared(q);
@@ -228,13 +236,21 @@ inline quat inverse(const quat& q)
 	return conjugate(q) * scalar;
 }
 
-// Checks whether the specified quaternion is normalized.
 inline bool is_normalized(const quat& q)
 {
 	return approx_equal(len_squared(q), 1.f);
 }
 
-// Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
+inline float len_squared(const quat& q)
+{
+	return (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.a * q.a);
+}
+
+inline float len(const quat& q)
+{
+	return std::sqrt(len_squared(q));
+}
+
 inline quat normalize(const quat& q)
 {
 	float l2 = len_squared(q);
@@ -244,9 +260,6 @@ inline quat normalize(const quat& q)
 	float factor = 1.f / sqrt(l2);
 	return q * factor;
 }
-
-// Performs spherical-interpolation between unit quaternions (geometrical slerp).
-quat slerp(const quat& q, const quat& r, float factor);
 
 } // namespace cg
 

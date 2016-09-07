@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <ostream>
-#include <type_traits>
 #include "cg/math/float3.h"
 #include "cg/math/float2.h"
 #include "cg/math/float4.h"
@@ -51,15 +50,13 @@ struct mat4 {
 	mat4& operator-=(const mat4& m);
 
 	// Multiplies this matrix by val.
-	template<typename Numeric>
-	mat4& operator*=(const Numeric& val);
+	mat4& operator*=(float val);
 
 	// Post-multiplies this matrix with the specified matrix.
 	mat4& operator*=(const mat4& m);
 
 	// Devies this matrix by val;
-	template<typename Numeric>
-	mat4& operator/=(const Numeric& val);
+	mat4& operator/=(float val);
 
 
 	float m00, m01, m02, m03;
@@ -67,6 +64,47 @@ struct mat4 {
 	float m20, m21, m22, m23;
 	float m30, m31, m32, m33;
 };
+
+// Checks whether matrices lhs and rhs are equal.
+bool operator==(const mat4& lhs, const mat4& rhs);
+
+// Checks whether matrices lhs and not rhs are equal.
+bool operator!=(const mat4& lhs, const mat4& rhs);
+
+// Returns a matrix which is the result of adding the corresponding entries of lhs & rhs.  
+mat4 operator+(const mat4& lhs, const mat4 rhs);
+
+// Returns a matrix which is the result of subtracting the corresponding entries of lhs & rhs. 
+mat4 operator-(const mat4& lhs, const mat4 rhs);
+
+// Multiplies each entry of m by val.
+mat4 operator*(const mat4& m, float val);
+
+// Post-multiplies lhs matrix with rhs.
+mat4 operator*(const mat4& lhs, const mat4& rhs);
+
+// Devides each entry of m by val.
+mat4 operator/(const mat4& m, float val);
+
+std::ostream& operator<<(std::ostream& out, const mat4& m);
+
+std::wostream& operator<<(std::wostream& out, const mat4& m);
+
+// Puts the matrix m into a float array in a column major order.
+float* put_in_column_major_order(const mat4& m, float* arr);
+
+// Puts the matrix m into a float array in a row major order.
+float* put_in_row_major_order(const mat4& m, float* arr);
+
+// Calculates the sum of the elements on the main diagonal. tr(M).
+float trace(const mat4& m);
+
+// Reflects the matrix over its main diagonal to obtain transposed matrix.
+mat4 transpose(const mat4& m);
+
+
+
+
 
 inline mat4::mat4() :
 	m00(0), m01(0), m02(0), m03(0),
@@ -84,6 +122,43 @@ inline mat4::mat4(float m00, float m01, float m02, float m03,
 	m20(m20), m21(m21), m22(m22), m23(m23),
 	m30(m30), m31(m31), m32(m32), m33(m33)
 {}
+
+
+inline float3 mat4::ox() const
+{
+	return float3(m00, m10, m20);
+}
+
+inline void mat4::set_ox(const float3& v)
+{
+	m00 = v.x;
+	m10 = v.y;
+	m20 = v.z;
+}
+
+inline float3 mat4::oy() const
+{
+	return float3(m01, m11, m21);
+}
+
+inline void mat4::set_oy(const float3& v)
+{
+	m01 = v.x;
+	m11 = v.y;
+	m21 = v.z;
+}
+
+inline float3 mat4::oz() const
+{
+	return float3(m02, m12, m22);
+}
+
+inline void mat4::set_oz(const float3& v)
+{
+	m02 = v.x;
+	m12 = v.y;
+	m22 = v.z;
+}
 
 
 inline mat4& mat4::operator+=(const mat4& m)
@@ -104,12 +179,8 @@ inline mat4& mat4::operator-=(const mat4& m)
 	return *this;
 }
 
-template<typename Numeric>
-inline mat4& mat4::operator*=(const Numeric& val)
+inline mat4& mat4::operator*=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-
 	m00 *= val; m01 *= val; m02 *= val; m03 *= val;
 	m10 *= val; m11 *= val; m12 *= val; m13 *= val;
 	m20 *= val; m21 *= val; m22 *= val; m23 *= val;
@@ -151,56 +222,15 @@ inline mat4& mat4::operator*=(const mat4& m)
 	return *this;
 }
 
-template<typename Numeric>
-inline mat4& mat4::operator/=(const Numeric& val)
+inline mat4& mat4::operator/=(float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	m00 /= val; m01 /= val; m02 /= val; m03 /= val;
 	m10 /= val; m11 /= val; m12 /= val; m13 /= val;
 	m20 /= val; m21 /= val; m22 /= val; m23 /= val;
 	m30 /= val; m31 /= val; m32 /= val; m33 /= val;
 	return *this;
-}
-
-
-inline float3 mat4::ox() const
-{
-	return float3(m00, m10, m20);
-}
-
-inline void mat4::set_ox(const float3& v)
-{
-	m00 = v.x;
-	m10 = v.y;
-	m20 = v.z;
-}
-
-inline float3 mat4::oy() const
-{
-	return float3(m01, m11, m21);
-}
-
-inline void mat4::set_oy(const float3& v)
-{
-	m01 = v.x;
-	m11 = v.y;
-	m21 = v.z;
-}
-
-inline float3 mat4::oz() const
-{
-	return float3(m02, m12, m22);
-}
-
-inline void mat4::set_oz(const float3& v)
-{
-	m02 = v.x;
-	m12 = v.y;
-	m22 = v.z;
 }
 
 
@@ -252,12 +282,8 @@ inline mat4 operator-(const mat4& lhs, const mat4 rhs)
 	);
 }
 
-template<typename Numeric>
-inline mat4 operator*(const mat4& m, const Numeric&  val)
+inline mat4 operator*(const mat4& m, float val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-
 	return mat4(
 		m.m00 * val, m.m01 * val, m.m02 * val, m.m03 * val,
 		m.m10 * val, m.m11 * val, m.m12 * val, m.m13 * val,
@@ -266,12 +292,8 @@ inline mat4 operator*(const mat4& m, const Numeric&  val)
 	);
 }
 
-template<typename Numeric>
-inline mat4 operator*(const Numeric&  val, const mat4& m)
+inline mat4 operator*(float  val, const mat4& m)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-
 	return mat4(
 		m.m00 * val, m.m01 * val, m.m02 * val, m.m03 * val,
 		m.m10 * val, m.m11 * val, m.m12 * val, m.m13 * val,
@@ -304,12 +326,9 @@ inline mat4 operator*(const mat4& lhs, const mat4& rhs)
 	return product;
 }
 
-template<typename Numeric>
-inline mat4 operator/(const mat4& m, const Numeric&  val)
+inline mat4 operator/(const mat4& m, float  val)
 {
-	static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-		"Numeric type must be an integer or a floating point value.");
-	assert(!approx_equal(val, 0));
+	assert(!approx_equal(val, 0.f));
 
 	return mat4(
 		m.m00 / val, m.m01 / val, m.m02 / val, m.m03 / val,
@@ -342,7 +361,7 @@ inline std::wostream& operator<<(std::wostream& out, const mat4& m)
 }
 
 
-// Puts the matrix m into a float array in a column major order.
+
 inline float* put_in_column_major_order(const mat4& m, float* arr)
 {
 	arr[0] = m.m00; arr[1] = m.m10; arr[2] = m.m20; arr[3] = m.m30;
@@ -353,7 +372,6 @@ inline float* put_in_column_major_order(const mat4& m, float* arr)
 	return arr;
 }
 
-// Puts the matrix m into a float array in a row major order.
 inline float* put_in_row_major_order(const mat4& m, float* arr)
 {
 	arr[0] = m.m00; arr[1] = m.m01; arr[2] = m.m02; arr[3] = m.m03;
@@ -364,13 +382,11 @@ inline float* put_in_row_major_order(const mat4& m, float* arr)
 	return arr;
 }
 
-// Calculates the sum of the elements on the main diagonal. tr(M).
 inline float trace(const mat4& m)
 {
 	return m.m00 + m.m11 + m.m22 + m.m33;
 }
 
-// Reflects the matrix over its main diagonal to obtain transposed matrix.
 inline mat4 transpose(const mat4& m)
 {
 	return mat4(

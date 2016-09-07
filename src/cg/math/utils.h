@@ -9,6 +9,18 @@
 
 namespace cg {
 
+// Determines whether lhs is approximately equal to rhs 
+// admitting a maximum absolute difference max_abs.
+// If Numeric is an integral value then max_abs doesn't matter.
+template<typename Numeric>
+bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f);
+
+// Clamps v into the given bounds [lo, hi].
+template<typename Numeric>
+Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi);
+
+
+
 namespace internal {
 
 // Approx_equal_helper resolvses to different operator() overloads
@@ -41,24 +53,14 @@ struct Approx_equal_helper<Numeric, true, false> {
 
 } // namespace internal
 
-// Determines whether lhs is approximately equal to rhs 
-// admitting a maximum absolute difference max_abs.
-// If Numeric is an integral value then max_abs doesn't matter.
-template<typename Numeric>
-inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f)
-{
-	//static_assert(std::is_integral<Numeric>::value || std::is_floating_point<Numeric>::value,
-	//	"Numeric type must be an integer or a floating point value.");
-	//assert(std::isfinite(lhs));
-	//assert(std::isfinite(rhs));
-	//assert(std::isfinite(max_abs));
 
-	//return std::abs(lhs - rhs) <= max_abs;
+template<typename Numeric>
+inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs)
+{
 	cg::internal::Approx_equal_helper<Numeric> aeh;
 	return aeh(lhs, rhs, max_abs);
 }
 
-// Clamps v into the given bounds [lo, hi].
 template<typename Numeric>
 inline Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi)
 {

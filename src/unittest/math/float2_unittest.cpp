@@ -107,7 +107,7 @@ public:
 
 		// operator/
 		Assert::AreEqual(float2(0.5, 1), v / 2);
-		Assert::AreEqual(float2::zero, 0 / v);
+		Assert::AreEqual(float2::zero, 0.f / v);
 	}
 
 	TEST_METHOD(clamp)
