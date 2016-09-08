@@ -224,6 +224,20 @@ public:
 		Assert::AreEqual(dot(u + v, w), dot(u, w) + dot(v, w), L"(U + V)*W = U*W + V*W");
 	}
 
+	TEST_METHOD(greater_than)
+	{
+		using cg::greater_than;
+
+		Assert::IsFalse(greater_than(float3(0, 5, 7), 1));
+		Assert::IsFalse(greater_than(float3(1, 5, 7), 1));
+		Assert::IsFalse(greater_than(float3(4, 0, 7), 1));
+		Assert::IsFalse(greater_than(float3(4, 1, 7), 1));
+		Assert::IsFalse(greater_than(float3(4, 5, 0), 1));
+		Assert::IsFalse(greater_than(float3(4, 5, 1), 1));
+
+		Assert::IsTrue(greater_than(float3(4, 5, 7), 1));
+	}
+
 	TEST_METHOD(is_normalized)
 	{
 		using cg::is_normalized;

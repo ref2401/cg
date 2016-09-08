@@ -116,6 +116,9 @@ float3 cross(const float3& lhs, const float3& rhs);
 // Calculates the dot product of the given vectors.
 float dot(const float3& lhs, const float3& rhs);
 
+// Returns true if every component of v is greater than val.
+bool greater_than(const float3& v, float val);
+
 // Checks whether the specified vector is normalized.
 bool is_normalized(const float3& v);
 
@@ -317,6 +320,11 @@ inline float3 cross(const float3& lhs, const float3& rhs)
 inline float dot(const float3& lhs, const float3& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
+}
+
+inline bool greater_than(const float3& v, float val)
+{
+	return (v.x > val) && (v.y > val) && (v.z > val);
 }
 
 inline bool is_normalized(const float3& v)

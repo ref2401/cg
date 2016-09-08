@@ -24,6 +24,11 @@ constexpr float pi_8 = pi / 8.f;
 //		angle = (In radians) describes the magnitude of the rotation about the axis.
 quat from_axis_angle_rotation(const float3& axis, float angle);
 
+// Construct a unit quaternion from the specified rotation matrix.
+// In the case of M is mat4 translation and perspective components are ignored.
+template<typename TMat>
+quat from_rotation_matrix(const TMat& m);
+
 // Returns the position component of the specified matrix.
 float3 position(const mat4& m);
 
@@ -60,6 +65,9 @@ TRetMat rotation_matrix_oy(float angle);
 template<typename TRetMat>
 TRetMat rotation_matrix_oz(float angle);
 
+// Returns a matrix which can be used to scale vectors s.
+template<typename TRetMat>
+TRetMat scale_matrix(const float3& s);
 
 // Returns a matrix which can be used to translate vectors to the position p.
 mat4 translation_matrix(const float3& p);
@@ -92,6 +100,58 @@ inline quat from_axis_angle_rotation(const float3& axis, float angle)
 	float c = std::cos(half_angle);
 	float s = std::sin(half_angle);
 	return quat(axis.x * s, axis.y * s, axis.z * s, c);
+}
+
+template<typename TMat>
+quat from_rotation_matrix(const TMat& m)
+{
+	static_assert(cg::internal::is_matrix<TMat>::value, "TMat must be a matrix (mat3 or mat4).");
+
+	if (m == TMat::zero) return quat::zero;
+	assert(is_orthogonal(m));
+
+	// NOTE(ref2401): see Ken Shoemake: Quaternions.
+	quat res;
+	float u = m.m00 + m.m11 + m.m22;
+
+	if (u >= 0.f) {
+		float s = std::sqrt(u + 1.f);
+		res.a = 0.5f * s;
+
+		s = 0.5f / s;
+		res.x = (m.m21 - m.m12) * s;
+		res.y = (m.m02 - m.m20) * s;
+		res.z = (m.m10 - m.m01) * s;
+	}
+	else if (m.m00 > m.m11 && m.m00 > m.m22) {
+		float s = sqrt(m.m00 - m.m11 - m.m22 + 1.f);
+		res.x = 0.5f * s;
+
+		s = 0.5f / s;
+		res.y = (m.m10 + m.m01) * s;
+		res.z = (m.m02 + m.m20) * s;
+		res.a = (m.m21 - m.m12) * s;
+	}
+	else if (m.m11 > m.m22) {
+		float s = sqrt(m.m11 - m.m00 - m.m22 + 1.f);
+		res.y = 0.5f * s;
+
+		s = 0.5f / s;
+		res.x = (m.m10 + m.m01) * s;
+		res.z = (m.m21 + m.m12) * s;
+		res.a = (m.m02 - m.m20) * s;
+	}
+	else {
+		float s = std::sqrt(m.m22 - m.m00 - m.m11 + 1.f);
+		res.z = 0.5f * s;
+
+		s = 0.5f / s;
+		res.a = (m.m10 - m.m01) * s;
+		res.x = (m.m02 + m.m20) * s;
+		res.y = (m.m21 + m.m12) * s;
+	}
+
+	return res;
 }
 
 inline float3 position(const mat4& m)
@@ -228,6 +288,14 @@ TRetMat rotation_matrix_oz(float angle)
 	r.m11 = cos_a;
 
 	return r;
+}
+
+template<typename TRetMat>
+TRetMat scale_matrix(const float3& s)
+{
+	TRetMat m = TRetMat::identity;
+
+	return m;
 }
 
 inline mat4 translation_matrix(const float3& p)

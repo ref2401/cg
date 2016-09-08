@@ -28,6 +28,27 @@ TEST_CLASS(Transform_unittest) {
 		Assert::IsTrue(approx_equal(q.a, std::cos(cg::pi_4)));
 	}
 
+	TEST_METHOD(from_rotation_matrix)
+	{
+		using cg::from_axis_angle_rotation;
+		using cg::from_rotation_matrix;
+		using cg::normalize;
+		using cg::rotation_matrix;
+
+		Assert::AreEqual(quat::zero, from_rotation_matrix(mat3::zero));
+		Assert::AreEqual(quat::zero, from_rotation_matrix(mat4::zero));
+		Assert::AreEqual(quat::identity, from_rotation_matrix(mat3::identity));
+		Assert::AreEqual(quat::identity, from_rotation_matrix(mat4::identity));
+
+		float3 axis = normalize(float3(1, 2, 5));
+		float angle = cg::pi_4;
+		quat expected_quat = from_axis_angle_rotation(axis, angle);
+
+		mat4 mR = rotation_matrix<mat4>(axis, angle);
+		quat actual_quat = from_rotation_matrix(mR);
+		Assert::AreEqual(expected_quat, actual_quat);
+	}
+
 	TEST_METHOD(position_get_set)
 	{
 		using cg::position;
@@ -192,7 +213,6 @@ TEST_CLASS(Transform_unittest) {
 		Assert::IsFalse(is_matrix<float4>::value);
 		Assert::IsFalse(is_matrix<cg::uint2>::value);
 	}
-
 };
 
 } // namespace unittest

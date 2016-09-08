@@ -104,6 +104,9 @@ float2 clamp(const float2& v, const float2& v_lo = float2::zero, const float2& v
 // Calculates the dot product of the given vectors.
 float dot(const float2& lhs, const float2& rhs);
 
+// Returns true if every component of v is greater than val.
+bool greater_than(const float2& v, float val);
+
 // Checks whether the specified vector is normalized.
 bool is_normalized(const float2& v);
 
@@ -258,7 +261,6 @@ inline std::wostream& operator<<(std::wostream& out, const cg::float2& v)
 	return out;
 }
 
-
 inline float2 clamp(const float2& v, const float2& v_lo, const float2& v_hi)
 {
 	return float2(
@@ -270,6 +272,11 @@ inline float2 clamp(const float2& v, const float2& v_lo, const float2& v_hi)
 inline float dot(const float2& lhs, const float2& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y);
+}
+
+inline bool greater_than(const float2& v, float val)
+{
+	return (v.x > val) && (v.y > val);
 }
 
 inline bool is_normalized(const float2& v)

@@ -128,6 +128,23 @@ public:
 		Assert::AreEqual(float2::unit_xy, clamp(float2(5)));
 	}
 
+	TEST_METHOD(dot_product)
+	{
+		using cg::dot;
+		using cg::len_squared;
+
+		float2 u(2, 3);
+		float2 v(4, 5);
+		float2 w(7, 8);
+
+		Assert::AreEqual(2.f * 4 + 3 * 5, dot(u, v));
+		Assert::AreEqual(0.f, dot(u, float2::zero));
+		Assert::AreEqual(len_squared(u), dot(u, u), L"U * U = |U| * |U|");
+		Assert::AreEqual(dot(u, v), dot(v, u), L"U * V = V * U");
+		Assert::AreEqual(dot(2 * u, v), 2 * dot(u, v), L"(aU) * V = a(U * V)");
+		Assert::AreEqual(dot(u + v, w), dot(u, w) + dot(v, w), L"(U + V)*W = U*W + V*W");
+	}
+
 	TEST_METHOD(equal_operator)
 	{
 		float2 v(1, 2);
@@ -139,21 +156,16 @@ public:
 		Assert::AreEqual(v, float2(1, 2));
 	}
 
-	TEST_METHOD(dot_product)
+	TEST_METHOD(greater_than)
 	{
-		using cg::dot;
-		using cg::len_squared;
+		using cg::greater_than;
 
-		float2 u(2, 3);
-		float2 v(4, 5);
-		float2 w(7, 8);
+		Assert::IsFalse(greater_than(float2(0, 5), 1));
+		Assert::IsFalse(greater_than(float2(1, 5), 1));
+		Assert::IsFalse(greater_than(float2(4, 0), 1));
+		Assert::IsFalse(greater_than(float2(4, 1), 1));
 
-		Assert::AreEqual(2.f*4 + 3*5, dot(u, v));
-		Assert::AreEqual(0.f, dot(u, float2::zero));
-		Assert::AreEqual(len_squared(u),dot(u, u), L"U * U = |U| * |U|");
-		Assert::AreEqual(dot(u, v), dot(v, u), L"U * V = V * U");
-		Assert::AreEqual(dot(2 * u, v), 2 * dot(u, v), L"(aU) * V = a(U * V)");
-		Assert::AreEqual(dot(u + v, w), dot(u, w) + dot(v, w), L"(U + V)*W = U*W + V*W");
+		Assert::IsTrue(greater_than(float2(4, 5), 1));
 	}
 
 	TEST_METHOD(is_normalized)

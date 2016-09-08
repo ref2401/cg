@@ -120,6 +120,9 @@ float4 clamp(const float4& v, const float4& v_lo = float4::zero, const float4& v
 // Calculates the dot product of the given vectors.
 float dot(const float4& lhs, const float4& rhs);
 
+// Returns true if every component of v is greater than val.
+bool greater_than(const float4& v, float val);
+
 // Checks whether the specified vector is normalized.
 bool is_normalized(const float4& v);
 
@@ -237,7 +240,6 @@ inline float4& float4::operator/=(float val)
 }
 
 
-
 inline bool operator==(const float4& lhs, const float4& rhs)
 {
 	return approx_equal(lhs.x, rhs.x)
@@ -333,6 +335,11 @@ inline float4 clamp(const float4& v, const float4& v_lo, const float4& v_hi)
 inline float dot(const float4& lhs, const float4& rhs)
 {
 	return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);
+}
+
+inline bool greater_than(const float4& v, float val)
+{
+	return (v.x > val) && (v.y > val) && (v.z > val) && (v.w > val);
 }
 
 inline bool is_normalized(const float4& v)

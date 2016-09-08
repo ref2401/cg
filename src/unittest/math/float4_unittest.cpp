@@ -144,19 +144,6 @@ public:
 		Assert::AreEqual(float4::unit_xyzw, clamp(float4(5)));
 	}
 
-	TEST_METHOD(equal_operator)
-	{
-		float4 v(1, 2, 3, 4);
-
-		Assert::AreNotEqual(v, float4(100, 2, 3, 4));
-		Assert::AreNotEqual(v, float4(1, 100, 3, 4));
-		Assert::AreNotEqual(v, float4(1, 2, 100, 4));
-		Assert::AreNotEqual(v, float4(1, 2, 3, 100));
-
-		Assert::AreEqual(v, v);
-		Assert::AreEqual(v, float4(1, 2, 3, 4));
-	}
-
 	TEST_METHOD(dot_product)
 	{
 		using cg::dot;
@@ -172,6 +159,35 @@ public:
 		Assert::AreEqual(dot(u, v), dot(v, u), L"U * V = V * U");
 		Assert::AreEqual(dot(2 * u, v), 2 * dot(u, v), L"(aU) * V = a(U * V)");
 		Assert::AreEqual(dot(u + v, w), dot(u, w) + dot(v, w), L"(U + V)*W = U*W + V*W");
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		float4 v(1, 2, 3, 4);
+
+		Assert::AreNotEqual(v, float4(100, 2, 3, 4));
+		Assert::AreNotEqual(v, float4(1, 100, 3, 4));
+		Assert::AreNotEqual(v, float4(1, 2, 100, 4));
+		Assert::AreNotEqual(v, float4(1, 2, 3, 100));
+
+		Assert::AreEqual(v, v);
+		Assert::AreEqual(v, float4(1, 2, 3, 4));
+	}
+
+	TEST_METHOD(greater_than)
+	{
+		using cg::greater_than;
+
+		Assert::IsFalse(greater_than(float4(0, 5, 7, 9), 1));
+		Assert::IsFalse(greater_than(float4(1, 5, 7, 9), 1));
+		Assert::IsFalse(greater_than(float4(4, 0, 7, 9), 1));
+		Assert::IsFalse(greater_than(float4(4, 1, 7, 9), 1));
+		Assert::IsFalse(greater_than(float4(4, 5, 0, 9), 1));
+		Assert::IsFalse(greater_than(float4(4, 5, 1, 9), 1));
+		Assert::IsFalse(greater_than(float4(4, 5, 7, 0), 1));
+		Assert::IsFalse(greater_than(float4(4, 5, 7, 1), 1));
+
+		Assert::IsTrue(greater_than(float4(4, 5, 7, 9), 1));
 	}
 
 	TEST_METHOD(is_normalized)
