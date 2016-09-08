@@ -2,6 +2,7 @@
 #define CG_MATH_MAT4_H_
 
 #include <cassert>
+#include <cmath>
 #include <ostream>
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
@@ -97,6 +98,9 @@ float det(const mat4& m);
 
 // Computes the inverse of the matrix.
 mat4 inverse(const mat4& m);
+
+// Determines whether the specified matrix is orthogonal.
+bool is_orthogonal(const mat4& m);
 
 // Multiplies matrix by the column vector float4(v.x, v.y, z, w). 
 float4 mul(const mat4& m, const float2& v, float z = 0.f, float w = 1.f);
@@ -388,6 +392,12 @@ inline float det(const mat4& m)
 		- m.m12*m.m21*m.m30 - m.m11*m.m20*m.m32 - m.m10*m.m22*m.m31;
 
 	return m.m00 * minor00 - m.m01 * minor01 + m.m02 * minor02 - m.m03 * minor03;
+}
+
+inline bool is_orthogonal(const mat4& m)
+{
+	float abs_d = std::abs(det(m));
+	return approx_equal(abs_d, 1.f);
 }
 
 inline float4 mul(const mat4& m, const float2& v, float z, float w)

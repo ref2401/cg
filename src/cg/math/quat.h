@@ -24,6 +24,8 @@ struct quat {
 	static const quat zero;
 
 
+	quat();
+
 	quat(float x, float y, float z, float a);
 
 	quat(const float3& v, float a);
@@ -90,6 +92,7 @@ quat normalize(const quat& q);
 quat slerp(const quat& q, const quat& r, float factor);
 
 
+inline quat::quat() : x(0), y(0), z(0), a(0) {}
 
 inline quat::quat(float x, float y, float z, float a) : x(x), y(y), z(z), a(a) {}
 

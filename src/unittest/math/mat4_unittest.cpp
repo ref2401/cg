@@ -212,6 +212,16 @@ public:
 		Assert::AreEqual(inverse(m * n), inverse(n) * inverse(m));
 	}
 
+	TEST_METHOD(is_orthogonal)
+	{
+		using cg::is_orthogonal;
+
+		Assert::IsTrue(is_orthogonal(mat4::identity));
+		Assert::IsFalse(is_orthogonal(mat4::zero));
+
+		// NOTE(ref2401): The tests are not convincing at all. Try harder...
+	}
+
 	TEST_METHOD(mul)
 	{
 		using cg::float2;

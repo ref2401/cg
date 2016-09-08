@@ -2,10 +2,12 @@
 #define CG_MATH_MAT3_H_
 
 #include <cassert>
+#include <cmath>
 #include <ostream>
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
 #include "cg/math/utils.h"
+
 
 namespace cg {
 
@@ -91,6 +93,9 @@ float det(const mat3& m);
 
 // Computes the inverse of the matrix.
 mat3 inverse(const mat3& m);
+
+// Determines whether the specified matrix is orthogonal.
+bool is_orthogonal(const mat3& m);
 
 // Multiplies matrix by the column vector float3(v.x, v.y, z). 
 float3 mul(const mat3& m, const float2& v, float z = 0.f);
@@ -333,6 +338,12 @@ inline float det(const mat3& m)
 {
 	return (m.m00 * m.m11 * m.m22) + (m.m01 * m.m12 * m.m20) + (m.m02 * m.m10 * m.m21)
 		- (m.m02 * m.m11 * m.m20) - (m.m01 * m.m10 * m.m22) - (m.m00 * m.m12 * m.m21);
+}
+
+inline bool is_orthogonal(const mat3& m)
+{
+	float abs_d = std::abs(det(m));
+	return approx_equal(abs_d, 1.f);
 }
 
 inline float3 mul(const mat3& m, const float2& v, float z)

@@ -1,5 +1,6 @@
 #include "cg/math/math.h"
 
+#include <utility>
 #include "unittest/math/math_unittest_utils.h"
 
 using cg::float3;
@@ -20,13 +21,39 @@ public:
 		Assert::AreEqual(quat(0, 0, 0, 0), quat::zero);
 	}
 
+	TEST_METHOD(assignments)
+	{
+		quat q(5, 6, 7, 8);
+
+		// copy assignment
+		quat qc;
+		qc = q;
+		Assert::IsTrue((qc.x == q.x) && (qc.y == q.y) && (qc.z == q.z) && (qc.a == q.a));
+
+		// move assignment
+		quat qm;
+		qm = std::move(q);
+		Assert::IsTrue((qm.x == q.x) && (qm.y == q.y) && (qm.z == q.z) && (qm.a == q.a));
+	}
+
 	TEST_METHOD(ctors)
 	{
-		quat q0(1, 2, 3, 4);
-		Assert::IsTrue((q0.x == 1) && (q0.y == 2) && (q0.z == 3) && (q0.a == 4));
+		quat q0;
+		Assert::IsTrue((q0.x == 0) && (q0.y == 0) && (q0.z == 0) && (q0.a == 0));
 
-		quat q1(float3(1, 2, 3), 4);
+		quat q1(1, 2, 3, 4);
 		Assert::IsTrue((q1.x == 1) && (q1.y == 2) && (q1.z == 3) && (q1.a == 4));
+
+		quat q2(float3(1, 2, 3), 4);
+		Assert::IsTrue((q2.x == 1) && (q2.y == 2) && (q2.z == 3) && (q2.a == 4));
+
+		// copy ctor.
+		quat qc = q1;
+		Assert::IsTrue((qc.x == q1.x) && (qc.y == q1.y) && (qc.z == q1.z) && (qc.a == q1.a));
+
+		// move ctor.
+		quat qm = std::move(qc);
+		Assert::IsTrue((qm.x == q1.x) && (qm.y == q1.y) && (qm.z == q1.z) && (qm.a == q1.a));
 	}
 
 	TEST_METHOD(compound_assignment_operators)
