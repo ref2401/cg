@@ -29,6 +29,27 @@ quat from_axis_angle_rotation(const float3& axis, float angle);
 template<typename TMat>
 quat from_rotation_matrix(const TMat& m);
 
+// Creates an OpenGL compatible orthographic projection matrix. 
+// right = -left, top = -bottom, near < far.
+mat4 orthographic_matrix(float width, float height, float near, float far);
+
+// Creates an OpenGL compatible orthographic projection matrix.
+// left < right, bottom < top, near < far.
+mat4 orthographic_matrix(float left, float right, float bottom, float top, float near, float far);
+
+// Computes an OpenGL compatible projection matrix for general frustum.
+// left < right, bottom < top, 0 < near < far.
+mat4 perspective_matrix(float left, float right, float bottom, float top, float near, float far);
+
+// Computes an OpenGL compatible symmetric perspective projection matrix based on a field of view.
+// 0 < vert_Fov < cg::pi, 0 < near < far.
+//	Params:
+//		vert_fov = Vertical field of view in radians.
+//		wh_ratio = The ratio of the width to the height of the near clipping plane.
+//		near = the distance between a viewer and the near clipping plane.
+//		far = the distance between a viewer and the far clipping plane.
+mat4 perspective_matrix(float vert_fov, float wh_ratio, float near, float far);
+
 // Returns the position component of the specified matrix.
 float3 position(const mat4& m);
 
@@ -178,6 +199,86 @@ quat from_rotation_matrix(const TMat& m)
 	}
 
 	return res;
+}
+
+inline mat4 orthographic_matrix(float width, float height, float near, float far)
+{
+	assert(width > 0);
+	assert(height > 0);
+	assert(near < far);
+
+	float far_minus_near = far - near;
+	float right = width / 2.f;
+	float top = height / 2.f;
+
+	return mat4(
+		1.f / right, 0, 0, 0,
+		0, 1.f / top, 0, 0,
+		0, 0, -2.f / far_minus_near, -(far + near) / far_minus_near,
+		0, 0, 0, 1
+	);
+}
+
+inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near, float far)
+{
+	assert(left < right);
+	assert(bottom < top);
+	assert(near < far);
+
+	float doubled_near = 2.f * near;
+	float far_minus_near = far - near;
+	float right_minus_left = right - left;
+	float top_minus_bottom = top - bottom;
+
+	return mat4(
+		2.f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
+		0, 2.f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
+		0, 0, -2.f / far_minus_near, -(far + near) / far_minus_near,
+		0, 0, 0, 1
+	);
+}
+
+inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near, float far)
+{
+	float doubled_near = 2.f * near;
+	float far_minus_near = far - near;
+	float right_minus_left = right - left;
+	float top_minus_bottom = top - bottom;
+
+
+	return mat4(
+		doubled_near / right_minus_left, 0, (right + left) / right_minus_left, 0,
+		0, doubled_near / top_minus_bottom, (top + bottom) / top_minus_bottom, 0,
+		0, 0, -(far + near) / far_minus_near, -doubled_near * far / far_minus_near,
+		0, 0, -1, 0
+	);
+}
+
+inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near, float far) 
+{
+	assert(0 < vert_fov && vert_fov < pi);
+	assert(0 < near && near < far);
+
+	float fat_minus_near = far - near;
+	float rev_tangent = 1.f / std::tan(vert_fov * 0.5f);
+
+	/*
+	* TAN = tan(vert_fov / 2.0L)
+	* top = near * TAN
+	* right = top * wh_ratio = wh_ratio * near * TAN
+	*
+	* 2near / (right - (-rigth)) = 2near / 2right = near / right =
+	* near / (wh_ratio * near * TAN) = 1 / (wh_ratio * TAN)
+	*
+	* 2near / (top - (-top)) = 2near / 2top = neat / top =
+	* near / (near * TAN) = 1 / TAN */
+
+	return mat4(
+		(1.f / wh_ratio) * rev_tangent, 0, 0, 0,
+		0, rev_tangent, 0, 0,
+		0, 0, -(far + near) / fat_minus_near, -2.f * near * far / fat_minus_near,
+		0, 0, -1, 0
+	);
 }
 
 inline float3 position(const mat4& m)

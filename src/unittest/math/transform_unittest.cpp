@@ -49,6 +49,42 @@ TEST_CLASS(Transform_unittest) {
 		Assert::AreEqual(expected_quat, actual_quat);
 	}
 
+	TEST_METHOD(orthographic_matrix)
+	{
+		using cg::orthographic_matrix;
+
+		float width = 800.f;
+		float height = 600.f;
+		float near = -5.f;
+		float far = 10.f;
+
+		// manual computation of (left, right, bottom, top, near, far) tuple
+		float hw = width / 2.f;
+		float hh = height / 2.f;
+
+		mat4 om1 = orthographic_matrix(-hw, hw, -hh, hh, near, far);
+		mat4 om2 = orthographic_matrix(width, height, near, far);
+		Assert::AreEqual(om1, om2);
+	}
+
+	TEST_METHOD(perspective_matrix)
+	{
+		using cg::perspective_matrix;
+
+		float near = 1.f;
+		float far = 100.f;
+		float fov = cg::pi_2;
+		float ratio = 800.f / 600.f;
+
+		// manual computation of (left, right, bottom, top, near, far) tuple
+		float height = near * std::tan(fov / 2.f);
+		float width = height * ratio;
+
+		mat4 pm1 = perspective_matrix(-width, width, -height, height, near, far);
+		mat4 pm2 = perspective_matrix(fov, ratio, near, far);
+		Assert::AreEqual(pm1, pm2);
+	}
+
 	TEST_METHOD(position_get_set)
 	{
 		using cg::position;
