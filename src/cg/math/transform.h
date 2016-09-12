@@ -47,6 +47,15 @@ TRetMat rotation_matrix(const quat& q);
 template<typename TRetMat>
 TRetMat rotation_matrix(const float3& axis, float angle);
 
+// Composes a look at rotation matrix. Translation component is not set.
+// Use tr_matrix to consturct a look at rotation and translation to position chain.
+//	Params:
+//		position = is eye/object position.
+//		target = point of interest.v The point we want to look at.
+//		up = the direction that is considered to be upward.
+template<typename TRetMat>
+TRetMat rotation_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
+
 // Composes a rotatiom matrix about ox axis.
 //	Params:
 //		angle = describes the magnitude in radians of the rotation about ox.
@@ -69,9 +78,26 @@ TRetMat rotation_matrix_oz(float angle);
 template<typename TRetMat>
 TRetMat scale_matrix(const float3& s);
 
+// Returns a matrix that is a concatenation of translation by p and rotation by q.
+// The result is equal to translation_matrix(p) * rotation_matrix(q).
+mat4 tr_matrix(const float3& p, const quat& q);
+
+// Returns a matrix that is a concatentation of traslation by p and a look at rotation
+mat4 tr_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
+
 // Returns a matrix which can be used to translate vectors to the position p.
 mat4 translation_matrix(const float3& p);
 
+// Return a matrix that is a concatenation of translation by p, rotation by q and scale by s.
+// The result is equal to translation_matrix(p) * rotation_matrix(q) * scale_matrix(s).
+mat4 trs_matrix(const float3& p, const quat& q, const float3& s);
+
+// Composes a matrix that cam be used to transform from world space to view space.
+//	Params:
+//		position = an origin, where eye(camera) is situated.
+//		target = a point of interest.
+//		up = the direction that is considered to be upward.
+mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
 
 namespace internal {
 
@@ -234,6 +260,24 @@ TRetMat rotation_matrix(const float3& axis, float angle)
 }
 
 template<typename TRetMat>
+TRetMat rotation_matrix(const float3& position, const float3& target, const float3& up)
+{
+	assert(position != target);
+	assert(is_normalized(up));
+
+	float3 forward = normalize(target - position);
+	float3 right = normalize(cross(up, forward));
+	float3 new_up = normalize(cross(forward, right));
+
+	TRetMat r = TRetMat::identity;
+	r.set_ox(right);
+	r.set_oy(new_up);
+	r.set_oz(forward);
+
+	return r;
+}
+
+template<typename TRetMat>
 TRetMat rotation_matrix_ox(float angle)
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
@@ -293,8 +337,26 @@ TRetMat rotation_matrix_oz(float angle)
 template<typename TRetMat>
 TRetMat scale_matrix(const float3& s)
 {
-	TRetMat m = TRetMat::identity;
+	assert(greater_than(s, 0));
 
+	TRetMat m = TRetMat::identity;
+	m.m00 = s.x;
+	m.m11 = s.y;
+	m.m22 = s.z;
+	return m;
+}
+
+inline mat4 tr_matrix(const float3& p, const quat& q)
+{
+	mat4 m = rotation_matrix<mat4>(q);
+	set_position(m, p);
+	return m;
+}
+
+inline mat4 tr_matrix(const float3& position, const float3& target, const float3& up)
+{
+	mat4 m = rotation_matrix<mat4>(position, target, up);
+	set_position(m, position);
 	return m;
 }
 
@@ -303,6 +365,29 @@ inline mat4 translation_matrix(const float3& p)
 	mat4 m = mat4::identity;
 	set_position(m, p);
 	return m;
+}
+
+inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s)
+{
+	return tr_matrix(p, q) * scale_matrix<mat4>(s);
+}
+
+inline mat4 view_matrix(const float3& position, const float3& target, const float3& up)
+{
+	assert(position != target);
+	assert(is_normalized(up));
+
+	float3 forward = normalize(target - position);
+	float3 right = normalize(cross(up, forward));
+	float3 new_up = normalize(cross(forward, right));
+
+	// transpose(rotation_matrix<mat4>(position, target, up)) * translation_matrix(-position)
+	mat4 r = mat4::identity;
+	r.m00 = right.x;	r.m01 = right.y;	r.m02 = right.z;	r.m03 = dot(right, -position);
+	r.m10 = new_up.x;	r.m11 = new_up.y;	r.m12 = new_up.z;	r.m13 = dot(new_up, -position);
+	r.m20 = forward.x;	r.m21 = forward.y;	r.m22 = forward.z;	r.m23 = dot(forward, -position);
+	
+	return r;
 }
 
 } // namespace cg

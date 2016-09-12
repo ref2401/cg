@@ -134,6 +134,25 @@ TEST_CLASS(Transform_unittest) {
 		Assert::IsTrue(transpose(r) == inverse(r));
 	}
 
+	TEST_METHOD(rotation_matrix_look_at)
+	{
+		using cg::rotation_matrix;
+
+		// rotation around the OX axis
+		mat3 oxM1 = rotation_matrix<mat3>(float3::zero, float3::unit_y, -float3::unit_z);
+		Assert::AreEqual(oxM1, rotation_matrix<mat3>(float3::unit_x, -cg::pi_2)); // -pi_2 - counter clockwise
+
+		// rotation arount the OY axis
+		mat3 oyM1 = rotation_matrix<mat3>(-float3::unit_z, float3::zero, float3::unit_y);
+		Assert::AreEqual(oyM1, mat3::identity);
+
+		mat3 oyM2 = rotation_matrix<mat3>(float3::zero, float3(1, 0, 1), float3::unit_y);
+		Assert::AreEqual(oyM2, rotation_matrix<mat3>(float3::unit_y, cg::pi_4));
+
+		mat4 oyM3 = rotation_matrix<mat4>(float3(0, 0, 7), float3(0, 0, -1), float3::unit_y);
+		Assert::AreEqual(oyM3, rotation_matrix<mat4>(float3::unit_y, cg::pi));
+	}
+
 	TEST_METHOD(rotation_matrix_ox_oy_oz)
 	{
 		using cg::rotation_matrix;
@@ -173,6 +192,39 @@ TEST_CLASS(Transform_unittest) {
 		Assert::AreEqual(rotation_matrix_oz<mat4>(angle), rotation_matrix<mat4>(float3::unit_z, angle));
 	}
 
+	TEST_METHOD(scale_matrix)
+	{
+		using cg::scale_matrix;
+
+		Assert::AreEqual(mat3(4, 0, 0, 0, 5, 0, 0, 0, 6), scale_matrix<mat3>(float3(4, 5, 6)));
+		Assert::AreEqual(mat4(7, 0, 0, 0, 0, 8, 0, 0, 0, 0, 9, 0, 0, 0, 0, 1), scale_matrix<mat4>(float3(7, 8, 9)));
+	}
+
+	TEST_METHOD(tr_matrix_pos_quat)
+	{
+		using cg::from_axis_angle_rotation;
+		using cg::normalize;
+		using cg::rotation_matrix;
+		using cg::tr_matrix;
+		using cg::translation_matrix;
+
+		quat q = from_axis_angle_rotation(normalize(float3(-5, 3, -10)), cg::pi_4);
+		float3 pos(7, 8, 9);
+
+		Assert::AreEqual(translation_matrix(pos) * rotation_matrix<mat4>(q), tr_matrix(pos, q));
+	}
+
+	TEST_METHOD(tr_matrix_pos_look_at)
+	{
+		using cg::rotation_matrix;
+		using cg::tr_matrix;
+		using cg::translation_matrix;
+
+		float3 p(4, -1, 8);
+		float3 t(1, 1, -8);
+		Assert::AreEqual(translation_matrix(p) * rotation_matrix<mat4>(p, t), tr_matrix(p, t));
+	}
+
 	TEST_METHOD(translation_matrix)
 	{
 		using cg::translation_matrix;
@@ -185,6 +237,38 @@ TEST_CLASS(Transform_unittest) {
 
 		Assert::AreEqual(expected_matrix, translation_matrix(pos));
 	}
+
+	TEST_METHOD(trs_matrix)
+	{
+		using cg::from_axis_angle_rotation;
+		using cg::normalize;
+		using cg::rotation_matrix;
+		using cg::scale_matrix;
+		using cg::trs_matrix;
+		using cg::translation_matrix;
+
+		float3 p(7, 8, 9);
+		quat q = from_axis_angle_rotation(normalize(float3(-5, 3, -10)), cg::pi_4);
+		float3 s(2, 3, 4);
+
+		mat4 mT = translation_matrix(p);
+		mat4 mR = rotation_matrix<mat4>(q);
+		mat4 mS = scale_matrix<mat4>(s);
+
+		Assert::AreEqual(mT * mR * mS, trs_matrix(p, q, s));
+	}
+
+	TEST_METHOD(view_matrix)
+	{
+		using cg::inverse;
+		using cg::tr_matrix;
+		using cg::view_matrix;
+
+		float3 p(4, -1, 8);
+		float3 t(1, 1, -8);
+		Assert::AreEqual(inverse(tr_matrix(p, t)), view_matrix(p, t));
+	}
+
 
 	TEST_METHOD(internal_is_3d_float_vector)
 	{
