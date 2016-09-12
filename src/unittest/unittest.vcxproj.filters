@@ -28,10 +28,16 @@
     <ClCompile Include="math\transform_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="data\mesh_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
       <UniqueIdentifier>{2076d25b-fb36-4785-91fe-f46b6f01b7b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{b4d228fe-d11b-40f8-9c0b-52b577f506a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

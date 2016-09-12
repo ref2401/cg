@@ -122,6 +122,7 @@
     <ClCompile Include="math\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data\mesh.h" />
     <ClInclude Include="math\float2.h" />
     <ClInclude Include="math\float4.h" />
     <ClInclude Include="math\mat3.h" />

@@ -9,6 +9,9 @@
     <Filter Include="math">
       <UniqueIdentifier>{e8106177-098e-4ac0-9905-2150be8ad417}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{3d601f46-1122-4c45-97a4-7a12c6a802a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\math.h">
@@ -40,6 +43,9 @@
     </ClInclude>
     <ClInclude Include="math\transform.h">
       <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="data\mesh.h">
+      <Filter>data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
