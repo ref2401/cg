@@ -14,34 +14,54 @@ TEST_CLASS(File_unittest) {
 
 	TEST_METHOD(ctor_open_file)
 	{
+		File fe;
+		Assert::IsTrue(fe.filename().empty());
+		Assert::IsFalse(fe.is_open());
+
 		Assert::ExpectException<File_exception>([] { File f("unknown-file"); });
 
 		File f(Filenames::empty_file);
 		Assert::AreEqual(Filenames::empty_file, f.filename());
-		Assert::IsNotNull(f.handle());
+		Assert::IsTrue(f.is_open());
 
-		auto expected_handle = f.handle();
 		File fm = std::move(f);
-		Assert::IsTrue(f.filename().empty());
-		Assert::IsNull(f.handle());
-
 		Assert::AreEqual(Filenames::empty_file, fm.filename());
-		Assert::IsTrue(expected_handle == fm.handle());
+		Assert::IsTrue(fm.is_open());
+		// f is empty
+		Assert::IsTrue(f.filename().empty());
+		Assert::IsFalse(f.is_open());
 	}
 
 	TEST_METHOD(move_assignment)
 	{
 		File f0(Filenames::empty_file);
 		File f1(Filenames::single_ascii_line_file);
-		Assert::IsTrue(f0.handle() != f1.handle());
 
-		auto expected_handle = f0.handle();
 		f1 = std::move(f0);
-		Assert::IsTrue(f0.filename().empty());
-		Assert::IsNull(f0.handle());
-
 		Assert::AreEqual(Filenames::empty_file, f1.filename());
-		Assert::IsTrue(expected_handle == f1.handle());
+		Assert::IsTrue(f1.is_open());
+		// f is empty
+		Assert::IsTrue(f0.filename().empty());
+		Assert::IsFalse(f0.is_open());
+	}
+
+	TEST_METHOD(open_close)
+	{
+		File f;
+		f.close(); // does not throw
+
+		Assert::ExpectException<File_exception>([&] { f.open("unknown-file"); });
+		Assert::IsTrue(f.filename().empty());
+		Assert::IsFalse(f.is_open());
+
+		f.open(Filenames::empty_file);
+		Assert::IsFalse(f.eof());
+		Assert::AreEqual(Filenames::empty_file, f.filename());
+		Assert::IsTrue(f.is_open());
+
+		f.close();
+		Assert::IsTrue(f.filename().empty());
+		Assert::IsFalse(f.is_open());
 	}
 
 	TEST_METHOD(read_byte_and_eof)
@@ -71,6 +91,18 @@ TEST_CLASS(File_unittest) {
 			bool res = f.read_byte(&ch);
 			Assert::IsFalse(res);
 			Assert::IsTrue(f.eof());
+		}
+
+		{ // attempt to read from moved File object
+			File f0(Filenames::single_ascii_line_file);
+			Assert::IsFalse(f0.eof());
+
+			File f = std::move(f0);
+			Assert::ExpectException<File_exception>([&]
+			{
+				char ch;
+				f0.read_byte(&ch);
+			});
 		}
 	}
 

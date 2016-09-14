@@ -10,9 +10,11 @@
 namespace cg {
 namespace file {
 
-// Implements only binary file read facilities.
+// Handles all files as binary. Implements only read facilities.
 class File final {
 public:
+
+	File();
 
 	explicit File(const std::string& filename);
 
@@ -31,25 +33,33 @@ public:
 
 	// Returns true if the end of the file has been reached.
 	// Also returns true if this->handle() equals to nullptr.
-	bool eof() const noexcept;
+	bool eof() const;
 
 	// Returns the name of the file being processed by this File object.
 	const std::string& filename() const noexcept;
 
-	// Returns raw file handle that can be used directly with cstdio funcs.
-	FILE* handle() noexcept;
+	// Returns true if the file has been opened.
+	bool is_open() const noexcept;
+
+
+	// Closes the file and sets filename & handle to empty string and nullptr respectively.
+	void close() noexcept;
+
+	void open(const std::string& filename);
+
+	void open(const char* filename);
 
 	// Reads one byte and stores it in buff.
 	// Returns: true is the read operation succeeded.
-	bool read_byte(void* buff);
+	bool read_byte(void* buff) const;
 	
 	// Reads a chunk of bytes and stores it in buff.
 	// Returns: actual count of bytes read.
-	size_t File::read_bytes(void* buff, size_t byte_count);
+	size_t File::read_bytes(void* buff, size_t byte_count) const;
 
 private:
 	std::string _filename;
-	FILE* _file_handle;
+	mutable FILE* _handle;
 };
 
 // File_exception class is the only exception class in the cg::file module 
@@ -65,9 +75,10 @@ public:
 };
 
 
-inline bool File::eof() const noexcept
+inline bool File::eof() const
 {
-	return (_file_handle) ? (std::feof(_file_handle) != 0) : true;
+	enforce<File_exception>(_handle, "Invalid operation. File is not open.");
+	return (std::feof(_handle) != 0);
 }
 
 inline const std::string& File::filename() const noexcept
@@ -75,9 +86,9 @@ inline const std::string& File::filename() const noexcept
 	return _filename;
 }
 
-inline FILE* File::handle() noexcept
+inline bool File::is_open() const noexcept
 {
-	return _file_handle;
+	return (_handle != nullptr);
 }
 
 
