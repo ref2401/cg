@@ -1,7 +1,5 @@
 #include "cg/file/file.h"
 
-#include <cassert>
-
 
 namespace cg {
 namespace file {
@@ -47,6 +45,26 @@ File& File::operator=(File&& f) noexcept
 	return *this;
 }
 
+bool File::read_byte(void* buff)
+{
+	assert(buff);
+	enforce<File_exception>(_file_handle, "Invalid operation. Can't read from nullptr file handle.");
+
+	int res = std::fgetc(_file_handle);
+	if (res == EOF) return false;
+
+	*(reinterpret_cast<unsigned char*>(buff)) = static_cast<unsigned char>(res);
+	return true;
+}
+
+size_t File::read_bytes(void* buff, size_t byte_count)
+{
+	assert(buff);
+	assert(byte_count);
+	enforce<File_exception>(_file_handle, "Invalid operation. Can't read from nullptr file handle.");
+
+	return fread(buff, sizeof(unsigned char), byte_count, _file_handle);
+}
 
 File_exception::File_exception(const std::string& msg) : std::runtime_error(msg) {}
 File_exception::File_exception(const char* msg) : std::runtime_error(msg) {}
