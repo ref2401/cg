@@ -105,6 +105,14 @@ public:
 		Assert::IsTrue(it_multi == By_line_iterator::end);
 	}
 
+	TEST_METHOD(post_increment)
+	{
+		std::string expected_lines[] = { "123", "abc", "", "last_line" };
+		By_line_iterator it(Filenames::multiline_ascii_file, false);
+		for (size_t i = 0; it != By_line_iterator::end; ++i) {
+			Assert::AreEqual(expected_lines[i], *it++);
+		}
+	}
 };
 
 } // namespace unittest
