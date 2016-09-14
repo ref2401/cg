@@ -11,8 +11,9 @@ namespace unittest {
 class Filenames final {
 public:
 
-	static const std::string Filenames::empty_file;
-	static const std::string Filenames::single_ascii_line_file;
+	static const std::string empty_file;
+	static const std::string multiline_ascii_file;
+	static const std::string single_line_ascii_file;
 };
 
 } // namespace unittest

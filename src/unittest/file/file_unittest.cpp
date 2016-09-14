@@ -35,7 +35,7 @@ TEST_CLASS(File_unittest) {
 	TEST_METHOD(move_assignment)
 	{
 		File f0(Filenames::empty_file);
-		File f1(Filenames::single_ascii_line_file);
+		File f1(Filenames::single_line_ascii_file);
 
 		f1 = std::move(f0);
 		Assert::AreEqual(Filenames::empty_file, f1.filename());
@@ -77,7 +77,7 @@ TEST_CLASS(File_unittest) {
 		}
 
 		{ // file content: abc123
-			File f(Filenames::single_ascii_line_file);
+			File f(Filenames::single_line_ascii_file);
 			Assert::IsFalse(f.eof());
 
 			char ch;
@@ -94,7 +94,7 @@ TEST_CLASS(File_unittest) {
 		}
 
 		{ // attempt to read from moved File object
-			File f0(Filenames::single_ascii_line_file);
+			File f0(Filenames::single_line_ascii_file);
 			Assert::IsFalse(f0.eof());
 
 			File f = std::move(f0);
@@ -120,7 +120,7 @@ TEST_CLASS(File_unittest) {
 
 		
 		{ // file content: abc123
-			File f(Filenames::single_ascii_line_file);
+			File f(Filenames::single_line_ascii_file);
 			Assert::IsFalse(f.eof());
 
 			unsigned char buffer[8];
@@ -132,7 +132,7 @@ TEST_CLASS(File_unittest) {
 		}
 
 		{ // attempt to read from moved File object
-			File f0(Filenames::single_ascii_line_file);
+			File f0(Filenames::single_line_ascii_file);
 			Assert::IsFalse(f0.eof());
 
 			File f = std::move(f0);

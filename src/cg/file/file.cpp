@@ -4,7 +4,9 @@
 namespace cg {
 namespace file {
 
-File::File() : _handle(nullptr) {}
+// ----- File -----
+
+File::File() noexcept : _handle(nullptr) {}
 
 File::File(const std::string& filename) : File(filename.c_str()) {}
 
@@ -87,6 +89,67 @@ size_t File::read_bytes(void* buff, size_t byte_count) const
 	return fread(buff, sizeof(unsigned char), byte_count, _handle);
 }
 
+// ----- By_line_iteator -----
+
+const By_line_iterator By_line_iterator::end {};
+
+By_line_iterator::By_line_iterator(const std::string& filename, bool keep_line_feed) 
+	: _file(filename), _keep_line_feed(keep_line_feed)
+{
+	read_next_line();
+}
+
+By_line_iterator::By_line_iterator(const char* filename, bool keep_line_feed) 
+	: _file(filename), _keep_line_feed(keep_line_feed)
+{
+	read_next_line();
+}
+
+By_line_iterator::By_line_iterator(By_line_iterator&& it) noexcept 
+	: _file(std::move(it._file)), 
+	_keep_line_feed(it._keep_line_feed), 
+	_line_buffer(std::move(it._line_buffer))
+{}
+
+By_line_iterator::~By_line_iterator() noexcept
+{
+	_file.close();
+}
+
+By_line_iterator& By_line_iterator::operator=(By_line_iterator&& it) noexcept
+{
+	_file = std::move(it._file);
+	_keep_line_feed = it._keep_line_feed;
+	_line_buffer = std::move(it._line_buffer);
+	return *this;
+}
+
+void By_line_iterator::read_next_line()
+{
+	_line_buffer.clear();
+
+	if (_file.eof()) {
+		_file.close();
+		return;
+	}
+
+	while (true) {
+		char ch;
+
+		bool res = _file.read_byte(&ch);
+		if (!res) break;
+
+		if (ch == '\r') continue; // skip the abomination.
+		if (ch == '\n') break;
+
+		_line_buffer.push_back(ch);
+	}
+
+	if (_keep_line_feed)
+		_line_buffer.push_back('\n');
+}
+
+// ----- File_exception -----
 
 File_exception::File_exception(const std::string& msg) : std::runtime_error(msg) {}
 File_exception::File_exception(const char* msg) : std::runtime_error(msg) {}
