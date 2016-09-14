@@ -160,7 +160,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base\base_unittest.cpp" />
     <ClCompile Include="data\mesh_unittest.cpp" />
+    <ClCompile Include="file\file_unittest.cpp" />
+    <ClCompile Include="file\file_unittest_common.cpp" />
     <ClCompile Include="math\float2_unittest.cpp" />
     <ClCompile Include="math\float4_unittest.cpp" />
     <ClCompile Include="math\mat3_unittest.cpp" />
@@ -177,7 +180,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\math_unittest_utils.h" />
+    <ClInclude Include="file\file_unittest_common.h" />
+    <ClInclude Include="math\math_unittest_common.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

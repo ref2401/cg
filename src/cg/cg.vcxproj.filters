@@ -4,6 +4,9 @@
     <ClCompile Include="math\math.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="file\file.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -11,6 +14,12 @@
     </Filter>
     <Filter Include="data">
       <UniqueIdentifier>{3d601f46-1122-4c45-97a4-7a12c6a802a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{14828bd9-7e54-46dc-b593-49e8baede65e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{2ea1799d-f62d-4847-87d8-4e95dd87c8c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="data\mesh.h">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="file\file.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="base\base.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

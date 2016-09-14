@@ -4,14 +4,14 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
-#include "unittest/math/math_unittest_utils.h"
+#include "unittest/math/math_unittest_common.h"
 
 using cg::mat3;
 
 
 namespace unittest {
 
-TEST_CLASS(Mat3_unittests) { 
+TEST_CLASS(Mat3_unittest) { 
 	TEST_METHOD(static_members)
 	{
 		Assert::AreEqual(mat3(1, 0, 0, 0, 1, 0, 0, 0, 1), mat3::identity);

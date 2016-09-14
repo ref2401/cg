@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
-#include "unittest/math/math_unittest_utils.h"
+#include "unittest/math/math_unittest_common.h"
 
 using cg::mat4;
 

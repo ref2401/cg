@@ -31,6 +31,15 @@
     <ClCompile Include="data\mesh_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="file\file_unittest.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="base\base_unittest.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="file\file_unittest_common.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -39,10 +48,19 @@
     <Filter Include="data">
       <UniqueIdentifier>{b4d228fe-d11b-40f8-9c0b-52b577f506a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{7891cba4-70ca-4586-80f3-e13257c7d895}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{db1f1e95-ccdc-4e77-a9d3-da0ece4b3664}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\math_unittest_utils.h">
+    <ClInclude Include="math\math_unittest_common.h">
       <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="file\file_unittest_common.h">
+      <Filter>file</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

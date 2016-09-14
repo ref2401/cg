@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <utility>
-#include "unittest/math/math_unittest_utils.h"
+#include "unittest/math/math_unittest_common.h"
 #include "CppUnitTest.h"
 
 using cg::float2;

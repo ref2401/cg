@@ -119,10 +119,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="file\file.cpp" />
     <ClCompile Include="math\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\base.h" />
     <ClInclude Include="data\mesh.h" />
+    <ClInclude Include="file\file.h" />
     <ClInclude Include="math\float2.h" />
     <ClInclude Include="math\float4.h" />
     <ClInclude Include="math\mat3.h" />

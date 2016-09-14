@@ -1,5 +1,5 @@
-#ifndef UNITTEST_MATH_MATH_UNITTEST_UTILS_H_
-#define UNITTEST_MATH_MATH_UNITTEST_UTILS_H_
+#ifndef UNITTEST_MATH_MATH_UNITTEST_COMMON_H_
+#define UNITTEST_MATH_MATH_UNITTEST_COMMON_H_
 
 #include "cg/math/math.h"
 #include "CppUnitTest.h"
@@ -19,4 +19,4 @@ template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
-#endif // UNITTEST_MATH_MATH_UNITTEST_UTILS_H_
+#endif // UNITTEST_MATH_MATH_UNITTEST_COMMON_H_

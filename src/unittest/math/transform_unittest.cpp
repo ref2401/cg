@@ -1,7 +1,7 @@
 #include "cg/math/math.h"
 
 #include <cmath>
-#include "unittest/math/math_unittest_utils.h"
+#include "unittest/math/math_unittest_common.h"
 
 using cg::float3;
 using cg::float4;
