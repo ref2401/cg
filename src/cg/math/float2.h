@@ -18,11 +18,11 @@ struct float2 {
 	static const float2 zero;
 
 
-	float2();
+	float2() noexcept;
 
-	explicit float2(float val);
+	explicit float2(float val) noexcept;
 
-	float2(float x, float y);
+	float2(float x, float y) noexcept;
 
 
 	// Adds val to every component of the vector.
@@ -89,9 +89,9 @@ float2 operator/(const float2& v, float val);
 // Devides val by each component of v.
 float2 operator/(float& val, const float2& v);
 
-std::ostream& operator<<(std::ostream& out, const cg::float2& v);
+std::ostream& operator<<(std::ostream& out, const float2& v);
 
-std::wostream& operator<<(std::wostream& out, const cg::float2& v);
+std::wostream& operator<<(std::wostream& out, const float2& v);
 
 // Constrains vector v to lie between two further vectors.
 // The function processes each component of the vector separately.
@@ -128,11 +128,11 @@ float2 lerp(const float2& lhs, const float2 rhs, float factor);
 float2 normalize(const float2& v);
 
 
-inline float2::float2() : x(0), y(0) {}
+inline float2::float2() noexcept : x(0), y(0) {}
 
-inline float2::float2(float val) : x(val), y(val) {}
+inline float2::float2(float val) noexcept : x(val), y(val) {}
 
-inline float2::float2(float x, float y) : x(x), y(y) {}
+inline float2::float2(float x, float y) noexcept : x(x), y(y) {}
 
 
 inline float2& float2::operator+=(float val)
@@ -249,13 +249,13 @@ inline float2 operator/(float val, const float2& v)
 	return float2(val / v.x, val / v.y);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const cg::float2& v)
+inline std::ostream& operator<<(std::ostream& out, const float2& v)
 {
 	out << "float2(" << v.x << ", " << v.y << ")";
 	return out;
 }
 
-inline std::wostream& operator<<(std::wostream& out, const cg::float2& v)
+inline std::wostream& operator<<(std::wostream& out, const float2& v)
 {
 	out << "float2(" << v.x << ", " << v.y  << ")";
 	return out;

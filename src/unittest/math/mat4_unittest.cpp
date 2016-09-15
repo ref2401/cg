@@ -4,14 +4,14 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
-#include "unittest/math/math_unittest_common.h"
+#include "unittest/common.h"
 
 using cg::mat4;
 
 
 namespace unittest {
 
-TEST_CLASS(Mat4_unittest) {
+TEST_CLASS(cg_math_Mat4) {
 public:
 
 	TEST_METHOD(static_members)

@@ -1,7 +1,7 @@
 #include "cg/math/math.h"
 
 #include <utility>
-#include "unittest/math/math_unittest_common.h"
+#include "unittest/common.h"
 
 using cg::float3;
 using cg::quat;
@@ -9,7 +9,7 @@ using cg::quat;
 
 namespace unittest {
 
-TEST_CLASS(Quat_unittest) {
+TEST_CLASS(cg_math_Quat) {
 public:
 
 	TEST_METHOD(static_members)

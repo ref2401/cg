@@ -19,13 +19,13 @@ struct float4 {
 	static const float4 zero;
 
 
-	float4();
+	float4() noexcept;
 
-	explicit float4(float val);
+	explicit float4(float val) noexcept;
 
-	explicit float4(const float3& v3, float w = 1.f);
+	explicit float4(const float3& v3, float w = 1.f) noexcept;
 
-	float4(float x, float y, float z, float w);
+	float4(float x, float y, float z, float w) noexcept;
 
 
 	// Returns the first two components of this vector.
@@ -152,14 +152,13 @@ float4 rgba(uint32_t val);
 
 
 
-inline float4::float4() : x(0), y(0), z(0), w(0) {}
+inline float4::float4() noexcept : x(0), y(0), z(0), w(0) {}
 
-inline float4::float4(float val) : x(val), y(val), z(val), w(val) {}
+inline float4::float4(float val) noexcept : x(val), y(val), z(val), w(val) {}
 
-inline float4::float4(const float3& v3, float w)
-	: x(v3.x), y(v3.y), z(v3.z), w(w) {}
+inline float4::float4(const float3& v3, float w) noexcept : x(v3.x), y(v3.y), z(v3.z), w(w) {}
 
-inline float4::float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+inline float4::float4(float x, float y, float z, float w) noexcept : x(x), y(y), z(z), w(w) {}
 
 
 inline float2 float4::xy() const

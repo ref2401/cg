@@ -1,7 +1,7 @@
 #include "cg/math/math.h"
 
 #include <cmath>
-#include "unittest/math/math_unittest_common.h"
+#include "unittest/common.h"
 
 using cg::float3;
 using cg::float4;
@@ -12,7 +12,7 @@ using cg::quat;
 
 namespace unittest {
 
-TEST_CLASS(Transform_unittest) {
+TEST_CLASS(cg_math_Transform) {
 
 	TEST_METHOD(from_axis_angle_rotation)
 	{

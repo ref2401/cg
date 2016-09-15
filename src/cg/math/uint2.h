@@ -13,11 +13,11 @@ struct uint2 {
 	static const uint2 zero;
 
 
-	uint2();
+	uint2() noexcept;
 
-	explicit uint2(uint32_t v);
+	explicit uint2(uint32_t v) noexcept;
 
-	uint2(uint32_t x, uint32_t y);
+	uint2(uint32_t x, uint32_t y) noexcept;
 
 
 	// Calculates the proportional relationship between this.width and this.height.
@@ -99,11 +99,11 @@ bool greater_than(const uint2& v, uint32_t val);
 
 
 
-inline uint2::uint2() : x(0), y(0) {}
+inline uint2::uint2() noexcept : x(0), y(0) {}
 
-inline uint2::uint2(uint32_t v) : x(v), y(v) {}
+inline uint2::uint2(uint32_t v) noexcept : x(v), y(v) {}
 
-inline uint2::uint2(uint32_t x, uint32_t y) : x(x), y(y) {}
+inline uint2::uint2(uint32_t x, uint32_t y) noexcept : x(x), y(y) {}
 
 
 template<typename TRet>

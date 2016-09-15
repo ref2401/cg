@@ -10,6 +10,9 @@
     <ClCompile Include="file\wavefront.cpp">
       <Filter>file</Filter>
     </ClCompile>
+    <ClCompile Include="data\mesh.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

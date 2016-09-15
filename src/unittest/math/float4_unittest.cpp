@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <utility>
-#include "unittest/math/math_unittest_common.h"
+#include "unittest/common.h"
 #include "CppUnitTest.h"
 
 using cg::float4;
@@ -10,7 +10,7 @@ using cg::float4;
 
 namespace unittest {
 
-TEST_CLASS(Float4_unittest) {
+TEST_CLASS(cg_math_Float4) {
 public:
 
 	TEST_METHOD(static_members)

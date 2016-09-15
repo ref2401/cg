@@ -7,7 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace unittest {
 
-TEST_CLASS(Utils_unittest) {
+TEST_CLASS(cg_math_Utils) {
 public:
 
 	TEST_METHOD(approx_equal)

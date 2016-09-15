@@ -19,12 +19,12 @@ struct mat4 {
 	static const mat4 zero;
 
 
-	mat4();
+	mat4() noexcept;
 
 	mat4(float m00, float m01, float m02, float m03,
 		float m10, float m11, float m12, float m13,
 		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33);
+		float m30, float m31, float m32, float m33) noexcept;
 
 
 	// Returns ox vectoc of a 3D space basis.
@@ -125,7 +125,7 @@ mat4 transpose(const mat4& m);
 
 
 
-inline mat4::mat4() :
+inline mat4::mat4() noexcept :
 	m00(0), m01(0), m02(0), m03(0),
 	m10(0), m11(0), m12(0), m13(0),
 	m20(0), m21(0), m22(0), m23(0),
@@ -135,7 +135,7 @@ inline mat4::mat4() :
 inline mat4::mat4(float m00, float m01, float m02, float m03,
 	float m10, float m11, float m12, float m13,
 	float m20, float m21, float m22, float m23,
-	float m30, float m31, float m32, float m33) :
+	float m30, float m31, float m32, float m33) noexcept :
 	m00(m00), m01(m01), m02(m02), m03(m03),
 	m10(m10), m11(m11), m12(m12), m13(m13),
 	m20(m20), m21(m21), m22(m22), m23(m23),

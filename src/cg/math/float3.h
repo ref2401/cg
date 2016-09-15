@@ -19,11 +19,11 @@ struct float3 {
 	static const float3 zero;
 
 
-	float3();
+	float3() noexcept;
 
-	explicit float3(float val);
+	explicit float3(float val) noexcept;
 
-	float3(float x, float y, float z);
+	float3(float x, float y, float z) noexcept;
 
 
 	// Returns the first two components of this vector.
@@ -98,9 +98,9 @@ float3 operator/(const float3& v, float val);
 // Devides val by each component of v.
 float3 operator/(float val, const float3& v);
 
-std::ostream& operator<<(std::ostream& out, const cg::float3& v);
+std::ostream& operator<<(std::ostream& out, const float3& v);
 
-std::wostream& operator<<(std::wostream& out, const cg::float3& v);
+std::wostream& operator<<(std::wostream& out, const float3& v);
 
 // Constrains vector v to lie between two further vectors.
 // The function processes each component of the vector separately.
@@ -148,11 +148,11 @@ float3 rgb(uint32_t val);
 
 
 
-inline float3::float3() : x(0), y(0), z(0) {}
+inline float3::float3() noexcept : x(0), y(0), z(0) {}
 
-inline float3::float3(float val) : x(val), y(val), z(val) {}
+inline float3::float3(float val) noexcept : x(val), y(val), z(val) {}
 
-inline float3::float3(float x, float y, float z) : x(x), y(y), z(z) {}
+inline float3::float3(float x, float y, float z) noexcept : x(x), y(y), z(z) {}
 
 
 inline float2 float3::xy() const
@@ -286,13 +286,13 @@ inline float3 operator/(float val, const float3& v)
 	return float3(val / v.x, val / v.y, val / v.z);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const cg::float3& v)
+inline std::ostream& operator<<(std::ostream& out, const float3& v)
 {
 	out << "float3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;
 }
 
-inline std::wostream& operator<<(std::wostream& out, const cg::float3& v)
+inline std::wostream& operator<<(std::wostream& out, const float3& v)
 {
 	out << "float3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return out;

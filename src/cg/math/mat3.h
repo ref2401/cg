@@ -17,11 +17,11 @@ struct mat3 {
 	static const mat3 identity;
 	static const mat3 zero;
 
-	mat3();
+	mat3() noexcept;
 
 	mat3(float m00, float m01, float m02,
 		float m10, float m11, float m12,
-		float m20, float m21, float m22);
+		float m20, float m21, float m22) noexcept;
 
 
 	// Returns ox vectoc of a 3D space basis.
@@ -117,7 +117,7 @@ mat3 transpose(const mat3& m);
 
 
 
-inline mat3::mat3() :
+inline mat3::mat3() noexcept :
 	m00(0), m01(0), m02(0), 
 	m10(0), m11(0), m12(0), 
 	m20(0), m21(0), m22(0)
@@ -125,7 +125,7 @@ inline mat3::mat3() :
 
 inline mat3::mat3(float m00, float m01, float m02,
 	float m10, float m11, float m12,
-	float m20, float m21, float m22) :
+	float m20, float m21, float m22) noexcept :
 	m00(m00), m01(m01), m02(m02), 
 	m10(m10), m11(m11), m12(m12), 
 	m20(m20), m21(m21), m22(m22)

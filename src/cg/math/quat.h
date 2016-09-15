@@ -24,11 +24,11 @@ struct quat {
 	static const quat zero;
 
 
-	quat();
+	quat() noexcept;
 
-	quat(float x, float y, float z, float a);
+	quat(float x, float y, float z, float a) noexcept;
 
-	quat(const float3& v, float a);
+	quat(const float3& v, float a) noexcept;
 
 
 	// Adds the specified quaternion q to this quaternion.
@@ -92,11 +92,11 @@ quat normalize(const quat& q);
 quat slerp(const quat& q, const quat& r, float factor);
 
 
-inline quat::quat() : x(0), y(0), z(0), a(0) {}
+inline quat::quat() noexcept : x(0), y(0), z(0), a(0) {}
 
-inline quat::quat(float x, float y, float z, float a) : x(x), y(y), z(z), a(a) {}
+inline quat::quat(float x, float y, float z, float a) noexcept : x(x), y(y), z(z), a(a) {}
 
-inline quat::quat(const float3& v, float a) : x(v.x), y(v.y), z(v.z), a(a) {}
+inline quat::quat(const float3& v, float a) noexcept : x(v.x), y(v.y), z(v.z), a(a) {}
 
 
 inline quat& quat::operator+=(const quat& q)

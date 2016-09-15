@@ -1,7 +1,8 @@
-#ifndef UNITTEST_MATH_MATH_UNITTEST_COMMON_H_
-#define UNITTEST_MATH_MATH_UNITTEST_COMMON_H_
+#ifndef UNITTEST_COMMON_H_
+#define UNITTEST_COMMON_H_
 
 #include "cg/math/math.h"
+#include "cg/data/mesh.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -16,7 +17,22 @@ template<> inline std::wstring ToString<cg::mat3>(const cg::mat3& t) { RETURN_WI
 template<> inline std::wstring ToString<cg::mat4>(const cg::mat4& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<cg::quat>(const cg::quat& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<cg::data::Vertex>(const cg::data::Vertex& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
-#endif // UNITTEST_MATH_MATH_UNITTEST_COMMON_H_
+
+namespace unittest {
+
+class Filenames final {
+public:
+
+	static const std::string ascii_multiline;
+	static const std::string ascii_single_line;
+	static const std::string empty_file;
+	static const std::string wavefront_triangle_p;
+};
+
+} // namespace unittest
+
+#endif // UNITTEST_COMMON_H_

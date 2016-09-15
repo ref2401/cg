@@ -37,15 +37,7 @@
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="file\file_unittest_common.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
-    <ClCompile Include="file\by_line_iterator_unittest.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
-    <ClCompile Include="file\load_mesh_wavefront_unittest.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
+    <ClCompile Include="common.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -62,11 +54,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\math_unittest_common.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="file\file_unittest_common.h">
-      <Filter>file</Filter>
-    </ClInclude>
+    <ClInclude Include="common.h" />
   </ItemGroup>
 </Project>

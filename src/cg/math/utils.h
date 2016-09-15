@@ -29,7 +29,7 @@ namespace internal {
 template<typename Numeric,
 	bool is_floating_point = std::is_floating_point<Numeric>::value,
 	bool is_integral = std::is_integral<Numeric>::value>
-	struct Approx_equal_helper;
+struct Approx_equal_helper;
 
 template<typename Numeric>
 struct Approx_equal_helper<Numeric, false, true> {

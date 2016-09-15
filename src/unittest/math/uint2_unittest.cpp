@@ -1,13 +1,14 @@
 #include "cg/math/math.h"
 
 #include <utility>
-#include "unittest/math/math_unittest_common.h"
+#include "unittest/common.h"
 
 using cg::uint2;
 
+
 namespace unittest {
 
-TEST_CLASS(Uint2_unittest) {
+TEST_CLASS(cg_math_Uint2) {
 public:
 
 	TEST_METHOD(static_members)
