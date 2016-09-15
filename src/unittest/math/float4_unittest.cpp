@@ -2,8 +2,7 @@
 
 #include <cmath>
 #include <utility>
-#include "unittest/common.h"
-#include "CppUnitTest.h"
+#include "unittest/math/common_math.h"
 
 using cg::float4;
 

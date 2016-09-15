@@ -1,18 +1,119 @@
 #include "cg/data/mesh.h"
 
 #include "cg/math/math.h"
-#include "unittest/common.h"
+#include "unittest/data/common_data.h"
+#include "unittest/math/common_math.h"
 #include "CppUnitTest.h"
 
 using cg::float2;
 using cg::float3;
 using cg::float4;
+using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex;
 using cg::data::Vertex_attribs;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {
+
+TEST_CLASS(cg_data_Interleaved_vertex_fotmat) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		Interleaved_vertex_format fmt0(Vertex_attribs::normal);
+		Assert::AreEqual(Vertex_attribs::normal, fmt0.attribs);
+
+		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_tangent_h);
+		Assert::AreEqual(Vertex_attribs::mesh_tangent_h, fmt1.attribs);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		Interleaved_vertex_format fmt0(Vertex_attribs::mesh_textured);
+
+		Assert::AreNotEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::position));
+		Assert::AreEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::mesh_textured));
+	}
+
+	TEST_METHOD(component_count)
+	{
+		Assert::AreEqual(Interleaved_vertex_format::component_count_position, 
+			Interleaved_vertex_format(Vertex_attribs::position).component_count());
+		
+		Assert::AreEqual(Interleaved_vertex_format::component_count_normal,
+			Interleaved_vertex_format(Vertex_attribs::normal).component_count());
+		
+		Assert::AreEqual(Interleaved_vertex_format::component_count_tex_coord,
+			Interleaved_vertex_format(Vertex_attribs::tex_coord).component_count());
+		
+		Assert::AreEqual(Interleaved_vertex_format::component_count_tangent_h,
+			Interleaved_vertex_format(Vertex_attribs::tangent_h).component_count());
+
+		// position & normal
+		auto attribs_pn = Vertex_attribs::position | Vertex_attribs::normal;
+		size_t expected_pn = Interleaved_vertex_format::component_count_position
+			+ Interleaved_vertex_format::component_count_normal;
+		Assert::AreEqual(expected_pn, Interleaved_vertex_format(attribs_pn).component_count());
+
+		// position & tex_coord
+		size_t expected_ptc = Interleaved_vertex_format::component_count_position
+			+ Interleaved_vertex_format::component_count_tex_coord;
+		Assert::AreEqual(expected_ptc, Interleaved_vertex_format(Vertex_attribs::mesh_textured).component_count());
+
+		// position, normal & tex_coord
+		auto attribs_pntc = Vertex_attribs::position | Vertex_attribs::normal | Vertex_attribs::tex_coord;
+		size_t expected_pntc = Interleaved_vertex_format::component_count_position
+			+ Interleaved_vertex_format::component_count_normal
+			+ Interleaved_vertex_format::component_count_tex_coord;
+		Assert::AreEqual(expected_pntc, Interleaved_vertex_format(attribs_pntc).component_count());
+
+		// position, normal, tex_coord & tangnet_h
+		size_t expected_pntcth = Interleaved_vertex_format::component_count_position
+			+ Interleaved_vertex_format::component_count_normal
+			+ Interleaved_vertex_format::component_count_tex_coord
+			+ Interleaved_vertex_format::component_count_tangent_h;
+		Assert::AreEqual(expected_pntcth, Interleaved_vertex_format(Vertex_attribs::mesh_tangent_h).component_count());
+
+		// tex_coord & tangent_h
+		auto attribs_tcth = Vertex_attribs::tex_coord | Vertex_attribs::tangent_h;
+		size_t expected_tcth = Interleaved_vertex_format::component_count_tex_coord
+			+ Interleaved_vertex_format::component_count_tangent_h;
+		Assert::AreEqual(expected_tcth, Interleaved_vertex_format(attribs_tcth).component_count());
+	}
+
+	TEST_METHOD(component_offset_all)
+	{
+		auto p_n_tc_th = Interleaved_vertex_format(Vertex_attribs::mesh_tangent_h);
+		Assert::AreEqual(p_n_tc_th.component_offset_position(),	0u);
+		Assert::AreEqual(p_n_tc_th.component_offset_normal(), Interleaved_vertex_format::component_count_position);
+		Assert::AreEqual(p_n_tc_th.component_offset_tex_coord(), 
+			Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_normal);
+		Assert::AreEqual(p_n_tc_th.component_offset_tangent_h(),
+			Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_normal
+			+ Interleaved_vertex_format::component_count_tex_coord);
+
+		auto n_tc_th = Interleaved_vertex_format(Vertex_attribs::normal 
+			| Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
+		Assert::AreEqual(n_tc_th.component_offset_position(), 0u);
+		Assert::AreEqual(n_tc_th.component_offset_normal(), 0u);
+		Assert::AreEqual(n_tc_th.component_offset_tex_coord(), Interleaved_vertex_format::component_count_normal);
+		Assert::AreEqual(n_tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_normal 
+			+ Interleaved_vertex_format::component_count_tex_coord);
+
+		auto tc_th = Interleaved_vertex_format(Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
+		Assert::AreEqual(tc_th.component_offset_position(), 0u);
+		Assert::AreEqual(tc_th.component_offset_normal(), 0u);
+		Assert::AreEqual(tc_th.component_offset_tex_coord(), 0u);
+		Assert::AreEqual(tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_tex_coord);
+
+		auto th = Interleaved_vertex_format(Vertex_attribs::tangent_h);
+		Assert::AreEqual(th.component_offset_position(), 0u);
+		Assert::AreEqual(th.component_offset_normal(), 0u);
+		Assert::AreEqual(th.component_offset_tex_coord(), 0u);
+		Assert::AreEqual(th.component_offset_tangent_h(), 0u);
+	}
+};
 
 TEST_CLASS(cg_data_mesh_Vertex) {
 public:
@@ -171,7 +272,7 @@ public:
 
 	TEST_METHOD(compute_tangent_h)
 	{
-		using cg::data::compute_tanget_h;
+		using cg::data::compute_tangent_h;
 
 		// right-handed basis
 		float3 normal_positive = float3::unit_z;
@@ -179,7 +280,7 @@ public:
 		Vertex rb0 = Vertex(float3(1, -1, 0), normal_positive, float2(1, 0)); // right-bottom
 		Vertex rt0 = Vertex(float3(1, 1, 0), normal_positive, float2::unit_xy); // right-top
 
-		float4 tan_right = compute_tanget_h(lb0, rb0, rt0);
+		float4 tan_right = compute_tangent_h(lb0, rb0, rt0);
 		Assert::AreEqual(float4(float3::unit_x, 1.f), tan_right);
 
 		// left-handed basis
@@ -188,7 +289,7 @@ public:
 		Vertex rb1 = Vertex(float3(1, -1, 0), normal_negative, float2(1, 0)); // right-bottom
 		Vertex rt1 = Vertex(float3(1, 1, 0), normal_negative, float2::unit_xy); // right-top
 
-		float4 tan_left = compute_tanget_h(lb1, rb1, rt1);
+		float4 tan_left = compute_tangent_h(lb1, rb1, rt1);
 		Assert::AreEqual(float4(float3::unit_x, -1.f), tan_left);
 	}
 };

@@ -1,7 +1,7 @@
 #include "cg/math/math.h"
 
 #include <utility>
-#include "unittest/common.h"
+#include "unittest/math/common_math.h"
 
 using cg::uint2;
 

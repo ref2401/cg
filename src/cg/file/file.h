@@ -12,6 +12,16 @@
 namespace cg {
 namespace file {
 
+// File_exception class is the only exception class in the cg::file module 
+// that is used to indicate that any file related operation has failed.
+class File_exception final : std::runtime_error {
+public:
+
+	explicit File_exception(const std::string& msg) : std::runtime_error(msg) {}
+
+	explicit File_exception(const char* msg) : std::runtime_error(msg) {}
+};
+
 // Handles all files as binary. Implements only read facilities.
 class File final {
 public:
@@ -33,15 +43,26 @@ public:
 
 	File& operator=(File&& f) noexcept;
 
+
 	// Returns true if the end of the file has been reached.
 	// Also returns true if this->handle() equals to nullptr.
-	bool eof() const;
+	bool eof() const
+	{
+		enforce<File_exception>(_handle, "Invalid operation. File is not open.");
+		return (std::feof(_handle) != 0);
+	}
 
 	// Returns the name of the file being processed by this File object.
-	const std::string& filename() const noexcept;
+	const std::string& filename() const noexcept
+	{
+		return _filename;
+	}
 
 	// Returns true if the file has been opened.
-	bool is_open() const noexcept;
+	bool is_open() const noexcept
+	{
+		return (_handle != nullptr);
+	}
 
 
 	// Closes the file and sets filename & handle to empty string and nullptr respectively.
@@ -108,25 +129,53 @@ public:
 
 	By_line_iterator& operator=(By_line_iterator&& it) noexcept;
 
-	reference operator*() noexcept;
+	reference operator*() noexcept
+	{
+		return _line_buffer;
+	}
 
-	pointer operator->() noexcept;
+	pointer operator->() noexcept
+	{
+		return &_line_buffer;
+	}
 
-	By_line_iterator& operator++();
+	By_line_iterator& operator++()
+	{
+		read_next_line();
+		return *this;
+	}
 
-	Proxy operator++(int);
-
-	friend bool operator==(const By_line_iterator& l, const By_line_iterator& r) noexcept;
-
-	friend bool operator!=(const By_line_iterator& l, const By_line_iterator& r) noexcept;
-
+	Proxy operator++(int)
+	{
+		Proxy p(_line_buffer);
+		read_next_line();
+		return p;
+	}
 	
+
 	// Returns the name of the file.
-	const std::string& filename() const noexcept;
+	const std::string& filename() const noexcept
+	{
+		return _file.filename();
+	}
 
 	// Returns true if the file has been opened. 
 	// false means that this iterator is the end iterator.
-	bool is_open() const noexcept;
+	bool is_open() const noexcept
+	{
+		return _file.is_open();
+	}
+
+
+	friend bool operator==(const By_line_iterator& l, const By_line_iterator& r) noexcept
+	{
+		return !(l._file.is_open() && r._file.is_open());
+	}
+
+	friend bool operator!=(const By_line_iterator& l, const By_line_iterator& r) noexcept
+	{
+		return (l._file.is_open() || r._file.is_open());
+	}
 
 private:
 	void read_next_line();
@@ -136,87 +185,9 @@ private:
 	std::string _line_buffer;
 };
 
-// File_exception class is the only exception class in the cg::file module 
-// that is used to indicate that any file related operation has failed.
-class File_exception final : std::runtime_error {
-public:
-
-	explicit File_exception(const std::string& msg);
-
-	explicit File_exception(const char* msg);
-
-	~File_exception() noexcept;
-};
-
 void load_mesh_wavefront(const std::string& filename);
 
 void load_mesh_wavefront(const char * filename);
-
-
-// ----- File -----
-
-inline bool File::eof() const
-{
-	enforce<File_exception>(_handle, "Invalid operation. File is not open.");
-	return (std::feof(_handle) != 0);
-}
-
-inline const std::string& File::filename() const noexcept
-{
-	return _filename;
-}
-
-inline bool File::is_open() const noexcept
-{
-	return (_handle != nullptr);
-}
-
-// ----- By_line_iteator -----
-
-inline By_line_iterator::reference By_line_iterator::operator*() noexcept
-{
-	return _line_buffer;
-}
-
-inline By_line_iterator::pointer By_line_iterator::operator->() noexcept
-{
-	return &_line_buffer;
-}
-
-inline By_line_iterator& By_line_iterator::operator++()
-{
-	read_next_line();
-	return *this;
-}
-
-inline By_line_iterator::Proxy By_line_iterator::operator++(int)
-{
-	Proxy p(_line_buffer);
-	read_next_line();
-	return p;
-}
-
-inline bool operator==(const By_line_iterator& l, const By_line_iterator& r) noexcept
-{
-	return !(l._file.is_open() && r._file.is_open());
-}
-
-inline bool operator!=(const By_line_iterator& l, const By_line_iterator& r) noexcept
-{
-	return (l._file.is_open() || r._file.is_open());
-}
-
-inline const std::string& By_line_iterator::filename() const noexcept
-{
-	return _file.filename();
-}
-
-inline bool By_line_iterator::is_open() const noexcept
-{
-	return _file.is_open();
-}
-
-
 
 
 } // namespace file

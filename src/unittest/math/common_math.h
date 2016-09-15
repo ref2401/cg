@@ -1,8 +1,7 @@
-#ifndef UNITTEST_COMMON_H_
-#define UNITTEST_COMMON_H_
+#ifndef UNITTEST_MATH_COMMON_MATH_H_
+#define UNITTEST_MATH_COMMON_MATH_H_
 
 #include "cg/math/math.h"
-#include "cg/data/mesh.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -17,7 +16,6 @@ template<> inline std::wstring ToString<cg::mat3>(const cg::mat3& t) { RETURN_WI
 template<> inline std::wstring ToString<cg::mat4>(const cg::mat4& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<cg::quat>(const cg::quat& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::data::Vertex>(const cg::data::Vertex& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
@@ -35,4 +33,4 @@ public:
 
 } // namespace unittest
 
-#endif // UNITTEST_COMMON_H_
+#endif // UNITTEST_MATH_COMMON_MATH_H_

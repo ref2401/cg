@@ -5,7 +5,7 @@ namespace data {
 
 // ----- funcs -----
 
-float4 compute_tanget_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
+float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 {
 	assert(v0.normal == v1.normal && v1.normal == v2.normal);
 

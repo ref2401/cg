@@ -149,11 +149,5 @@ void By_line_iterator::read_next_line()
 		_line_buffer.push_back('\n');
 }
 
-// ----- File_exception -----
-
-File_exception::File_exception(const std::string& msg) : std::runtime_error(msg) {}
-File_exception::File_exception(const char* msg) : std::runtime_error(msg) {}
-File_exception::~File_exception() {}
-
 } // namespace file
 } // namespace cg

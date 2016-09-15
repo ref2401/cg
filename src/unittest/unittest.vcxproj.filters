@@ -37,7 +37,9 @@
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="common.cpp" />
+    <ClCompile Include="file\common_file.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -54,6 +56,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
+    <ClInclude Include="data\common_data.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="file\common_file.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="math\common_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

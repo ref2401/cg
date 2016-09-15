@@ -161,8 +161,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
-    <ClCompile Include="common.cpp" />
     <ClCompile Include="data\mesh_unittest.cpp" />
+    <ClCompile Include="file\common_file.cpp" />
     <ClCompile Include="file\file_unittest.cpp" />
     <ClCompile Include="math\float2_unittest.cpp" />
     <ClCompile Include="math\float4_unittest.cpp" />
@@ -180,7 +180,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
+    <ClInclude Include="data\common_data.h" />
+    <ClInclude Include="file\common_file.h" />
+    <ClInclude Include="math\common_math.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
