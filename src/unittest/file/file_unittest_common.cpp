@@ -2,8 +2,9 @@
 
 namespace unittest {
 
-const std::string Filenames::empty_file("../data/unittest/empty");
-const std::string Filenames::multiline_ascii_file("../data/unittest/multiline_ascii");
-const std::string Filenames::single_line_ascii_file("../data/unittest/single_line_ascii");
+const std::string Filenames::ascii_multiline("../data/unittest/ascii_multiline");
+const std::string Filenames::ascii_single_line("../data/unittest/ascii_single_line");
+const std::string Filenames::empty_file("../data/unittest/empty_file");
+const std::string Filenames::wavefront_triangle_p("../data/unittest/wavefront_triangle_p.obj");
 
 } // namespace unittest

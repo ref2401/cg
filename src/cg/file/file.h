@@ -6,6 +6,7 @@
 #include <iterator>
 #include <stdexcept>
 #include "cg/base/base.h"
+#include "cg/data/mesh.h"
 
 
 namespace cg {
@@ -147,6 +148,10 @@ public:
 	~File_exception() noexcept;
 };
 
+void load_mesh_wavefront(const std::string& filename);
+
+void load_mesh_wavefront(const char * filename);
+
 
 // ----- File -----
 
@@ -210,6 +215,8 @@ inline bool By_line_iterator::is_open() const noexcept
 {
 	return _file.is_open();
 }
+
+
 
 
 } // namespace file

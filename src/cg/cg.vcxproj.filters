@@ -7,6 +7,9 @@
     <ClCompile Include="file\file.cpp">
       <Filter>file</Filter>
     </ClCompile>
+    <ClCompile Include="file\wavefront.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

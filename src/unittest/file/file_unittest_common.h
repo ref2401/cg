@@ -11,9 +11,10 @@ namespace unittest {
 class Filenames final {
 public:
 
+	static const std::string ascii_multiline;
+	static const std::string ascii_single_line;
 	static const std::string empty_file;
-	static const std::string multiline_ascii_file;
-	static const std::string single_line_ascii_file;
+	static const std::string wavefront_triangle_p;
 };
 
 } // namespace unittest

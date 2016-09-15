@@ -162,9 +162,10 @@
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
     <ClCompile Include="data\mesh_unittest.cpp" />
-    <ClCompile Include="file\By_line_iterator_unittest.cpp" />
+    <ClCompile Include="file\by_line_iterator_unittest.cpp" />
     <ClCompile Include="file\file_unittest.cpp" />
     <ClCompile Include="file\file_unittest_common.cpp" />
+    <ClCompile Include="file\load_mesh_wavefront_unittest.cpp" />
     <ClCompile Include="math\float2_unittest.cpp" />
     <ClCompile Include="math\float4_unittest.cpp" />
     <ClCompile Include="math\mat3_unittest.cpp" />

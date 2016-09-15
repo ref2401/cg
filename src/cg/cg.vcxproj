@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="file\file.cpp" />
+    <ClCompile Include="file\wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
   </ItemGroup>
   <ItemGroup>

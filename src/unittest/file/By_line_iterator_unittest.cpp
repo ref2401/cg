@@ -29,8 +29,8 @@ public:
 		
 		{ // single line file iterator
 			std::string expected_first_line = "abc123";
-			By_line_iterator it(Filenames::single_line_ascii_file);
-			Assert::AreEqual(Filenames::single_line_ascii_file, it.filename());
+			By_line_iterator it(Filenames::ascii_single_line);
+			Assert::AreEqual(Filenames::ascii_single_line, it.filename());
 			Assert::IsTrue(it.is_open());
 			Assert::AreEqual(expected_first_line, *it);
 			Assert::AreEqual(expected_first_line.size(), it->size());
@@ -39,8 +39,8 @@ public:
 
 		{ // multiline file iterator
 			std::string expected_first_line = "123";
-			By_line_iterator it(Filenames::multiline_ascii_file);
-			Assert::AreEqual(Filenames::multiline_ascii_file, it.filename());
+			By_line_iterator it(Filenames::ascii_multiline);
+			Assert::AreEqual(Filenames::ascii_multiline, it.filename());
 			Assert::IsTrue(it.is_open());
 			Assert::AreEqual(expected_first_line, *it);
 			Assert::AreEqual(expected_first_line.size(), it->size());
@@ -61,14 +61,14 @@ public:
 
 		// single line file iterator
 		std::string expected_line = "abc123";
-		By_line_iterator it_single(Filenames::single_line_ascii_file, false);
+		By_line_iterator it_single(Filenames::ascii_single_line, false);
 		Assert::AreEqual(expected_line, *it_single);
 		++it_single;
 		Assert::IsTrue(it_single == By_line_iterator::end);
 
 		// multiline file iterator
 		std::string expected_lines[] = { "123", "abc", "", "last_line" };
-		By_line_iterator it_multi(Filenames::multiline_ascii_file, false);
+		By_line_iterator it_multi(Filenames::ascii_multiline, false);
 		for (size_t i = 0; it_multi != By_line_iterator::end; ++it_multi, ++i) {
 			Assert::AreEqual(expected_lines[i], *it_multi);
 		}
@@ -90,7 +90,7 @@ public:
 
 		{ // single line file iterator
 			std::string expected_line = "abc123\n";
-			By_line_iterator it_single(Filenames::single_line_ascii_file, true);
+			By_line_iterator it_single(Filenames::ascii_single_line, true);
 			Assert::AreEqual(expected_line, *it_single);
 			++it_single;
 			Assert::IsTrue(it_single == By_line_iterator::end);
@@ -98,7 +98,7 @@ public:
 
 		// multiline file iterator
 		std::string expected_lines[] = { "123\n", "abc\n", "\n", "last_line\n" };
-		By_line_iterator it_multi(Filenames::multiline_ascii_file, true);
+		By_line_iterator it_multi(Filenames::ascii_multiline, true);
 		for (size_t i = 0; it_multi != By_line_iterator::end; ++it_multi, ++i) {
 			Assert::AreEqual(expected_lines[i], *it_multi);
 		}
@@ -108,7 +108,7 @@ public:
 	TEST_METHOD(post_increment)
 	{
 		std::string expected_lines[] = { "123", "abc", "", "last_line" };
-		By_line_iterator it(Filenames::multiline_ascii_file, false);
+		By_line_iterator it(Filenames::ascii_multiline, false);
 		for (size_t i = 0; it != By_line_iterator::end; ++i) {
 			Assert::AreEqual(expected_lines[i], *it++);
 		}

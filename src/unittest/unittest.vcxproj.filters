@@ -40,7 +40,10 @@
     <ClCompile Include="file\file_unittest_common.cpp">
       <Filter>file</Filter>
     </ClCompile>
-    <ClCompile Include="file\By_line_iterator_unittest.cpp">
+    <ClCompile Include="file\by_line_iterator_unittest.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="file\load_mesh_wavefront_unittest.cpp">
       <Filter>file</Filter>
     </ClCompile>
   </ItemGroup>
