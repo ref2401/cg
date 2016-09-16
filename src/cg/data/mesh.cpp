@@ -3,6 +3,55 @@
 namespace cg {
 namespace data {
 
+// ----- Interleaved_mesh_data -----
+
+void Interleaved_mesh_data::push_back_index(uint32_t i)
+{
+	_indices.push_back(i);
+}
+
+void Interleaved_mesh_data::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
+{
+	_indices.push_back(i0);
+	_indices.push_back(i1);
+	_indices.push_back(i2);
+}
+
+void Interleaved_mesh_data::push_back_vertex(const Vertex& v)
+{
+	if (has_position(_format.attribs)) {
+		_data.push_back(v.position.x);
+		_data.push_back(v.position.y);
+		_data.push_back(v.position.z);
+	}
+
+	if (has_normal(_format.attribs)) {
+		_data.push_back(v.normal.x);
+		_data.push_back(v.normal.y);
+		_data.push_back(v.normal.z);
+	}
+
+	if (has_tex_coord(_format.attribs)) {
+		_data.push_back(v.tex_coord.u);
+		_data.push_back(v.tex_coord.v);
+	}
+
+	if (has_tangent_h(_format.attribs)) {
+		_data.push_back(v.tangent_h.x);
+		_data.push_back(v.tangent_h.y);
+		_data.push_back(v.tangent_h.z);
+		_data.push_back(v.tangent_h.w);
+	}
+
+}
+
+void Interleaved_mesh_data::push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2)
+{
+	push_back_vertex(v0);
+	push_back_vertex(v1);
+	push_back_vertex(v2);
+}
+
 // ----- funcs -----
 
 float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)

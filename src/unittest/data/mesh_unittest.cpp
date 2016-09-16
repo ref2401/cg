@@ -1,5 +1,7 @@
 #include "cg/data/mesh.h"
 
+#include <algorithm>
+#include <iterator>
 #include "cg/math/math.h"
 #include "unittest/data/common_data.h"
 #include "unittest/math/common_math.h"
@@ -8,6 +10,8 @@
 using cg::float2;
 using cg::float3;
 using cg::float4;
+using cg::approx_equal;
+using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex;
 using cg::data::Vertex_attribs;
@@ -15,6 +19,120 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {
+
+TEST_CLASS(cg_data_Interleaved_mesh_data) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		Interleaved_mesh_data md0(Vertex_attribs::position);
+		Assert::AreEqual(Vertex_attribs::position, md0.attribs());
+		Assert::AreEqual(0u, md0.data().capacity());
+		Assert::AreEqual(0u, md0.indices().capacity());
+
+		Interleaved_mesh_data md1(Vertex_attribs::mesh_textured, 4, 6);
+		Assert::AreEqual(Vertex_attribs::mesh_textured, md1.attribs());
+		Assert::AreEqual(md1.data().capacity(),
+			4 * (Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_tex_coord));
+		Assert::AreEqual(6u, md1.indices().capacity());
+	}
+
+	TEST_METHOD(push_back_indices)
+	{
+		uint32_t expected_indices[5] = { 0, 1, 2, 3, 4 };
+
+		Interleaved_mesh_data md(Vertex_attribs::position);
+		md.push_back_index(0);
+		md.push_back_indices(1, 2, 3);
+		md.push_back_index(4);
+
+		Assert::IsTrue(std::equal(md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+	}
+
+	TEST_METHOD(push_back_vertices)
+	{
+		Vertex v0(float3(1, 2, 3), float3(6, 7, 8), float2(4, 5),  float4(9, 10, 11, 12));
+		Vertex v1(float3(101, 102, 103), float3(106, 107, 108), float2(104, 105), float4(109, 110, 111, 112));
+		Vertex v2(float3(201, 202, 203), float3(206, 207, 208), float2(204, 205), float4(209, 210, 211, 212));
+
+		{ // position attrib
+			float expected_data[9] = { 
+				v0.position.x, v0.position.y, v0.position.z,
+				v1.position.x, v1.position.y, v1.position.z,
+				v2.position.x, v2.position.y, v2.position.z
+			};
+
+			Interleaved_mesh_data md(Vertex_attribs::position);
+			md.push_back_vertex(v0);
+			md.push_back_vertex(v1);
+			md.push_back_vertex(v2);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(), 
+				std::cbegin(expected_data), 
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position & normal attribs
+			float expected_data[18] = {
+				v0.position.x, v0.position.y, v0.position.z, v0.normal.x, v0.normal.y, v0.normal.z,
+				v1.position.x, v1.position.y, v1.position.z, v1.normal.x, v1.normal.y, v1.normal.z,
+				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z
+			};
+
+			Interleaved_mesh_data md(Vertex_attribs::position | Vertex_attribs::normal);
+			md.push_back_vertex(v0);
+			md.push_back_vertex(v1);
+			md.push_back_vertex(v2);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position, normal & tex_coord attribs
+			float expected_data[24] = {
+				v0.position.x, v0.position.y, v0.position.z, v0.normal.x, v0.normal.y, v0.normal.z, v0.tex_coord.u, v0.tex_coord.v,
+				v1.position.x, v1.position.y, v1.position.z, v1.normal.x, v1.normal.y, v1.normal.z, v1.tex_coord.u, v1.tex_coord.v,
+				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z, v2.tex_coord.u, v2.tex_coord.v,
+			};
+
+			Interleaved_mesh_data md(Vertex_attribs::position | Vertex_attribs::normal | Vertex_attribs::tex_coord);
+			md.push_back_vertex(v0);
+			md.push_back_vertex(v1);
+			md.push_back_vertex(v2);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position, normal & tex_coord attribs
+			float expected_data[36] = {
+				v0.position.x, v0.position.y, v0.position.z, v0.normal.x, v0.normal.y, v0.normal.z, 
+				v0.tex_coord.u, v0.tex_coord.v, v0.tangent_h.x, v0.tangent_h.y, v0.tangent_h.z, v0.tangent_h.w,
+				
+				v1.position.x, v1.position.y, v1.position.z, v1.normal.x, v1.normal.y, v1.normal.z, 
+				v1.tex_coord.u, v1.tex_coord.v, v1.tangent_h.x, v1.tangent_h.y, v1.tangent_h.z, v1.tangent_h.w,
+
+				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z, 
+				v2.tex_coord.u, v2.tex_coord.v, v2.tangent_h.x, v2.tangent_h.y, v2.tangent_h.z, v2.tangent_h.w,
+			};
+
+			Interleaved_mesh_data md(Vertex_attribs::mesh_tangent_h);
+			md.push_back_vertex(v0);
+			md.push_back_vertex(v1);
+			md.push_back_vertex(v2);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+	}
+};
 
 TEST_CLASS(cg_data_Interleaved_vertex_fotmat) {
 public:

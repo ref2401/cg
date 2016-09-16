@@ -2,8 +2,10 @@
 #define CG_DATA_MESH_H_
 
 #include <cassert>
+#include <cstdint>
 #include <ostream>
 #include <type_traits>
+#include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
 
@@ -27,9 +29,8 @@ constexpr bool has_position(Vertex_attribs attribs);
 constexpr bool has_tangent_h(Vertex_attribs attribs);
 constexpr bool has_tex_coord(Vertex_attribs attribs);
 
-
 // Describes the order and offset (byte & component) of every vertex attribute.
-// The default order of the attributes is: position, normal, tex_coord, tangent_h.
+// The relative order of the attributes is: position, normal, tex_coord, tangent_h.
 // All the offsets are calculated accordint to the defaul order.
 //
 // Each attribute has at least 1 component of some type (offen the type is float).
@@ -38,7 +39,7 @@ constexpr bool has_tex_coord(Vertex_attribs attribs);
 // position has 3 components: x, y, z; tex_coord has 2 components: u, v.
 // total component count = 3 + 2 = 5;
 // total byte count = 5 * sizeof(float).
-// position's offset:	0 components, 0 bytes (position is first in the default order).
+// position's offset:	0 components, 0 bytes (position is first in the relative order).
 // tex_coord's offset:	3 components, 3 * sizeof(float) bytes (tex_coord goes right after the position).
 struct Interleaved_vertex_format {
 	static constexpr size_t component_count_normal = 3;
@@ -47,10 +48,10 @@ struct Interleaved_vertex_format {
 	static constexpr size_t component_count_tex_coord = 2;
 
 
-	explicit Interleaved_vertex_format(Vertex_attribs attribs) noexcept 
-		: attribs(attribs) 
+	explicit Interleaved_vertex_format(Vertex_attribs attribs) noexcept
+		: attribs(attribs)
 	{}
-	
+
 	// Total size in bytes of the vertex.
 	size_t byte_count() const
 	{
@@ -96,8 +97,8 @@ struct Interleaved_vertex_format {
 	// How many components are there before normal data starts.
 	size_t component_offset_normal() const noexcept
 	{
-		size_t prior_cmpt_count = has_position(attribs) 
-			? (Interleaved_vertex_format::component_count_position) 
+		size_t prior_cmpt_count = has_position(attribs)
+			? (Interleaved_vertex_format::component_count_position)
 			: 0u;
 		return component_offset_position() + prior_cmpt_count;
 	}
@@ -112,7 +113,7 @@ struct Interleaved_vertex_format {
 	size_t component_offset_tangent_h() const noexcept
 	{
 		size_t prior_cmpt_count = has_tex_coord(attribs)
-			? (Interleaved_vertex_format::component_count_tex_coord) 
+			? (Interleaved_vertex_format::component_count_tex_coord)
 			: 0u;
 		return component_offset_tex_coord() + prior_cmpt_count;
 	}
@@ -120,8 +121,8 @@ struct Interleaved_vertex_format {
 	// How many components are there before tex_coord data starts.
 	size_t component_offset_tex_coord() const noexcept
 	{
-		size_t prior_cmpt_count = has_normal(attribs) 
-			? (Interleaved_vertex_format::component_count_normal) 
+		size_t prior_cmpt_count = has_normal(attribs)
+			? (Interleaved_vertex_format::component_count_normal)
 			: 0u;
 		return component_offset_normal() + prior_cmpt_count;
 	}
@@ -158,6 +159,63 @@ struct Vertex {
 	float3 normal;
 	float2 tex_coord;
 	float4 tangent_h;
+};
+
+// Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
+// Implementation details: does not support base vertex counter.
+class Interleaved_mesh_data final {
+public:
+
+	explicit Interleaved_mesh_data(Vertex_attribs attribs)
+		: Interleaved_mesh_data(attribs, 0, 0)
+	{}
+
+	Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
+		: _format(attribs)
+	{
+		_data.reserve(_format.component_count() * vertex_count);
+		_indices.reserve(index_count);
+	}
+
+
+	Vertex_attribs attribs() const
+	{
+		return _format.attribs;
+	}
+
+	// Returns interleaved attributes buffer.
+	const std::vector<float>& data() const
+	{
+		return _data;
+	}
+
+	// Represents format of this mesh data. Use format property to set offsets & strides.
+	Interleaved_vertex_format format() const
+	{
+		return _format;
+	}
+
+	// Indices
+	const std::vector<uint32_t>& indices() const
+	{
+		return _indices;
+	}
+
+
+	void push_back_index(uint32_t i);
+
+	void push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2);
+
+	// Packs all the v vertex attribus that are specified in format.
+	// Preserves the relative order of the attributes: positon, normal, tex_coord, tangent_h.
+	void push_back_vertex(const Vertex& v);
+
+	void push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2);
+
+private:
+	std::vector<float> _data;
+	std::vector<uint32_t> _indices;
+	Interleaved_vertex_format _format;
 };
 
 
