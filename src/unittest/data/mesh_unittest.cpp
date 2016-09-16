@@ -19,6 +19,37 @@ namespace unittest {
 TEST_CLASS(cg_data_Interleaved_vertex_fotmat) {
 public:
 
+	TEST_METHOD(byte_count)
+	{
+		Interleaved_vertex_format fmt0(Vertex_attribs::position);
+		Assert::AreEqual(fmt0.component_count() * sizeof(float), fmt0.byte_count());
+
+		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_textured);
+		Assert::AreEqual(fmt1.component_count() * sizeof(float), fmt1.byte_count());
+
+		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_h);
+		Assert::AreEqual(fmt2.component_count() * sizeof(float), fmt2.byte_count());
+	}
+
+	TEST_METHOD(byte_offset)
+	{
+		Interleaved_vertex_format fmt(Vertex_attribs::mesh_tangent_h);
+		
+		Assert::AreEqual(fmt.byte_offset_position(), 0u);
+		
+		Assert::AreEqual(fmt.byte_offset_normal(), 
+			Interleaved_vertex_format::component_count_position * sizeof(float));
+		
+		Assert::AreEqual(fmt.byte_offset_tex_coord(), 
+			(Interleaved_vertex_format::component_count_position 
+			+ Interleaved_vertex_format::component_count_normal) * sizeof(float));
+
+		Assert::AreEqual(fmt.byte_offset_tangent_h(),
+			(Interleaved_vertex_format::component_count_position
+				+ Interleaved_vertex_format::component_count_normal
+				+ Interleaved_vertex_format::component_count_tex_coord) * sizeof(float));
+	}
+
 	TEST_METHOD(ctors)
 	{
 		Interleaved_vertex_format fmt0(Vertex_attribs::normal);
@@ -26,14 +57,6 @@ public:
 
 		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_tangent_h);
 		Assert::AreEqual(Vertex_attribs::mesh_tangent_h, fmt1.attribs);
-	}
-
-	TEST_METHOD(equal_operator)
-	{
-		Interleaved_vertex_format fmt0(Vertex_attribs::mesh_textured);
-
-		Assert::AreNotEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::position));
-		Assert::AreEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::mesh_textured));
 	}
 
 	TEST_METHOD(component_count)
@@ -84,7 +107,7 @@ public:
 
 	TEST_METHOD(component_offset_all)
 	{
-		auto p_n_tc_th = Interleaved_vertex_format(Vertex_attribs::mesh_tangent_h);
+		Interleaved_vertex_format p_n_tc_th(Vertex_attribs::mesh_tangent_h);
 		Assert::AreEqual(p_n_tc_th.component_offset_position(),	0u);
 		Assert::AreEqual(p_n_tc_th.component_offset_normal(), Interleaved_vertex_format::component_count_position);
 		Assert::AreEqual(p_n_tc_th.component_offset_tex_coord(), 
@@ -93,7 +116,7 @@ public:
 			Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_normal
 			+ Interleaved_vertex_format::component_count_tex_coord);
 
-		auto n_tc_th = Interleaved_vertex_format(Vertex_attribs::normal 
+		Interleaved_vertex_format n_tc_th(Vertex_attribs::normal
 			| Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
 		Assert::AreEqual(n_tc_th.component_offset_position(), 0u);
 		Assert::AreEqual(n_tc_th.component_offset_normal(), 0u);
@@ -101,17 +124,25 @@ public:
 		Assert::AreEqual(n_tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_normal 
 			+ Interleaved_vertex_format::component_count_tex_coord);
 
-		auto tc_th = Interleaved_vertex_format(Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
+		Interleaved_vertex_format tc_th(Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
 		Assert::AreEqual(tc_th.component_offset_position(), 0u);
 		Assert::AreEqual(tc_th.component_offset_normal(), 0u);
 		Assert::AreEqual(tc_th.component_offset_tex_coord(), 0u);
 		Assert::AreEqual(tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_tex_coord);
 
-		auto th = Interleaved_vertex_format(Vertex_attribs::tangent_h);
+		Interleaved_vertex_format th(Vertex_attribs::tangent_h);
 		Assert::AreEqual(th.component_offset_position(), 0u);
 		Assert::AreEqual(th.component_offset_normal(), 0u);
 		Assert::AreEqual(th.component_offset_tex_coord(), 0u);
 		Assert::AreEqual(th.component_offset_tangent_h(), 0u);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		Interleaved_vertex_format fmt0(Vertex_attribs::mesh_textured);
+
+		Assert::AreNotEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::position));
+		Assert::AreEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::mesh_textured));
 	}
 };
 

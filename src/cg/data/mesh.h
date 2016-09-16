@@ -38,8 +38,8 @@ constexpr bool has_tex_coord(Vertex_attribs attribs);
 // position has 3 components: x, y, z; tex_coord has 2 components: u, v.
 // total component count = 3 + 2 = 5;
 // total byte count = 5 * sizeof(float).
-// position's offset:	0 components, 0 bytes. (position is first in the default order).
-// tex_coord's offset:	3 components, 3 * sizeof(float) bytes.
+// position's offset:	0 components, 0 bytes (position is first in the default order).
+// tex_coord's offset:	3 components, 3 * sizeof(float) bytes (tex_coord goes right after the position).
 struct Interleaved_vertex_format {
 	static constexpr size_t component_count_normal = 3;
 	static constexpr size_t component_count_position = 3;
@@ -52,10 +52,34 @@ struct Interleaved_vertex_format {
 	{}
 	
 	// Total size in bytes of the vertex.
-	//size_t byte_count() const;
+	size_t byte_count() const
+	{
+		return component_count() * sizeof(float);
+	}
 
-	//size_t byte_offset_position() const;
+	// How many bytes are there before normal data starts.
+	size_t byte_offset_normal() const
+	{
+		return component_offset_normal() * sizeof(float);
+	}
 
+	// How many bytes are there before position data starts.
+	size_t byte_offset_position() const
+	{
+		return component_offset_position() * sizeof(float);
+	}
+
+	// How many bytes are there before tangent_h data starts.
+	size_t byte_offset_tangent_h() const
+	{
+		return component_offset_tangent_h() * sizeof(float);
+	}
+
+	// How many bytes are there before tex_coord data starts.
+	size_t byte_offset_tex_coord() const
+	{
+		return component_offset_tex_coord() * sizeof(float);
+	}
 
 	// Total number of components in the vertex.
 	size_t component_count() const noexcept
@@ -69,7 +93,7 @@ struct Interleaved_vertex_format {
 		return counter;
 	}
 
-	// How many components are before normal data starts.
+	// How many components are there before normal data starts.
 	size_t component_offset_normal() const noexcept
 	{
 		size_t prior_cmpt_count = has_position(attribs) 
@@ -78,13 +102,13 @@ struct Interleaved_vertex_format {
 		return component_offset_position() + prior_cmpt_count;
 	}
 
-	// How many components are before position data starts.
+	// How many components are there before position data starts.
 	size_t component_offset_position() const noexcept
 	{
 		return 0u;
 	}
 
-	// How many components are before tangent_h data starts.
+	// How many components are there before tangent_h data starts.
 	size_t component_offset_tangent_h() const noexcept
 	{
 		size_t prior_cmpt_count = has_tex_coord(attribs)
@@ -93,7 +117,7 @@ struct Interleaved_vertex_format {
 		return component_offset_tex_coord() + prior_cmpt_count;
 	}
 
-	// How many components are before tex_coord data starts.
+	// How many components are there before tex_coord data starts.
 	size_t component_offset_tex_coord() const noexcept
 	{
 		size_t prior_cmpt_count = has_normal(attribs) 
@@ -232,9 +256,8 @@ inline std::wostream& operator<<(std::wostream& out, const Vertex& v)
 	return out;
 }
 
-// Computes tangent and handedness of bitangent for a trinagnel 
-// that is specified by the 3 given vertices.
-// Assumes that all the normals are equal.
+// Computes tangent and handedness of bitangent for a trinaglel that is specified by the 3 given vertices.
+// Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.
 // Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
 float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2);
 
