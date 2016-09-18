@@ -1,5 +1,7 @@
 #include "cg/file/file.h"
 
+#include <algorithm>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include "unittest/file/common_file.h"
@@ -257,11 +259,100 @@ public:
 TEST_CLASS(cg_file_Funcs) {
 public:
 
-	TEST_METHOD(load_mesh_triangle_positions)
+	TEST_METHOD(load_mesh_triangle)
 	{
+		using cg::approx_equal;
+		using cg::data::Interleaved_mesh_data;
+		using cg::data::Vertex_attribs;
 		using cg::file::load_mesh_wavefront;
 
-		load_mesh_wavefront(Filenames::wavefront_triangle_p);
+		uint32_t expected_indices[3] = { 0, 1, 2 };
+		{ // positions only
+			float expected_data[9] = { -1, 0, 1, 1, 0, 1, 1, 0, -1 };
+			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_p, Vertex_attribs::position);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+			
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & normals
+			float expected_data[18] = { 
+				-1, 0, 1, 0, 1, 0,
+				1, 0, 1, 0, 1, 0,
+				1, 0, -1, 0, 1, 0
+			};
+
+			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pn, 
+				Vertex_attribs::position | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & tex_coords
+			float expected_data[15] = {
+				-1, 0, 1, 0, 1,
+				1, 0, 1, 0, 0,
+				1, 0, -1, 1, 0
+			};
+
+			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_ptc, Vertex_attribs::mesh_textured);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal & tex_coords
+			float expected_data[24] = {
+				-1, 0, 1,  0, 1, 0,  0, 1,
+				1, 0, 1,  0, 1, 0,  0, 0,
+				1, 0, -1,  0, 1, 0,  1, 0
+			};
+
+			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pntc, 
+				Vertex_attribs::mesh_textured | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal, tex_coords, tangent_h
+			float expected_data[36] = {
+				-1, 0, 1,  0, 1, 0,  0, 1,  0, 0, -1, 1,
+				1, 0, 1,  0, 1, 0,  0, 0,  0, 0, -1, 1,
+				1, 0, -1,  0, 1, 0,  1, 0,  0, 0, -1, 1
+			};
+
+			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pntc, Vertex_attribs::mesh_tangent_h);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
 	}
 
 };

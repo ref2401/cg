@@ -44,6 +44,9 @@ public:
 	File& operator=(File&& f) noexcept;
 
 
+	// Closes the file and sets filename & handle to empty string and nullptr respectively.
+	void close() noexcept;
+
 	// Returns true if the end of the file has been reached.
 	// Also returns true if this->handle() equals to nullptr.
 	bool eof() const
@@ -63,10 +66,6 @@ public:
 	{
 		return (_handle != nullptr);
 	}
-
-
-	// Closes the file and sets filename & handle to empty string and nullptr respectively.
-	void close() noexcept;
 
 	void open(const std::string& filename);
 
@@ -185,9 +184,9 @@ private:
 	std::string _line_buffer;
 };
 
-void load_mesh_wavefront(const std::string& filename);
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, cg::data::Vertex_attribs attribs);
 
-void load_mesh_wavefront(const char * filename);
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const char * filename, cg::data::Vertex_attribs attribs);
 
 
 } // namespace file

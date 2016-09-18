@@ -16,6 +16,9 @@ public:
 	static const std::string ascii_single_line;
 	static const std::string empty_file;
 	static const std::string wavefront_triangle_p;
+	static const std::string wavefront_triangle_pn;
+	static const std::string wavefront_triangle_ptc;
+	static const std::string wavefront_triangle_pntc;
 };
 
 } // namespace unittest

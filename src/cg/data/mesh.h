@@ -201,7 +201,6 @@ public:
 		return _indices;
 	}
 
-
 	void push_back_index(uint32_t i);
 
 	void push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2);
@@ -254,32 +253,26 @@ inline bool operator!=(const Vertex& l, const Vertex& r) noexcept
 	return !(l == r);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attrib)
+inline std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
 {
-	switch (attrib) {
-		case Vertex_attribs::position:			out << "Vertex_attribs::position"; break;
-		case Vertex_attribs::normal:			out << "Vertex_attribs::normal"; break;
-		case Vertex_attribs::tex_coord:			out << "Vertex_attribs::tex_coord"; break;
-		case Vertex_attribs::tangent_h:			out << "Vertex_attribs::tangent_h"; break;
-			// case Vertex_attribs::mesh_position: is skipped 
-		case Vertex_attribs::mesh_textured:		out << "Vertex_attribs::mesh_textured"; break;
-		case Vertex_attribs::mesh_tangent_h:	out << "Vertex_attribs::mesh_tangent_h"; break;
-	}
+	out << "Vertex_attribs(";
+	if (has_position(attribs)) out << "position";
+	if (has_normal(attribs)) out << " normal";
+	if (has_tex_coord(attribs)) out << " tex_coord";
+	if (has_tangent_h(attribs)) out << " tangent_h";
+	out << ")";
 
 	return out;
 }
 
-inline std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attrib)
+inline std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
 {
-	switch (attrib) {
-		case Vertex_attribs::position:			out << "Vertex_attribs::position"; break;
-		case Vertex_attribs::normal:			out << "Vertex_attribs::normal"; break;
-		case Vertex_attribs::tex_coord:			out << "Vertex_attribs::tex_coord"; break;
-		case Vertex_attribs::tangent_h:			out << "Vertex_attribs::tangent_h"; break;
-			// case Vertex_attribs::mesh_position: is skipped 
-		case Vertex_attribs::mesh_textured:		out << "Vertex_attribs::mesh_textured"; break;
-		case Vertex_attribs::mesh_tangent_h:	out << "Vertex_attribs::mesh_tangent_h"; break;
-	}
+	out << "Vertex_attribs(";
+	if (has_position(attribs)) out << "position";
+	if (has_normal(attribs)) out << " normal";
+	if (has_tex_coord(attribs)) out << " tex_coord";
+	if (has_tangent_h(attribs)) out << " tangent_h";
+	out << ")";
 
 	return out;
 }
