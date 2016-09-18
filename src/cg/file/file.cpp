@@ -6,28 +6,6 @@ namespace file {
 
 // ----- File -----
 
-File::File() noexcept : _handle(nullptr) {}
-
-File::File(const std::string& filename) : File(filename.c_str()) {}
-
-File::File(const char* filename)
-	: _handle(nullptr)
-{
-	open(filename);
-}
-
-File::File(File&& f) noexcept : 
-	_filename(std::move(f._filename)), 
-	_handle(f._handle)
-{
-	f._handle = nullptr;
-}
-
-File::~File() noexcept
-{
-	close();
-}
-
 File& File::operator=(File&& f) noexcept
 {
 	if (this == &f) return *this;

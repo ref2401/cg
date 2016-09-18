@@ -26,17 +26,32 @@ public:
 class File final {
 public:
 
-	File() noexcept;
+	File() noexcept 
+		: _handle(nullptr) 
+	{}
 
-	explicit File(const std::string& filename);
+	explicit File(const std::string& filename) 
+		: File(filename.c_str()) 
+	{}
 
-	explicit File(const char* filename);
+	explicit File(const char* filename) 
+		: _handle(nullptr)
+	{
+		open(filename);
+	}
 	
 	File(const File& f) = delete;
 
-	File(File&& f) noexcept;
+	File(File&& f) noexcept
+		: _filename(std::move(f._filename)), _handle(f._handle)
+	{
+		f._handle = nullptr;
+	}
 
-	~File() noexcept;
+	~File() noexcept
+	{
+		close();
+	}
 
 
 	File& operator=(const File& f) = delete;
