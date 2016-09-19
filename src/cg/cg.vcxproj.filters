@@ -13,6 +13,9 @@
     <ClCompile Include="data\mesh.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="sys\win32_app.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -26,6 +29,9 @@
     </Filter>
     <Filter Include="base">
       <UniqueIdentifier>{2ea1799d-f62d-4847-87d8-4e95dd87c8c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{015ab915-01f0-44ac-9236-202f6e7e53f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="base\base.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\app.h">
+      <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

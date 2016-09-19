@@ -201,47 +201,47 @@ quat from_rotation_matrix(const TMat& m)
 	return res;
 }
 
-inline mat4 orthographic_matrix(float width, float height, float near, float far)
+inline mat4 orthographic_matrix(float width, float height, float near_z, float far_z)
 {
 	assert(width > 0);
 	assert(height > 0);
-	assert(near < far);
+	assert(near_z < far_z);
 
-	float far_minus_near = far - near;
+	float far_minus_near = far_z - near_z;
 	float right = width / 2.f;
 	float top = height / 2.f;
 
 	return mat4(
 		1.f / right, 0, 0, 0,
 		0, 1.f / top, 0, 0,
-		0, 0, -2.f / far_minus_near, -(far + near) / far_minus_near,
+		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
 		0, 0, 0, 1
 	);
 }
 
-inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near, float far)
+inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z)
 {
 	assert(left < right);
 	assert(bottom < top);
-	assert(near < far);
+	assert(near_z < far_z);
 
-	float doubled_near = 2.f * near;
-	float far_minus_near = far - near;
+	float doubled_near = 2.f * near_z;
+	float far_minus_near = far_z - near_z;
 	float right_minus_left = right - left;
 	float top_minus_bottom = top - bottom;
 
 	return mat4(
 		2.f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
 		0, 2.f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
-		0, 0, -2.f / far_minus_near, -(far + near) / far_minus_near,
+		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
 		0, 0, 0, 1
 	);
 }
 
-inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near, float far)
+inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z)
 {
-	float doubled_near = 2.f * near;
-	float far_minus_near = far - near;
+	float doubled_near = 2.f * near_z;
+	float far_minus_near = far_z - near_z;
 	float right_minus_left = right - left;
 	float top_minus_bottom = top - bottom;
 
@@ -249,17 +249,17 @@ inline mat4 perspective_matrix(float left, float right, float bottom, float top,
 	return mat4(
 		doubled_near / right_minus_left, 0, (right + left) / right_minus_left, 0,
 		0, doubled_near / top_minus_bottom, (top + bottom) / top_minus_bottom, 0,
-		0, 0, -(far + near) / far_minus_near, -doubled_near * far / far_minus_near,
+		0, 0, -(far_z + near_z) / far_minus_near, -doubled_near * far_z / far_minus_near,
 		0, 0, -1, 0
 	);
 }
 
-inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near, float far) 
+inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z)
 {
 	assert(0 < vert_fov && vert_fov < pi);
-	assert(0 < near && near < far);
+	assert(0 < near_z && near_z < far_z);
 
-	float fat_minus_near = far - near;
+	float fat_minus_near = far_z - near_z;
 	float rev_tangent = 1.f / std::tan(vert_fov * 0.5f);
 
 	/*
@@ -276,7 +276,7 @@ inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near, float
 	return mat4(
 		(1.f / wh_ratio) * rev_tangent, 0, 0, 0,
 		0, rev_tangent, 0, 0,
-		0, 0, -(far + near) / fat_minus_near, -2.f * near * far / fat_minus_near,
+		0, 0, -(far_z + near_z) / fat_minus_near, -2.f * near_z * far_z / fat_minus_near,
 		0, 0, -1, 0
 	);
 }

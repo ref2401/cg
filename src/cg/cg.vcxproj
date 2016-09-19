@@ -123,6 +123,7 @@
     <ClCompile Include="file\file.cpp" />
     <ClCompile Include="file\wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
+    <ClCompile Include="sys\win32_app.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\base.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="math\uint2.h" />
     <ClInclude Include="math\utils.h" />
     <ClInclude Include="math\float3.h" />
+    <ClInclude Include="sys\app.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
