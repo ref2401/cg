@@ -22,6 +22,9 @@
     <ClCompile Include="sys\win32_opengl.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="opengl\utility.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -45,9 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\math.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\utils.h">
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="math\float3.h">
@@ -90,6 +90,12 @@
       <Filter>opengl</Filter>
     </ClInclude>
     <ClInclude Include="opengl\opengl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="math\utility.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\utility.h">
       <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>

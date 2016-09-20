@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <ostream>
 #include <type_traits>
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 
 namespace cg {

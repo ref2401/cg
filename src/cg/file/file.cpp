@@ -1,5 +1,6 @@
- #include "cg/file/file.h"
+#include "cg/file/file.h"
 
+#include <type_traits>
 
 namespace cg {
 namespace file {
@@ -125,6 +126,29 @@ void By_line_iterator::read_next_line()
 
 	if (_keep_line_feed)
 		_line_buffer.push_back('\n');
+}
+
+// ----- funcs ------
+
+std::string load_text(const std::string& filename)
+{
+	return load_text(filename.c_str());
+}
+
+std::string load_text(const char* filename)
+{
+	File f(filename);
+
+	std::string text;
+	
+	char buffer[1024];
+	while (!f.eof()) {
+		size_t actual_bytes = f.read_bytes(buffer, std::extent<decltype(buffer)>::value);
+		if (actual_bytes)
+			text.append(buffer, actual_bytes);
+	}
+
+	return text;
 }
 
 } // namespace file

@@ -9,7 +9,7 @@
 #include "cg/math/quat.h"
 #include "cg/math/transform.h"
 #include "cg/math/uint2.h"
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 
 #endif // CG_MATH_MATH_H_

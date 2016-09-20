@@ -8,7 +8,7 @@
 #include "cg/math/mat3.h"
 #include "cg/math/mat4.h"
 #include "cg/math/quat.h"
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 
 namespace cg {

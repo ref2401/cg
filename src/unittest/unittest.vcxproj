@@ -177,7 +177,7 @@
     <ClCompile Include="math\quat_unittest.cpp" />
     <ClCompile Include="math\transform_unittest.cpp" />
     <ClCompile Include="math\uint2_unittest.cpp" />
-    <ClCompile Include="math\utils_unittest.cpp" />
+    <ClCompile Include="math\utility_unittest.cpp" />
     <ClCompile Include="math\float3_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>

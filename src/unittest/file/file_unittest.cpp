@@ -355,6 +355,25 @@ public:
 		}
 	}
 
+	TEST_METHOD(load_text)
+	{
+		using cg::file::load_text;
+
+		{ // empty file
+			std::string text = load_text(Filenames::empty_file);
+			Assert::IsTrue(text.empty());
+		}
+
+		{ // single line file
+			std::string text = load_text(Filenames::ascii_single_line);
+			Assert::AreEqual("abc123", text.c_str());
+		}
+
+		{ // multiline file
+			std::string text = load_text(Filenames::ascii_multiline);
+			Assert::AreEqual("123\nabc\n\nlast_line", text.c_str());
+		}
+	}
 };
 
 } // namespace unittest

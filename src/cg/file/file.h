@@ -203,6 +203,9 @@ cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename,
 
 cg::data::Interleaved_mesh_data load_mesh_wavefront(const char * filename, cg::data::Vertex_attribs attribs);
 
+std::string load_text(const std::string& filename);
+
+std::string load_text(const char* filename);
 
 } // namespace file
 } // namespace cg

@@ -1,5 +1,5 @@
-#ifndef CG_MATH_UTILS_H_
-#define CG_MATH_UTILS_H_
+#ifndef CG_MATH_UTILITY_H_
+#define CG_MATH_UTILITY_H_
 
 #include <cassert>
 #include <cmath>
@@ -73,4 +73,4 @@ inline Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi)
 
 } // namespace cg
 
-#endif // CG_MATH_UTILS_H_
+#endif // CG_MATH_UTILITY_H_

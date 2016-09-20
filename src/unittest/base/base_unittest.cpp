@@ -7,7 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace unittest {
 
-TEST_CLASS(Base_unittest) {
+TEST_CLASS(cg_base_Base) {
 
 	TEST_METHOD(enforce)
 	{

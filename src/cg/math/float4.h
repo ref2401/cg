@@ -5,7 +5,7 @@
 #include <ostream>
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 
 namespace cg {

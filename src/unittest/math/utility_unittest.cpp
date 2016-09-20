@@ -1,4 +1,4 @@
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 #include "CppUnitTest.h"
 
@@ -7,7 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace unittest {
 
-TEST_CLASS(cg_math_Utils) {
+TEST_CLASS(cg_math_Utility) {
 public:
 
 	TEST_METHOD(approx_equal)

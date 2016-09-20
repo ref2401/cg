@@ -6,7 +6,7 @@
 #include <type_traits>
 #include "cg/math/float3.h"
 #include "cg/math/float4.h"
-#include "cg/math/utils.h"
+#include "cg/math/utility.h"
 
 
 namespace cg {
