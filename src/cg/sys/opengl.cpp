@@ -19,18 +19,15 @@ inline func_t load_dll_func(HMODULE dll, const char* func_name)
 	return f;
 }
 
-//func_t load_opengl_func(HMODULE dll, const char* func_name)
-//{
-//	assert(dll);
-//	assert(func_name);
-//
-//	func_t f = static_cast<func_t>(wglGetProcAddress(func_name));
-//	if (!f)
-//		f = 
-//
-//	assert(f);
-//	return f;
-//}
+inline func_t load_opengl_func(const char* func_name)
+{
+	assert(func_name);
+
+	func_t f = static_cast<func_t>(wglGetProcAddress(func_name));
+	cg::enforce(f, func_name);
+
+	return f;
+}
 
 } // namespace
 
@@ -155,10 +152,149 @@ void Opengl_render_context::load_opengl_11() const
 	glBindTexture = static_cast<PFNGLBINDTEXTUREPROC>(load_dll_func(_opengl_dll, "glBindTexture"));
 	glDeleteTextures = static_cast<PFNGLDELETETEXTURESPROC>(load_dll_func(_opengl_dll, "glDeleteTextures"));
 	glGenTextures = static_cast<PFNGLGENTEXTURESPROC>(load_dll_func(_opengl_dll, "glGenTextures"));
+	glIsTexture = static_cast<PFNGLISTEXTUREPROC>(load_dll_func(_opengl_dll, "glIsTexture"));
 }
 
 void Opengl_render_context::load_opengl_45() const
 {
+	// opengl 1.2
+	glDrawRangeElements = static_cast<PFNGLDRAWRANGEELEMENTSPROC>(load_opengl_func("glDrawRangeElements"));
+	glTexImage3D = static_cast<PFNGLTEXIMAGE3DPROC>(load_opengl_func("glTexImage3D"));
+	glTexSubImage3D = static_cast<PFNGLTEXSUBIMAGE3DPROC>(load_opengl_func("glTexSubImage3D"));
+	glCopyTexSubImage3D = static_cast<PFNGLCOPYTEXSUBIMAGE3DPROC>(load_opengl_func("glCopyTexSubImage3D"));
+	// opengl 1.3
+	glActiveTexture = static_cast<PFNGLACTIVETEXTUREPROC>(load_opengl_func("glActiveTexture"));
+	glSampleCoverage = static_cast<PFNGLSAMPLECOVERAGEPROC>(load_opengl_func("glSampleCoverage"));
+	glCompressedTexImage3D = static_cast<PFNGLCOMPRESSEDTEXIMAGE3DPROC>(load_opengl_func("glCompressedTexImage3D"));
+	glCompressedTexImage2D = static_cast<PFNGLCOMPRESSEDTEXIMAGE2DPROC>(load_opengl_func("glCompressedTexImage2D"));
+	glCompressedTexImage1D = static_cast<PFNGLCOMPRESSEDTEXIMAGE1DPROC>(load_opengl_func("glCompressedTexImage1D"));
+	glCompressedTexSubImage3D = static_cast<PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC>(load_opengl_func("glCompressedTexSubImage3D"));
+	glCompressedTexSubImage2D = static_cast<PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC>(load_opengl_func("glCompressedTexSubImage2D"));
+	glCompressedTexSubImage1D = static_cast<PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC>(load_opengl_func("glCompressedTexSubImage1D"));
+	glGetCompressedTexImage = static_cast<PFNGLGETCOMPRESSEDTEXIMAGEPROC>(load_opengl_func("glGetCompressedTexImage"));
+	// opengl 1.4
+	glBlendFuncSeparate = static_cast<PFNGLBLENDFUNCSEPARATEPROC>(load_opengl_func("glBlendFuncSeparate"));
+	glMultiDrawArrays = static_cast<PFNGLMULTIDRAWARRAYSPROC>(load_opengl_func("glMultiDrawArrays"));
+	glMultiDrawElements = static_cast<PFNGLMULTIDRAWELEMENTSPROC>(load_opengl_func("glMultiDrawElements"));
+	glPointParameterf = static_cast<PFNGLPOINTPARAMETERFPROC>(load_opengl_func("glPointParameterf"));
+	glPointParameterfv = static_cast<PFNGLPOINTPARAMETERFVPROC>(load_opengl_func("glPointParameterfv"));
+	glPointParameteri = static_cast<PFNGLPOINTPARAMETERIPROC>(load_opengl_func("glPointParameteri"));
+	glPointParameteriv = static_cast<PFNGLPOINTPARAMETERIVPROC>(load_opengl_func("glPointParameteriv"));
+	glBlendColor = static_cast<PFNGLBLENDCOLORPROC>(load_opengl_func("glBlendColor"));
+	glBlendEquation = static_cast<PFNGLBLENDEQUATIONPROC>(load_opengl_func("glBlendEquation"));
+	// opengl 1.5
+	glGenQueries = static_cast<PFNGLGENQUERIESPROC>(load_opengl_func("glGenQueries"));
+	glDeleteQueries = static_cast<PFNGLDELETEQUERIESPROC>(load_opengl_func("glDeleteQueries"));
+	glIsQuery = static_cast<PFNGLISQUERYPROC>(load_opengl_func("glIsQuery"));
+	glBeginQuery = static_cast<PFNGLBEGINQUERYPROC>(load_opengl_func("glBeginQuery"));
+	glEndQuery = static_cast<PFNGLENDQUERYPROC>(load_opengl_func("glEndQuery"));
+	glGetQueryiv = static_cast<PFNGLGETQUERYIVPROC>(load_opengl_func("glGetQueryiv"));
+	glGetQueryObjectiv = static_cast<PFNGLGETQUERYOBJECTIVPROC>(load_opengl_func("glGetQueryObjectiv"));
+	glGetQueryObjectuiv = static_cast<PFNGLGETQUERYOBJECTUIVPROC>(load_opengl_func("glGetQueryObjectuiv"));
+	glDeleteBuffers = static_cast<PFNGLDELETEBUFFERSPROC>(load_opengl_func("glDeleteBuffers"));
+	glGenBuffers = static_cast<PFNGLGENBUFFERSPROC>(load_opengl_func("glGenBuffers"));
+	glIsBuffer = static_cast<PFNGLISBUFFERPROC>(load_opengl_func("glIsBuffer"));
+	glBufferData = static_cast<PFNGLBUFFERDATAPROC>(load_opengl_func("glBufferData"));
+	glBufferSubData = static_cast<PFNGLBUFFERSUBDATAPROC>(load_opengl_func("glBufferSubData"));
+	glGetBufferSubData = static_cast<PFNGLGETBUFFERSUBDATAPROC>(load_opengl_func("glGetBufferSubData"));
+	glMapBuffer = static_cast<PFNGLMAPBUFFERPROC>(load_opengl_func("glMapBuffer"));
+	glUnmapBuffer = static_cast<PFNGLUNMAPBUFFERPROC>(load_opengl_func("glUnmapBuffer"));
+	glGetBufferParameteriv = static_cast<PFNGLGETBUFFERPARAMETERIVPROC>(load_opengl_func("glGetBufferParameteriv"));
+	glGetBufferPointerv = static_cast<PFNGLGETBUFFERPOINTERVPROC>(load_opengl_func("glGetBufferPointerv"));
+	// opengl 2.0
+	glBlendEquationSeparate = static_cast<PFNGLBLENDEQUATIONSEPARATEPROC>(load_opengl_func("glBlendEquationSeparate"));
+	glDrawBuffers = static_cast<PFNGLDRAWBUFFERSPROC>(load_opengl_func("glDrawBuffers"));
+	glStencilOpSeparate = static_cast<PFNGLSTENCILOPSEPARATEPROC>(load_opengl_func("glStencilOpSeparate"));
+	glStencilFuncSeparate = static_cast<PFNGLSTENCILFUNCSEPARATEPROC>(load_opengl_func("glStencilFuncSeparate"));
+	glStencilMaskSeparate = static_cast<PFNGLSTENCILMASKSEPARATEPROC>(load_opengl_func("glStencilMaskSeparate"));
+	glAttachShader = static_cast<PFNGLATTACHSHADERPROC>(load_opengl_func("glAttachShader"));
+	glBindAttribLocation = static_cast<PFNGLBINDATTRIBLOCATIONPROC>(load_opengl_func("glBindAttribLocation"));
+	glCompileShader = static_cast<PFNGLCOMPILESHADERPROC>(load_opengl_func("glCompileShader"));
+	glCreateProgram = static_cast<PFNGLCREATEPROGRAMPROC>(load_opengl_func("glCreateProgram"));
+	glCreateShader = static_cast<PFNGLCREATESHADERPROC>(load_opengl_func("glCreateShader"));
+	glDeleteProgram = static_cast<PFNGLDELETEPROGRAMPROC>(load_opengl_func("glDeleteProgram"));
+	glDeleteShader = static_cast<PFNGLDELETESHADERPROC>(load_opengl_func("glDeleteShader"));
+	glDetachShader = static_cast<PFNGLDETACHSHADERPROC>(load_opengl_func("glDetachShader"));
+	glDisableVertexAttribArray = static_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(load_opengl_func("glDisableVertexAttribArray"));
+	glEnableVertexAttribArray = static_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(load_opengl_func("glEnableVertexAttribArray"));
+	glGetActiveAttrib = static_cast<PFNGLGETACTIVEATTRIBPROC>(load_opengl_func("glGetActiveAttrib"));
+	glGetActiveUniform = static_cast<PFNGLGETACTIVEUNIFORMPROC>(load_opengl_func("glGetActiveUniform"));
+	glGetAttachedShaders = static_cast<PFNGLGETATTACHEDSHADERSPROC>(load_opengl_func("glGetAttachedShaders"));
+	glGetAttribLocation = static_cast<PFNGLGETATTRIBLOCATIONPROC>(load_opengl_func("glGetAttribLocation"));
+	glGetProgramiv = static_cast<PFNGLGETPROGRAMIVPROC>(load_opengl_func("glGetProgramiv"));
+	glGetProgramInfoLog = static_cast<PFNGLGETPROGRAMINFOLOGPROC>(load_opengl_func("glGetProgramInfoLog"));
+	glGetShaderiv = static_cast<PFNGLGETSHADERIVPROC>(load_opengl_func("glGetShaderiv"));
+	glGetShaderInfoLog = static_cast<PFNGLGETSHADERINFOLOGPROC>(load_opengl_func("glGetShaderInfoLog"));
+	glGetShaderSource = static_cast<PFNGLGETSHADERSOURCEPROC>(load_opengl_func("glGetShaderSource"));
+	glGetUniformLocation = static_cast<PFNGLGETUNIFORMLOCATIONPROC>(load_opengl_func("glGetUniformLocation"));
+	glGetUniformfv = static_cast<PFNGLGETUNIFORMFVPROC>(load_opengl_func("glGetUniformfv"));
+	glGetUniformiv = static_cast<PFNGLGETUNIFORMIVPROC>(load_opengl_func("glGetUniformiv"));
+	glGetVertexAttribdv = static_cast<PFNGLGETVERTEXATTRIBDVPROC>(load_opengl_func("glGetVertexAttribdv"));
+	glGetVertexAttribfv = static_cast<PFNGLGETVERTEXATTRIBFVPROC>(load_opengl_func("glGetVertexAttribfv"));
+	glGetVertexAttribiv = static_cast<PFNGLGETVERTEXATTRIBIVPROC>(load_opengl_func("glGetVertexAttribiv"));
+	glGetVertexAttribPointerv = static_cast<PFNGLGETVERTEXATTRIBPOINTERVPROC>(load_opengl_func("glGetVertexAttribPointerv"));
+	glIsProgram = static_cast<PFNGLISPROGRAMPROC>(load_opengl_func("glIsProgram"));
+	glIsShader = static_cast<PFNGLISSHADERPROC>(load_opengl_func("glIsShader"));
+	glLinkProgram = static_cast<PFNGLLINKPROGRAMPROC>(load_opengl_func("glLinkProgram"));
+	glShaderSource = static_cast<PFNGLSHADERSOURCEPROC>(load_opengl_func("glShaderSource"));
+	glUseProgram = static_cast<PFNGLUSEPROGRAMPROC>(load_opengl_func("glUseProgram"));
+	glUniform1f = static_cast<PFNGLUNIFORM1FPROC>(load_opengl_func("glUniform1f"));
+	glUniform2f = static_cast<PFNGLUNIFORM2FPROC>(load_opengl_func("glUniform2f"));
+	glUniform3f = static_cast<PFNGLUNIFORM3FPROC>(load_opengl_func("glUniform3f"));
+	glUniform4f = static_cast<PFNGLUNIFORM4FPROC>(load_opengl_func("glUniform4f"));
+	glUniform1i = static_cast<PFNGLUNIFORM1IPROC>(load_opengl_func("glUniform1i"));
+	glUniform2i = static_cast<PFNGLUNIFORM2IPROC>(load_opengl_func("glUniform2i"));
+	glUniform3i = static_cast<PFNGLUNIFORM3IPROC>(load_opengl_func("glUniform3i"));
+	glUniform4i = static_cast<PFNGLUNIFORM4IPROC>(load_opengl_func("glUniform4i"));
+	glUniform1fv = static_cast<PFNGLUNIFORM1FVPROC>(load_opengl_func("glUniform1fv"));
+	glUniform2fv = static_cast<PFNGLUNIFORM2FVPROC>(load_opengl_func("glUniform2fv"));
+	glUniform3fv = static_cast<PFNGLUNIFORM3FVPROC>(load_opengl_func("glUniform3fv"));
+	glUniform4fv = static_cast<PFNGLUNIFORM4FVPROC>(load_opengl_func("glUniform4fv"));
+	glUniform1iv = static_cast<PFNGLUNIFORM1IVPROC>(load_opengl_func("glUniform1iv"));
+	glUniform2iv = static_cast<PFNGLUNIFORM2IVPROC>(load_opengl_func("glUniform2iv"));
+	glUniform3iv = static_cast<PFNGLUNIFORM3IVPROC>(load_opengl_func("glUniform3iv"));
+	glUniform4iv = static_cast<PFNGLUNIFORM4IVPROC>(load_opengl_func("glUniform4iv"));
+	glUniformMatrix2fv = static_cast<PFNGLUNIFORMMATRIX2FVPROC>(load_opengl_func("glUniformMatrix2fv"));
+	glUniformMatrix3fv = static_cast<PFNGLUNIFORMMATRIX3FVPROC>(load_opengl_func("glUniformMatrix3fv"));
+	glUniformMatrix4fv = static_cast<PFNGLUNIFORMMATRIX4FVPROC>(load_opengl_func("glUniformMatrix4fv"));
+	glValidateProgram = static_cast<PFNGLVALIDATEPROGRAMPROC>(load_opengl_func("glValidateProgram"));
+	glVertexAttrib1d = static_cast<PFNGLVERTEXATTRIB1DPROC>(load_opengl_func("glVertexAttrib1d"));
+	glVertexAttrib1dv = static_cast<PFNGLVERTEXATTRIB1DVPROC>(load_opengl_func("glVertexAttrib1dv"));
+	glVertexAttrib1f = static_cast<PFNGLVERTEXATTRIB1FPROC>(load_opengl_func("glVertexAttrib1f"));
+	glVertexAttrib1fv = static_cast<PFNGLVERTEXATTRIB1FVPROC>(load_opengl_func("glVertexAttrib1fv"));
+	glVertexAttrib1s = static_cast<PFNGLVERTEXATTRIB1SPROC>(load_opengl_func("glVertexAttrib1s"));
+	glVertexAttrib1sv = static_cast<PFNGLVERTEXATTRIB1SVPROC>(load_opengl_func("glVertexAttrib1sv"));
+	glVertexAttrib2d = static_cast<PFNGLVERTEXATTRIB2DPROC>(load_opengl_func("glVertexAttrib2d"));
+	glVertexAttrib2dv = static_cast<PFNGLVERTEXATTRIB2DVPROC>(load_opengl_func("glVertexAttrib2dv"));
+	glVertexAttrib2f = static_cast<PFNGLVERTEXATTRIB2FPROC>(load_opengl_func("glVertexAttrib2f"));
+	glVertexAttrib2fv = static_cast<PFNGLVERTEXATTRIB2FVPROC>(load_opengl_func("glVertexAttrib2fv"));
+	glVertexAttrib2s = static_cast<PFNGLVERTEXATTRIB2SPROC>(load_opengl_func("glVertexAttrib2s"));
+	glVertexAttrib2sv = static_cast<PFNGLVERTEXATTRIB2SVPROC>(load_opengl_func("glVertexAttrib2sv"));
+	glVertexAttrib3d = static_cast<PFNGLVERTEXATTRIB3DPROC>(load_opengl_func("glVertexAttrib3d"));
+	glVertexAttrib3dv = static_cast<PFNGLVERTEXATTRIB3DVPROC>(load_opengl_func("glVertexAttrib3dv"));
+	glVertexAttrib3f = static_cast<PFNGLVERTEXATTRIB3FPROC>(load_opengl_func("glVertexAttrib3f"));
+	glVertexAttrib3fv = static_cast<PFNGLVERTEXATTRIB3FVPROC>(load_opengl_func("glVertexAttrib3fv"));
+	glVertexAttrib3s = static_cast<PFNGLVERTEXATTRIB3SPROC>(load_opengl_func("glVertexAttrib3s"));
+	glVertexAttrib3sv = static_cast<PFNGLVERTEXATTRIB3SVPROC>(load_opengl_func("glVertexAttrib3sv"));
+	glVertexAttrib4Nbv = static_cast<PFNGLVERTEXATTRIB4NBVPROC>(load_opengl_func("glVertexAttrib4Nbv"));
+	glVertexAttrib4Niv = static_cast<PFNGLVERTEXATTRIB4NIVPROC>(load_opengl_func("glVertexAttrib4Niv"));
+	glVertexAttrib4Nsv = static_cast<PFNGLVERTEXATTRIB4NSVPROC>(load_opengl_func("glVertexAttrib4Nsv"));
+	glVertexAttrib4Nub = static_cast<PFNGLVERTEXATTRIB4NUBPROC>(load_opengl_func("glVertexAttrib4Nub"));
+	glVertexAttrib4Nubv = static_cast<PFNGLVERTEXATTRIB4NUBVPROC>(load_opengl_func("glVertexAttrib4Nubv"));
+	glVertexAttrib4Nuiv = static_cast<PFNGLVERTEXATTRIB4NUIVPROC>(load_opengl_func("glVertexAttrib4Nuiv"));
+	glVertexAttrib4Nusv = static_cast<PFNGLVERTEXATTRIB4NUSVPROC>(load_opengl_func("glVertexAttrib4Nusv"));
+	glVertexAttrib4bv = static_cast<PFNGLVERTEXATTRIB4BVPROC>(load_opengl_func("glVertexAttrib4bv"));
+	glVertexAttrib4d = static_cast<PFNGLVERTEXATTRIB4DPROC>(load_opengl_func("glVertexAttrib4d"));
+	glVertexAttrib4dv = static_cast<PFNGLVERTEXATTRIB4DVPROC>(load_opengl_func("glVertexAttrib4dv"));
+	glVertexAttrib4f = static_cast<PFNGLVERTEXATTRIB4FPROC>(load_opengl_func("glVertexAttrib4f"));
+	glVertexAttrib4fv = static_cast<PFNGLVERTEXATTRIB4FVPROC>(load_opengl_func("glVertexAttrib4fv"));
+	glVertexAttrib4iv = static_cast<PFNGLVERTEXATTRIB4IVPROC>(load_opengl_func("glVertexAttrib4iv"));
+	glVertexAttrib4s = static_cast<PFNGLVERTEXATTRIB4SPROC>(load_opengl_func("glVertexAttrib4s"));
+	glVertexAttrib4sv = static_cast<PFNGLVERTEXATTRIB4SVPROC>(load_opengl_func("glVertexAttrib4sv"));
+	glVertexAttrib4ubv = static_cast<PFNGLVERTEXATTRIB4UBVPROC>(load_opengl_func("glVertexAttrib4ubv"));
+	glVertexAttrib4uiv = static_cast<PFNGLVERTEXATTRIB4UIVPROC>(load_opengl_func("glVertexAttrib4uiv"));
+	glVertexAttrib4usv = static_cast<PFNGLVERTEXATTRIB4USVPROC>(load_opengl_func("glVertexAttrib4usv"));
+	glVertexAttribPointer = static_cast<PFNGLVERTEXATTRIBPOINTERPROC>(load_opengl_func("glVertexAttribPointer"));
 }
 
 } // namespace sys
