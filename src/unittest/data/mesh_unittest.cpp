@@ -5,7 +5,6 @@
 #include "cg/math/math.h"
 #include "unittest/data/common_data.h"
 #include "unittest/math/common_math.h"
-#include "CppUnitTest.h"
 
 using cg::float2;
 using cg::float3;
@@ -15,7 +14,6 @@ using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex;
 using cg::data::Vertex_attribs;
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {

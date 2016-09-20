@@ -179,6 +179,7 @@
     <ClCompile Include="math\uint2_unittest.cpp" />
     <ClCompile Include="math\utility_unittest.cpp" />
     <ClCompile Include="math\float3_unittest.cpp" />
+    <ClCompile Include="shader_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">

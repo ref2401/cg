@@ -98,5 +98,8 @@
     <ClInclude Include="opengl\utility.h">
       <Filter>opengl</Filter>
     </ClInclude>
+    <ClInclude Include="data\shader.h">
+      <Filter>data</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="base\base.h" />
     <ClInclude Include="data\mesh.h" />
+    <ClInclude Include="data\shader.h" />
     <ClInclude Include="file\file.h" />
     <ClInclude Include="math\float2.h" />
     <ClInclude Include="math\float4.h" />

@@ -40,6 +40,9 @@
     <ClCompile Include="math\utility_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="shader_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
