@@ -3,6 +3,7 @@
 #include <cassert>
 #include <memory>
 #include "cg/math/math.h"
+#include "cg/sys/opengl.h"
 #include <windows.h>
 
 
@@ -11,6 +12,7 @@ namespace {
 using cg::uint2;
 using cg::sys::IApplication;
 using cg::sys::IGame;
+using cg::sys::Opengl_render_context;
 using cg::sys::IWindow;
 
 
@@ -27,6 +29,11 @@ public:
 	~Win32_window() noexcept;
 
 
+	HWND hwdn() const noexcept
+	{
+		return _hwnd;
+	}
+
 	void show() noexcept override;
 
 	uint2 size() const noexcept override;
@@ -34,6 +41,7 @@ public:
 private:
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
+	HDC _hdc = nullptr;
 };
 
 Win32_window::Win32_window(HINSTANCE hinstance, uint2 wnd_position, uint2 wnd_size)
@@ -104,7 +112,8 @@ public:
 
 	Win32_app(uint2 wnd_position, uint2 wnd_size);
 
-	~Win32_app() noexcept override;
+	~Win32_app() noexcept override = default;
+
 
 	// Processes all the system messages that are situated in the message queue at the moment.
 	// Returns true if the application has to terminate.
@@ -118,21 +127,17 @@ public:
 	}
 
 private:
-	bool _is_running;
-	HINSTANCE _hinstance;
+	bool _is_running = false;
+	HINSTANCE _hinstance = nullptr;
 	std::unique_ptr<Win32_window> _window;
+	std::unique_ptr<Opengl_render_context> _rnd_context;
 };
 
 Win32_app::Win32_app(uint2 wnd_position, uint2 wnd_size)
-	: _is_running(false)
 {
 	_hinstance = GetModuleHandle(nullptr);
 	_window = std::make_unique<Win32_window>(_hinstance, wnd_position, wnd_size);
-}
-
-Win32_app::~Win32_app()
-{
-
+	_rnd_context = std::make_unique<Opengl_render_context>(_window->hwdn());
 }
 
 bool Win32_app::pump_sys_messages()

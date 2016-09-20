@@ -3,8 +3,8 @@
 
 #include <cassert>
 #include <memory>
-#include "cg/math/math.h"
 #include <windows.h>
+#include "cg/math/math.h"
 
 
 namespace cg {

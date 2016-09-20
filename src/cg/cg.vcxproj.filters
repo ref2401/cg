@@ -16,6 +16,9 @@
     <ClCompile Include="sys\win32_app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="sys\opengl.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -75,6 +78,12 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="sys\app.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\glcorearb.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\opengl.h">
       <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
