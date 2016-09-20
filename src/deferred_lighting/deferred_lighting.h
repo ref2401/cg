@@ -2,7 +2,7 @@
 #define DEFERRED_LIGHTING_DEFERRED_LIGHTING_H_
 
 #include "cg/sys/app.h"
-#include "cg/sys/opengl.h"
+#include "cg/opengl/opengl.h"
 
 
 namespace deferred_lighting {

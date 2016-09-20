@@ -1,6 +1,6 @@
 #include "deferred_lighting/deferred_lighting.h"
 
-#include "cg/sys/opengl.h"
+#include "cg/opengl/opengl.h"
 
 
 namespace deferred_lighting {

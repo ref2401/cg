@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 #include "cg/math/math.h"
-#include "cg/sys/opengl.h"
+#include "cg/opengl/opengl.h"
 #include <windows.h>
 
 
@@ -12,8 +12,9 @@ namespace {
 using cg::uint2;
 using cg::sys::IApplication;
 using cg::sys::IGame;
-using cg::sys::Opengl_render_context;
+using cg::sys::IRender_context;
 using cg::sys::IWindow;
+using cg::sys::make_win32_opengl_render_context;
 
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);
@@ -130,14 +131,14 @@ private:
 	bool _is_running = false;
 	HINSTANCE _hinstance = nullptr;
 	std::unique_ptr<Win32_window> _window;
-	std::unique_ptr<Opengl_render_context> _rnd_context;
+	std::unique_ptr<IRender_context> _rnd_context;
 };
 
 Win32_app::Win32_app(uint2 wnd_position, uint2 wnd_size)
 {
 	_hinstance = GetModuleHandle(nullptr);
 	_window = std::make_unique<Win32_window>(_hinstance, wnd_position, wnd_size);
-	_rnd_context = std::make_unique<Opengl_render_context>(_window->hwdn());
+	_rnd_context = make_win32_opengl_render_context(_window->hwdn());
 }
 
 bool Win32_app::pump_sys_messages()

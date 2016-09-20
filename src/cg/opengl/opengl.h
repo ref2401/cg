@@ -1,39 +1,7 @@
-#ifndef CG_SYS_OPENGL_H_
-#define CG_SYS_OPENGL_H_
+#ifndef CG_OPENGL_OPENGL_H_
+#define CG_OPENGL_OPENGL_H_
 
-#include <windows.h>
-#include "cg/sys/glcorearb.h"
-
-
-namespace cg {
-namespace sys {
-
-class Opengl_render_context final {
-public:
-
-	Opengl_render_context(HWND hwnd);
-
-	~Opengl_render_context() noexcept;
-
-	void swap_color_buffers() noexcept;
-
-private:
-
-	void load_opengl_11() const;
-
-	void load_opengl_45() const;
-
-	// Opengl_render_context does not own and is not responsible for _hwnd object.
-	HWND _hwnd = nullptr;
-	HDC _hdc = nullptr;
-	HGLRC _hglrc = nullptr;
-	HMODULE _opengl_dll = nullptr;
-	int _version_major = 0;
-	int _version_minor = 0;
-};
-
-} // namespace sys
-} // namespace cg
+#include "cg/opengl/glcorearb.h"
 
 extern "C" {
 	extern PFNGLCULLFACEPROC glCullFace;
@@ -691,4 +659,4 @@ extern "C" {
 	extern PFNGLTEXTUREBARRIERPROC glTextureBarrier;
 }
 
-#endif // CG_SYS_OPENGL_H_
+#endif // CG_OPENGL_OPENGL_H_

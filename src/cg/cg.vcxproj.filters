@@ -16,7 +16,10 @@
     <ClCompile Include="sys\win32_app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="sys\opengl.cpp">
+    <ClCompile Include="opengl\opengl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="sys\win32_opengl.cpp">
       <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,6 +38,9 @@
     </Filter>
     <Filter Include="sys">
       <UniqueIdentifier>{015ab915-01f0-44ac-9236-202f6e7e53f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="opengl">
+      <UniqueIdentifier>{7b214224-e4a9-4b7f-a05d-9bbab53c65be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,11 +86,11 @@
     <ClInclude Include="sys\app.h">
       <Filter>sys</Filter>
     </ClInclude>
-    <ClInclude Include="sys\glcorearb.h">
-      <Filter>sys</Filter>
+    <ClInclude Include="opengl\glcorearb.h">
+      <Filter>opengl</Filter>
     </ClInclude>
-    <ClInclude Include="sys\opengl.h">
-      <Filter>sys</Filter>
+    <ClInclude Include="opengl\opengl.h">
+      <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

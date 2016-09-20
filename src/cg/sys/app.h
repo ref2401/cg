@@ -46,7 +46,18 @@ public:
 	virtual IWindow* window() const noexcept = 0;
 };
 
+class IRender_context {
+public:
+
+	virtual ~IRender_context() noexcept = default;
+
+
+	virtual void swap_color_buffers() noexcept = 0;
+};
+
 std::unique_ptr<IApplication> make_win32_application(uint2 wnd_position, uint2 wnd_size);
+
+std::unique_ptr<IRender_context> make_win32_opengl_render_context(HWND hwnd);
 
 } // namespace sys
 } // namespace cg
