@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include "cg/base/base.h"
 #include "cg/data/mesh.h"
+#include "cg/data/shader.h"
 
 
 namespace cg {
@@ -188,6 +189,32 @@ private:
 	bool _keep_line_feed;
 	std::string _line_buffer;
 };
+
+// Returns true if the given file (or directory) exists.
+bool exists(const std::string& filename);
+
+// Returns true if the given file (or directory) exists.
+bool exists(const char* filename);
+
+// Loads all found shader source code files.
+// Each file name is constructed as filename + .<shader_type> + .glsl
+// Won't throw if a file does not exist.
+// Example:
+//		load_glsl_program_source(../data/shader/blinn_phong);
+//		The constructed filenames are:
+//		- ../data/shader/blinn_phong.vertex.glsl
+//		- ../data/shader/blinn_phong.pixel.glsl
+cg::data::Shader_program_source_code load_glsl_program_source(const std::string& filename);
+
+// Loads all found shader source code files.
+// Each file name is constructed as filename + .<shader_type> + .glsl
+// Won't throw if a file does not exist.
+// Example:
+//		load_glsl_program_source(../data/shader/blinn_phong);
+//		The constructed filenames are:
+//		- ../data/shader/blinn_phong.vertex.glsl
+//		- ../data/shader/blinn_phong.pixel.glsl
+cg::data::Shader_program_source_code load_glsl_program_source(const char* filename);
 
 cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, cg::data::Vertex_attribs attribs);
 

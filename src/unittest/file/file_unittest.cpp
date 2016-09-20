@@ -4,6 +4,8 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include "cg/data/mesh.h"
+#include "cg/data/shader.h"
 #include "unittest/file/common_file.h"
 
 using cg::file::By_line_iterator;
@@ -257,6 +259,34 @@ public:
 
 TEST_CLASS(cg_file_Funcs) {
 public:
+
+	TEST_METHOD(exists)
+	{
+		using cg::file::exists;
+
+		Assert::IsTrue(exists(Filenames::empty_file));
+		Assert::IsTrue(exists(Filenames::ascii_single_line));
+		Assert::IsTrue(exists(Filenames::wavefront_triangle_p.c_str()));
+		Assert::IsFalse(exists(""));
+		Assert::IsFalse(exists("unknown_director/unknown_file.some_ext"));
+	}
+
+	TEST_METHOD(load_glsl_program_source)
+	{
+		using cg::data::Shader_program_source_code;
+		using cg::file::load_glsl_program_source;
+		using cg::file::load_text;
+
+		auto src0 = load_glsl_program_source("unknown_file");
+		Assert::IsTrue(src0.vertex_source.empty());
+		Assert::IsTrue(src0.pixel_source.empty());
+
+		auto expected_vertex_source = load_text(Filenames::invalid_vertex_glsl);
+		auto expected_pixel_source = load_text(Filenames::invalid_pixel_glsl);
+		auto src1 = load_glsl_program_source(Filenames::invalid_shader_program_name);
+		Assert::AreEqual(expected_vertex_source, src1.vertex_source);
+		Assert::AreEqual(expected_pixel_source, src1.pixel_source);
+	}
 
 	TEST_METHOD(load_mesh_triangle)
 	{

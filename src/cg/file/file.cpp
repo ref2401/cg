@@ -1,6 +1,9 @@
 #include "cg/file/file.h"
 
+#include <cstring>
 #include <type_traits>
+#include <windows.h>
+
 
 namespace cg {
 namespace file {
@@ -129,6 +132,48 @@ void By_line_iterator::read_next_line()
 }
 
 // ----- funcs ------
+
+bool exists(const std::string& filename)
+{
+	assert(filename.size() < MAX_PATH); // :'(
+	return (GetFileAttributes(filename.c_str()) != INVALID_FILE_ATTRIBUTES);
+}
+
+bool exists(const char* filename)
+{
+	assert(std::strlen(filename)< MAX_PATH); // :'(
+	return (GetFileAttributes(filename) != INVALID_FILE_ATTRIBUTES);
+}
+
+cg::data::Shader_program_source_code load_glsl_program_source(const std::string& filename)
+{
+	return load_glsl_program_source(filename.c_str());
+}
+
+cg::data::Shader_program_source_code load_glsl_program_source(const char* filename)
+{
+	using cg::data::Shader_program_source_code;
+
+	if (!filename) return Shader_program_source_code {};
+
+	std::string fn;
+	Shader_program_source_code src;
+
+	// vertex shader
+	fn.append(filename);
+	fn.append(".vertex.glsl");
+	if (exists(fn))
+		src.vertex_source = load_text(fn);
+
+	// pixel shader
+	fn.clear();
+	fn.append(filename);
+	fn.append(".pixel.glsl");
+	if (exists(fn))
+		src.pixel_source = load_text(fn);
+
+	return src;
+}
 
 std::string load_text(const std::string& filename)
 {
