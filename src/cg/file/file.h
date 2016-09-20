@@ -12,16 +12,6 @@
 namespace cg {
 namespace file {
 
-// File_exception class is the only exception class in the cg::file module 
-// that is used to indicate that any file related operation has failed.
-class File_exception final : std::runtime_error {
-public:
-
-	explicit File_exception(const std::string& msg) : std::runtime_error(msg) {}
-
-	explicit File_exception(const char* msg) : std::runtime_error(msg) {}
-};
-
 // Handles all files as binary. Implements only read facilities.
 class File final {
 public:
@@ -66,7 +56,7 @@ public:
 	// Also returns true if this->handle() equals to nullptr.
 	bool eof() const
 	{
-		enforce<File_exception>(_handle, "Invalid operation. File is not open.");
+		enforce(_handle, "Invalid operation. File is not open.");
 		return (std::feof(_handle) != 0);
 	}
 

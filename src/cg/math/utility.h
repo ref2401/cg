@@ -9,18 +9,6 @@
 
 namespace cg {
 
-// Determines whether lhs is approximately equal to rhs 
-// admitting a maximum absolute difference max_abs.
-// If Numeric is an integral value then max_abs doesn't matter.
-template<typename Numeric>
-bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f);
-
-// Clamps v into the given bounds [lo, hi].
-template<typename Numeric>
-Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi);
-
-
-
 namespace internal {
 
 // Approx_equal_helper resolvses to different operator() overloads
@@ -29,7 +17,7 @@ namespace internal {
 template<typename Numeric,
 	bool is_floating_point = std::is_floating_point<Numeric>::value,
 	bool is_integral = std::is_integral<Numeric>::value>
-struct Approx_equal_helper;
+	struct Approx_equal_helper;
 
 template<typename Numeric>
 struct Approx_equal_helper<Numeric, false, true> {
@@ -53,14 +41,17 @@ struct Approx_equal_helper<Numeric, true, false> {
 
 } // namespace internal
 
-
+// Determines whether lhs is approximately equal to rhs 
+// admitting a maximum absolute difference max_abs.
+// If Numeric is an integral value then max_abs doesn't matter.
 template<typename Numeric>
-inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs)
+inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f)
 {
 	cg::internal::Approx_equal_helper<Numeric> aeh;
 	return aeh(lhs, rhs, max_abs);
 }
 
+// Clamps v into the given bounds [lo, hi].
 template<typename Numeric>
 inline Numeric clamp(const Numeric& v, const Numeric& lo, const Numeric& hi)
 {

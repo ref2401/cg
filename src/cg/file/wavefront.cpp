@@ -17,7 +17,6 @@ using cg::data::Vertex;
 using cg::data::Vertex_attribs;
 using cg::data::compute_tangent_h;
 using cg::file::By_line_iterator;
-using cg::file::File_exception;
 
 
 // Wf_face reprsents a triangle face. Each vertex of the triangle can have 
@@ -94,7 +93,7 @@ public:
 			vertices[1].normal = normals[f.n1 - 1];
 			vertices[2].normal = normals[f.n2 - 1];
 
-			enforce<File_exception>(vertices[0].normal == vertices[1].normal 
+			enforce(vertices[0].normal == vertices[1].normal 
 				&& vertices[1].normal == vertices[2].normal, "Normals must be equal because all faces are triangles.");
 		}
 
@@ -158,21 +157,21 @@ Wf_face parse_face(const std::string& line, bool has_normals, bool has_tex_coord
 	if (has_normals && has_tex_coords) {
 		int count = sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d",
 			&face.p0, &face.tc0, &face.n0, &face.p1, &face.tc1, &face.n1, &face.p2, &face.tc2, &face.n2);
-		enforce<File_exception>(count == 9u, "Invalid face format. Position tex_coord and normal indices were expected.");
+		enforce(count == 9u, "Invalid face format. Position tex_coord and normal indices were expected.");
 	}
 	else if (has_normals) {
 		int count = sscanf(line.c_str(), "f %d//%d %d//%d %d//%d",
 			&face.p0, &face.n0, &face.p1, &face.n1, &face.p2, &face.n2);
-		enforce<File_exception>(count == 6u, "Invalid face format. Position and normal indices were expected.");
+		enforce(count == 6u, "Invalid face format. Position and normal indices were expected.");
 	}
 	else if (has_tex_coords) {
 		int count = sscanf(line.c_str(), "f %d/%d %d/%d %d/%d",
 			&face.p0, &face.tc0, &face.p1, &face.tc1, &face.p2, &face.tc2);
-		enforce<File_exception>(count == 6u, "Invalid face format. Position and tex_coord indices were expected.");
+		enforce(count == 6u, "Invalid face format. Position and tex_coord indices were expected.");
 	}
 	else {
 		int count = sscanf(line.c_str(), "f %d %d %d", &face.p0, &face.p1, &face.p2);
-		enforce<File_exception>(count == 3u, "Invalid face format. Only position indices were expected.");
+		enforce(count == 3u, "Invalid face format. Only position indices were expected.");
 	}
 
 	return face;
@@ -183,7 +182,7 @@ float3 parse_normal(const std::string& line)
 {
 	float x, y, z;
 	int count = std::sscanf(line.c_str(), "vn %f %f %f", &x, &y, &z);
-	enforce<File_exception>(count == 3, "Unexpected number of normal components.");
+	enforce(count == 3, "Unexpected number of normal components.");
 
 	return float3(x, y, z);
 }
@@ -193,7 +192,7 @@ float3 parse_position(const std::string& line)
 {
 	float x, y, z;
 	int count = std::sscanf(line.c_str(), "v %f %f %f", &x, &y, &z);
-	enforce<File_exception>(count == 3, "Unexpected number of position components.");
+	enforce(count == 3, "Unexpected number of position components.");
 
 	return float3(x, y, z);
 }
@@ -203,7 +202,7 @@ float2 parse_tex_coord(const std::string& line)
 {
 	float x, y;
 	int count = std::sscanf(line.c_str(), "vt %f %f", &x, &y);
-	enforce<File_exception>(count == 2, "Unexpected number of tex_coord components.");
+	enforce(count == 2, "Unexpected number of tex_coord components.");
 
 	return float2(x, y);
 }
@@ -252,11 +251,11 @@ cg::data::Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_
 	}
 
 	// validate mesh data
-	enforce<File_exception>(mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
+	enforce(mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
 	if (has_normal(attribs)) 
-		enforce<File_exception>(mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
+		enforce(mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
 	if (has_tex_coord(attribs))
-		enforce<File_exception>(mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
+		enforce(mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
 
 	// pack data
 	size_t index_counter = 0;

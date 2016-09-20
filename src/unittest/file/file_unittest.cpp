@@ -8,7 +8,6 @@
 
 using cg::file::By_line_iterator;
 using cg::file::File;
-using cg::file::File_exception;
 
 
 namespace unittest {
@@ -21,7 +20,7 @@ TEST_CLASS(cg_file_File) {
 		Assert::IsTrue(fe.filename().empty());
 		Assert::IsFalse(fe.is_open());
 
-		Assert::ExpectException<File_exception>([] { File f("unknown-file"); });
+		Assert::ExpectException<std::runtime_error>([] { File f("unknown-file"); });
 
 		File f(Filenames::empty_file);
 		Assert::AreEqual(Filenames::empty_file, f.filename());
@@ -53,7 +52,7 @@ TEST_CLASS(cg_file_File) {
 		File f;
 		f.close(); // does not throw
 
-		Assert::ExpectException<File_exception>([&] { f.open("unknown-file"); });
+		Assert::ExpectException<std::runtime_error>([&] { f.open("unknown-file"); });
 		Assert::IsTrue(f.filename().empty());
 		Assert::IsFalse(f.is_open());
 
@@ -101,7 +100,7 @@ TEST_CLASS(cg_file_File) {
 			Assert::IsFalse(f0.eof());
 
 			File f = std::move(f0);
-			Assert::ExpectException<File_exception>([&]
+			Assert::ExpectException<std::runtime_error>([&]
 			{
 				char ch;
 				f0.read_byte(&ch);
@@ -139,7 +138,7 @@ TEST_CLASS(cg_file_File) {
 			Assert::IsFalse(f0.eof());
 
 			File f = std::move(f0);
-			Assert::ExpectException<File_exception>([&]
+			Assert::ExpectException<std::runtime_error>([&]
 			{ 
 				char ch;
 				f0.read_bytes(&ch, 1);  
@@ -192,7 +191,7 @@ public:
 	TEST_METHOD(iterate_no_line_feeds)
 	{
 		By_line_iterator it0;
-		Assert::ExpectException<File_exception>([&] { ++it0; });
+		Assert::ExpectException<std::runtime_error>([&] { ++it0; });
 
 		// empty file iterator
 		By_line_iterator it_empty(Filenames::empty_file, false);
@@ -219,7 +218,7 @@ public:
 	TEST_METHOD(iterate_with_line_feeds)
 	{
 		By_line_iterator it0;
-		Assert::ExpectException<File_exception>([&] { ++it0; });
+		Assert::ExpectException<std::runtime_error>([&] { ++it0; });
 
 		{ // empty file iterator
 			std::string expected_line = "\n";
