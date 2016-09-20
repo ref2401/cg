@@ -767,6 +767,10 @@ void Opengl_render_context::load_opengl_45() const
 	glTextureBarrier = static_cast<PFNGLTEXTUREBARRIERPROC>(load_opengl_func("glTextureBarrier"));
 }
 
+void Opengl_render_context::swap_color_buffers() noexcept {
+	SwapBuffers(_hdc);
+}
+
 } // namespace sys
 } // namespace cg
 

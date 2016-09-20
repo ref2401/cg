@@ -15,6 +15,8 @@ public:
 
 	~Opengl_render_context() noexcept;
 
+	void swap_color_buffers() noexcept;
+
 private:
 
 	void load_opengl_11() const;

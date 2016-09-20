@@ -144,7 +144,8 @@ bool Win32_app::pump_sys_messages()
 {
 	MSG msg;
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-		if (msg.message == WM_QUIT) return true;
+		if (msg.message == WM_QUIT) 
+			return true;
 
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
@@ -156,6 +157,7 @@ bool Win32_app::pump_sys_messages()
 void Win32_app::run(std::unique_ptr<IGame> game)
 {
 	assert(!_is_running);
+	assert(game);
 
 	_is_running = true;
 	_window->show();
@@ -164,6 +166,8 @@ void Win32_app::run(std::unique_ptr<IGame> game)
 		bool terminate = pump_sys_messages();
 		if (terminate) break;
 
+		game->render(1.f);
+		_rnd_context->swap_color_buffers();
 	} // while
 }
 
