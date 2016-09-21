@@ -4,8 +4,8 @@
 #include <string>
 #include "cg/base/base.h"
 #include "cg/data/shader.h"
-#include "cg/file/file.h"
 #include "cg/opengl/opengl.h"
+
 
 namespace cg {
 namespace opengl {
@@ -25,9 +25,9 @@ Shader::Shader(GLenum type, const std::string& source_code)
 
 	if (!compiled()) {
 		const char* type_name = (_type == GL_VERTEX_SHADER) ? "Vertex" : "Pixel";
-		std::string msg = concat(type_name, " shader compilation error:\n", log());
-
-		throw std::runtime_error(msg);
+		std::string log_msg = log();
+		dispose();
+		enforce(false, ENFORSE_MSG(type_name, " shader compilation error.\n", log_msg));
 	}
 }
 
@@ -103,37 +103,97 @@ std::string Shader::log() const noexcept
 
 // ----- Shader_program -----
 
-Shader_program::Shader_program(const std::string& filename)
-	: Shader_program(filename.c_str())
-{}
-
-Shader_program::Shader_program(const char* filename)
-	: Shader_program(cg::file::load_glsl_program_source(filename))
-{}
-
-Shader_program::Shader_program(const cg::data::Shader_program_source_code& src)
+Shader_program::Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src)
+	: _name(name)
 {
-	enforce(src.vertex_source.size() > 0, "Vertex source code is empty.");
-	enforce(src.pixel_source.size() > 0, "Pixel source code is empty.");
+	assert(src.vertex_source.size() > 0);
+	assert(src.pixel_source.size() > 0);
 
+	_id = glCreateProgram();
+}
+
+Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader)
+{
 
 }
 
+Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code)
+{
+
+}
+
+Shader_program::Shader_program(Shader_program&& prog) noexcept
+	: _id(prog._id), _name(std::move(prog._name))
+{
+	prog._id = Shader_program::invalid_id;
+}
+
 Shader_program::~Shader_program() noexcept
+{
+	dispose();
+}
+
+Shader_program& Shader_program::operator=(Shader_program&& prog) noexcept
+{
+	dispose();
+
+	_id = prog._id;
+	_name = std::move(prog._name);
+	prog._id = Shader_program::invalid_id;
+
+	return *this;
+}
+
+void Shader_program::dispose() noexcept
 {
 	if (_id == Shader_program::invalid_id) return;
 
 	glDeleteProgram(_id);
 	_id = Shader_program::invalid_id;
+	// _name.clear();
 }
 
-// ----- funcs -----
-
-Shader_program make_program(const cg::data::Shader_program_source_code& src)
+GLint Shader_program::get_property(GLenum prop) const noexcept
 {
-	
-	return Shader_program(src);
+	assert(_id != Shader_program::invalid_id);
+	assert(prop == GL_DELETE_STATUS
+		|| prop == GL_INFO_LOG_LENGTH
+		|| prop == GL_LINK_STATUS
+		|| prop == GL_VALIDATE_STATUS);
+
+	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
+	glGetProgramiv(_id, prop, &v);
+	assert(v != -1);
+
+	return v;
 }
+
+bool Shader_program::linked() const noexcept
+{
+	return get_property(GL_LINK_STATUS) != 0;
+}
+
+std::string Shader_program::log() const noexcept
+{
+	assert(_id != Shader_program::invalid_id);
+
+	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
+	char* msg_buffer = new char[log_size];
+
+	GLsizei actual_size;
+	glGetProgramInfoLog(_id, log_size, &actual_size, msg_buffer);
+
+	std::string msg(msg_buffer, actual_size);
+	delete[] msg_buffer;
+
+	return msg;
+}
+
+bool Shader_program::validated() const noexcept
+{
+	return get_property(GL_VALIDATE_STATUS) != 0;
+}
+
 
 } // namespace opengl
 } // namespace cg

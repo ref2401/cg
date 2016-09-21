@@ -3,12 +3,15 @@
 
 #include "cg/sys/app.h"
 #include "cg/opengl/opengl.h"
+#include "cg/opengl/utility.h"
 
 
 namespace deferred_lighting {
 
 class Deferred_lighting final : public cg::sys::IGame {
 public:
+
+	Deferred_lighting();
 
 	~Deferred_lighting() noexcept override = default;
 

@@ -46,9 +46,9 @@ public:
 
 private:
 
-	GLint get_property(GLenum prop) const noexcept;
-
 	void dispose() noexcept;
+
+	GLint get_property(GLenum prop) const noexcept;
 
 	GLuint _id = Shader::invalid_id;
 	GLenum _type = Shader::invalid_type;
@@ -60,14 +60,21 @@ public:
 	static constexpr GLuint invalid_id = 0;
 
 
-	Shader_program(const std::string& filename);
+	Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src);
 
-	Shader_program(const char* filename);
+	Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader);
 
-	Shader_program(const cg::data::Shader_program_source_code& src);
+	Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code);
+
+	Shader_program(const Shader_program& prog) = delete;
+
+	Shader_program(Shader_program&& prog) noexcept;
 
 	~Shader_program() noexcept;
 
+	Shader_program& operator=(const Shader_program& prog) = delete;
+
+	Shader_program& operator=(Shader_program&& prog) noexcept;
 
 
 	GLuint id() const noexcept
@@ -75,9 +82,26 @@ public:
 		return _id;
 	}
 
+	bool linked() const noexcept;
+
+	std::string log() const noexcept;
+
+	const std::string& name() const noexcept
+	{
+		return _name;
+	}
+
+	bool validated() const noexcept;
 
 private:
+
+	void dispose() noexcept;
+
+	GLint get_property(GLenum prop) const noexcept;
+
+
 	GLuint _id = Shader_program::invalid_id;
+	std::string _name;
 };
 
 

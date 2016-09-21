@@ -45,7 +45,7 @@ void File::open(const char* filename)
 	assert(filename);
 
 	_handle = std::fopen(filename, "rb");
-	enforce(_handle, "Failed to open file:", filename);
+	enforce(_handle, ENFORSE_MSG("Failed to open file:", filename));
 	_filename = filename;
 }
 #pragma warning(pop)
@@ -53,7 +53,7 @@ void File::open(const char* filename)
 bool File::read_byte(void* buff) const
 {
 	assert(buff);
-	enforce(_handle, "Invalid operation. File is not open.");
+	enforce(_handle, ENFORSE_MSG("Invalid operation. File is not open."));
 
 	int res = std::fgetc(_handle);
 	if (res == EOF) return false;
@@ -66,7 +66,7 @@ size_t File::read_bytes(void* buff, size_t byte_count) const
 {
 	assert(buff);
 	assert(byte_count);
-	enforce(_handle, "Invalid operation. File is not open.");
+	enforce(_handle, ENFORSE_MSG("Invalid operation. File is not open."));
 
 	return fread(buff, sizeof(unsigned char), byte_count, _handle);
 }
