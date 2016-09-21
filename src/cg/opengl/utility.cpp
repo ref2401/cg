@@ -1,6 +1,7 @@
 #include "cg/opengl/utility.h"
 
 #include <cassert>
+#include <exception>
 #include <string>
 #include "cg/base/base.h"
 #include "cg/data/shader.h"
@@ -26,8 +27,10 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	if (!compiled()) {
 		const char* type_name = (_type == GL_VERTEX_SHADER) ? "Vertex" : "Pixel";
 		std::string log_msg = log();
+		std::string exc_msg = concat(EXCEPTION_MSG(type_name, " shader compilation error.\n", log_msg));
+		
 		dispose();
-		enforce(false, ENFORSE_MSG(type_name, " shader compilation error.\n", log_msg));
+		throw std::runtime_error(exc_msg);
 	}
 }
 
@@ -45,6 +48,7 @@ Shader::~Shader() noexcept
 
 Shader& Shader::operator=(Shader&& shader) noexcept
 {
+	assert(this != &shader);
 	dispose();
 
 	_id = shader._id;
@@ -109,17 +113,104 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 	assert(src.vertex_source.size() > 0);
 	assert(src.pixel_source.size() > 0);
 
-	_id = glCreateProgram();
+	try {
+		Shader vertex_shader(GL_VERTEX_SHADER, src.vertex_source);
+		Shader pixel_shader(GL_FRAGMENT_SHADER, src.pixel_source);
+
+		_id = glCreateProgram();
+		glAttachShader(_id, vertex_shader.id());
+		glAttachShader(_id, pixel_shader.id());
+		glLinkProgram(_id); 
+		// once shaders have been linked into a program they are no longer needed.
+	}
+	catch (...) {
+		std::string exc_msg = concat(EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program."));
+		
+		dispose();
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	if (!linked()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+		
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+
+	glValidateProgram(_id);
+	if (!valid()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
 }
 
 Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader)
+	: _name(name)
 {
+	_id = glCreateProgram();
+	glAttachShader(_id, vertex_shader.id());
+	glAttachShader(_id, pixel_shader.id());
+	glLinkProgram(_id);
 
+	if (!linked()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+
+	glValidateProgram(_id);
+	if (!valid()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
 }
 
 Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code)
+	: _name(name)
 {
+	assert(pixel_source_code.size() > 0);
 
+	try {
+		Shader pixel_shader(GL_FRAGMENT_SHADER, pixel_source_code);
+
+		_id = glCreateProgram();
+		glAttachShader(_id, vertex_shader.id());
+		glAttachShader(_id, pixel_shader.id());
+		glLinkProgram(_id);
+		// once shaders have been linked into a program they are no longer needed.
+	}
+	catch (...) {
+		std::string exc_msg = concat(EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program."));
+
+		dispose();
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	if (!linked()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+
+	glValidateProgram(_id);
+	if (!valid()) {
+		std::string msg_log = log();
+		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
 }
 
 Shader_program::Shader_program(Shader_program&& prog) noexcept
@@ -135,6 +226,7 @@ Shader_program::~Shader_program() noexcept
 
 Shader_program& Shader_program::operator=(Shader_program&& prog) noexcept
 {
+	assert(this != &prog);
 	dispose();
 
 	_id = prog._id;
@@ -150,7 +242,8 @@ void Shader_program::dispose() noexcept
 
 	glDeleteProgram(_id);
 	_id = Shader_program::invalid_id;
-	// _name.clear();
+	// NOTE(ref2401): Do not clear the _name.
+	// It might be used to compose exception messages after the object has been disposed;
 }
 
 GLint Shader_program::get_property(GLenum prop) const noexcept
@@ -189,7 +282,7 @@ std::string Shader_program::log() const noexcept
 	return msg;
 }
 
-bool Shader_program::validated() const noexcept
+bool Shader_program::valid() const noexcept
 {
 	return get_property(GL_VALIDATE_STATUS) != 0;
 }

@@ -9,7 +9,7 @@
 
 // Convenient macro to format more readable cg::enforce message.
 // Prepends string arguments with __FILE__ & __LINE__ macro which.
-#define ENFORSE_MSG(...) __FILE__, '(', std::to_string(__LINE__), "): ", __VA_ARGS__
+#define EXCEPTION_MSG(...) __FILE__, '(', std::to_string(__LINE__), "): ", __VA_ARGS__
 
 namespace cg {
 

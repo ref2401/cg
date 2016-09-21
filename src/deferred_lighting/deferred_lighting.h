@@ -24,6 +24,8 @@ public:
 
 private:
 
+	std::unique_ptr<cg::opengl::Shader_program> _program;
+	GLuint _vao_id;
 };
 
 } // namespace deferred_lighting

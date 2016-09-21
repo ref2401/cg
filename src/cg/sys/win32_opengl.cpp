@@ -20,7 +20,7 @@ inline func_t load_dll_func(HMODULE dll, const char* func_name)
 	assert(func_name);
 
 	func_t f = static_cast<func_t>(GetProcAddress(dll, func_name));
-	cg::enforce(f, ENFORSE_MSG(func_name));
+	cg::enforce(f, EXCEPTION_MSG(func_name));
 
 	return f;
 }
@@ -30,7 +30,7 @@ inline func_t load_opengl_func(const char* func_name)
 	assert(func_name);
 
 	func_t f = static_cast<func_t>(wglGetProcAddress(func_name));
-	cg::enforce(f, ENFORSE_MSG(func_name));
+	cg::enforce(f, EXCEPTION_MSG(func_name));
 
 	return f;
 }
@@ -91,7 +91,7 @@ Opengl_render_context::Opengl_render_context(HWND hwnd)
 
 	glGetIntegerv(GL_MAJOR_VERSION, &_version_major);
 	glGetIntegerv(GL_MINOR_VERSION, &_version_minor);
-	enforce(_version_major == 4 && _version_minor == 5, ENFORSE_MSG("Opengl version must be 4.5 or greater."));
+	enforce(_version_major == 4 && _version_minor == 5, EXCEPTION_MSG("Opengl version must be 4.5 or greater."));
 	load_opengl_45();
 }
 

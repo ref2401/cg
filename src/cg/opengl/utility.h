@@ -91,7 +91,7 @@ public:
 		return _name;
 	}
 
-	bool validated() const noexcept;
+	bool valid() const noexcept;
 
 private:
 

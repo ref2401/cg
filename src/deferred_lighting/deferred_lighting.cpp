@@ -5,21 +5,25 @@
 using cg::opengl::Shader;
 using cg::opengl::Shader_program;
 
+
 namespace deferred_lighting {
 
 Deferred_lighting::Deferred_lighting()
 {
-	auto src_v = cg::file::load_text("../data/test.vertex.glsl");
-	auto src_p = cg::file::load_text("../data/test.pixel.glsl");
-	Shader s(GL_VERTEX_SHADER, src_v);
-	Shader s1 = std::move(s);
-	s1 = Shader(GL_FRAGMENT_SHADER, src_p);
+	auto src = cg::file::load_glsl_program_source("../data/test");
+	_program = std::make_unique<Shader_program>("test", src);
+
+	glCreateVertexArrays(1, &_vao_id);
+	glBindVertexArray(_vao_id);
+	glPointSize(8);
 }
 
 void Deferred_lighting::render(float blend_state) 
 {
 	float rgb[4] = { 0.5f, 0.5f, 0.55f, 1.f };
 	glClearBufferfv(GL_COLOR, 0, rgb);
+	glUseProgram(_program->id());
+	glDrawArrays(GL_POINTS, 0, 1);
 }
 
 } // namespace deferred_lighting

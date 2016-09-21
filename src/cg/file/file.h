@@ -57,7 +57,7 @@ public:
 	// Also returns true if this->handle() equals to nullptr.
 	bool eof() const
 	{
-		enforce(_handle, ENFORSE_MSG("Invalid operation. File is not open."));
+		enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
 		return (std::feof(_handle) != 0);
 	}
 

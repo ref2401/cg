@@ -22,8 +22,7 @@ int main(int argc, char* argv[])
 	}
 	catch (std::exception& exc) {
 		OutputDebugString("\nException:\n");
-		std::string msg = cg::get_exception_message(exc);
-		OutputDebugString(msg.c_str());
+		OutputDebugString(cg::get_exception_message(exc).c_str());
 		OutputDebugString("----------\n");
 	}
 	
