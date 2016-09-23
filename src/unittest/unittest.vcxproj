@@ -179,6 +179,7 @@
     <ClCompile Include="math\uint2_unittest.cpp" />
     <ClCompile Include="math\utility_unittest.cpp" />
     <ClCompile Include="math\float3_unittest.cpp" />
+    <ClCompile Include="opengl\vertex_spec_unittest.cpp" />
     <ClCompile Include="shader_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="data\common_data.h" />
     <ClInclude Include="file\common_file.h" />
     <ClInclude Include="math\common_math.h" />
+    <ClInclude Include="opengl\common_opengl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

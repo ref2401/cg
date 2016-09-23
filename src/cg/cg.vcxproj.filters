@@ -16,13 +16,16 @@
     <ClCompile Include="sys\win32_app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="opengl\opengl.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
     <ClCompile Include="sys\win32_opengl.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="opengl\utility.cpp">
+    <ClCompile Include="opengl\shader.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\opengl_def.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\vertex_spec.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,17 +92,23 @@
     <ClInclude Include="opengl\glcorearb.h">
       <Filter>opengl</Filter>
     </ClInclude>
-    <ClInclude Include="opengl\opengl.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
     <ClInclude Include="math\utility.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="opengl\utility.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
     <ClInclude Include="data\shader.h">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\shader.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\opengl_def.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\opengl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\vertex_spec.h">
+      <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

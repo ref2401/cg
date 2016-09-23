@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 #include "cg/math/math.h"
-#include "cg/opengl/opengl.h"
+#include "cg/opengl/opengl_def.h"
 #include <windows.h>
 
 

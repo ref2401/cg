@@ -3,7 +3,6 @@
 
 #include "cg/sys/app.h"
 #include "cg/opengl/opengl.h"
-#include "cg/opengl/utility.h"
 
 
 namespace deferred_lighting {

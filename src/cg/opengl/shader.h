@@ -1,8 +1,8 @@
-#ifndef CG_OPENGL_UTILITY_H_
-#define CG_OPENGL_UTILITY_H_
+#ifndef CG_OPENGL_SHADER_H_
+#define CG_OPENGL_SHADER_H_
 
 #include "cg/data/shader.h"
-#include "cg/opengl/opengl.h"
+#include "cg/opengl/opengl_def.h"
 
 
 namespace cg {
@@ -109,4 +109,4 @@ private:
 } // namespace opengl
 } // namespace cg
 
-#endif // CG_OPENGL_UTILITY_H_
+#endif // CG_OPENGL_SHADER_H_

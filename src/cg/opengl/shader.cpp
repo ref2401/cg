@@ -1,11 +1,11 @@
-#include "cg/opengl/utility.h"
+#include "cg/opengl/shader.h"
 
 #include <cassert>
 #include <exception>
 #include <string>
 #include "cg/base/base.h"
 #include "cg/data/shader.h"
-#include "cg/opengl/opengl.h"
+#include "cg/opengl/opengl_def.h"
 
 
 namespace cg {

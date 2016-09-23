@@ -43,6 +43,9 @@
     <ClCompile Include="shader_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="opengl\vertex_spec_unittest.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -57,6 +60,9 @@
     <Filter Include="base">
       <UniqueIdentifier>{db1f1e95-ccdc-4e77-a9d3-da0ece4b3664}</UniqueIdentifier>
     </Filter>
+    <Filter Include="opengl">
+      <UniqueIdentifier>{8605e44c-d5cd-4adc-900e-b744c6554d44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data\common_data.h">
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="math\common_math.h">
       <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\common_opengl.h">
+      <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
