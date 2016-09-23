@@ -47,17 +47,18 @@ struct DE_base_vertex_params {
 class DE_cmd final {
 public:
 
-	DE_cmd(GLuint vao_id, size_t index_count, size_t offset_index, size_t base_vertex) noexcept
-		: _vao_id(vao_id), _index_count(index_count), _offset_index(offset_index), _base_vertex(base_vertex)
+	DE_cmd(GLuint vao_id, size_t index_count, size_t offset_indices, size_t base_vertex) noexcept
+		: _vao_id(vao_id), _index_count(index_count), _offset_indices(offset_indices), _base_vertex(base_vertex)
 	{}
 
-	DE_cmd::DE_cmd(GLuint vao_id, size_t index_count, size_t offset_index, size_t base_vertex,
+	DE_cmd::DE_cmd(GLuint vao_id, size_t index_count, size_t offset_indices, size_t base_vertex,
 		size_t instance_count, size_t base_instance) noexcept
-		: _vao_id(vao_id), _index_count(index_count), _offset_index(offset_index),
+		: _vao_id(vao_id), _index_count(index_count), _offset_indices(offset_indices),
 		_base_vertex(base_vertex), _instance_count(instance_count), _base_instance(base_instance)
 	{
 		assert(_vao_id != invalid_vao_id);
 	}
+
 
 	// The constant that should be added to each instance index
 	// while fetching from enabled vertex attributes.
@@ -76,7 +77,7 @@ public:
 	// Returns glDrawElementsBaseVertex params.
 	DE_base_vertex_params get_base_vertex_params() const noexcept {
 		return DE_base_vertex_params(GL_TRIANGLES, _index_count, GL_UNSIGNED_INT,
-			reinterpret_cast<void*>(_offset_index * sizeof(GL_UNSIGNED_INT)), _base_vertex);
+			reinterpret_cast<void*>(_offset_indices * sizeof(GL_UNSIGNED_INT)), _base_vertex);
 	}
 
 	// The number of indices to be rendered.
@@ -93,9 +94,9 @@ public:
 
 	// The number of precedint indices that must be ignored.
 	// The offset value is in units of indices (GL_UNSIGNED_INT).
-	size_t offset_index() const
+	size_t offset_indices() const
 	{
-		return _offset_index;
+		return _offset_indices;
 	}
 
 	// Vertex array object that owns vertex/index buffers required to perform this command. 
@@ -114,7 +115,7 @@ public:
 private:
 	GLuint _vao_id;
 	size_t _index_count;
-	size_t _offset_index;
+	size_t _offset_indices;
 	size_t _base_vertex;
 	size_t _instance_count = 1;
 	size_t _base_instance = 0;
@@ -129,9 +130,20 @@ public:
 
 	// Start building process.
 	// Params:
-	// -	format: Describes required vertex attributes.
+	// -	attribs: Describes required vertex attributes.
 	// -	vertex_bytes_limit: The memory threshold for the vertex buffer.
-	void begin(cg::data::Interleaved_vertex_format format, size_t vertex_limit_bytes);
+	void begin(cg::data::Vertex_attribs attribs, size_t vertex_limit_bytes);
+
+	// Ends the building process and returns a Static_vertex_spec object 
+	// that manages internal OpenGL resources.
+	void end();
+
+	// Returns true if the building process has been started.
+	// The process is considered started between begin() and end() calls.
+	bool building_process() const noexcept
+	{
+		return _vao_id != invalid_vao_id;
+	}
 
 	DE_cmd push_back(const cg::data::Interleaved_mesh_data& mesh_data);
 
@@ -143,7 +155,7 @@ private:
 	GLuint _vao_id = invalid_vao_id;
 	cg::data::Interleaved_vertex_format _format;
 	size_t _vertex_limit_bytes;
-	size_t _index_count;
+	size_t _offset_indices;
 	size_t _base_vertex;
 };
 
@@ -166,7 +178,7 @@ inline bool operator==(const DE_cmd& lhs, const DE_cmd& rhs) noexcept
 {
 	return (lhs._vao_id == rhs._vao_id)
 		&& (lhs._index_count == rhs._index_count)
-		&& (lhs._offset_index == rhs._offset_index)
+		&& (lhs._offset_indices == rhs._offset_indices)
 		&& (lhs._base_vertex == rhs._base_vertex)
 		&& (lhs._instance_count == rhs._instance_count)
 		&& (lhs._base_instance == rhs._base_instance);
@@ -194,7 +206,7 @@ inline std::wostream& operator<<(std::wostream& out, const DE_base_vertex_params
 inline std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd)
 {
 	out << "DE_cmd(" << cmd._vao_id << ", " << cmd._index_count << ", "
-		<< cmd._offset_index << ", " << cmd._base_vertex << ", "
+		<< cmd._offset_indices << ", " << cmd._base_vertex << ", "
 		<< cmd._instance_count << ", " << cmd._base_instance << ')';
 	return out;
 }
@@ -202,7 +214,7 @@ inline std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd)
 inline std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd)
 {
 	out << "DE_cmd(" << cmd._vao_id << ", " << cmd._index_count << ", "
-		<< cmd._offset_index << ", " << cmd._base_vertex << ", "
+		<< cmd._offset_indices << ", " << cmd._base_vertex << ", "
 		<< cmd._instance_count << ", " << cmd._base_instance << ')';
 	return out;
 }

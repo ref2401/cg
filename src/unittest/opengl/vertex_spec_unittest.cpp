@@ -53,7 +53,7 @@ public:
 		DE_cmd cmd0(1, 2, 3, 4);
 		Assert::AreEqual<GLuint>(1, cmd0.vao_id());
 		Assert::AreEqual<size_t>(2, cmd0.index_count());
-		Assert::AreEqual<size_t>(3, cmd0.offset_index());
+		Assert::AreEqual<size_t>(3, cmd0.offset_indices());
 		Assert::AreEqual<size_t>(4, cmd0.base_vertex());
 		Assert::AreEqual<size_t>(1, cmd0.instance_count());
 		Assert::AreEqual<size_t>(0, cmd0.base_instance());
@@ -61,7 +61,7 @@ public:
 		DE_cmd cmd1(1, 2, 3, 4, 5, 6);
 		Assert::AreEqual<GLuint>(1, cmd1.vao_id());
 		Assert::AreEqual<size_t>(2, cmd1.index_count());
-		Assert::AreEqual<size_t>(3, cmd1.offset_index());
+		Assert::AreEqual<size_t>(3, cmd1.offset_indices());
 		Assert::AreEqual<size_t>(4, cmd1.base_vertex());
 		Assert::AreEqual<size_t>(5, cmd1.instance_count());
 		Assert::AreEqual<size_t>(6, cmd1.base_instance());
