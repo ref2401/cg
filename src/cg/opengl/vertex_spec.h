@@ -102,6 +102,13 @@ public:
 		return _vao_id;
 	}
 
+
+	friend bool operator==(const DE_cmd& lhs, const DE_cmd& rhs) noexcept;
+
+	friend std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd);
+
+	friend std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd);
+
 private:
 	GLuint _vao_id;
 	size_t _index_count;
@@ -126,6 +133,21 @@ inline bool operator!=(const DE_base_vertex_params& lhs, const DE_base_vertex_pa
 	return !(lhs == rhs);
 }
 
+inline bool operator==(const DE_cmd& lhs, const DE_cmd& rhs) noexcept
+{
+	return (lhs._vao_id == rhs._vao_id)
+		&& (lhs._index_count == rhs._index_count)
+		&& (lhs._offset_index == rhs._offset_index)
+		&& (lhs._base_vertex == rhs._base_vertex)
+		&& (lhs._instance_count == rhs._instance_count)
+		&& (lhs._base_instance == rhs._base_instance);
+}
+
+inline bool operator!=(const DE_cmd& lhs, const DE_cmd& rhs) noexcept
+{
+	return !(lhs == rhs);
+}
+
 inline std::ostream& operator<<(std::ostream& out, const DE_base_vertex_params& p)
 {
 	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
@@ -137,6 +159,22 @@ inline std::wostream& operator<<(std::wostream& out, const DE_base_vertex_params
 {
 	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
 		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
+	return out;
+}
+
+inline std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd)
+{
+	out << "DE_cmd(" << cmd._vao_id << ", " << cmd._index_count << ", "
+		<< cmd._offset_index << ", " << cmd._base_vertex << ", "
+		<< cmd._instance_count << ", " << cmd._base_instance << ')';
+	return out;
+}
+
+inline std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd)
+{
+	out << "DE_cmd(" << cmd._vao_id << ", " << cmd._index_count << ", "
+		<< cmd._offset_index << ", " << cmd._base_vertex << ", "
+		<< cmd._instance_count << ", " << cmd._base_instance << ')';
 	return out;
 }
 
