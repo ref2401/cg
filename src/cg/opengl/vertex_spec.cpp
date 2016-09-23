@@ -34,20 +34,59 @@ void Static_vertex_spec_builder::begin(Vertex_attribs attribs, size_t vertex_lim
 	glCreateVertexArrays(1, &_vao_id);
 }
 
-void Static_vertex_spec_builder::end()
+void Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
 {
 	assert(building_process());
-	glBindVertexArray(_vao_id);
-
+	
 	GLuint ids[2]; // vertex_buffer_id, index_buffer_id;
 	glCreateBuffers(2, ids);
 	glNamedBufferStorage(ids[0], _vertex_data.size() * sizeof(float), _vertex_data.data(), 0);
-	glNamedBufferStorage(ids[0], _index_data.size() * sizeof(uint32_t), _index_data.data(), 0);
+	glNamedBufferStorage(ids[1], _index_data.size() * sizeof(uint32_t), _index_data.data(), 0);
 
+	GLuint vb_binding_index = 0;
+	glBindVertexArray(_vao_id);
+	glVertexArrayVertexBuffer(_vao_id, 0, ids[0], vb_binding_index, _format.byte_count());
+	// position
+	if (has_position(_format.attribs)) {
+		assert(attrib_layout.position_location != Vertex_attrib_layout::invalid_location);
+		glEnableVertexArrayAttrib(_vao_id, attrib_layout.position_location);
+		glVertexArrayAttribBinding(_vao_id, attrib_layout.position_location, vb_binding_index);
+		glVertexArrayAttribFormat(_vao_id, attrib_layout.position_location,
+			3, GL_FLOAT, false, _format.byte_offset_position());
+	}
 
-	// Vertex_attrib_layout
-	/*if (has_position(_format.attribs)) {
-	}*/
+	// normal
+	if (has_normal(_format.attribs)) {
+		assert(attrib_layout.normal_location != Vertex_attrib_layout::invalid_location);
+		glEnableVertexArrayAttrib(_vao_id, attrib_layout.normal_location);
+		glVertexArrayAttribBinding(_vao_id, attrib_layout.normal_location, vb_binding_index);
+		glVertexArrayAttribFormat(_vao_id, attrib_layout.normal_location,
+			3, GL_FLOAT, false, _format.byte_offset_normal());
+	}
+
+	// tex_coord
+	if (has_tex_coord(_format.attribs)) {
+		assert(attrib_layout.tex_coord_location != Vertex_attrib_layout::invalid_location);
+		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tex_coord_location);
+		glVertexArrayAttribBinding(_vao_id, attrib_layout.tex_coord_location, vb_binding_index);
+		glVertexArrayAttribFormat(_vao_id, attrib_layout.tex_coord_location,
+			2, GL_FLOAT, false, _format.byte_offset_tex_coord());
+	}
+
+	// tangent_h
+	if (has_tangent_h(_format.attribs)) {
+		assert(attrib_layout.tangent_h_location != Vertex_attrib_layout::invalid_location);
+		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tangent_h_location);
+		glVertexArrayAttribBinding(_vao_id, attrib_layout.tangent_h_location, vb_binding_index);
+		glVertexArrayAttribFormat(_vao_id, attrib_layout.tangent_h_location,
+			4, GL_FLOAT, false, _format.byte_offset_tangent_h());
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ids[1]);
+	
+
+	if (unbind_vao)
+		glBindVertexArray(invalid_vao_id);
 }
 
 DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_data& mesh_data)

@@ -22,6 +22,8 @@ public:
 	void update(float dt) override {}
 
 private:
+	std::unique_ptr<cg::opengl::Shader_program> _prog;
+	cg::opengl::DE_cmd _de_cmd;
 };
 
 } // namespace deferred_lighting

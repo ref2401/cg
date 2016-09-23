@@ -16,6 +16,8 @@ constexpr GLuint invalid_vao_id = 0;
 // Specifies params to call the glDrawElementsBaseVertex func.
 // glDrawElementsBaseVertex(mode, index_count, index_type, offset_bytes, base_vertex);
 struct DE_base_vertex_params {
+	DE_base_vertex_params() noexcept = default;
+
 	DE_base_vertex_params(GLenum mode, GLsizei index_count, GLenum index_type,
 		void* offset_bytes, GLint base_vertex) noexcept
 		: mode(mode), index_count(index_count), index_type(index_type),
@@ -26,19 +28,19 @@ struct DE_base_vertex_params {
 	}
 
 	// The type of primitive to render.
-	GLenum mode;
+	GLenum mode = GL_TRIANGLES;
 
 	// The number of indices to render.
-	GLsizei index_count;
+	GLsizei index_count = 0;
 
 	// The type of each index.
-	GLenum index_type;
+	GLenum index_type = GL_UNSIGNED_INT;
 
 	// The byte offset into the buffer bound to GL_ELEMENT_ARRAY_BUFFER.
-	void* offset_bytes;
+	void* offset_bytes = nullptr;
 
 	// The constant that should be added to each index while rendering using this command.
-	GLint base_vertex;
+	GLint base_vertex = 0;
 };
 
 // DE_cmd class contains all the required params to bind vertex array object
@@ -46,6 +48,8 @@ struct DE_base_vertex_params {
 // The class is used to constracut various direct & indirect glDrawElenentsXXX commands' params.
 class DE_cmd final {
 public:
+
+	DE_cmd() noexcept = default;
 
 	DE_cmd(GLuint vao_id, size_t index_count, size_t offset_indices, size_t base_vertex) noexcept
 		: _vao_id(vao_id), _index_count(index_count), _offset_indices(offset_indices), _base_vertex(base_vertex)
@@ -113,12 +117,28 @@ public:
 	friend std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd);
 
 private:
-	GLuint _vao_id;
-	size_t _index_count;
-	size_t _offset_indices;
-	size_t _base_vertex;
+	GLuint _vao_id = invalid_vao_id;
+	size_t _index_count = 0;
+	size_t _offset_indices = 0;
+	size_t _base_vertex = 0;
 	size_t _instance_count = 1;
 	size_t _base_instance = 0;
+};
+
+// Desribis attribute indices within a particular shader.
+struct Vertex_attrib_layout {
+	static constexpr GLint invalid_location = -1;
+
+	Vertex_attrib_layout(GLint position_location, GLint normal_location,
+		GLint tex_coord_location, GLint tangent_h_location) noexcept
+		: position_location(position_location), normal_location(normal_location),
+		tex_coord_location(tex_coord_location), tangent_h_location(tangent_h_location)
+	{}
+
+	GLint position_location = Vertex_attrib_layout::invalid_location;
+	GLint normal_location = Vertex_attrib_layout::invalid_location;
+	GLint tex_coord_location = Vertex_attrib_layout::invalid_location;
+	GLint tangent_h_location = Vertex_attrib_layout::invalid_location;
 };
 
 class Static_vertex_spec_builder final {
@@ -136,7 +156,7 @@ public:
 
 	// Ends the building process and returns a Static_vertex_spec object 
 	// that manages internal OpenGL resources.
-	void end();
+	void end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao = false);
 
 	// Returns true if the building process has been started.
 	// The process is considered started between begin() and end() calls.
@@ -160,20 +180,6 @@ private:
 };
 
 
-inline bool operator==(const DE_base_vertex_params& lhs, const DE_base_vertex_params& rhs) noexcept
-{
-	return (lhs.mode == rhs.mode)
-		&& (lhs.index_count == rhs.index_count)
-		&& (lhs.index_type == rhs.index_type)
-		&& (lhs.offset_bytes == rhs.offset_bytes)
-		&& (lhs.base_vertex == rhs.base_vertex);
-}
-
-inline bool operator!=(const DE_base_vertex_params& lhs, const DE_base_vertex_params& rhs) noexcept
-{
-	return !(lhs == rhs);
-}
-
 inline bool operator==(const DE_cmd& lhs, const DE_cmd& rhs) noexcept
 {
 	return (lhs._vao_id == rhs._vao_id)
@@ -189,18 +195,18 @@ inline bool operator!=(const DE_cmd& lhs, const DE_cmd& rhs) noexcept
 	return !(lhs == rhs);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const DE_base_vertex_params& p)
+inline bool operator==(const DE_base_vertex_params& lhs, const DE_base_vertex_params& rhs) noexcept
 {
-	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
-		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
-	return out;
+	return (lhs.mode == rhs.mode)
+		&& (lhs.index_count == rhs.index_count)
+		&& (lhs.index_type == rhs.index_type)
+		&& (lhs.offset_bytes == rhs.offset_bytes)
+		&& (lhs.base_vertex == rhs.base_vertex);
 }
 
-inline std::wostream& operator<<(std::wostream& out, const DE_base_vertex_params& p)
+inline bool operator!=(const DE_base_vertex_params& lhs, const DE_base_vertex_params& rhs) noexcept
 {
-	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
-		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
-	return out;
+	return !(lhs == rhs);
 }
 
 inline std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd)
@@ -217,6 +223,32 @@ inline std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd)
 		<< cmd._offset_indices << ", " << cmd._base_vertex << ", "
 		<< cmd._instance_count << ", " << cmd._base_instance << ')';
 	return out;
+}
+
+inline std::ostream& operator<<(std::ostream& out, const DE_base_vertex_params& p)
+{
+	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
+		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
+	return out;
+}
+
+inline std::wostream& operator<<(std::wostream& out, const DE_base_vertex_params& p)
+{
+	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
+		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
+	return out;
+}
+
+// Convenient function to call the glDrawElementsBaseVertex func.
+inline void draw_elements_base_vertex(const DE_base_vertex_params& p) noexcept
+{
+	glDrawElementsBaseVertex(p.mode, p.index_count, p.index_type, p.offset_bytes, p.base_vertex);
+}
+
+// Convenient function to call the glDrawElementsBaseVertex func.
+inline void draw_elements_base_vertex(const DE_cmd& cmd) noexcept
+{
+	draw_elements_base_vertex(cmd.get_base_vertex_params());
 }
 
 } // namespace opengl

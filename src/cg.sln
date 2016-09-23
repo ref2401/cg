@@ -11,6 +11,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cg_launcher", "cg_launcher\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deferred_lighting", "deferred_lighting\deferred_lighing.vcxproj", "{B38120E5-C5E2-4F18-8706-EADBDD296E6F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{EB942D58-4D6F-4509-8542-770FBD3EAB36}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\test.pixel.glsl = ..\data\test.pixel.glsl
+		..\data\test.vertex.glsl = ..\data\test.vertex.glsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
