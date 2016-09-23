@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <iostream>
+#include <vector>
+#include "cg/data/mesh.h"
 #include "cg/opengl/opengl_def.h"
 
 
@@ -121,9 +123,28 @@ private:
 class Static_vertex_spec_builder final {
 public:
 
-	//Static_vertex_spec_builder()
+	// Reserves memory for vertex buffer and index buffer data.
+	// The allocated memory will be reused by evry vertex specification building process.
+	explicit Static_vertex_spec_builder(size_t vertex_buffer_capacity = 64, size_t index_buffer_capacity = 256);
+
+	// Start building process.
+	// Params:
+	// -	format: Describes required vertex attributes.
+	// -	vertex_bytes_limit: The memory threshold for the vertex buffer.
+	void begin(cg::data::Interleaved_vertex_format format, size_t vertex_limit_bytes);
+
+	DE_cmd push_back(const cg::data::Interleaved_mesh_data& mesh_data);
 
 private:
+	std::vector<float> _vertex_data;
+	std::vector<uint32_t> _index_data;
+	// vertex specification building process related.
+	// the following fields are reset every begin() call
+	GLuint _vao_id = invalid_vao_id;
+	cg::data::Interleaved_vertex_format _format;
+	size_t _vertex_limit_bytes;
+	size_t _index_count;
+	size_t _base_vertex;
 };
 
 

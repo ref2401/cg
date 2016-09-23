@@ -155,10 +155,10 @@ struct Vertex {
 	{}
 
 
-	float3 position;
-	float3 normal;
-	float2 tex_coord;
-	float4 tangent_h;
+	float3 position = float3::zero;
+	float3 normal = float3::zero;
+	float2 tex_coord = float2::zero;
+	float4 tangent_h = float4::zero;
 };
 
 // Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
@@ -195,6 +195,12 @@ public:
 		return _format;
 	}
 
+	// How many indices are in this mesh data.
+	size_t index_count() const noexcept
+	{
+		return _indices.size();
+	}
+
 	// Indices
 	const std::vector<uint32_t>& indices() const
 	{
@@ -210,6 +216,12 @@ public:
 	void push_back_vertex(const Vertex& v);
 
 	void push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2);
+
+	// How many vertices are in this mesh data.
+	size_t vertex_count() const noexcept
+	{
+		return _data.size() / _format.component_count();
+	}
 
 private:
 	std::vector<float> _data;

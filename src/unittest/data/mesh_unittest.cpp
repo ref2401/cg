@@ -18,7 +18,7 @@ using cg::data::Vertex_attribs;
 
 namespace unittest {
 
-TEST_CLASS(cg_data_Interleaved_mesh_data) {
+TEST_CLASS(cg_data_mesh_Interleaved_mesh_data) {
 public:
 
 	TEST_METHOD(ctors)
@@ -33,6 +33,21 @@ public:
 		Assert::AreEqual(md1.data().capacity(),
 			4 * (Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_tex_coord));
 		Assert::AreEqual(6u, md1.indices().capacity());
+	}
+
+	TEST_METHOD(index_count)
+	{
+		Interleaved_mesh_data md(Vertex_attribs::position);
+		Assert::AreEqual<size_t>(0, md.index_count());
+
+		md.push_back_index(0);
+		Assert::AreEqual<size_t>(1, md.index_count());
+
+		md.push_back_index(1);
+		Assert::AreEqual<size_t>(2, md.index_count());
+
+		md.push_back_indices(2, 3, 4);
+		Assert::AreEqual<size_t>(5, md.index_count());
 	}
 
 	TEST_METHOD(push_back_indices)
@@ -129,6 +144,21 @@ public:
 				std::cbegin(expected_data),
 				[](float a, float b) { return approx_equal<float>(a, b); }));
 		}
+	}
+
+	TEST_METHOD(vertex_count)
+	{
+		Interleaved_mesh_data md(Vertex_attribs::position);
+		Assert::AreEqual<size_t>(0, md.vertex_count());
+
+		md.push_back_vertex(Vertex());
+		Assert::AreEqual<size_t>(1, md.vertex_count());
+		
+		md.push_back_vertex(Vertex());
+		Assert::AreEqual<size_t>(2, md.vertex_count());
+
+		md.push_back_vertices(Vertex(), Vertex(), Vertex());
+		Assert::AreEqual<size_t>(5, md.vertex_count());
 	}
 };
 
