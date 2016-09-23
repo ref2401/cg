@@ -126,14 +126,19 @@ private:
 };
 
 // Desribis attribute indices within a particular shader.
+// If a location equals to invalid_location it means that there is no such attribute is the shader.
 struct Vertex_attrib_layout {
 	static constexpr GLint invalid_location = -1;
+
+
+	Vertex_attrib_layout() noexcept = default;
 
 	Vertex_attrib_layout(GLint position_location, GLint normal_location,
 		GLint tex_coord_location, GLint tangent_h_location) noexcept
 		: position_location(position_location), normal_location(normal_location),
 		tex_coord_location(tex_coord_location), tangent_h_location(tangent_h_location)
 	{}
+
 
 	GLint position_location = Vertex_attrib_layout::invalid_location;
 	GLint normal_location = Vertex_attrib_layout::invalid_location;
