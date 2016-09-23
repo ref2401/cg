@@ -118,6 +118,14 @@ private:
 	size_t _base_instance = 0;
 };
 
+class Static_vertex_spec_builder final {
+public:
+
+	//Static_vertex_spec_builder()
+
+private:
+};
+
 
 inline bool operator==(const DE_base_vertex_params& lhs, const DE_base_vertex_params& rhs) noexcept
 {

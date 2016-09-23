@@ -96,6 +96,20 @@ inline std::string get_exception_message(const std::exception& exc)
 	return msg;
 }
 
+// Calculates how many bytes are in the specified number of kilobytes.
+// Uses base 2 definition: 1 Kb = 1024 bytes = 2^10 bytes.
+constexpr size_t kilobytes(size_t amount) noexcept
+{
+	return amount * 1024;
+}
+
+// Calculates how many bytes are in the specified number of megabytes.
+// Uses base 2 definition: 1 Mb = 1048576 bytes = (1024 * 1024) bytes = 2^20 bytes.
+constexpr size_t megabytes(size_t amount) noexcept
+{
+	return amount * 1048576;
+}
+
 }
 
 #endif // CG_BASE_BASE_H_

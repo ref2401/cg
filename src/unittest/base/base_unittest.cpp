@@ -91,6 +91,21 @@ TEST_CLASS(cg_base_Base) {
 		Assert::AreEqual(expected_msg, actual_msg);
 	}
 
+	TEST_METHOD(kilobytes_megabytes)
+	{
+		using cg::kilobytes;
+		using cg::megabytes;
+
+		Assert::AreEqual<size_t>(0, kilobytes(0));
+		Assert::AreEqual<size_t>(1024, kilobytes(1));
+		Assert::AreEqual<size_t>(128 * 1024, kilobytes(128));
+
+		Assert::AreEqual<size_t>(0, megabytes(0));
+		Assert::AreEqual<size_t>(1024 * 1024, megabytes(1));
+		Assert::AreEqual<size_t>(128 * 1024 * 1024, megabytes(128));
+
+		Assert::AreEqual<size_t>(kilobytes(1024), megabytes(1));
+	}
 };
 
 } // namespace unittest
