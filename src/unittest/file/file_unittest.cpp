@@ -127,12 +127,12 @@ TEST_CLASS(cg_file_File) {
 			File f(Filenames::ascii_single_line);
 			Assert::IsFalse(f.eof());
 
-			unsigned char buffer[8];
-			size_t count = f.read_bytes(buffer, std::extent<decltype(buffer)>::value);
-			buffer[count] = '\0';
+			unsigned char buffer_id[8];
+			size_t count = f.read_bytes(buffer_id, std::extent<decltype(buffer_id)>::value);
+			buffer_id[count] = '\0';
 			Assert::AreEqual(6u, count);
 			Assert::IsTrue(f.eof());
-			Assert::AreEqual("abc123", reinterpret_cast<char*>(buffer));
+			Assert::AreEqual("abc123", reinterpret_cast<char*>(buffer_id));
 		}
 
 		{ // attempt to read from moved File object

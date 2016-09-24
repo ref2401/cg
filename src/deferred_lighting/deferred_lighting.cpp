@@ -3,16 +3,18 @@
 #include "cg/base/base.h"
 #include "cg/file/file.h"
 
+using cg::uint2;
 using cg::data::Vertex_attribs;
 using cg::opengl::Shader;
 using cg::opengl::Shader_program;
+using cg::opengl::Static_vertex_spec;
 using cg::opengl::Static_vertex_spec_builder;
 using cg::opengl::Vertex_attrib_layout;
 
 
 namespace deferred_lighting {
 
-Deferred_lighting::Deferred_lighting()
+Deferred_lighting::Deferred_lighting(uint2 window_size)
 {
 	auto src = cg::file::load_glsl_program_source("../data/test");
 	_prog = std::make_unique<Shader_program>("test-shader", src);
@@ -23,8 +25,8 @@ Deferred_lighting::Deferred_lighting()
 
 	vs_builder.begin(Vertex_attribs::position, cg::megabytes(4));
 	_de_cmd = vs_builder.push_back(mesh_data);
-	vs_builder.end(attrib_layout);
-	glPointSize(40);
+	_vertex_spec = std::make_unique<Static_vertex_spec>(vs_builder.end(attrib_layout));
+	glViewport(0, 0, window_size.width, window_size.height);
 }
 
 void Deferred_lighting::render(float blend_state) 

@@ -186,11 +186,11 @@ std::string load_text(const char* filename)
 
 	std::string text;
 	
-	char buffer[1024];
+	char buffer_id[1024];
 	while (!f.eof()) {
-		size_t actual_bytes = f.read_bytes(buffer, std::extent<decltype(buffer)>::value);
+		size_t actual_bytes = f.read_bytes(buffer_id, std::extent<decltype(buffer_id)>::value);
 		if (actual_bytes)
-			text.append(buffer, actual_bytes);
+			text.append(buffer_id, actual_bytes);
 	}
 
 	return text;

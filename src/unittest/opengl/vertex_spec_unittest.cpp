@@ -2,6 +2,7 @@
 
 using cg::opengl::DE_cmd;
 using cg::opengl::DE_base_vertex_params;
+using cg::opengl::Invalid;
 using cg::opengl::Vertex_attrib_layout;
 
 
@@ -13,7 +14,7 @@ public:
 	TEST_METHOD(ctors)
 	{
 		DE_cmd cmd0;
-		Assert::AreEqual<GLuint>(cg::opengl::invalid_vao_id, cmd0.vao_id());
+		Assert::AreEqual<GLuint>(cg::opengl::Invalid::vao_id, cmd0.vao_id());
 		Assert::AreEqual<size_t>(0, cmd0.index_count());
 		Assert::AreEqual<size_t>(0, cmd0.offset_indices());
 		Assert::AreEqual<size_t>(0, cmd0.base_vertex());
@@ -117,10 +118,10 @@ public:
 	TEST_METHOD(ctors)
 	{
 		Vertex_attrib_layout al0;
-		Assert::AreEqual(Vertex_attrib_layout::invalid_location, al0.position_location);
-		Assert::AreEqual(Vertex_attrib_layout::invalid_location, al0.normal_location);
-		Assert::AreEqual(Vertex_attrib_layout::invalid_location, al0.tex_coord_location);
-		Assert::AreEqual(Vertex_attrib_layout::invalid_location, al0.tangent_h_location);
+		Assert::AreEqual(Invalid::vertex_attrib_location, al0.position_location);
+		Assert::AreEqual(Invalid::vertex_attrib_location, al0.normal_location);
+		Assert::AreEqual(Invalid::vertex_attrib_location, al0.tex_coord_location);
+		Assert::AreEqual(Invalid::vertex_attrib_location, al0.tangent_h_location);
 
 		Vertex_attrib_layout al1(1, 2, 3, 4);
 		Assert::AreEqual(1, al1.position_location);

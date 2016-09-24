@@ -34,11 +34,10 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	}
 }
 
-Shader::Shader(Shader&& shader) noexcept
-	: _id(shader._id), _type(shader._type)
+Shader::Shader(Shader&& shader_id) noexcept
+	: _id(shader_id._id), _type(shader_id._type)
 {
-	shader._id = Shader::invalid_id;
-	shader._type = Shader::invalid_type;
+	shader_id._id = Invalid::shader_id;
 }
 
 Shader::~Shader() noexcept
@@ -46,15 +45,14 @@ Shader::~Shader() noexcept
 	dispose();
 }
 
-Shader& Shader::operator=(Shader&& shader) noexcept
+Shader& Shader::operator=(Shader&& shader_id) noexcept
 {
-	assert(this != &shader);
+	assert(this != &shader_id);
 	dispose();
 
-	_id = shader._id;
-	_type = shader._type;
-	shader._id = Shader::invalid_id;
-	shader._type = Shader::invalid_type;
+	_id = shader_id._id;
+	_type = shader_id._type;
+	shader_id._id = Invalid::shader_id;
 
 	return *this;
 }
@@ -66,11 +64,10 @@ bool Shader::compiled() const noexcept
 
 void Shader::dispose() noexcept
 {
-	if (_id == Shader::invalid_id) return;
+	if (_id == Invalid::shader_id) return;
 
 	glDeleteShader(_id);
-	_id = Shader::invalid_id;
-	_type = Shader::invalid_type;
+	_id = Invalid::shader_id;
 }
 
 GLint Shader::get_property(GLenum prop) const noexcept
@@ -216,7 +213,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 Shader_program::Shader_program(Shader_program&& prog) noexcept
 	: _id(prog._id), _name(std::move(prog._name))
 {
-	prog._id = Shader_program::invalid_id;
+	prog._id = Invalid::shader_program_id;
 }
 
 Shader_program::~Shader_program() noexcept
@@ -231,24 +228,24 @@ Shader_program& Shader_program::operator=(Shader_program&& prog) noexcept
 
 	_id = prog._id;
 	_name = std::move(prog._name);
-	prog._id = Shader_program::invalid_id;
+	prog._id = Invalid::shader_program_id;
 
 	return *this;
 }
 
 void Shader_program::dispose() noexcept
 {
-	if (_id == Shader_program::invalid_id) return;
+	if (_id == Invalid::shader_program_id) return;
 
 	glDeleteProgram(_id);
-	_id = Shader_program::invalid_id;
-	// NOTE(ref2401): Do not clear the _name.
+	_id = Invalid::shader_program_id;
+	// NOTE(ref2401): Do not clear the _name field.
 	// It might be used to compose exception messages after the object has been disposed;
 }
 
 GLint Shader_program::get_property(GLenum prop) const noexcept
 {
-	assert(_id != Shader_program::invalid_id);
+	assert(_id != Invalid::shader_program_id);
 	assert(prop == GL_DELETE_STATUS
 		|| prop == GL_INFO_LOG_LENGTH
 		|| prop == GL_LINK_STATUS
@@ -268,7 +265,7 @@ bool Shader_program::linked() const noexcept
 
 std::string Shader_program::log() const noexcept
 {
-	assert(_id != Shader_program::invalid_id);
+	assert(_id != Invalid::shader_program_id);
 
 	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
 	char* msg_buffer = new char[log_size];

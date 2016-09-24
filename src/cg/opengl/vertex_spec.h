@@ -11,8 +11,6 @@
 namespace cg {
 namespace opengl {
 
-constexpr GLuint invalid_vao_id = 0;
-
 // Specifies params to call the glDrawElementsBaseVertex func.
 // glDrawElementsBaseVertex(mode, index_count, index_type, offset_bytes, base_vertex);
 struct DE_base_vertex_params {
@@ -60,7 +58,7 @@ public:
 		: _vao_id(vao_id), _index_count(index_count), _offset_indices(offset_indices),
 		_base_vertex(base_vertex), _instance_count(instance_count), _base_instance(base_instance)
 	{
-		assert(_vao_id != invalid_vao_id);
+		assert(_vao_id != Invalid::vao_id);
 	}
 
 
@@ -117,7 +115,7 @@ public:
 	friend std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd);
 
 private:
-	GLuint _vao_id = invalid_vao_id;
+	GLuint _vao_id = Invalid::vao_id;
 	size_t _index_count = 0;
 	size_t _offset_indices = 0;
 	size_t _base_vertex = 0;
@@ -126,10 +124,8 @@ private:
 };
 
 // Desribis attribute indices within a particular shader.
-// If a location equals to invalid_location it means that there is no such attribute is the shader.
+// If a location equals to Invalid_id::vertex_attrib_location it means that there is no such attribute is the shader.
 struct Vertex_attrib_layout {
-	static constexpr GLint invalid_location = -1;
-
 
 	Vertex_attrib_layout() noexcept = default;
 
@@ -140,10 +136,59 @@ struct Vertex_attrib_layout {
 	{}
 
 
-	GLint position_location = Vertex_attrib_layout::invalid_location;
-	GLint normal_location = Vertex_attrib_layout::invalid_location;
-	GLint tex_coord_location = Vertex_attrib_layout::invalid_location;
-	GLint tangent_h_location = Vertex_attrib_layout::invalid_location;
+	GLint position_location = Invalid::vertex_attrib_location;
+	GLint normal_location = Invalid::vertex_attrib_location;
+	GLint tex_coord_location = Invalid::vertex_attrib_location;
+	GLint tangent_h_location = Invalid::vertex_attrib_location;
+};
+
+// ...
+// Static_vertex_spec determines life time of all its resources: vao, vertex/index buffers.
+class Static_vertex_spec final {
+public:
+
+	Static_vertex_spec(cg::data::Interleaved_vertex_format format, 
+		GLuint vao_id, GLuint vertex_buffer_id, GLuint index_buffer_id) noexcept;
+
+	Static_vertex_spec(const Static_vertex_spec& spec) = delete;
+
+	Static_vertex_spec(Static_vertex_spec&& spec) noexcept;
+
+	~Static_vertex_spec() noexcept;
+
+
+	Static_vertex_spec& operator=(const Static_vertex_spec& spec) = delete;
+
+	Static_vertex_spec& operator=(Static_vertex_spec&& spec) noexcept;
+
+
+	cg::data::Interleaved_vertex_format format() const noexcept
+	{
+		return _format;
+	}
+
+	GLuint index_buffer_id() const noexcept
+	{
+		return _index_buffer_id;
+	}
+
+	GLuint vao_id() const noexcept
+	{
+		return _vao_id;
+	}
+
+	GLuint vertex_buffer_id() const noexcept
+	{
+		return _vertex_buffer_id;
+	}
+
+private:
+	void dispose() noexcept;
+
+	GLuint _vao_id = Invalid::vao_id;
+	cg::data::Interleaved_vertex_format _format;
+	GLuint _vertex_buffer_id = Invalid::buffer_id;
+	GLuint _index_buffer_id = Invalid::buffer_id;
 };
 
 class Static_vertex_spec_builder final {
@@ -161,13 +206,14 @@ public:
 
 	// Ends the building process and returns a Static_vertex_spec object 
 	// that manages internal OpenGL resources.
-	void end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao = false);
+	// Returns: a spec object which is responsible for internal vao and buffers.
+	Static_vertex_spec end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao = false);
 
 	// Returns true if the building process has been started.
 	// The process is considered started between begin() and end() calls.
 	bool building_process() const noexcept
 	{
-		return _vao_id != invalid_vao_id;
+		return _vao_id != Invalid::vao_id;
 	}
 
 	DE_cmd push_back(const cg::data::Interleaved_mesh_data& mesh_data);
@@ -175,9 +221,9 @@ public:
 private:
 	std::vector<float> _vertex_data;
 	std::vector<uint32_t> _index_data;
-	// vertex specification building process related.
-	// the following fields are reset every begin() call
-	GLuint _vao_id = invalid_vao_id;
+	// The following fields are related to the vertex specification building process.
+	// The fields are reset every begin() call
+	GLuint _vao_id = Invalid::vao_id;
 	cg::data::Interleaved_vertex_format _format;
 	size_t _vertex_limit_bytes;
 	size_t _offset_indices;

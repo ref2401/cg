@@ -18,16 +18,16 @@ public:
 
 	Shader(GLenum type, const std::string& source_code);
 
-	Shader(const Shader& shader) = delete;
+	Shader(const Shader& shader_id) = delete;
 
-	Shader(Shader&& shader) noexcept;
+	Shader(Shader&& shader_id) noexcept;
 
 	~Shader() noexcept;
 
 	
-	Shader& operator=(const Shader& shader) = delete;
+	Shader& operator=(const Shader& shader_id) = delete;
 
-	Shader& operator=(Shader&& shader) noexcept;
+	Shader& operator=(Shader&& shader_id) noexcept;
 
 
 	bool compiled() const noexcept;
@@ -50,15 +50,12 @@ private:
 
 	GLint get_property(GLenum prop) const noexcept;
 
-	GLuint _id = Shader::invalid_id;
-	GLenum _type = Shader::invalid_type;
+	GLuint _id = Invalid::shader_id;
+	GLenum _type;
 };
 
 class Shader_program final {
 public:
-
-	static constexpr GLuint invalid_id = 0;
-
 
 	Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src);
 
@@ -100,7 +97,7 @@ private:
 	GLint get_property(GLenum prop) const noexcept;
 
 
-	GLuint _id = Shader_program::invalid_id;
+	GLuint _id = Invalid::shader_program_id;
 	std::string _name;
 };
 
