@@ -20,14 +20,14 @@ public:
 
 	Shader(const Shader& shader_id) = delete;
 
-	Shader(Shader&& shader_id) noexcept;
+	Shader(Shader&& shader_id) = delete;
 
 	~Shader() noexcept;
 
 	
 	Shader& operator=(const Shader& shader_id) = delete;
 
-	Shader& operator=(Shader&& shader_id) noexcept;
+	Shader& operator=(Shader&& shader_id) = delete;
 
 
 	bool compiled() const noexcept;
@@ -65,13 +65,13 @@ public:
 
 	Shader_program(const Shader_program& prog) = delete;
 
-	Shader_program(Shader_program&& prog) noexcept;
+	Shader_program(Shader_program&& prog) = delete;
 
 	~Shader_program() noexcept;
 
 	Shader_program& operator=(const Shader_program& prog) = delete;
 
-	Shader_program& operator=(Shader_program&& prog) noexcept;
+	Shader_program& operator=(Shader_program&& prog) = delete;
 
 
 	GLuint id() const noexcept

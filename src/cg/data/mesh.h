@@ -47,6 +47,9 @@ struct Interleaved_vertex_format {
 	static constexpr size_t component_count_tangent_h = 4;
 	static constexpr size_t component_count_tex_coord = 2;
 
+	Interleaved_vertex_format() noexcept
+		: attribs(Vertex_attribs::position)
+	{}
 
 	explicit Interleaved_vertex_format(Vertex_attribs attribs) noexcept
 		: attribs(attribs)

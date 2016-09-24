@@ -198,11 +198,14 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		Interleaved_vertex_format fmt0(Vertex_attribs::normal);
-		Assert::AreEqual(Vertex_attribs::normal, fmt0.attribs);
+		Interleaved_vertex_format fmt0;
+		Assert::AreEqual(Vertex_attribs::position, fmt0.attribs);
 
-		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_tangent_h);
-		Assert::AreEqual(Vertex_attribs::mesh_tangent_h, fmt1.attribs);
+		Interleaved_vertex_format fmt1(Vertex_attribs::normal);
+		Assert::AreEqual(Vertex_attribs::normal, fmt1.attribs);
+
+		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_h);
+		Assert::AreEqual(Vertex_attribs::mesh_tangent_h, fmt2.attribs);
 	}
 
 	TEST_METHOD(component_count)

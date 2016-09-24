@@ -34,27 +34,9 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	}
 }
 
-Shader::Shader(Shader&& shader_id) noexcept
-	: _id(shader_id._id), _type(shader_id._type)
-{
-	shader_id._id = Invalid::shader_id;
-}
-
 Shader::~Shader() noexcept
 {
 	dispose();
-}
-
-Shader& Shader::operator=(Shader&& shader_id) noexcept
-{
-	assert(this != &shader_id);
-	dispose();
-
-	_id = shader_id._id;
-	_type = shader_id._type;
-	shader_id._id = Invalid::shader_id;
-
-	return *this;
 }
 
 bool Shader::compiled() const noexcept
@@ -210,27 +192,9 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 	}
 }
 
-Shader_program::Shader_program(Shader_program&& prog) noexcept
-	: _id(prog._id), _name(std::move(prog._name))
-{
-	prog._id = Invalid::shader_program_id;
-}
-
 Shader_program::~Shader_program() noexcept
 {
 	dispose();
-}
-
-Shader_program& Shader_program::operator=(Shader_program&& prog) noexcept
-{
-	assert(this != &prog);
-	dispose();
-
-	_id = prog._id;
-	_name = std::move(prog._name);
-	prog._id = Invalid::shader_program_id;
-
-	return *this;
 }
 
 void Shader_program::dispose() noexcept

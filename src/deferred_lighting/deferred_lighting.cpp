@@ -25,7 +25,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 
 	vs_builder.begin(Vertex_attribs::position, cg::megabytes(4));
 	_de_cmd = vs_builder.push_back(mesh_data);
-	_vertex_spec = std::make_unique<Static_vertex_spec>(vs_builder.end(attrib_layout));
+	_vertex_spec = vs_builder.end(attrib_layout);
 	glViewport(0, 0, window_size.width, window_size.height);
 }
 

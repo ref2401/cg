@@ -27,38 +27,7 @@ Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format forma
 	assert(_vertex_buffer_id != _index_buffer_id);
 }
 
-Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept
-	: _format(spec._format), _vao_id(spec._vao_id), 
-	_vertex_buffer_id(spec._vertex_buffer_id), _index_buffer_id(spec._index_buffer_id)
-{
-	spec._vao_id = Invalid::vao_id;
-	spec._vertex_buffer_id = Invalid::buffer_id;
-	spec._index_buffer_id = Invalid::buffer_id;
-}
-
 Static_vertex_spec::~Static_vertex_spec() noexcept
-{
-	dispose();
-}
-
-Static_vertex_spec& Static_vertex_spec::operator=(Static_vertex_spec&& spec) noexcept
-{
-	assert(this != &spec);
-
-	dispose();
-	_format = spec._format;
-	_vao_id = spec._vao_id;
-	_vertex_buffer_id = spec._vertex_buffer_id;
-	_index_buffer_id = spec._index_buffer_id;
-
-	spec._vao_id = Invalid::vao_id;
-	spec._vertex_buffer_id = Invalid::buffer_id;
-	spec._index_buffer_id = Invalid::buffer_id;
-
-	return *this;
-}
-
-void Static_vertex_spec::dispose() noexcept
 {
 	if (_vertex_buffer_id != Invalid::buffer_id) {
 		glDeleteBuffers(1, &_vertex_buffer_id);
@@ -97,7 +66,7 @@ void Static_vertex_spec_builder::begin(Vertex_attribs attribs, size_t vertex_lim
 	glCreateVertexArrays(1, &_vao_id);
 }
 
-Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
+std::unique_ptr<Static_vertex_spec> Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
 {
 	assert(building_process());
 	
@@ -151,7 +120,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 		glBindVertexArray(Invalid::vao_id);
 
 	// reset members
-	Static_vertex_spec spec(_format, _vao_id, ids[0], ids[1]);
+	auto spec = std::make_unique<Static_vertex_spec>(_format, _vao_id, ids[0], ids[1]);
 	_vao_id = Invalid::vao_id; // this ends building process
 	return spec;
 }
