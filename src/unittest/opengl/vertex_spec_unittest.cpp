@@ -2,6 +2,7 @@
 
 using cg::opengl::DE_cmd;
 using cg::opengl::DE_base_vertex_params;
+using cg::opengl::DE_indirect_params;
 using cg::opengl::Invalid;
 using cg::opengl::Vertex_attrib_layout;
 
@@ -48,6 +49,20 @@ public:
 
 		DE_cmd cmd(24, index_count, offset_index, base_vertex);
 		Assert::AreEqual(expected_params, cmd.get_base_vertex_params());
+	}
+
+	TEST_METHOD(get_indirect_params)
+	{
+		size_t index_count = 3;
+		size_t offset_indices = 100;
+		size_t base_vertex = 11;
+		size_t instance_count = 2;
+		size_t base_instance = 5;
+
+		DE_indirect_params expected_params(index_count, instance_count, offset_indices, base_vertex, base_instance);
+
+		DE_cmd cmd(100, index_count, offset_indices, base_vertex, instance_count, base_instance);
+		Assert::AreEqual(expected_params, cmd.get_indirect_params());
 	}
 
 	TEST_METHOD(equal_operator)
@@ -110,6 +125,40 @@ public:
 		Assert::AreEqual(p, DE_base_vertex_params(mode, count, type, offset, base_vertex));
 	}
 
+};
+
+TEST_CLASS(gl_opengl_vertex_spec_DE_indirect_params) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		DE_indirect_params p0;
+		Assert::AreEqual<GLuint>(0, p0.index_count);
+		Assert::AreEqual<GLuint>(0, p0.instance_count);
+		Assert::AreEqual<GLuint>(0, p0.offset_indices);
+		Assert::AreEqual<GLuint>(0, p0.base_vertex);
+		Assert::AreEqual<GLuint>(0, p0.base_instance);
+
+		DE_indirect_params p1(1, 2, 3, 4, 5);
+		Assert::AreEqual<GLuint>(1, p1.index_count);
+		Assert::AreEqual<GLuint>(2, p1.instance_count);
+		Assert::AreEqual<GLuint>(3, p1.offset_indices);
+		Assert::AreEqual<GLuint>(4, p1.base_vertex);
+		Assert::AreEqual<GLuint>(5, p1.base_instance);
+	}
+
+	TEST_METHOD(equality_operator)
+	{
+		DE_indirect_params p(1, 2, 3, 4, 5);
+
+		Assert::AreNotEqual(p, DE_indirect_params(100, 2, 3, 4, 5));
+		Assert::AreNotEqual(p, DE_indirect_params(1, 200, 3, 4, 5));
+		Assert::AreNotEqual(p, DE_indirect_params(1, 2, 300, 4, 5));
+		Assert::AreNotEqual(p, DE_indirect_params(1, 2, 3, 400, 5));
+		Assert::AreNotEqual(p, DE_indirect_params(1, 2, 3, 4, 500));
+
+		Assert::AreEqual(p, DE_indirect_params(1, 2, 3, 4, 5));
+	}
 };
 
 TEST_CLASS(cg_opengl_vertex_spec_Vertex_attrib_layout) {

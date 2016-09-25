@@ -42,6 +42,36 @@ struct DE_base_vertex_params {
 	GLint base_vertex = 0;
 };
 
+// The layout of the struct is specified by Opengl spec.
+struct DE_indirect_params {
+
+	DE_indirect_params() noexcept = default;
+
+	DE_indirect_params(GLuint index_count, GLuint instance_count,
+		GLuint offset_indices, GLuint base_vertex, GLuint base_instance) noexcept
+		: index_count(index_count), instance_count(instance_count), 
+		offset_indices(offset_indices), base_vertex(base_vertex), base_instance(base_instance)
+	{}
+
+
+	// The number of indices to render.
+	GLuint index_count = 0;
+
+	// The number of instances to be rendered.
+	GLuint instance_count = 0;
+
+	// The number of precedint indices that must be ignored.
+	// The offset value is in units of indices (GL_UNSIGNED_INT).
+	GLuint offset_indices = 0;
+
+	// The constant that should be added to each index while rendering using this command.
+	GLuint base_vertex = 0;
+
+	// The constant that should be added to each instance index while fetching from enabled vertex attributes.
+	// gl_InstanceID is not affected by base_instance value.
+	GLuint base_instance = 0;
+};
+
 // DE_cmd class contains all the required params to bind vertex array object
 // and render geomertry which is written in a specific part of vertex/index buffers.
 // The class is used to constracut various direct & indirect glDrawElenentsXXX commands' params.
@@ -63,8 +93,7 @@ public:
 	}
 
 
-	// The constant that should be added to each instance index
-	// while fetching from enabled vertex attributes.
+	// The constant that should be added to each instance index while fetching from enabled vertex attributes.
 	// gl_InstanceID is not affected by base_instance value.
 	size_t base_instance() const noexcept
 	{
@@ -77,10 +106,18 @@ public:
 		return _base_vertex;
 	}
 
-	// Returns glDrawElementsBaseVertex params.
-	DE_base_vertex_params get_base_vertex_params() const noexcept {
+	// Returns glDrawElementsBaseVertex compatible params.
+	DE_base_vertex_params get_base_vertex_params() const noexcept 
+	{
 		return DE_base_vertex_params(GL_TRIANGLES, _index_count, GL_UNSIGNED_INT,
 			reinterpret_cast<void*>(_offset_indices * sizeof(GL_UNSIGNED_INT)), _base_vertex);
+	}
+
+	// Returns glDrawElementsIndirect compatible params.
+	DE_indirect_params get_indirect_params() const noexcept
+	{
+		return DE_indirect_params(_index_count, _instance_count, _offset_indices, 
+			_base_vertex, _base_instance);
 	}
 
 	// The number of indices to be rendered.
@@ -260,6 +297,20 @@ inline bool operator!=(const DE_base_vertex_params& lhs, const DE_base_vertex_pa
 	return !(lhs == rhs);
 }
 
+inline bool operator==(const DE_indirect_params& lhs, const DE_indirect_params& rhs) noexcept
+{
+	return (lhs.index_count == rhs.index_count)
+		&& (lhs.instance_count == rhs.instance_count)
+		&& (lhs.offset_indices == rhs.offset_indices)
+		&& (lhs.base_vertex == rhs.base_vertex)
+		&& (lhs.base_instance == rhs.base_instance);
+}
+
+inline bool operator!=(const DE_indirect_params& lhs, const DE_indirect_params& rhs) noexcept
+{
+	return !(lhs == rhs);
+}
+
 inline std::ostream& operator<<(std::ostream& out, const DE_cmd& cmd)
 {
 	out << "DE_cmd(" << cmd._vao_id << ", " << cmd._index_count << ", "
@@ -287,6 +338,20 @@ inline std::wostream& operator<<(std::wostream& out, const DE_base_vertex_params
 {
 	out << "DE_base_vertex_params(" << p.mode << ", " << p.index_count << ", "
 		<< p.index_type << ", " << p.offset_bytes << ", " << p.base_vertex << ')';
+	return out;
+}
+
+inline std::ostream& operator<<(std::ostream& out, const DE_indirect_params& p)
+{
+	out << "DE_indirect_params(" << p.index_count << ", " << p.instance_count << ", "
+		<< p.offset_indices << ", " << p.base_vertex << ", " << p.base_instance << ')';
+	return out;
+}
+
+inline std::wostream& operator<<(std::wostream& out, const DE_indirect_params& p)
+{
+	out << "DE_indirect_params(" << p.index_count << ", " << p.instance_count << ", "
+		<< p.offset_indices << ", " << p.base_vertex << ", " << p.base_instance << ')';
 	return out;
 }
 
