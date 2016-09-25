@@ -35,11 +35,10 @@ private:
 	std::vector<cg::opengl::DE_cmd> _renderable_objects;
 	// rendering
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
-	cg::opengl::Persistent_buffer _indirect_buffer;
+	std::unique_ptr<cg::opengl::Persistent_buffer> _indirect_buffer;
+	GLsync _frame_sync_obj;
 
-	/*std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
 	std::unique_ptr<cg::opengl::Shader_program> _prog;
-	cg::opengl::DE_cmd _de_cmd;*/
 };
 
 } // namespace deferred_lighting

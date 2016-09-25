@@ -43,6 +43,7 @@ struct DE_base_vertex_params {
 };
 
 // The layout of the struct is specified by Opengl spec.
+// DE_indirect_params opbject is compatible with glDrawElementsIndirect & glMultiDrawElementsIndirect.
 struct DE_indirect_params {
 
 	DE_indirect_params() noexcept = default;

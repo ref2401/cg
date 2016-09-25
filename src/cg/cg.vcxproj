@@ -129,7 +129,7 @@
     <ClCompile Include="file\file.cpp" />
     <ClCompile Include="file\wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
-    <ClCompile Include="opengl\buffer.cpp" />
+    <ClCompile Include="opengl\utility.cpp" />
     <ClCompile Include="opengl\opengl_def.cpp" />
     <ClCompile Include="opengl\shader.cpp" />
     <ClCompile Include="opengl\vertex_spec.cpp" />
@@ -151,11 +151,11 @@
     <ClInclude Include="math\uint2.h" />
     <ClInclude Include="math\utility.h" />
     <ClInclude Include="math\float3.h" />
-    <ClInclude Include="opengl\buffer.h" />
     <ClInclude Include="opengl\glcorearb.h" />
     <ClInclude Include="opengl\opengl.h" />
     <ClInclude Include="opengl\opengl_def.h" />
     <ClInclude Include="opengl\shader.h" />
+    <ClInclude Include="opengl\utility.h" />
     <ClInclude Include="opengl\vertex_spec.h" />
     <ClInclude Include="sys\app.h" />
   </ItemGroup>
