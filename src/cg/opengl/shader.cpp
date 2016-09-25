@@ -7,6 +7,8 @@
 #include "cg/data/shader.h"
 #include "cg/opengl/opengl_def.h"
 
+using cg::enforce;
+
 
 namespace cg {
 namespace opengl {
@@ -220,6 +222,22 @@ GLint Shader_program::get_property(GLenum prop) const noexcept
 	assert(v != -1);
 
 	return v;
+}
+
+GLint Shader_program::get_uniform_location(const std::string& uniform_name) const
+{
+	return get_uniform_location(uniform_name.c_str());
+}
+
+GLint Shader_program::get_uniform_location(const char* uniform_name) const
+{
+	assert(uniform_name);
+
+	GLint location = glGetUniformLocation(_id, uniform_name);
+	enforce(_id != Invalid::uniform_location, 
+		EXCEPTION_MSG("Shader program '", _name, "' does not have a uniform called '", uniform_name, "'."));
+
+	return location;
 }
 
 bool Shader_program::linked() const noexcept

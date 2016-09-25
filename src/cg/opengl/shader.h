@@ -74,6 +74,14 @@ public:
 	Shader_program& operator=(Shader_program&& prog) = delete;
 
 
+	// Returns a location value of the specified uniform.
+	// Throws if the uniform name does not belong to this shader program.
+	GLint get_uniform_location(const std::string& uniform_name) const;
+
+	// Returns a location value of the specified uniform.
+	// Throws if the uniform name does not belong to this shader program.
+	GLint get_uniform_location(const char* uniform_name) const;
+
 	GLuint id() const noexcept
 	{
 		return _id;
