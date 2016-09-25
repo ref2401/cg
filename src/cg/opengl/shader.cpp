@@ -111,7 +111,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 
 	if (!linked()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log));
 		
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -120,7 +120,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 	glValidateProgram(_id);
 	if (!valid()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log));
 
 		dispose();
 		throw std::runtime_error(exc_msg);

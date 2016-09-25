@@ -11,7 +11,8 @@ namespace deferred_lighting {
 
 // ...
 // Deferred_lighting renderer (embedded) uses persistent mapped buffer technique
-// for multi-indirect rendering and gl_DrawID simulation.
+// for multi-indirect rendering and gl_DrawID simulation. Indirect buffer and draw index buffer use
+// tripple buffering technique to metigate synchronization with OpenGL command queue.
 class Deferred_lighting final : public cg::sys::IGame {
 public:
 
@@ -36,6 +37,7 @@ private:
 	// rendering
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	std::unique_ptr<cg::opengl::Persistent_buffer> _indirect_buffer;
+	std::unique_ptr<cg::opengl::Persistent_buffer> _draw_index_buffer; // simulates gl_DrawID
 	GLsync _frame_sync_obj;
 
 	std::unique_ptr<cg::opengl::Shader_program> _prog;
