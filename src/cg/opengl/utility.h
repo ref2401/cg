@@ -56,7 +56,7 @@ size_t Persistent_buffer::write(size_t offset, T* ptr, size_t count) noexcept
 
 // ----- funcs -----
 
-// Puts the current thread into a spinlock, while sync_obj is noc completed.
+// Puts the current thread into a spinlock, while sync_obj is not completed.
 // if sync_obj is nullptr then the func returns immediately.
 void wait_for(GLsync sync_obj) noexcept;
 

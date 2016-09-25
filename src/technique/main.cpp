@@ -4,7 +4,7 @@
 #include "cg/base/base.h"
 #include "cg/math/math.h"
 #include "cg/sys/app.h"
-#include "deferred_lighting/deferred_lighting.h"
+#include "technique/deferred_lighting/deferred_lighting.h"
 
 using cg::uint2;
 using cg::sys::make_win32_application;

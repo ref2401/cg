@@ -1,4 +1,4 @@
-#include "deferred_lighting/deferred_lighting.h"
+#include "technique/deferred_lighting/deferred_lighting.h"
 
 #include "cg/base/base.h"
 #include "cg/file/file.h"

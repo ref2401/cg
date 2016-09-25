@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F39F9F4B-4584-4F17-8BB4-32CA1F3D12C3}</ProjectGuid>
-    <RootNamespace>cg_launcher</RootNamespace>
+    <RootNamespace>technique</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -129,15 +129,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deferred_lighting\deferred_lighting.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">
       <Project>{6f1c7da3-e163-4bc7-8a59-99661973f995}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\deferred_lighting\deferred_lighing.vcxproj">
-      <Project>{b38120e5-c5e2-4f18-8706-eadbdd296e6f}</Project>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="deferred_lighting\deferred_lighting.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
