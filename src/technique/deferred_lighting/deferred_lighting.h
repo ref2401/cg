@@ -28,19 +28,21 @@ public:
 	void update(float dt) override {}
 
 private:
-	void load_data();
+	void load_data(const cg::uint2& window_size);
 
 	// scene
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
 	std::vector<cg::opengl::DE_cmd> _renderable_objects;
+	cg::mat4 _pvm_matrix = cg::mat4::identity;
 	// rendering
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	std::unique_ptr<cg::opengl::Persistent_buffer> _indirect_buffer;
 	std::unique_ptr<cg::opengl::Persistent_buffer> _draw_index_buffer; // simulates gl_DrawID
 	GLsync _frame_sync_obj;
-
+	// test shader
 	std::unique_ptr<cg::opengl::Shader_program> _prog;
+	GLint _pvm_matrix_location = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

@@ -68,7 +68,7 @@ mat3 inverse(const mat3& m)
 	return adj * inv_d;
 }
 
-mat4 inverse(const mat4& m)
+mat4 inverse(const mat4& m) noexcept
 {
 	// inverse is found by Cramer’s rule.
 

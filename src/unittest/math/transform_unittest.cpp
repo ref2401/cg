@@ -294,17 +294,6 @@ TEST_CLASS(cg_math_Transform) {
 		Assert::AreEqual(mT * mR * mS, trs_matrix(p, q, s));
 	}
 
-	TEST_METHOD(view_matrix)
-	{
-		using cg::inverse;
-		using cg::tr_matrix;
-		using cg::view_matrix;
-
-		float3 p(4, -1, 8);
-		float3 t(1, 1, -8);
-		Assert::AreEqual(inverse(tr_matrix(p, t)), view_matrix(p, t));
-	}
-
 
 	TEST_METHOD(internal_is_3d_float_vector)
 	{

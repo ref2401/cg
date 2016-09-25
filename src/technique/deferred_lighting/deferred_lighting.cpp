@@ -3,6 +3,8 @@
 #include "cg/base/base.h"
 #include "cg/file/file.h"
 
+using cg::float3;
+using cg::mat4;
 using cg::uint2;
 using cg::kilobytes;
 using cg::megabytes;
@@ -14,6 +16,7 @@ using cg::opengl::Static_vertex_spec;
 using cg::opengl::Static_vertex_spec_builder;
 using cg::opengl::Persistent_buffer;
 using cg::opengl::Vertex_attrib_layout;
+using cg::opengl::set_uniform;
 using cg::opengl::wait_for;
 
 
@@ -24,17 +27,21 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 {
 	_indirect_buffer = std::make_unique<Persistent_buffer>(megabytes(1));
 	_draw_index_buffer = std::make_unique<Persistent_buffer>(kilobytes(512));
-	load_data();
+	load_data(window_size);
 	glViewport(0, 0, window_size.width, window_size.height);
 }
 
-void Deferred_lighting::load_data()
+void Deferred_lighting::load_data(const uint2& window_size)
 {
-	// load shader programs
+	// load shader program
 	auto src = cg::file::load_glsl_program_source("../data/test");
 	_prog = std::make_unique<Shader_program>("test-shader", src);
+	_pvm_matrix_location = _prog->get_uniform_location("u_pvm_matrix");
 
-	// load models
+	// scene
+	_pvm_matrix = cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50)
+		* cg::view_matrix(float3(0, 0, 2), float3::zero);
+
 	_renderable_objects.reserve(8);
 	// square model
 	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", Vertex_attribs::position);
@@ -68,6 +75,7 @@ void Deferred_lighting::render(float blend_state)
 	float rgb[4] = { 0.5f, 0.5f, 0.55f, 1.f };
 	glClearBufferfv(GL_COLOR, 0, rgb);
 	glUseProgram(_prog->id());
+	set_uniform(_pvm_matrix_location, _pvm_matrix);
 	glBindVertexArray(_vertex_spec->vao_id());
 	
 	size_t offset_indirect = 0;

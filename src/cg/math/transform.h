@@ -13,8 +13,26 @@
 
 namespace cg {
 
+namespace internal {
+
+	// Checks whether the given type T is float3 or float4 vector.
+	template<typename T>
+	struct is_3d_float_vector : std::false_type {};
+	template<> struct is_3d_float_vector<float3> : std::true_type {};
+	template<> struct is_3d_float_vector<float4> : std::true_type {};
+
+	// Checks whether the given type T is mat3 or mat4 vector.
+	template<typename T>
+	struct is_matrix : std::false_type {};
+	template<> struct is_matrix<mat3> : std::true_type {};
+	template<> struct is_matrix<mat4> : std::true_type {};
+
+} // namespace internal
+
+
 constexpr float pi = 3.1415926535897932384626433832f;
 constexpr float pi_2 = pi / 2.f;
+constexpr float pi_3 = pi / 3.f;
 constexpr float pi_4 = pi / 4.f;
 constexpr float pi_8 = pi / 8.f;
 
@@ -22,122 +40,7 @@ constexpr float pi_8 = pi / 8.f;
 //	Params:
 //		axis = a unit vector indicates direction of a rotation axis.
 //		angle = (In radians) describes the magnitude of the rotation about the axis.
-quat from_axis_angle_rotation(const float3& axis, float angle);
-
-// Construct a unit quaternion from the specified rotation matrix.
-// In the case of M is mat4 translation and perspective components are ignored.
-template<typename TMat>
-quat from_rotation_matrix(const TMat& m);
-
-// Creates an OpenGL compatible orthographic projection matrix. 
-// right = -left, top = -bottom, near < far.
-mat4 orthographic_matrix(float width, float height, float near, float far);
-
-// Creates an OpenGL compatible orthographic projection matrix.
-// left < right, bottom < top, near < far.
-mat4 orthographic_matrix(float left, float right, float bottom, float top, float near, float far);
-
-// Computes an OpenGL compatible projection matrix for general frustum.
-// left < right, bottom < top, 0 < near < far.
-mat4 perspective_matrix(float left, float right, float bottom, float top, float near, float far);
-
-// Computes an OpenGL compatible symmetric perspective projection matrix based on a field of view.
-// 0 < vert_Fov < cg::pi, 0 < near < far.
-//	Params:
-//		vert_fov = Vertical field of view in radians.
-//		wh_ratio = The ratio of the width to the height of the near clipping plane.
-//		near = the distance between a viewer and the near clipping plane.
-//		far = the distance between a viewer and the far clipping plane.
-mat4 perspective_matrix(float vert_fov, float wh_ratio, float near, float far);
-
-// Returns the position component of the specified matrix.
-float3 position(const mat4& m);
-
-// Sets the position component of the specifiend matrix.
-void set_position(mat4& m, const float3& p);
-
-// Constructs rotation matrix from (possibly non-unit) quaternion.
-template<typename TRetMat>
-TRetMat rotation_matrix(const quat& q);
-
-// Composes a rotatiom matrix that rotates a vector by angle about an arbitrary axis.
-// The rotation is conter-clockwise.
-//	Params:
-//		axis = a unit vector indicates the direction of a rotation axis.
-//		angle = describes the magnitude in radians of the rotation about the axis.
-template<typename TRetMat>
-TRetMat rotation_matrix(const float3& axis, float angle);
-
-// Composes a look at rotation matrix. Translation component is not set.
-// Use tr_matrix to consturct a look at rotation and translation to position chain.
-//	Params:
-//		position = is eye/object position.
-//		target = point of interest.v The point we want to look at.
-//		up = the direction that is considered to be upward.
-template<typename TRetMat>
-TRetMat rotation_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
-
-// Composes a rotatiom matrix about ox axis.
-//	Params:
-//		angle = describes the magnitude in radians of the rotation about ox.
-template<typename TRetMat>
-TRetMat rotation_matrix_ox(float angle);
-
-// Composes a rotatiom matrix about oy axis.
-//	Params:
-//		angle = describes the magnitude in radians of the rotation about oy.
-template<typename TRetMat>
-TRetMat rotation_matrix_oy(float angle);
-
-// Composes a rotatiom matrix about oz axis.
-//	Params:
-//		angle = describes the magnitude in radians of the rotation about oz.
-template<typename TRetMat>
-TRetMat rotation_matrix_oz(float angle);
-
-// Returns a matrix which can be used to scale vectors s.
-template<typename TRetMat>
-TRetMat scale_matrix(const float3& s);
-
-// Returns a matrix that is a concatenation of translation by p and rotation by q.
-// The result is equal to translation_matrix(p) * rotation_matrix(q).
-mat4 tr_matrix(const float3& p, const quat& q);
-
-// Returns a matrix that is a concatentation of traslation by p and a look at rotation
-mat4 tr_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
-
-// Returns a matrix which can be used to translate vectors to the position p.
-mat4 translation_matrix(const float3& p);
-
-// Return a matrix that is a concatenation of translation by p, rotation by q and scale by s.
-// The result is equal to translation_matrix(p) * rotation_matrix(q) * scale_matrix(s).
-mat4 trs_matrix(const float3& p, const quat& q, const float3& s);
-
-// Composes a matrix that cam be used to transform from world space to view space.
-//	Params:
-//		position = an origin, where eye(camera) is situated.
-//		target = a point of interest.
-//		up = the direction that is considered to be upward.
-mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y);
-
-namespace internal {
-
-// Checks whether the given type T is float3 or float4 vector.
-template<typename T>
-struct is_3d_float_vector : std::false_type {};
-template<> struct is_3d_float_vector<float3> : std::true_type {};
-template<> struct is_3d_float_vector<float4> : std::true_type {};
-
-// Checks whether the given type T is mat3 or mat4 vector.
-template<typename T>
-struct is_matrix : std::false_type {};
-template<> struct is_matrix<mat3> : std::true_type {};
-template<> struct is_matrix<mat4> : std::true_type {};
-
-} // namespace internal
-
-
-inline quat from_axis_angle_rotation(const float3& axis, float angle)
+inline quat from_axis_angle_rotation(const float3& axis, float angle) noexcept
 {
 	assert(is_normalized(axis));
 
@@ -149,8 +52,10 @@ inline quat from_axis_angle_rotation(const float3& axis, float angle)
 	return quat(axis.x * s, axis.y * s, axis.z * s, c);
 }
 
+// Construct a unit quaternion from the specified rotation matrix.
+// In the case of M is mat4 translation and perspective components are ignored.
 template<typename TMat>
-quat from_rotation_matrix(const TMat& m)
+quat from_rotation_matrix(const TMat& m) noexcept
 {
 	static_assert(cg::internal::is_matrix<TMat>::value, "TMat must be a matrix (mat3 or mat4).");
 
@@ -201,7 +106,9 @@ quat from_rotation_matrix(const TMat& m)
 	return res;
 }
 
-inline mat4 orthographic_matrix(float width, float height, float near_z, float far_z)
+// Creates an OpenGL compatible orthographic projection matrix. 
+// right = -left, top = -bottom, near < far.
+inline mat4 orthographic_matrix(float width, float height, float near_z, float far_z) noexcept
 {
 	assert(width > 0);
 	assert(height > 0);
@@ -219,7 +126,9 @@ inline mat4 orthographic_matrix(float width, float height, float near_z, float f
 	);
 }
 
-inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z)
+// Creates an OpenGL compatible orthographic projection matrix.
+// left < right, bottom < top, near < far.
+inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
 {
 	assert(left < right);
 	assert(bottom < top);
@@ -238,7 +147,9 @@ inline mat4 orthographic_matrix(float left, float right, float bottom, float top
 	);
 }
 
-inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z)
+// Computes an OpenGL compatible projection matrix for general frustum.
+// left < right, bottom < top, 0 < near < far.
+inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
 {
 	float doubled_near = 2.f * near_z;
 	float far_minus_near = far_z - near_z;
@@ -254,7 +165,14 @@ inline mat4 perspective_matrix(float left, float right, float bottom, float top,
 	);
 }
 
-inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z)
+// Computes an OpenGL compatible symmetric perspective projection matrix based on a field of view.
+// 0 < vert_Fov < cg::pi, 0 < near < far.
+//	Params:
+//		vert_fov = Vertical field of view in radians.
+//		wh_ratio = The ratio of the width to the height of the near clipping plane.
+//		near = the distance between a viewer and the near clipping plane.
+//		far = the distance between a viewer and the far clipping plane.
+inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept
 {
 	assert(0 < vert_fov && vert_fov < pi);
 	assert(0 < near_z && near_z < far_z);
@@ -281,20 +199,23 @@ inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, flo
 	);
 }
 
-inline float3 position(const mat4& m)
+// Returns the position component of the specified matrix.
+inline float3 position(const mat4& m) noexcept
 {
 	return float3(m.m03, m.m13, m.m23);
 }
 
-inline void set_position(mat4& m, const float3& p)
+// Sets the position component of the specifiend matrix.
+inline void set_position(mat4& m, const float3& p) noexcept
 {
 	m.m03 = p.x;
 	m.m13 = p.y;
 	m.m23 = p.z;
 }
 
+// Constructs rotation matrix from (possibly non-unit) quaternion.
 template<typename TRetMat>
-TRetMat rotation_matrix(const quat& q)
+TRetMat rotation_matrix(const quat& q) noexcept
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
 
@@ -328,8 +249,13 @@ TRetMat rotation_matrix(const quat& q)
 	return rot;
 }
 
+// Composes a rotatiom matrix that rotates a vector by angle about an arbitrary axis.
+// The rotation is conter-clockwise.
+//	Params:
+//		axis = a unit vector indicates the direction of a rotation axis.
+//		angle = describes the magnitude in radians of the rotation about the axis.
 template<typename TRetMat>
-TRetMat rotation_matrix(const float3& axis, float angle)
+TRetMat rotation_matrix(const float3& axis, float angle) noexcept
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
 	assert(is_normalized(axis));
@@ -360,8 +286,14 @@ TRetMat rotation_matrix(const float3& axis, float angle)
 	return rot;
 }
 
+// Composes a look at rotation matrix. Translation component is not set.
+// Use tr_matrix to consturct a look at rotation and translation to position chain.
+//	Params:
+//		position = is eye/object position.
+//		target = point of interest.v The point we want to look at.
+//		up = the direction that is considered to be upward.
 template<typename TRetMat>
-TRetMat rotation_matrix(const float3& position, const float3& target, const float3& up)
+TRetMat rotation_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept
 {
 	assert(position != target);
 	assert(is_normalized(up));
@@ -378,8 +310,11 @@ TRetMat rotation_matrix(const float3& position, const float3& target, const floa
 	return r;
 }
 
+// Composes a rotatiom matrix about ox axis.
+//	Params:
+//		angle = describes the magnitude in radians of the rotation about ox.
 template<typename TRetMat>
-TRetMat rotation_matrix_ox(float angle)
+TRetMat rotation_matrix_ox(float angle) noexcept
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
 
@@ -397,8 +332,11 @@ TRetMat rotation_matrix_ox(float angle)
 	return r;
 }
 
+// Composes a rotatiom matrix about oy axis.
+//	Params:
+//		angle = describes the magnitude in radians of the rotation about oy.
 template<typename TRetMat>
-TRetMat rotation_matrix_oy(float angle)
+TRetMat rotation_matrix_oy(float angle) noexcept
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
 
@@ -416,8 +354,11 @@ TRetMat rotation_matrix_oy(float angle)
 	return r;
 }
 
+// Composes a rotatiom matrix about oz axis.
+//	Params:
+//		angle = describes the magnitude in radians of the rotation about oz.
 template<typename TRetMat>
-TRetMat rotation_matrix_oz(float angle)
+TRetMat rotation_matrix_oz(float angle) noexcept
 {
 	static_assert(cg::internal::is_matrix<TRetMat>::value, "TRetMat must be a matrix (mat3, mat4).");
 
@@ -435,8 +376,9 @@ TRetMat rotation_matrix_oz(float angle)
 	return r;
 }
 
+// Returns a matrix which can be used to scale vectors s.
 template<typename TRetMat>
-TRetMat scale_matrix(const float3& s)
+TRetMat scale_matrix(const float3& s) noexcept
 {
 	assert(greater_than(s, 0));
 
@@ -447,47 +389,57 @@ TRetMat scale_matrix(const float3& s)
 	return m;
 }
 
-inline mat4 tr_matrix(const float3& p, const quat& q)
+// Returns a matrix that is a concatenation of translation by p and rotation by q.
+// The result is equal to translation_matrix(p) * rotation_matrix(q).
+inline mat4 tr_matrix(const float3& p, const quat& q) noexcept
 {
 	mat4 m = rotation_matrix<mat4>(q);
 	set_position(m, p);
 	return m;
 }
 
-inline mat4 tr_matrix(const float3& position, const float3& target, const float3& up)
+// Returns a matrix that is a concatentation of traslation by p and a look at rotation
+inline mat4 tr_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept
 {
 	mat4 m = rotation_matrix<mat4>(position, target, up);
 	set_position(m, position);
 	return m;
 }
 
-inline mat4 translation_matrix(const float3& p)
+// Returns a matrix which can be used to translate vectors to the position p.
+inline mat4 translation_matrix(const float3& p) noexcept
 {
 	mat4 m = mat4::identity;
 	set_position(m, p);
 	return m;
 }
 
-inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s)
+// Return a matrix that is a concatenation of translation by p, rotation by q and scale by s.
+// The result is equal to translation_matrix(p) * rotation_matrix(q) * scale_matrix(s).
+inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s) noexcept
 {
 	return tr_matrix(p, q) * scale_matrix<mat4>(s);
 }
 
-inline mat4 view_matrix(const float3& position, const float3& target, const float3& up)
+// Composes a matrix that cam be used to transform from world space to view space.
+//	Params:
+//		position = an origin, where eye(camera) is situated.
+//		target = a point of interest.
+//		up = the direction that is considered to be upward.
+inline mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept
 {
 	assert(position != target);
 	assert(is_normalized(up));
 
 	float3 forward = normalize(target - position);
-	float3 right = normalize(cross(up, forward));
-	float3 new_up = normalize(cross(forward, right));
+	float3 right = normalize(cross(forward, up));
+	float3 new_up = normalize(cross(right, forward));
 
-	// transpose(rotation_matrix<mat4>(position, target, up)) * translation_matrix(-position)
 	mat4 r = mat4::identity;
 	r.m00 = right.x;	r.m01 = right.y;	r.m02 = right.z;	r.m03 = dot(right, -position);
 	r.m10 = new_up.x;	r.m11 = new_up.y;	r.m12 = new_up.z;	r.m13 = dot(new_up, -position);
-	r.m20 = forward.x;	r.m21 = forward.y;	r.m22 = forward.z;	r.m23 = dot(forward, -position);
-	
+	r.m20 = -forward.x;	r.m21 = -forward.y;	r.m22 = -forward.z;	r.m23 = dot(forward, position);
+
 	return r;
 }
 

@@ -2,6 +2,7 @@
 #define CG_OPENGL_SHADER_H_
 
 #include "cg/data/shader.h"
+#include "cg/math/math.h"
 #include "cg/opengl/opengl_def.h"
 
 
@@ -110,6 +111,20 @@ private:
 };
 
 
+// Sets a uniform variable value.
+// Params:
+// -	location: Uniform location in the currently used shader program.
+// -	value: New value to be used for the specified uniform variable.
+template<typename T>
+void set_uniform(GLint location, const T& value) noexcept;
+
+template<>
+inline void set_uniform<cg::mat4>(GLint location, const cg::mat4& mat) noexcept
+{
+	float arr[16];
+	cg::put_in_column_major_order(mat, arr);
+	glUniformMatrix4fv(location, 1, false, arr);
+}
 
 } // namespace opengl
 } // namespace cg
