@@ -1,6 +1,7 @@
 #ifndef DEFERRED_LIGHTING_DEFERRED_LIGHTING_H_
 #define DEFERRED_LIGHTING_DEFERRED_LIGHTING_H_
 
+#include <vector>
 #include "cg/math/math.h"
 #include "cg/opengl/opengl.h"
 #include "cg/sys/app.h"
@@ -8,6 +9,9 @@
 
 namespace deferred_lighting {
 
+// ...
+// Deferred_lighting renderer (embedded) uses persistent mapped buffer techniquec
+// for indirect rendering and gl_DrawID simulation
 class Deferred_lighting final : public cg::sys::IGame {
 public:
 
@@ -23,9 +27,19 @@ public:
 	void update(float dt) override {}
 
 private:
+	void load_data();
+
+	// scene
+	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
+	std::vector<cg::opengl::DE_cmd> _renderable_objects;
+	// rendering
+	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
+	cg::opengl::Persistent_buffer _indirect_buffer;
+
+	/*std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
 	std::unique_ptr<cg::opengl::Shader_program> _prog;
-	cg::opengl::DE_cmd _de_cmd;
+	cg::opengl::DE_cmd _de_cmd;*/
 };
 
 } // namespace deferred_lighting

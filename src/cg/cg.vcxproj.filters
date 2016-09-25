@@ -28,6 +28,9 @@
     <ClCompile Include="opengl\vertex_spec.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
+    <ClCompile Include="opengl\buffer.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -108,6 +111,9 @@
       <Filter>opengl</Filter>
     </ClInclude>
     <ClInclude Include="opengl\vertex_spec.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\buffer.h">
       <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>
