@@ -5,6 +5,9 @@
     <ClCompile Include="deferred_lighting\deferred_lighting.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
+    <ClCompile Include="deferred_lighting\render.cpp">
+      <Filter>deferred_lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
@@ -13,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="deferred_lighting\deferred_lighting.h">
+      <Filter>deferred_lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\render.h">
       <Filter>deferred_lighting</Filter>
     </ClInclude>
   </ItemGroup>

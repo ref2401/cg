@@ -17,6 +17,10 @@ public:
 
 	Persistent_buffer(size_t byte_count) noexcept;
 
+	Persistent_buffer(const Persistent_buffer& buff) = delete;
+
+	Persistent_buffer(Persistent_buffer&& buff) = delete;
+
 	~Persistent_buffer() noexcept;
 
 

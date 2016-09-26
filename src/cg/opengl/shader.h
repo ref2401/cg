@@ -26,11 +26,6 @@ public:
 
 	~Shader() noexcept;
 
-	
-	Shader& operator=(const Shader& shader_id) = delete;
-
-	Shader& operator=(Shader&& shader_id) = delete;
-
 
 	bool compiled() const noexcept;
 
@@ -70,10 +65,6 @@ public:
 	Shader_program(Shader_program&& prog) = delete;
 
 	~Shader_program() noexcept;
-
-	Shader_program& operator=(const Shader_program& prog) = delete;
-
-	Shader_program& operator=(Shader_program&& prog) = delete;
 
 
 	// Returns a location value of the specified uniform.

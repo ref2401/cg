@@ -17,9 +17,13 @@ namespace opengl {
 
 // ----- Static_vertex_spec
 
-Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format format, 
-	GLuint vao_id, GLuint vertex_buffer_id, GLuint index_buffer_id) noexcept
-	: _format(format), _vao_id(vao_id), _vertex_buffer_id(vertex_buffer_id), _index_buffer_id(index_buffer_id)
+Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id,
+	GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept
+:	_format(format), 
+	_vao_id(vao_id), 
+	_vertex_buffer_id(vertex_buffer_id), 
+	_vertex_buffer_binding_index(vertex_buffer_binding_index), 
+	_index_buffer_id(index_buffer_id)
 {
 	assert(vao_id != Invalid::vao_id);
 	assert(_vertex_buffer_id != Invalid::buffer_id);
@@ -120,7 +124,7 @@ std::unique_ptr<Static_vertex_spec> Static_vertex_spec_builder::end(const Vertex
 		glBindVertexArray(Invalid::vao_id);
 
 	// reset members
-	auto spec = std::make_unique<Static_vertex_spec>(_format, _vao_id, ids[0], ids[1]);
+	auto spec = std::make_unique<Static_vertex_spec>(_format, _vao_id, ids[0], vb_binding_index, ids[1]);
 	_vao_id = Invalid::vao_id; // this ends building process
 	return spec;
 }

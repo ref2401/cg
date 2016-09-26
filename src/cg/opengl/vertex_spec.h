@@ -186,19 +186,14 @@ struct Vertex_attrib_layout {
 class Static_vertex_spec final {
 public:
 
-	Static_vertex_spec(cg::data::Interleaved_vertex_format format, 
-		GLuint vao_id, GLuint vertex_buffer_id, GLuint index_buffer_id) noexcept;
+	Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id, 
+		GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
 
 	Static_vertex_spec(const Static_vertex_spec& spec) = delete;
 
 	Static_vertex_spec(Static_vertex_spec&& spec) = delete;
 
 	~Static_vertex_spec() noexcept;
-
-
-	Static_vertex_spec& operator=(const Static_vertex_spec& spec) = delete;
-
-	Static_vertex_spec& operator=(Static_vertex_spec&& spec) = delete;
 
 
 	cg::data::Interleaved_vertex_format format() const noexcept
@@ -221,11 +216,17 @@ public:
 		return _vertex_buffer_id;
 	}
 
+	GLuint vertex_buffer_binding_index() const noexcept
+	{
+		return _vertex_buffer_binding_index;
+	}
+
 private:
 
 	GLuint _vao_id = Invalid::vao_id;
 	cg::data::Interleaved_vertex_format _format;
 	GLuint _vertex_buffer_id = Invalid::buffer_id;
+	GLuint _vertex_buffer_binding_index;
 	GLuint _index_buffer_id = Invalid::buffer_id;
 };
 

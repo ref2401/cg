@@ -6,7 +6,8 @@ uniform mat4 u_model_matrix_array[3];
 layout(location = 0) in vec3 vert_position;
 layout(location = 1) in vec3 vert_normal;
 layout(location = 2) in vec2 vert_tex_coord;
-layout(location = 10) in uint draw_index;
+// the last location is reserved by renderer.
+layout(location = 15) in uint draw_index; 
 
 out Frag_data_i {
 	vec3 normal;
