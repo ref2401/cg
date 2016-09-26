@@ -1,11 +1,12 @@
 #version 450 core
 
-uniform mat4 u_pvm_matrix;
+uniform mat4 u_projection_view_matrix;
+uniform mat4 u_model_matrix_array[3];
 
 layout(location = 0) in vec3 vert_position;
 layout(location = 1) in vec3 vert_normal;
 layout(location = 2) in vec2 vert_tex_coord;
-layout(location = 10) in float draw_index;
+layout(location = 10) in uint draw_index;
 
 out Frag_data_i {
 	vec3 normal;
@@ -16,8 +17,11 @@ out Frag_data_i {
 
 void main()
 {
-	gl_Position = u_pvm_matrix * vec4(vert_position.x + draw_index * 0.2, vert_position.y, vert_position.z, 1);
+	float pos_offset = float(draw_index) * 0.2;
+	vec4 p = vec4(vert_position.x + pos_offset, vert_position.y, vert_position.z, 1);
+
+	gl_Position = u_projection_view_matrix * (u_model_matrix_array[draw_index] * p);
 	vs_out.normal = vert_normal;
 	vs_out.tex_coord = vert_tex_coord;
-	vs_out.draw_index = draw_index;
+	vs_out.draw_index = float(draw_index);
 }

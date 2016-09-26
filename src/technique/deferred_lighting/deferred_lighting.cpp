@@ -17,6 +17,7 @@ using cg::opengl::Static_vertex_spec_builder;
 using cg::opengl::Persistent_buffer;
 using cg::opengl::Vertex_attrib_layout;
 using cg::opengl::set_uniform;
+using cg::opengl::set_uniform_array;
 using cg::opengl::wait_for;
 
 
@@ -36,20 +37,26 @@ void Deferred_lighting::load_data(const uint2& window_size)
 	// load shader program
 	auto src = cg::file::load_glsl_program_source("../data/test");
 	_prog = std::make_unique<Shader_program>("test-shader", src);
-	_pvm_matrix_location = _prog->get_uniform_location("u_pvm_matrix");
+	_u_pv_matrix = _prog->get_uniform_location("u_projection_view_matrix");
+	_u_model_matrix_array = _prog->get_uniform_location("u_model_matrix_array");
 
 	// scene
-	_pvm_matrix = cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50)
-		* cg::view_matrix(float3(0, 0, 2), float3::zero);
+	// scene.camera
+	_projection_matrix = cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50);
+	_view_matrix = cg::view_matrix(float3(0, 0, 2), float3::zero);
 
 	_renderable_objects.reserve(8);
 	// square model
 	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", Vertex_attribs::position);
 	_vs_builder.begin(Vertex_attribs::position, cg::megabytes(4));
 	DE_cmd cmd = _vs_builder.push_back(mesh_data);
+
 	_renderable_objects.push_back(cmd);
+	_model_matrices.push_back(cg::translation_matrix(float3::zero));
 	_renderable_objects.push_back(cmd);
+	_model_matrices.push_back(cg::translation_matrix(float3(0, 0.2f, 0)));
 	_renderable_objects.push_back(cmd);
+	_model_matrices.push_back(cg::translation_matrix(float3(0, 0.4f, 0)));
 	
 	// other models ...
 	
@@ -60,7 +67,7 @@ void Deferred_lighting::load_data(const uint2& window_size)
 	GLuint di_binding_index = 10;
 	glVertexArrayVertexBuffer(_vertex_spec->vao_id(), di_binding_index, _draw_index_buffer->id(), 0, sizeof(GLuint));
 	glVertexArrayAttribBinding(_vertex_spec->vao_id(), di_binding_index, di_binding_index);
-	glVertexArrayAttribFormat(_vertex_spec->vao_id(), di_binding_index, 1, GL_UNSIGNED_INT, false, 0);
+	glVertexArrayAttribIFormat(_vertex_spec->vao_id(), di_binding_index, 1, GL_UNSIGNED_INT, 0);
 	glVertexArrayBindingDivisor(_vertex_spec->vao_id(), di_binding_index, 1);
 	glEnableVertexArrayAttrib(_vertex_spec->vao_id(), di_binding_index);
 }
@@ -75,12 +82,14 @@ void Deferred_lighting::render(float blend_state)
 	float rgb[4] = { 0.5f, 0.5f, 0.55f, 1.f };
 	glClearBufferfv(GL_COLOR, 0, rgb);
 	glUseProgram(_prog->id());
-	set_uniform(_pvm_matrix_location, _pvm_matrix);
+	set_uniform(_u_pv_matrix, _projection_matrix * _view_matrix);
+	set_uniform_array(_u_model_matrix_array, _model_matrices.data(), _model_matrices.size());
 	glBindVertexArray(_vertex_spec->vao_id());
-	
+
 	size_t offset_indirect = 0;
 	size_t offset_draw_index = 0;
-	for (size_t i = 0; i < _renderable_objects.size(); ++i) {
+
+	for (size_t i = 0; i < _renderable_objects.size(); ++i) {	
 		auto params = _renderable_objects[i].get_indirect_params();
 		params.base_instance = i; // base index is required to calculate an index to draw_index_buffer
 		offset_indirect = _indirect_buffer->write(offset_indirect, &params);

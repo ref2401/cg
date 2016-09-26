@@ -234,7 +234,7 @@ GLint Shader_program::get_uniform_location(const char* uniform_name) const
 	assert(uniform_name);
 
 	GLint location = glGetUniformLocation(_id, uniform_name);
-	enforce(_id != Invalid::uniform_location, 
+	enforce(location != Invalid::uniform_location,
 		EXCEPTION_MSG("Shader program '", _name, "' does not have a uniform called '", uniform_name, "'."));
 
 	return location;

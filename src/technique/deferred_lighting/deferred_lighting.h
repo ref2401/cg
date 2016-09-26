@@ -33,8 +33,12 @@ private:
 	// scene
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
+	// scene.renderable objects
+	std::vector<cg::mat4> _model_matrices;
 	std::vector<cg::opengl::DE_cmd> _renderable_objects;
-	cg::mat4 _pvm_matrix = cg::mat4::identity;
+	// scene.camera
+	cg::mat4 _projection_matrix = cg::mat4::identity;
+	cg::mat4 _view_matrix = cg::mat4::identity;
 	// rendering
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	std::unique_ptr<cg::opengl::Persistent_buffer> _indirect_buffer;
@@ -42,7 +46,8 @@ private:
 	GLsync _frame_sync_obj;
 	// test shader
 	std::unique_ptr<cg::opengl::Shader_program> _prog;
-	GLint _pvm_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_pv_matrix = cg::opengl::Invalid::uniform_location;
+	GLint _u_model_matrix_array = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting
