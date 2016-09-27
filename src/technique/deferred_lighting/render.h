@@ -1,12 +1,11 @@
 #ifndef TECHNIQUE_DEFERRED_LIGHTING_RENDER_H_
 #define TECHNIQUE_DEFERRED_LIGHTING_RENDER_H_
 
+#include <array>
 #include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
 #include "cg/opengl/opengl.h"
-
-
 
 
 namespace deferred_lighting {
@@ -104,11 +103,13 @@ public:
 
 
 private:
+	static constexpr size_t max_draw_call_count = 512;
+
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
-	cg::opengl::Persistent_buffer _indirect_buffer;
-	cg::opengl::Persistent_buffer _draw_index_buffer; // simulates gl_DrawID
+	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _indirect_buffer;
+	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
 	std::vector<cg::mat4> _model_matrices;
-	GLsync _frame_sync_obj = nullptr;
+	std::array<GLsync, 3> _sync_objects;
 	// temporary here
 	cg::opengl::Shader_program _prog;
 	GLint _u_pv_matrix = cg::opengl::Invalid::uniform_location;

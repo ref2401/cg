@@ -23,7 +23,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 
 	auto src = cg::file::load_glsl_program_source("../data/test");
 	_renderer = std::make_unique<Renderer>(window_size, src);
-	
+
 	// scene
 	// square geometry
 	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", Vertex_attribs::position);
@@ -37,9 +37,9 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	_frame->set_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50));
 	_frame->set_view_matrix(cg::view_matrix(float3(0, 0, 2), float3::zero));
 	// put square three times as different models into frame
+	_frame->push_back_renderable(cmd, translation_matrix(float3(-0.2f, -0.2f, 0)));
 	_frame->push_back_renderable(cmd, translation_matrix(float3::zero));
 	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)));
-	_frame->push_back_renderable(cmd, translation_matrix(float3(0.4f, 0.4f, 0)));
 }
 
 void Deferred_lighting::render(float blend_state) 

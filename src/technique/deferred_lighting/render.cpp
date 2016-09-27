@@ -1,6 +1,7 @@
 #include "technique/deferred_lighting/render.h"
 
 #include <algorithm>
+#include <numeric>
 #include <memory>
 
 using cg::float3;
@@ -8,15 +9,28 @@ using cg::mat4;
 using cg::uint2;
 using cg::put_in_column_major_order;
 using cg::data::Shader_program_source_code;
+using cg::opengl::DE_indirect_params;
 using cg::opengl::DE_cmd;
 using cg::opengl::Invalid;
 using cg::opengl::Persistent_buffer;
 using cg::opengl::Shader_program;
+using cg::opengl::Static_buffer;
 using cg::opengl::Vertex_attrib_layout;
 using cg::opengl::set_uniform;
 using cg::opengl::set_uniform_array;
 using cg::opengl::wait_for;
 
+
+namespace {
+
+Static_buffer make_draw_index_buffer(size_t draw_call_count)
+{
+	std::vector<GLuint> draw_indices(draw_call_count);
+	std::iota(draw_indices.begin(), draw_indices.end(), 0);
+	return Static_buffer(draw_indices.data(), draw_call_count);
+}
+
+} // namespace
 
 namespace deferred_lighting {
 
@@ -55,8 +69,8 @@ void Frame::push_back_renderable(const DE_cmd& cmd, const mat4& model_matrix)
 
 Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src)
 	: _vertex_attrib_layout(0, 1, 2, 3),
-	_indirect_buffer(cg::megabytes(4)),
-	_draw_index_buffer(cg::kilobytes(512)),
+	_indirect_buffer(3, max_draw_call_count * sizeof(DE_indirect_params)),
+	_draw_index_buffer(make_draw_index_buffer(max_draw_call_count)),
 	_prog("test-shader", src),
 	_u_pv_matrix(_prog.get_uniform_location("u_projection_view_matrix")),
 	_u_model_matrix_array(_prog.get_uniform_location("u_model_matrix_array"))
@@ -68,9 +82,10 @@ void Renderer::render(const Frame& frame) noexcept
 {
 	assert(frame.renderable_objects().size() <= 512); // use uniform blocks for renderable list that is greater than 512.
 
-	wait_for(_frame_sync_obj);
-	glDeleteSync(_frame_sync_obj);
-	_frame_sync_obj = nullptr;
+	GLsync sync_obj = _sync_objects[_indirect_buffer.current_partition_index()];
+	wait_for(sync_obj);
+	glDeleteSync(sync_obj);
+	_sync_objects[_indirect_buffer.current_partition_index()] = nullptr;
 
 	static constexpr float clear_color[4] = { 0.5f, 0.5f, 0.55f, 1.f };
 	glClearBufferfv(GL_COLOR, 0, clear_color);
@@ -83,9 +98,10 @@ void Renderer::render(const Frame& frame) noexcept
 	glBindVertexArray(frame.vao_id());
 
 	// renderable
+	const size_t draw_call_count = frame.renderable_objects().size();
+	assert(draw_call_count <= Renderer::max_draw_call_count);
 	size_t offset_indirect = 0;
 	size_t offset_draw_index = 0;
-	const size_t draw_call_count = frame.renderable_objects().size();
 	_model_matrices.clear();
 	_model_matrices.reserve(draw_call_count);
 
@@ -99,14 +115,13 @@ void Renderer::render(const Frame& frame) noexcept
 		auto params = rnd_object.cmd.get_indirect_params();
 		params.base_instance = i; // base index is required to calculate an index to draw_index_buffer
 		offset_indirect = _indirect_buffer.write(offset_indirect, &params);
-		
-		// set draw index attrib value
-		offset_draw_index = _draw_index_buffer.write<GLuint>(offset_draw_index, &i);
 	}
 
 	set_uniform_array(_u_model_matrix_array, _model_matrices.data(), _model_matrices.size());
 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, draw_call_count, 0);
-	_frame_sync_obj = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+	_sync_objects[_indirect_buffer.current_partition_index()] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	_indirect_buffer.move_next_partition();
 }
 
 void Renderer::register_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept

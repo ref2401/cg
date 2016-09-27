@@ -21,28 +21,16 @@ Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format forma
 	GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept
 :	_format(format), 
 	_vao_id(vao_id), 
-	_vertex_buffer_id(vertex_buffer_id), 
+	_vertex_buffer(vertex_buffer_id), 
 	_vertex_buffer_binding_index(vertex_buffer_binding_index), 
-	_index_buffer_id(index_buffer_id)
+	_index_buffer(index_buffer_id)
 {
 	assert(vao_id != Invalid::vao_id);
-	assert(_vertex_buffer_id != Invalid::buffer_id);
-	assert(_index_buffer_id != Invalid::buffer_id);
-	assert(_vertex_buffer_id != _index_buffer_id);
+	assert(_vertex_buffer.id() != _index_buffer.id());
 }
 
 Static_vertex_spec::~Static_vertex_spec() noexcept
 {
-	if (_vertex_buffer_id != Invalid::buffer_id) {
-		glDeleteBuffers(1, &_vertex_buffer_id);
-		_vertex_buffer_id = Invalid::buffer_id;
-	}
-
-	if (_index_buffer_id != Invalid::buffer_id) {
-		glDeleteBuffers(1, &_vertex_buffer_id);
-		_index_buffer_id = Invalid::buffer_id;
-	}
-
 	if (_vao_id != Invalid::vao_id) {
 		glDeleteVertexArrays(1, &_vao_id);
 		_vao_id = Invalid::vao_id;

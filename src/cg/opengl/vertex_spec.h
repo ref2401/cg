@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "cg/data/mesh.h"
+#include "cg/opengl/buffer.h"
 #include "cg/opengl/shader.h"
 #include "cg/opengl/opengl_def.h"
 
@@ -183,9 +184,9 @@ public:
 		return _format;
 	}
 
-	GLuint index_buffer_id() const noexcept
+	const Static_buffer& index_buffer() const noexcept
 	{
-		return _index_buffer_id;
+		return _index_buffer;
 	}
 
 	GLuint vao_id() const noexcept
@@ -193,9 +194,9 @@ public:
 		return _vao_id;
 	}
 
-	GLuint vertex_buffer_id() const noexcept
+	const Static_buffer& vertex_buffer() const noexcept
 	{
-		return _vertex_buffer_id;
+		return _vertex_buffer;
 	}
 
 	GLuint vertex_buffer_binding_index() const noexcept
@@ -207,9 +208,9 @@ private:
 
 	GLuint _vao_id = Invalid::vao_id;
 	cg::data::Interleaved_vertex_format _format;
-	GLuint _vertex_buffer_id = Invalid::buffer_id;
+	Static_buffer _vertex_buffer;
 	GLuint _vertex_buffer_binding_index;
-	GLuint _index_buffer_id = Invalid::buffer_id;
+	Static_buffer _index_buffer;
 };
 
 class Static_vertex_spec_builder final {
@@ -218,6 +219,7 @@ public:
 	// Reserves memory for vertex buffer and index buffer data.
 	// The allocated memory will be reused by evry vertex specification building process.
 	explicit Static_vertex_spec_builder(size_t vertex_buffer_capacity = 64, size_t index_buffer_capacity = 256);
+
 
 	// Start building process.
 	// Params:
