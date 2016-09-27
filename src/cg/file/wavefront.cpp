@@ -212,6 +212,8 @@ float2 parse_tex_coord(const std::string& line)
 // Loads, parses and constructs a mesh object using the specified file iterator.
 cg::data::Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs)
 {
+	assert(attribs != Vertex_attribs::none);
+
 	static thread_local Wf_mesh_data mesh_data;
 	mesh_data.clear();
 

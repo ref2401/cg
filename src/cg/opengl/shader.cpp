@@ -8,6 +8,7 @@
 #include "cg/opengl/opengl_def.h"
 
 using cg::enforce;
+using cg::data::Vertex_attribs;
 
 
 namespace cg {
@@ -266,6 +267,26 @@ bool Shader_program::valid() const noexcept
 	return get_property(GL_VALIDATE_STATUS) != 0;
 }
 
+// ----- Vertex_attrib_layout
+
+Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
+{
+	auto attr = Vertex_attribs::none;
+
+	if (position_location != Invalid::vertex_attrib_location)
+		attr |= Vertex_attribs::position;
+
+	if (normal_location != Invalid::vertex_attrib_location)
+		attr |= Vertex_attribs::normal;
+
+	if (tex_coord_location != Invalid::vertex_attrib_location)
+		attr |= Vertex_attribs::tex_coord;
+
+	if (tangent_h_location != Invalid::vertex_attrib_location)
+		attr |= Vertex_attribs::tangent_h;
+
+	return attr;
+}
 
 } // namespace opengl
 } // namespace cg

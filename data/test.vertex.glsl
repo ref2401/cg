@@ -18,10 +18,7 @@ out Frag_data_i {
 
 void main()
 {
-	float pos_offset = float(draw_index) * 0.2;
-	vec4 p = vec4(vert_position.x + pos_offset, vert_position.y, vert_position.z, 1);
-
-	gl_Position = u_projection_view_matrix * (u_model_matrix_array[draw_index] * p);
+	gl_Position = u_projection_view_matrix * (u_model_matrix_array[draw_index] * vec4(vert_position, 1));
 	vs_out.normal = vert_normal;
 	vs_out.tex_coord = vert_tex_coord;
 	vs_out.draw_index = float(draw_index);

@@ -199,7 +199,7 @@ public:
 	TEST_METHOD(ctors)
 	{
 		Interleaved_vertex_format fmt0;
-		Assert::AreEqual(Vertex_attribs::position, fmt0.attribs);
+		Assert::AreEqual(Vertex_attribs::none, fmt0.attribs);
 
 		Interleaved_vertex_format fmt1(Vertex_attribs::normal);
 		Assert::AreEqual(Vertex_attribs::normal, fmt1.attribs);
@@ -371,6 +371,47 @@ public:
 };
 
 TEST_CLASS(cg_data_mesh_Vertex_attribs) {
+
+	TEST_METHOD(assignment_operatos)
+	{
+		auto a = Vertex_attribs::position;
+		a |= Vertex_attribs::normal;
+
+		Assert::AreEqual(Vertex_attribs::position, a & Vertex_attribs::position);
+		Assert::AreEqual(Vertex_attribs::normal, a & Vertex_attribs::normal);
+		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
+		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
+
+		auto origin = Vertex_attribs::position | Vertex_attribs::normal;
+		
+		a = origin;
+		a &= Vertex_attribs::position;
+		Assert::AreEqual(Vertex_attribs::position, a & Vertex_attribs::position);
+		Assert::AreNotEqual(Vertex_attribs::normal, a & Vertex_attribs::normal);
+		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
+		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
+
+		a = origin;
+		a &= Vertex_attribs::normal;
+		Assert::AreNotEqual(Vertex_attribs::position, a & Vertex_attribs::position);
+		Assert::AreEqual(Vertex_attribs::normal, a & Vertex_attribs::normal);
+		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
+		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
+
+		a = origin;
+		a &= Vertex_attribs::tex_coord;
+		Assert::AreNotEqual(Vertex_attribs::position, a & Vertex_attribs::position);
+		Assert::AreNotEqual(Vertex_attribs::normal, a & Vertex_attribs::normal);
+		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
+		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
+
+		a = origin;
+		a &= Vertex_attribs::tangent_h;
+		Assert::AreNotEqual(Vertex_attribs::position, a & Vertex_attribs::position);
+		Assert::AreNotEqual(Vertex_attribs::normal, a & Vertex_attribs::normal);
+		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
+		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
+	}
 
 	TEST_METHOD(has_vertex_attrib)
 	{

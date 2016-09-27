@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
     <ClCompile Include="data\mesh_unittest.cpp" />
+    <ClCompile Include="data\shader_unittest_data.cpp" />
     <ClCompile Include="file\common_file.cpp" />
     <ClCompile Include="file\file_unittest.cpp" />
     <ClCompile Include="math\float2_unittest.cpp" />
@@ -179,8 +180,8 @@
     <ClCompile Include="math\uint2_unittest.cpp" />
     <ClCompile Include="math\utility_unittest.cpp" />
     <ClCompile Include="math\float3_unittest.cpp" />
+    <ClCompile Include="opengl\shader_unittest_opengl.cpp" />
     <ClCompile Include="opengl\vertex_spec_unittest.cpp" />
-    <ClCompile Include="shader_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">

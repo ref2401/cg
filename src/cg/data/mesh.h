@@ -14,6 +14,7 @@ namespace cg {
 namespace data {
 
 enum class Vertex_attribs : unsigned char {
+	none = 0,
 	position = 1,
 	normal = 2,
 	tex_coord = 4,
@@ -41,15 +42,13 @@ constexpr bool has_tex_coord(Vertex_attribs attribs);
 // total byte count = 5 * sizeof(float).
 // position's offset:	0 components, 0 bytes (position is first in the relative order).
 // tex_coord's offset:	3 components, 3 * sizeof(float) bytes (tex_coord goes right after the position).
-struct Interleaved_vertex_format {
+struct Interleaved_vertex_format final {
 	static constexpr size_t component_count_normal = 3;
 	static constexpr size_t component_count_position = 3;
 	static constexpr size_t component_count_tangent_h = 4;
 	static constexpr size_t component_count_tex_coord = 2;
 
-	Interleaved_vertex_format() noexcept
-		: attribs(Vertex_attribs::position)
-	{}
+	Interleaved_vertex_format() noexcept = default;
 
 	explicit Interleaved_vertex_format(Vertex_attribs attribs) noexcept
 		: attribs(attribs)
@@ -100,6 +99,8 @@ struct Interleaved_vertex_format {
 	// How many components are there before normal data starts.
 	size_t component_offset_normal() const noexcept
 	{
+		if (!has_normal(attribs)) return 0;
+
 		size_t prior_cmpt_count = has_position(attribs)
 			? (Interleaved_vertex_format::component_count_position)
 			: 0u;
@@ -115,6 +116,8 @@ struct Interleaved_vertex_format {
 	// How many components are there before tangent_h data starts.
 	size_t component_offset_tangent_h() const noexcept
 	{
+		if (!has_tangent_h(attribs)) return 0;
+
 		size_t prior_cmpt_count = has_tex_coord(attribs)
 			? (Interleaved_vertex_format::component_count_tex_coord)
 			: 0u;
@@ -124,6 +127,8 @@ struct Interleaved_vertex_format {
 	// How many components are there before tex_coord data starts.
 	size_t component_offset_tex_coord() const noexcept
 	{
+		if (!has_tex_coord(attribs)) return 0;
+
 		size_t prior_cmpt_count = has_normal(attribs)
 			? (Interleaved_vertex_format::component_count_normal)
 			: 0u;
@@ -131,7 +136,7 @@ struct Interleaved_vertex_format {
 	}
 
 
-	Vertex_attribs attribs;
+	Vertex_attribs attribs = Vertex_attribs::none;
 };
 
 struct Vertex {
@@ -176,6 +181,7 @@ public:
 	Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
 		: _format(attribs)
 	{
+		assert(attribs != Vertex_attribs::none);
 		_data.reserve(_format.component_count() * vertex_count);
 		_indices.reserve(index_count);
 	}
@@ -245,6 +251,18 @@ constexpr Vertex_attribs operator&(Vertex_attribs l, Vertex_attribs r)
 	return static_cast<Vertex_attribs>(static_cast<Val_t>(l) & static_cast<Val_t>(r));
 }
 
+inline Vertex_attribs& operator|=(Vertex_attribs& l, Vertex_attribs r) noexcept
+{
+	l = l | r;
+	return l;
+}
+
+inline Vertex_attribs& operator&=(Vertex_attribs& l, Vertex_attribs r) noexcept
+{
+	l = l & r;
+	return l;
+}
+
 inline bool operator==(const Interleaved_vertex_format& l, const Interleaved_vertex_format& r) noexcept
 {
 	return (l.attribs == r.attribs);
@@ -271,24 +289,36 @@ inline bool operator!=(const Vertex& l, const Vertex& r) noexcept
 inline std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
 {
 	out << "Vertex_attribs(";
-	if (has_position(attribs)) out << "position";
-	if (has_normal(attribs)) out << " normal";
-	if (has_tex_coord(attribs)) out << " tex_coord";
-	if (has_tangent_h(attribs)) out << " tangent_h";
-	out << ")";
+	
+	if (attribs == Vertex_attribs::none) {
+		out << "none";
+	}
+	else {
+		if (has_position(attribs)) out << "position";
+		if (has_normal(attribs)) out << " normal";
+		if (has_tex_coord(attribs)) out << " tex_coord";
+		if (has_tangent_h(attribs)) out << " tangent_h";
+	}
 
+	out << ")";
 	return out;
 }
 
 inline std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
 {
 	out << "Vertex_attribs(";
-	if (has_position(attribs)) out << "position";
-	if (has_normal(attribs)) out << " normal";
-	if (has_tex_coord(attribs)) out << " tex_coord";
-	if (has_tangent_h(attribs)) out << " tangent_h";
-	out << ")";
 
+	if (attribs == Vertex_attribs::none) {
+		out << "none";
+	}
+	else {
+		if (has_position(attribs)) out << "position";
+		if (has_normal(attribs)) out << " normal";
+		if (has_tex_coord(attribs)) out << " tex_coord";
+		if (has_tangent_h(attribs)) out << " tangent_h";
+	}
+
+	out << ")";
 	return out;
 }
 

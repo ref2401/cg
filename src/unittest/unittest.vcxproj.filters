@@ -40,11 +40,14 @@
     <ClCompile Include="math\utility_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="shader_unittest.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="opengl\vertex_spec_unittest.cpp">
       <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\shader_unittest_opengl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="data\shader_unittest_data.cpp">
+      <Filter>data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -38,8 +38,8 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	_frame->set_view_matrix(cg::view_matrix(float3(0, 0, 2), float3::zero));
 	// put square three times as different models into frame
 	_frame->push_back_renderable(cmd, translation_matrix(float3::zero));
-	_frame->push_back_renderable(cmd, translation_matrix(float3(0, 0.2f, 0)));
-	_frame->push_back_renderable(cmd, translation_matrix(float3(0, 0.4f, 0)));
+	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)));
+	_frame->push_back_renderable(cmd, translation_matrix(float3(0.4f, 0.4f, 0)));
 }
 
 void Deferred_lighting::render(float blend_state) 
