@@ -10,15 +10,13 @@ Later I would like to do the same using DirectX 11
 - Static_vertex_spec_builder, DE_cmd, DE_base_vertex_params
 - Static_vertex_spec, DE_indirect_params, sync, MultiDrawIndirect
 - draw index simulation
--> unform arrays  & tripple buffering
+- unform arrays  & tripple buffering
+-> loading .tga, simple Material (diffuse texture)
 
 ## roadmap
-- uniform array
-- tripple buffering
 - cube/ball/buddha meshes
-- on window resize
-- timestep
 - texturing
+- timestep
 - Static_vertex_spec. I need several vaos to perform different passes. Each pass takes only subset of all vertex attribs defined in Static_vertex_spec.
 
 - deferred lighting (opengl/direct 3d)
@@ -27,6 +25,7 @@ Later I would like to do the same using DirectX 11
 	- point light
 	- spotlight
 	- any light
+- on window resize
 - shadow mapping
 - ambient occlusion
 - normal mapping

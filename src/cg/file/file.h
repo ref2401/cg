@@ -13,39 +13,27 @@
 namespace cg {
 namespace file {
 
+enum class File_seek_origin : unsigned char {
+	current_position = 0,
+	file_start = 1,
+};
+
 // Handles all files as binary. Implements only read facilities.
 class File final {
 public:
 
-	File() noexcept 
-		: _handle(nullptr) 
-	{}
+	File() noexcept = default;
 
-	explicit File(const std::string& filename) 
-		: File(filename.c_str()) 
-	{}
+	explicit File(const std::string& filename);
 
-	explicit File(const char* filename) 
-		: _handle(nullptr)
-	{
-		open(filename);
-	}
+	explicit File(const char* filename);
 	
 	File(const File& f) = delete;
 
-	File(File&& f) noexcept
-		: _filename(std::move(f._filename)), _handle(f._handle)
-	{
-		f._handle = nullptr;
-	}
+	File(File&& f) noexcept;
 
-	~File() noexcept
-	{
-		close();
-	}
+	~File() noexcept;
 
-
-	File& operator=(const File& f) = delete;
 
 	File& operator=(File&& f) noexcept;
 
@@ -85,9 +73,15 @@ public:
 	// Returns: actual count of bytes read.
 	size_t File::read_bytes(void* buff, size_t byte_count) const;
 
+	// Sets the new position of the internal file.
+	// Params:
+	// -	offset: Number of bytes to shift the position relative to origin.
+	// -	origin: Position in file to which offset is added.
+	void seek(long offset, File_seek_origin origin) const;
+
 private:
 	std::string _filename;
-	mutable FILE* _handle;
+	mutable FILE* _handle = nullptr;
 };
 
 // By_line_iterator is an input iterator that provides ability to read from file one line at a time.

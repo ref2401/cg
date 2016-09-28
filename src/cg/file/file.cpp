@@ -10,6 +10,27 @@ namespace file {
 
 // ----- File -----
 
+File::File(const std::string& filename) :
+	File(filename.c_str())
+{}
+
+File::File(const char* filename)
+{
+	open(filename);
+}
+
+File::File(File&& f) noexcept :
+	_filename(std::move(f._filename)), 
+	_handle(f._handle)
+{
+	f._handle = nullptr;
+}
+
+File::~File() noexcept
+{
+	close();
+}
+
 File& File::operator=(File&& f) noexcept
 {
 	if (this == &f) return *this;
@@ -69,6 +90,15 @@ size_t File::read_bytes(void* buff, size_t byte_count) const
 	enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
 
 	return fread(buff, sizeof(unsigned char), byte_count, _handle);
+}
+
+void File::seek(long offset, File_seek_origin origin) const
+{
+	enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
+	int res = std::fseek(_handle, offset,
+		(origin == File_seek_origin::current_position) ? SEEK_CUR : SEEK_SET);
+
+	enforce(res == 0, EXCEPTION_MSG("File seek error: ", _filename));
 }
 
 // ----- By_line_iteator -----

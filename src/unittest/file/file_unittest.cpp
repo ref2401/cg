@@ -10,6 +10,7 @@
 
 using cg::file::By_line_iterator;
 using cg::file::File;
+using cg::file::File_seek_origin;
 
 
 namespace unittest {
@@ -148,6 +149,21 @@ TEST_CLASS(cg_file_File) {
 		}
 	}
 
+	TEST_METHOD(seek)
+	{
+		{ // empty file
+			char ch;
+			File f(Filenames::ascii_single_line);
+
+			f.seek(3, File_seek_origin::file_start);
+			f.read_byte(&ch);
+			Assert::AreEqual('1', ch);
+			
+			f.seek(1, File_seek_origin::current_position);
+			f.read_byte(&ch);
+			Assert::AreEqual('3', ch);
+		}
+	}
 };
 
 TEST_CLASS(cg_file_By_line_iterator) {
@@ -281,9 +297,9 @@ public:
 		Assert::IsTrue(src0.vertex_source.empty());
 		Assert::IsTrue(src0.pixel_source.empty());
 
-		auto expected_vertex_source = load_text(Filenames::invalid_vertex_glsl);
-		auto expected_pixel_source = load_text(Filenames::invalid_pixel_glsl);
-		auto src1 = load_glsl_program_source(Filenames::invalid_shader_program_name);
+		auto expected_vertex_source = load_text(Filenames::not_real_vertex_glsl);
+		auto expected_pixel_source = load_text(Filenames::not_real_pixel_glsl);
+		auto src1 = load_glsl_program_source(Filenames::not_real_shader_program_name);
 		Assert::AreEqual(expected_vertex_source, src1.vertex_source);
 		Assert::AreEqual(expected_pixel_source, src1.pixel_source);
 	}
