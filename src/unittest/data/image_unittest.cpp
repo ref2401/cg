@@ -49,7 +49,7 @@ public:
 		// copy ctor.
 		Image_2d img_c = img1;
 		Assert::AreNotEqual(img1.data(), img_c.data());
-		Assert::IsTrue(std::equal(img1.data(), img1.data() + img_c.byte_count(), img1.data()));
+		Assert::IsTrue(std::equal(img1.data(), img1.data() + img1.byte_count(), img_c.data()));
 		Assert::AreEqual(img1.size(), img_c.size());
 		Assert::AreEqual(img1.format(), img_c.format());
 
@@ -58,13 +58,71 @@ public:
 		Image_2d img_m = std::move(img_c);
 		Assert::AreNotEqual(img1.data(), img_m.data());
 		Assert::AreEqual(expected_data, img_m.data());
-		Assert::IsTrue(std::equal(img1.data(), img1.data() + img_m.byte_count(), img1.data()));
+		Assert::IsTrue(std::equal(img1.data(), img1.data() + img1.byte_count(), img_m.data()));
 		Assert::AreEqual(img1.size(), img_m.size());
 		Assert::AreEqual(img1.format(), img_m.format());
 		Assert::IsNull(img_c.data());
 		Assert::AreEqual(uint2::zero, img_c.size());
 		Assert::AreEqual(Image_format::none, img_c.format());
 		Assert::AreEqual<size_t>(0, img_c.byte_count());
+
+		// move empty
+		Image_2d img_me = std::move(img0);
+		Assert::IsNull(img_me.data());
+		Assert::AreEqual(uint2::zero, img_me.size());
+		Assert::AreEqual(Image_format::none, img_me.format());
+		Assert::AreEqual<size_t>(0, img_me.byte_count());
+		Assert::IsNull(img0.data());
+		Assert::AreEqual(uint2::zero, img0.size());
+		Assert::AreEqual(Image_format::none, img0.format());
+		Assert::AreEqual<size_t>(0, img0.byte_count());
+	}
+
+	TEST_METHOD(assignments)
+	{
+		Image_2d img(uint2(4, 3), Image_format::bgra_8);
+
+		// copy assignment
+		Image_2d img_c;
+		img_c = img;
+		Assert::AreNotEqual(img.data(), img_c.data());
+		Assert::IsTrue(std::equal(img.data(), img.data() + img.byte_count(), img_c.data()));
+		Assert::AreEqual(img.size(), img_c.size());
+		Assert::AreEqual(img.format(), img_c.format());
+
+		// move assignment
+		Image_2d img_m;
+		img_m  = std::move(img_c);
+		Assert::AreNotEqual(img.data(), img_m.data());
+		Assert::IsTrue(std::equal(img.data(), img.data() + img.byte_count(), img_m.data()));
+		Assert::AreEqual(img.size(), img_m.size());
+		Assert::AreEqual(img.format(), img_m.format());
+		Assert::IsNull(img_c.data());
+		Assert::AreEqual(uint2::zero, img_c.size());
+		Assert::AreEqual(Image_format::none, img_c.format());
+		Assert::AreEqual<size_t>(0, img_c.byte_count());
+
+		// move self
+		auto expected_data = img_m.data();
+		auto expected_size = img_m.size();
+		auto expected_format = img_m.format();
+		img_m = std::move(img_m);
+		Assert::AreEqual(expected_data, img_m.data());
+		Assert::AreEqual(expected_size, img_m.size());
+		Assert::AreEqual(expected_format, img_m.format());
+
+		// move empty
+		Image_2d img0;
+		Image_2d img_me;
+		img_me = std::move(img0);
+		Assert::IsNull(img_me.data());
+		Assert::AreEqual(uint2::zero, img_me.size());
+		Assert::AreEqual(Image_format::none, img_me.format());
+		Assert::AreEqual<size_t>(0, img_me.byte_count());
+		Assert::IsNull(img0.data());
+		Assert::AreEqual(uint2::zero, img0.size());
+		Assert::AreEqual(Image_format::none, img0.format());
+		Assert::AreEqual<size_t>(0, img0.byte_count());
 	}
 };
 
@@ -76,11 +134,11 @@ public:
 		using cg::data::byte_count;
 
 		Assert::AreEqual<size_t>(0, byte_count(Image_format::none));
-		Assert::AreEqual<size_t>(8, byte_count(Image_format::red_8));
-		Assert::AreEqual<size_t>(24, byte_count(Image_format::rgb_8));
-		Assert::AreEqual<size_t>(32, byte_count(Image_format::rgba_8));
-		Assert::AreEqual<size_t>(24, byte_count(Image_format::bgr_8));
-		Assert::AreEqual<size_t>(32, byte_count(Image_format::bgra_8));
+		Assert::AreEqual<size_t>(1, byte_count(Image_format::red_8));
+		Assert::AreEqual<size_t>(3, byte_count(Image_format::rgb_8));
+		Assert::AreEqual<size_t>(4, byte_count(Image_format::rgba_8));
+		Assert::AreEqual<size_t>(3, byte_count(Image_format::bgr_8));
+		Assert::AreEqual<size_t>(4, byte_count(Image_format::bgra_8));
 	}
 };
 

@@ -153,11 +153,11 @@ inline size_t byte_count(const Image_format& fmt) noexcept
 	switch (fmt) {
 		default:
 		case Image_format::none: return 0;
-		case Image_format::red_8: return 8;
-		case Image_format::rgb_8: return 24;
-		case Image_format::rgba_8: return 32;
-		case Image_format::bgr_8: return 24;
-		case Image_format::bgra_8: return 32;
+		case Image_format::red_8: return 1;
+		case Image_format::rgb_8: return 3;
+		case Image_format::rgba_8: return 4;
+		case Image_format::bgr_8: return 3;
+		case Image_format::bgra_8: return 4;
 	}
 }
 

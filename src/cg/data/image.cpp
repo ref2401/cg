@@ -8,7 +8,7 @@ namespace cg {
 namespace data {
 
 Image_2d::Image_2d(uint2 size, Image_format format) :
-	_ptr(new unsigned char[size.width * size.height]),
+	_ptr(new unsigned char[size.width * size.height * cg::data::byte_count(format)]),
 	_size(size),
 	_format(format)
 {
@@ -43,9 +43,11 @@ Image_2d& Image_2d::operator=(const Image_2d& img)
 {
 	if (this == &img) return *this;
 
-	dispose();
+	if (_size != img._size || _format != img._format) {
+		dispose();
+		_ptr = new unsigned char[img.byte_count()];
+	}
 
-	_ptr = new unsigned char[img.byte_count()];
 	std::memcpy(_ptr, img._ptr, img.byte_count());
 	_size = img._size;
 	_format = img._format;
