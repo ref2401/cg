@@ -13,7 +13,7 @@ using cg::sys::make_win32_application;
 
 int main(int argc, char* argv[])
 {
-	cg::file::load_image_tga("../data/unittest/tga_true_color_square_2x2.tga");
+	cg::file::load_image_tga("../data/unittest/tga_gayscale_r_compressed_rect_3x2.tga");
 
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);

@@ -10,6 +10,7 @@ using cg::enforce;
 using cg::greater_than;
 using cg::data::Image_2d;
 using cg::data::Image_format;
+using cg::data::byte_count;
 using cg::file::File;
 using cg::file::File_seek_origin;
 
@@ -155,6 +156,34 @@ void read_image_data(File& file, Image_2d& image, bool compressed) noexcept
 	if (!compressed) {
 		file.read_bytes(image.data(), image.byte_count());
 	}
+	else {
+		size_t curr_byte = 0;
+		size_t pixel_byte_count = byte_count(image.format());
+		unsigned char pixel_buffer[4 * sizeof(unsigned char)]; // 4 stands for bgra - the maximum possible component count of a pixel.
+
+		while (curr_byte < image.byte_count()) {
+			// run_info (ri_)
+			unsigned char run_info;
+			file.read_byte(&run_info);
+
+			bool ri_rle_compression = run_info & 0b1000'0000;
+			size_t ri_pixel_count = (run_info & 0b0111'1111) + 1;
+
+			if (ri_rle_compression) {
+				file.read_bytes(pixel_buffer, pixel_byte_count);
+
+				// repeat 'pixel_buffer' value 'ri_pixel_count' times
+				for (size_t i = 0; i < ri_pixel_count; ++i) {
+					curr_byte = image.write(curr_byte, pixel_buffer, pixel_byte_count);
+				}
+			}
+			else {
+				size_t byte_count_to_read = ri_pixel_count * pixel_byte_count;
+				file.read_bytes(image.data() + curr_byte, byte_count_to_read);
+				curr_byte += byte_count_to_read;
+			}
+		} // while
+	} // else
 }
 
 Image_2d load_image_tga(File file)
