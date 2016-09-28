@@ -212,9 +212,9 @@ cg::data::Shader_program_source_code load_glsl_program_source(const std::string&
 //		- ../data/shader/blinn_phong.pixel.glsl
 cg::data::Shader_program_source_code load_glsl_program_source(const char* filename);
 
-void load_image_tga(const std::string& filename);
+cg::data::Image_2d load_image_tga(const std::string& filename);
 
-void load_image_tga(const char* filename);
+cg::data::Image_2d load_image_tga(const char* filename);
 
 cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, cg::data::Vertex_attribs attribs);
 

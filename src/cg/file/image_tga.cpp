@@ -8,6 +8,7 @@ namespace {
 using cg::uint2;
 using cg::enforce;
 using cg::greater_than;
+using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::file::File;
 using cg::file::File_seek_origin;
@@ -32,6 +33,7 @@ enum class Tga_origin_corner {
 	top_right
 };
 
+// Describes an tga image data.
 struct Tga_header final {
 	uint2 size;
 	Image_format format;
@@ -60,6 +62,9 @@ inline Tga_image_type parse_image_type(unsigned char type) noexcept
 	}
 }
 
+// Parses Tga_origin_corner enumeration value from bits 5 & 4 which are used to indicate the order in 
+// which pixel data is transferred from the file to the screen.
+// 0 - bottom left, 1 - bottom right, 2 - top left, 3 - top right.
 inline Tga_origin_corner parse_origin_corner(unsigned char descriptor) noexcept
 {
 	unsigned char corner = (descriptor >> 4) & 0b11;
@@ -73,7 +78,8 @@ inline Tga_origin_corner parse_origin_corner(unsigned char descriptor) noexcept
 	}
 }
 
-Tga_header parse_header(File& file)
+// Reads first 18 bytes from file which are used to represent tga image header.
+Tga_header read_header(File& file)
 {
 	Tga_header header;
 	unsigned char header_buffer[18];
@@ -116,8 +122,6 @@ Tga_header parse_header(File& file)
 	unsigned char bits_per_pixel = header_buffer[16];
 
 	// Image specification (descriptor)
-	// Bits 5 & 4 are used to indicate the order in which pixel data is transferred from the file to the screen.
-	// 0 - bottom left, 1 - bottom right, 2 - top left, 3 - top right.
 	auto origin_corner = parse_origin_corner(header_buffer[17]);
 	enforce(origin_corner == Tga_origin_corner::bottom_left, 
 		EXCEPTION_MSG("Reading tga image error. Unexpected origin corner. ", file.filename()));
@@ -146,9 +150,20 @@ Tga_header parse_header(File& file)
 	return header;
 }
 
-void load_image_tga(File file)
+void read_image_data(File& file, Image_2d& image, bool compressed) noexcept
 {
-	auto header = parse_header(file);
+	if (!compressed) {
+		file.read_bytes(image.data(), image.byte_count());
+	}
+}
+
+Image_2d load_image_tga(File file)
+{
+	auto header = read_header(file);
+	Image_2d image(header.size, header.format);
+	read_image_data(file, image, header.compressed);
+	// tga footer is omitted
+	return image;
 }
 
 } // namespace
@@ -156,14 +171,14 @@ void load_image_tga(File file)
 namespace cg {
 namespace file {
 
-void load_image_tga(const std::string& filename)
+cg::data::Image_2d load_image_tga(const std::string& filename)
 {
-	::load_image_tga(File(filename));
+	return ::load_image_tga(File(filename));
 }
 
-void load_image_tga(const char* filename)
+cg::data::Image_2d load_image_tga(const char* filename)
 {
-	::load_image_tga(File(filename));
+	return ::load_image_tga(File(filename));
 }
 
 } // namespace file
