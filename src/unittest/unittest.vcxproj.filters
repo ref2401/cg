@@ -49,6 +49,9 @@
     <ClCompile Include="data\shader_unittest_data.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="data\image_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -68,9 +71,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="data\common_data.h">
-      <Filter>data</Filter>
-    </ClInclude>
     <ClInclude Include="file\common_file.h">
       <Filter>file</Filter>
     </ClInclude>

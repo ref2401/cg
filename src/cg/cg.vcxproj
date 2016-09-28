@@ -125,9 +125,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="data\image.cpp" />
     <ClCompile Include="data\mesh.cpp" />
     <ClCompile Include="file\file.cpp" />
-    <ClCompile Include="file\wavefront.cpp" />
+    <ClCompile Include="file\image_tga.cpp" />
+    <ClCompile Include="file\mesh_wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
     <ClCompile Include="opengl\buffer.cpp" />
     <ClCompile Include="opengl\utility.cpp" />
@@ -139,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\base.h" />
+    <ClInclude Include="data\image.h" />
     <ClInclude Include="data\mesh.h" />
     <ClInclude Include="data\shader.h" />
     <ClInclude Include="file\file.h" />

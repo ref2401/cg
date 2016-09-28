@@ -20,6 +20,7 @@ public:
 	static const std::string not_real_shader_program_name;
 	static const std::string not_real_vertex_glsl;
 	static const std::string not_real_pixel_glsl;
+	static const std::string tga_true_color_square_2x2;
 	static const std::string wavefront_triangle_p;
 	static const std::string wavefront_triangle_pn;
 	static const std::string wavefront_triangle_ptc;

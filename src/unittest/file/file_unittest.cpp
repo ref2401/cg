@@ -304,6 +304,13 @@ public:
 		Assert::AreEqual(expected_pixel_source, src1.pixel_source);
 	}
 
+	TEST_METHOD(load_image_tga)
+	{
+		using cg::file::load_image_tga;
+
+		load_image_tga(Filenames::tga_true_color_square_2x2);
+	}
+
 	TEST_METHOD(load_mesh_triangle)
 	{
 		using cg::approx_equal;

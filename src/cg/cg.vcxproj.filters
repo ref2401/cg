@@ -7,9 +7,6 @@
     <ClCompile Include="file\file.cpp">
       <Filter>file</Filter>
     </ClCompile>
-    <ClCompile Include="file\wavefront.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
     <ClCompile Include="data\mesh.cpp">
       <Filter>data</Filter>
     </ClCompile>
@@ -33,6 +30,15 @@
     </ClCompile>
     <ClCompile Include="opengl\buffer.cpp">
       <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="file\mesh_wavefront.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="file\image_tga.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="data\image.cpp">
+      <Filter>data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="opengl\buffer.h">
       <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="data\image.h">
+      <Filter>data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

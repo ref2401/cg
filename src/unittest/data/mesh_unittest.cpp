@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <iterator>
 #include "cg/math/math.h"
-#include "unittest/data/common_data.h"
 #include "unittest/math/common_math.h"
+#include "CppUnitTest.h"
 
 using cg::float2;
 using cg::float3;
@@ -14,6 +14,16 @@ using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex;
 using cg::data::Vertex_attribs;
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
+
+template<> inline std::wstring ToString<cg::data::Interleaved_vertex_format>(const cg::data::Interleaved_vertex_format& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<cg::data::Vertex>(const cg::data::Vertex& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<cg::data::Vertex_attribs>(const cg::data::Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
+
+}}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {

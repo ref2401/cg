@@ -1,9 +1,11 @@
 #include "cg/data/shader.h"
 
 #include <utility>
-#include "unittest/data/common_data.h"
+
+#include "CppUnitTest.h"
 
 using cg::data::Shader_program_source_code;
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {
