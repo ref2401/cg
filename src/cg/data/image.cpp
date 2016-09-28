@@ -77,5 +77,17 @@ void Image_2d::dispose() noexcept
 	_ptr = nullptr;
 }
 
+size_t Image_2d::write(size_t offset, unsigned char* ptr, size_t count) noexcept
+{
+	if (count == 0) return offset;
+
+	size_t bytes_to_write = sizeof(unsigned char) * count;
+	size_t ret_offset = offset + bytes_to_write;
+	assert(ret_offset <= byte_count());
+
+	std::memcpy(_ptr + offset, ptr, bytes_to_write);
+	return ret_offset;
+}
+
 } // namespace data
 } // namespace cg

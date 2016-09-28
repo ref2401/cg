@@ -72,6 +72,15 @@ public:
 		return _size;
 	}
 
+	// Writes a sequence of bytes into the image's underlying buffer.
+	// -	offset: Byte offset from the beginig of the underlying buffer.
+	// -	ptr: Pointer to the first byte in the sequence.
+	// -	count: How many bytes are in the sequence pointed by ptr.
+	//		If count is 0 the method returns immediately.
+	// Returns:	offset + sizeof(unsigned char) * count.
+	//			Byte offset into the buffer that can be used for subsequent writes.	
+	size_t write(size_t offset, unsigned char* ptr, size_t count) noexcept;
+
 private:
 	void dispose() noexcept;
 

@@ -1,6 +1,7 @@
 #include "cg/data/image.h"
 
 #include <algorithm>
+#include <array>
 #include <utility>
 #include "cg/math/math.h"
 #include "unittest/math/common_math.h"
@@ -123,6 +124,19 @@ public:
 		Assert::AreEqual(uint2::zero, img0.size());
 		Assert::AreEqual(Image_format::none, img0.format());
 		Assert::AreEqual<size_t>(0, img0.byte_count());
+	}
+
+	TEST_METHOD(write)
+	{
+		Image_2d img(uint2(2, 2), Image_format::red_8);
+		
+		std::array<unsigned char, 4> arr = { 0, 1, 2, 3 };
+		for (size_t i = 0; i < arr.size(); ++i) {
+			size_t offset = img.write(i, &arr[i], 1);
+			Assert::AreEqual(i + 1, offset);
+		}
+
+		Assert::IsTrue(std::equal(arr.cbegin(), arr.cend(), img.data()));
 	}
 };
 

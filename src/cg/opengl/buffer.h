@@ -184,7 +184,7 @@ size_t Persistent_buffer::write(size_t offset, const T* ptr, size_t count) noexc
 	if (count == 0) return offset;
 
 	size_t ret_offset = offset + sizeof(T) * count;
-	assert(ret_offset < _byte_count);
+	assert(ret_offset <= _byte_count);
 
 	std::memcpy(_ptr + offset, ptr, sizeof(T) * count);
 	return ret_offset;
@@ -198,7 +198,7 @@ size_t Partitioned_buffer<Buffer_type>::write(size_t rel_offset, const T* ptr, s
 	if (count == 0) return rel_offset;
 
 	size_t ret_offset = rel_offset + sizeof(T) * count;
-	assert(ret_offset < _partition_byte_count);
+	assert(ret_offset <= _partition_byte_count);
 
 	_buffer.write<T>(_partition_offset + rel_offset, ptr, count);
 	return ret_offset;
