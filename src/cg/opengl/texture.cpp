@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+using cg::greater_than;
 using cg::data::Image_2d;
 using cg::data::Image_format;
 
@@ -9,15 +10,28 @@ using cg::data::Image_format;
 namespace cg {
 namespace opengl {
 
-Texture_2d_sub_image::Texture_2d_sub_image(const Image_2d& image) noexcept
+Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, const Image_2d& image) noexcept :
+	mip_level(mip_level), offset(offset), size(image.size()),
+	pixel_format(texture_sub_image_format(image.format())),
+	pixel_type(texture_sub_image_type(image.format())),
+	pixels(static_cast<const void*>(image.data()))
 {
+	assert(greater_than(size, 0));
+	assert(is_valid_texture_sub_image_type(pixel_type));
+	assert(is_valid_texture_sub_image_format(pixel_format));
+	assert(pixels != nullptr);
 }
 
 Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, cg::uint2 size,
-	GLenum pixel_format, GLenum pixel_type, void* pixels) noexcept :
-	offset(offset), size(size), mip_level(mip_level), pixel_type(pixel_type),
-	pixel_format(pixel_format), pixels(pixels)
-{}
+	GLenum pixel_format, GLenum pixel_type, const void* pixels) noexcept :
+	offset(offset), size(size), mip_level(mip_level), 
+	pixel_format(pixel_format), pixel_type(pixel_type), pixels(pixels)
+{
+	assert(greater_than(size, 0));
+	assert(is_valid_texture_sub_image_type(pixel_type));
+	assert(is_valid_texture_sub_image_format(pixel_format));
+	assert(pixels != nullptr);
+}
 
 // ---- funcs ----
 

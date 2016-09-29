@@ -13,10 +13,10 @@ namespace opengl {
 
 struct Texture_2d_sub_image final {
 
-	Texture_2d_sub_image(const cg::data::Image_2d& image) noexcept;
+	Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, const cg::data::Image_2d& image) noexcept;
 
 	Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, cg::uint2 size,
-		GLenum pixel_format, GLenum pixel_type, void* pixels) noexcept;
+		GLenum pixel_format, GLenum pixel_type, const void* pixels) noexcept;
 
 
 	// Texel offset in x & y directions.
@@ -28,14 +28,14 @@ struct Texture_2d_sub_image final {
 	// The level-of-detail number (mipmap level).
 	size_t mip_level = 0;
 
-	// The data type of a pixel.
-	GLenum pixel_type;
-
 	// Specifies the format of pixels pointed by pixels.
 	GLenum pixel_format;
 
+	// The data type of a pixel.
+	GLenum pixel_type;
+
 	// Pointer to the image in memory. 
-	void* pixels;
+	const void* pixels;
 
 };
 
