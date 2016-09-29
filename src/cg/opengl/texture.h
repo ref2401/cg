@@ -12,6 +12,15 @@
 namespace cg {
 namespace opengl {
 
+enum class Mag_filter : unsigned char {
+	// Fetch a single sample from the texture nearest to the texture coordinate.
+	nearest,
+
+	// Take the four nearest texels to the texture coordinate 
+	// and combine their colors by weighted average according to distance. 
+	bilinear
+};
+
 struct Texture_2d_sub_image final {
 
 	Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const cg::data::Image_2d& image) noexcept;
@@ -137,9 +146,13 @@ inline bool operator!=(const Texture_2d_sub_image& lhs, const Texture_2d_sub_ima
 	return !(lhs == rhs);
 }
 
-std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg);
+std::ostream& operator<<(std::ostream& out, const Mag_filter& filter);
 
-std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& subimg);
+std::wostream& operator<<(std::wostream& out, const Mag_filter& filter);
+
+std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img);
+
+std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img);
 
 std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 
@@ -155,6 +168,9 @@ Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;
 // Converts the specified texture format into OpenGL internal texture format.
 GLenum get_texture_internal_format(Texture_format fmt) noexcept;
 
+// Converts the specified magnofication filter into OpenGL texture mag filter value.
+GLenum get_texture_mag_filter(Mag_filter filter) noexcept;
+
 // Inferes an appropriate format value for the glTextureSubImage call based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
@@ -164,7 +180,7 @@ GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
 GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
 
 // Converts the specified wrap_mode into OpenGL wrap value.
-GLenum get_wrap(Wrap_mode wrap_mode) noexcept;
+GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept;
 
 // Convenient function to call the glTextureSubImage2D func.
 inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image sub_img) noexcept

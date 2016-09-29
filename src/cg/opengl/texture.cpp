@@ -85,19 +85,53 @@ void Texture_2d::dispose() noexcept
 
 // ----- funcs -----
 
-std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg)
+std::ostream& operator<<(std::ostream& out, const Mag_filter& filter)
 {
-	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mipmap_index << ", " << subimg.pixel_type << ", "
-		<< subimg.pixel_format << ", " << subimg.pixels << ')';
+	out << "Mag_filter::";
+
+	switch (filter) {
+		case Mag_filter::nearest:
+			out << "nearest";
+			break;
+
+		case Mag_filter::bilinear:
+			out << "bilinear";
+			break;
+	}
+
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& subimg)
+std::wostream& operator<<(std::wostream& out, const Mag_filter& filter)
 {
-	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mipmap_index << ", " << subimg.pixel_type << ", "
-		<< subimg.pixel_format << ", " << subimg.pixels << ')';
+	out << "Mag_filter::";
+
+	switch (filter) {
+		case Mag_filter::nearest:
+			out << "nearest";
+			break;
+
+		case Mag_filter::bilinear:
+			out << "bilinear";
+			break;
+	}
+
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img)
+{
+	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
+		<< sub_img.mipmap_index << ", " << sub_img.pixel_type << ", "
+		<< sub_img.pixel_format << ", " << sub_img.pixels << ')';
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img)
+{
+	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
+		<< sub_img.mipmap_index << ", " << sub_img.pixel_type << ", "
+		<< sub_img.pixel_format << ", " << sub_img.pixels << ')';
 	return out;
 }
 
@@ -327,6 +361,17 @@ GLenum get_texture_internal_format(Texture_format fmt) noexcept
 	}
 }
 
+GLenum get_texture_mag_filter(Mag_filter filter) noexcept
+{
+	switch (filter) {
+		case Mag_filter::nearest: return GL_NEAREST;
+		case Mag_filter::bilinear: return GL_LINEAR;
+	}
+
+	assert(false);
+	return GL_NONE;
+}
+
 GLenum get_texture_sub_image_format(Image_format fmt) noexcept
 {
 	switch (fmt) {
@@ -355,7 +400,7 @@ GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
 	}
 }
 
-GLenum get_wrap(Wrap_mode wrap_mode) noexcept
+GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept
 {
 	switch (wrap_mode) {
 		case Wrap_mode::repeat: return GL_REPEAT;

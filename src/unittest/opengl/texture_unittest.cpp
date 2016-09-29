@@ -7,6 +7,7 @@
 using cg::uint2;
 using cg::data::Image_2d;
 using cg::data::Image_format;
+using cg::opengl::Mag_filter;
 using cg::opengl::Texture_2d_sub_image;
 using cg::opengl::Texture_format;
 using cg::opengl::Wrap_mode;
@@ -17,6 +18,7 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
 template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Image_format>(const Image_format& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Mag_filter>(const Mag_filter& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_2d_sub_image>(const Texture_2d_sub_image& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_format>(const Texture_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_WIDE_STRING(t); }
@@ -102,6 +104,14 @@ public:
 		Assert::AreEqual<GLenum>(GL_DEPTH32F_STENCIL8, get_texture_internal_format(Texture_format::depth_32f_stencil_8));
 	}
 
+	TEST_METHOD(get_texture_mag_filter)
+	{
+		using cg::opengl::get_texture_mag_filter;
+
+		Assert::AreEqual<GLenum>(GL_NEAREST, get_texture_mag_filter(Mag_filter::nearest));
+		Assert::AreEqual<GLenum>(GL_LINEAR, get_texture_mag_filter(Mag_filter::bilinear));
+	}
+
 	TEST_METHOD(get_texture_sub_image_format)
 	{
 		using cg::opengl::get_texture_sub_image_format;
@@ -126,15 +136,15 @@ public:
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgra_8));
 	}
 
-	TEST_METHOD(get_wrap)
+	TEST_METHOD(get_texture_wrap)
 	{
-		using cg::opengl::get_wrap;
+		using cg::opengl::get_texture_wrap;
 
-		Assert::AreEqual<GLenum>(GL_REPEAT, get_wrap(Wrap_mode::repeat));
-		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER , get_wrap(Wrap_mode::clamp_to_border));
-		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, get_wrap(Wrap_mode::clamp_to_edge));
-		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, get_wrap(Wrap_mode::mirror_repeat));
-		Assert::AreEqual<GLenum>(GL_MIRROR_CLAMP_TO_EDGE, get_wrap(Wrap_mode::mirror_clamp_to_edge));
+		Assert::AreEqual<GLenum>(GL_REPEAT, get_texture_wrap(Wrap_mode::repeat));
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER , get_texture_wrap(Wrap_mode::clamp_to_border));
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, get_texture_wrap(Wrap_mode::clamp_to_edge));
+		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, get_texture_wrap(Wrap_mode::mirror_repeat));
+		Assert::AreEqual<GLenum>(GL_MIRROR_CLAMP_TO_EDGE, get_texture_wrap(Wrap_mode::mirror_clamp_to_edge));
 	}
 };
 
