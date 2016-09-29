@@ -89,8 +89,11 @@ std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
 // Inferes an appropriate texture format based on the specified image format.
 Texture_format texture_format(cg::data::Image_format fmt) noexcept;
 
-// Inferes an appropriate format value for glTextureSubImage call based on the specified image format.
+// Inferes an appropriate format value for the glTextureSubImage call based on the specified image format.
 GLenum texture_sub_image_format(cg::data::Image_format fmt) noexcept;
+
+// Inferes an appropriate type value for the glTextureSubImage call based on the specified image format.
+GLenum texture_sub_image_type(cg::data::Image_format fmt) noexcept;
 
 } // namespace opengl
 } // namespace cg
