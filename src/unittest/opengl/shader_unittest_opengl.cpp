@@ -1,7 +1,11 @@
-#include "unittest/opengl/common_opengl.h"
+#include "cg/opengl/shader.h"
+
+#include "cg/opengl/utility.h"
+#include "CppUnitTest.h"
 
 using cg::opengl::Invalid;
 using cg::opengl::Vertex_attrib_layout;
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {

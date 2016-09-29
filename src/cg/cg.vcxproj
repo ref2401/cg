@@ -160,6 +160,7 @@
     <ClInclude Include="opengl\opengl.h" />
     <ClInclude Include="opengl\opengl_def.h" />
     <ClInclude Include="opengl\shader.h" />
+    <ClInclude Include="opengl\texture.h" />
     <ClInclude Include="opengl\utility.h" />
     <ClInclude Include="opengl\vertex_spec.h" />
     <ClInclude Include="sys\app.h" />

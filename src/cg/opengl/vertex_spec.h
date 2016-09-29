@@ -9,6 +9,7 @@
 #include "cg/opengl/buffer.h"
 #include "cg/opengl/shader.h"
 #include "cg/opengl/opengl_def.h"
+#include "cg/opengl/utility.h"
 
 
 namespace cg {

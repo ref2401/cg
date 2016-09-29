@@ -3,23 +3,6 @@
 
 #include "cg/opengl/glcorearb.h"
 
-namespace cg {
-namespace opengl {
-
-class Invalid final {
-public:
-
-	static constexpr GLuint buffer_id = 0;
-	static constexpr GLuint shader_id = 0;
-	static constexpr GLuint shader_program_id = 0;
-	static constexpr GLint uniform_location = -1;
-	static constexpr GLuint vao_id = 0;
-	static constexpr GLint vertex_attrib_location = -1;
-};
-
-} // namespace opengl
-} // namespace cg
-
 extern "C" {
 	extern PFNGLCULLFACEPROC glCullFace;
 	extern PFNGLFRONTFACEPROC glFrontFace;

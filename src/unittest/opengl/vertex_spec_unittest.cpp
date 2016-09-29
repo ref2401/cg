@@ -1,8 +1,21 @@
-#include "unittest/opengl/common_opengl.h"
+#include "cg/opengl/vertex_spec.h"
+
+#include "cg/opengl/utility.h"
+#include "CppUnitTest.h"
 
 using cg::opengl::DE_cmd;
 using cg::opengl::DE_base_vertex_params;
 using cg::opengl::DE_indirect_params;
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
+
+template<> inline std::wstring ToString<DE_cmd>(const DE_cmd& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<DE_base_vertex_params>(const DE_base_vertex_params& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<DE_indirect_params>(const DE_indirect_params& t) { RETURN_WIDE_STRING(t); }
+
+}}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {

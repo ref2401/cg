@@ -6,6 +6,7 @@
 #include "cg/data/mesh.h"
 #include "cg/math/math.h"
 #include "cg/opengl/opengl_def.h"
+#include "cg/opengl/utility.h"
 
 
 namespace cg {

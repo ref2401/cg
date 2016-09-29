@@ -5,6 +5,7 @@
 #include <cstring>
 #include <type_traits>
 #include "cg/opengl/opengl_def.h"
+#include "cg/opengl/utility.h"
 
 
 namespace cg {

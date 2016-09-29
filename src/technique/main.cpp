@@ -3,7 +3,6 @@
 #include <windows.h>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
-#include "cg/file/file.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/deferred_lighting.h"
 
@@ -13,8 +12,6 @@ using cg::sys::make_win32_application;
 
 int main(int argc, char* argv[])
 {
-	cg::file::load_image_tga("../data/unittest/tga_gayscale_r_compressed_rect_3x2.tga");
-
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);
 	auto app = make_win32_application(wnd_position, wnd_size);

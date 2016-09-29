@@ -37,9 +37,6 @@
     <ClCompile Include="file\common_file.cpp">
       <Filter>file</Filter>
     </ClCompile>
-    <ClCompile Include="math\utility_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="opengl\vertex_spec_unittest.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
@@ -51,6 +48,12 @@
     </ClCompile>
     <ClCompile Include="data\image_unittest.cpp">
       <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="math\utility_unittest_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl\utility_unittest_opengl.cpp">
+      <Filter>opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,9 +79,6 @@
     </ClInclude>
     <ClInclude Include="math\common_math.h">
       <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\common_opengl.h">
-      <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
