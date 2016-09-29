@@ -40,6 +40,9 @@
     <ClCompile Include="data\image.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="opengl\texture.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

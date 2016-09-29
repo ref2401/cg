@@ -132,6 +132,7 @@
     <ClCompile Include="file\mesh_wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
     <ClCompile Include="opengl\buffer.cpp" />
+    <ClCompile Include="opengl\texture.cpp" />
     <ClCompile Include="opengl\utility.cpp" />
     <ClCompile Include="opengl\opengl_def.cpp" />
     <ClCompile Include="opengl\shader.cpp" />

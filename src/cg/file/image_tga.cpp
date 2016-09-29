@@ -166,7 +166,7 @@ void read_image_data(File& file, Image_2d& image, bool compressed) noexcept
 			unsigned char run_info;
 			file.read_byte(&run_info);
 
-			bool ri_rle_compression = run_info & 0b1000'0000;
+			bool ri_rle_compression = (run_info & 0b1000'0000) != 0;
 			size_t ri_pixel_count = (run_info & 0b0111'1111) + 1;
 
 			if (ri_rle_compression) {

@@ -2,6 +2,7 @@
 #define CG_OPENGL_TEXTURE_H_
 
 #include <ostream>
+#include "cg/data/image.h"
 #include "cg/math/math.h"
 #include "cg/opengl/opengl_def.h"
 #include "cg/opengl/utility.h"
@@ -11,21 +12,21 @@ namespace cg {
 namespace opengl {
 
 struct Texture_2d_sub_image final {
+
+	Texture_2d_sub_image(const cg::data::Image_2d& image) noexcept;
+
 	Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, cg::uint2 size,
-		GLenum pixel_format, GLenum pixel_type, void* pixels) noexcept :
-		offset(offset), size(size), mip_level(mip_level), pixel_type(pixel_type),
-		pixel_format(pixel_format), pixels(pixels)
-	{}
+		GLenum pixel_format, GLenum pixel_type, void* pixels) noexcept;
 
 
 	// Texel offset in x & y directions.
-	cg::uint2 offset;
+	cg::uint2 offset = cg::uint2::zero;
 
 	// Texel width & height of subimage.
-	cg::uint2 size;
+	cg::uint2 size = cg::uint2::zero;
 
 	// The level-of-detail number (mipmap level).
-	size_t mip_level;
+	size_t mip_level = 0;
 
 	// The data type of a pixel.
 	GLenum pixel_type;
@@ -77,22 +78,16 @@ inline bool operator!=(const Texture_2d_sub_image& lhs, const Texture_2d_sub_ima
 	return !(lhs == rhs);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg)
-{
-	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mip_level << ", " << subimg.pixel_type << ", " 
-		<< subimg.pixel_format << ", " << subimg.pixels << ')';
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg);
 
-inline std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& subimg)
-{
-	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mip_level << ", " << subimg.pixel_type << ", "
-		<< subimg.pixel_format << ", " << subimg.pixels << ')';
-	return out;
-}
+std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& subimg);
 
+std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
+
+std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
+
+// Inferes an appropriate texture format based on the specified iamge format.
+Texture_format texture_format(cg::data::Image_format fmt) noexcept;
 
 } // namespace opengl
 } // namespace cg

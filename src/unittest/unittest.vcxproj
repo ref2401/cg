@@ -182,6 +182,7 @@
     <ClCompile Include="math\utility_unittest_math.cpp" />
     <ClCompile Include="math\float3_unittest.cpp" />
     <ClCompile Include="opengl\shader_unittest_opengl.cpp" />
+    <ClCompile Include="opengl\texture_unittest.cpp" />
     <ClCompile Include="opengl\utility_unittest_opengl.cpp" />
     <ClCompile Include="opengl\vertex_spec_unittest.cpp" />
   </ItemGroup>
