@@ -183,5 +183,21 @@ Texture_format texture_format(cg::data::Image_format fmt) noexcept
 	}
 }
 
+GLenum texture_sub_image_format(Image_format fmt) noexcept
+{
+	assert(fmt != Image_format::none);
+
+	switch (fmt) {
+		default:
+		case Image_format::none: return GL_NONE;
+
+		case Image_format::red_8: return GL_RED;
+		case Image_format::rgb_8: return GL_RGB;
+		case Image_format::rgba_8: return GL_RGBA;
+		case Image_format::bgr_8: return GL_BGR;
+		case Image_format::bgra_8: return GL_BGRA;
+	}
+}
+
 } // namespace opengl
 } // namespace cg
