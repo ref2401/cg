@@ -119,6 +119,72 @@ std::wostream& operator<<(std::wostream& out, const Mag_filter& filter)
 	return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const Min_filter& filter)
+{
+	out << "Min_filter::";
+
+	switch (filter) {
+		case Min_filter::nearest:
+			out << "nearest";
+			break;
+
+		case Min_filter::bilinear:
+			out << "bilinear";
+			break;
+
+		case Min_filter::nearest_mipmap:
+			out << "nearest_mipmap";
+			break;
+
+		case Min_filter::bilinear_mipmap:
+			out << "bilinear_mipmap";
+			break;
+
+		case Min_filter::lerp_nearest_mipmaps:
+			out << "lerp_nearest_mipmaps";
+			break;
+
+		case Min_filter::lerp_bilinear_mipmaps:
+			out << "lerp_bilinear_mipmaps";
+			break;
+	}
+
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Min_filter& filter)
+{
+	out << "Min_filter::";
+
+	switch (filter) {
+		case Min_filter::nearest:
+			out << "nearest";
+			break;
+
+		case Min_filter::bilinear:
+			out << "bilinear";
+			break;
+
+		case Min_filter::nearest_mipmap:
+			out << "nearest_mipmap";
+			break;
+
+		case Min_filter::bilinear_mipmap:
+			out << "bilinear_mipmap";
+			break;
+
+		case Min_filter::lerp_nearest_mipmaps:
+			out << "lerp_nearest_mipmaps";
+			break;
+
+		case Min_filter::lerp_bilinear_mipmaps:
+			out << "lerp_bilinear_mipmaps";
+			break;
+	}
+
+	return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img)
 {
 	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
@@ -366,6 +432,21 @@ GLenum get_texture_mag_filter(Mag_filter filter) noexcept
 	switch (filter) {
 		case Mag_filter::nearest: return GL_NEAREST;
 		case Mag_filter::bilinear: return GL_LINEAR;
+	}
+
+	assert(false);
+	return GL_NONE;
+}
+
+GLenum get_texture_min_filter(Min_filter filter) noexcept
+{
+	switch (filter) {
+		case Min_filter::nearest: return GL_NEAREST;
+		case Min_filter::bilinear: return GL_LINEAR;
+		case Min_filter::nearest_mipmap: return GL_NEAREST_MIPMAP_NEAREST;
+		case Min_filter::bilinear_mipmap: return GL_LINEAR_MIPMAP_NEAREST;
+		case Min_filter::lerp_nearest_mipmaps: return GL_NEAREST_MIPMAP_LINEAR;
+		case Min_filter::lerp_bilinear_mipmaps: return GL_LINEAR_MIPMAP_LINEAR;
 	}
 
 	assert(false);

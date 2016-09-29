@@ -12,6 +12,7 @@
 namespace cg {
 namespace opengl {
 
+// Mag_filter describes the process of fragment color calculation from a stretched texture.
 enum class Mag_filter : unsigned char {
 	// Fetch a single sample from the texture nearest to the texture coordinate.
 	nearest,
@@ -19,6 +20,28 @@ enum class Mag_filter : unsigned char {
 	// Take the four nearest texels to the texture coordinate 
 	// and combine their colors by weighted average according to distance. 
 	bilinear
+};
+
+// Mag_filter describes the process of fragment color calculation from a shrunken texture.
+enum class Min_filter {
+	// Fetch a single sample from the texture nearest to the texture coordinate.
+	nearest,
+
+	// Take the four nearest texels to the texture coordinate 
+	// and combine their colors by weighted average according to distance. 
+	bilinear,
+
+	// Take a single sample from the closest mip level.
+	nearest_mipmap,
+
+	// Take a bilinear sample from the closest mip level
+	bilinear_mipmap,
+
+	// Fetch 1 nearest sample from 2 closest mipmaps and linearly interpolate between those samples.
+	lerp_nearest_mipmaps,
+
+	// Trilinear filtering. Take 1 bilinear sample from 2 closest mipmaps and linearly interpolate between those samples.
+	lerp_bilinear_mipmaps
 };
 
 struct Texture_2d_sub_image final {
@@ -150,6 +173,10 @@ std::ostream& operator<<(std::ostream& out, const Mag_filter& filter);
 
 std::wostream& operator<<(std::wostream& out, const Mag_filter& filter);
 
+std::ostream& operator<<(std::ostream& out, const Min_filter& filter);
+
+std::wostream& operator<<(std::wostream& out, const Min_filter& filter);
+
 std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img);
 
 std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img);
@@ -168,8 +195,11 @@ Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;
 // Converts the specified texture format into OpenGL internal texture format.
 GLenum get_texture_internal_format(Texture_format fmt) noexcept;
 
-// Converts the specified magnofication filter into OpenGL texture mag filter value.
+// Converts the specified magnification filter into OpenGL texture mag filter value.
 GLenum get_texture_mag_filter(Mag_filter filter) noexcept;
+
+// Converts the specified minification filter into OpenGL texture min filter value.
+GLenum get_texture_min_filter(Min_filter filter) noexcept;
 
 // Inferes an appropriate format value for the glTextureSubImage call based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.

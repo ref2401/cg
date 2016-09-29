@@ -8,6 +8,7 @@ using cg::uint2;
 using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::opengl::Mag_filter;
+using cg::opengl::Min_filter;
 using cg::opengl::Texture_2d_sub_image;
 using cg::opengl::Texture_format;
 using cg::opengl::Wrap_mode;
@@ -19,6 +20,7 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Image_format>(const Image_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Mag_filter>(const Mag_filter& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Min_filter>(const Min_filter& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_2d_sub_image>(const Texture_2d_sub_image& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_format>(const Texture_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_WIDE_STRING(t); }
@@ -110,6 +112,18 @@ public:
 
 		Assert::AreEqual<GLenum>(GL_NEAREST, get_texture_mag_filter(Mag_filter::nearest));
 		Assert::AreEqual<GLenum>(GL_LINEAR, get_texture_mag_filter(Mag_filter::bilinear));
+	}
+
+	TEST_METHOD(get_texture_min_filter)
+	{
+		using cg::opengl::get_texture_min_filter;
+
+		Assert::AreEqual<GLenum>(GL_NEAREST, get_texture_min_filter(Min_filter::nearest));
+		Assert::AreEqual<GLenum>(GL_LINEAR, get_texture_min_filter(Min_filter::bilinear));
+		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_NEAREST, get_texture_min_filter(Min_filter::nearest_mipmap));
+		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_NEAREST, get_texture_min_filter(Min_filter::bilinear_mipmap));
+		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_LINEAR, get_texture_min_filter(Min_filter::lerp_nearest_mipmaps));
+		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_LINEAR, get_texture_min_filter(Min_filter::lerp_bilinear_mipmaps));
 	}
 
 	TEST_METHOD(get_texture_sub_image_format)
