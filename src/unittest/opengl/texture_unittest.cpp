@@ -31,7 +31,7 @@ public:
 	{
 		float data[3];
 		Texture_2d_sub_image tex_img0(0, uint2::zero, uint2(8, 4), GL_RGB, GL_FLOAT, data);
-		Assert::AreEqual<size_t>(0, tex_img0.mip_level);
+		Assert::AreEqual<size_t>(0, tex_img0.mipmap_index);
 		Assert::AreEqual(uint2::zero, tex_img0.offset);
 		Assert::AreEqual(uint2(8, 4), tex_img0.size);
 		Assert::AreEqual<GLenum>(GL_RGB, tex_img0.pixel_format);
@@ -40,7 +40,7 @@ public:
 
 		Image_2d img(uint2(4, 3), Image_format::bgra_8);
 		Texture_2d_sub_image tex_img1(1, uint2(1), img);
-		Assert::AreEqual<size_t>(1, tex_img1.mip_level);
+		Assert::AreEqual<size_t>(1, tex_img1.mipmap_index);
 		Assert::AreEqual(uint2(1), tex_img1.offset);
 		Assert::AreEqual(uint2(4, 3), tex_img1.size);
 		Assert::AreEqual<GLenum>(GL_BGRA, tex_img1.pixel_format);
@@ -80,10 +80,31 @@ public:
 		Assert::AreEqual(Texture_format::rgba_8, texture_format(Image_format::bgra_8));
 	}
 
+	TEST_METHOD(texture_internal_format)
+	{
+		using cg::opengl::texture_internal_format;
+
+		Assert::AreEqual<GLenum>(GL_NONE, texture_internal_format(Texture_format::none));
+		Assert::AreEqual<GLenum>(GL_R8, texture_internal_format(Texture_format::red_8));
+		Assert::AreEqual<GLenum>(GL_R32F, texture_internal_format(Texture_format::red_32f));
+		Assert::AreEqual<GLenum>(GL_RG8, texture_internal_format(Texture_format::rg_8));
+		Assert::AreEqual<GLenum>(GL_RG32F, texture_internal_format(Texture_format::rg_32f));
+		Assert::AreEqual<GLenum>(GL_RGB8, texture_internal_format(Texture_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_RGB32F, texture_internal_format(Texture_format::rgb_32f));
+		Assert::AreEqual<GLenum>(GL_RGBA8, texture_internal_format(Texture_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_RGBA32F, texture_internal_format(Texture_format::rgba_32f));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT24, texture_internal_format(Texture_format::depth_24));
+		Assert::AreEqual<GLenum>(GL_DEPTH24_STENCIL8, texture_internal_format(Texture_format::depth_24_stencil_8));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32, texture_internal_format(Texture_format::depth_32));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32F, texture_internal_format(Texture_format::depth_32f));
+		Assert::AreEqual<GLenum>(GL_DEPTH32F_STENCIL8, texture_internal_format(Texture_format::depth_32f_stencil_8));
+	}
+
 	TEST_METHOD(texture_sub_image_format)
 	{
 		using cg::opengl::texture_sub_image_format;
 
+		Assert::AreEqual<GLenum>(GL_NONE, texture_sub_image_format(Image_format::none));
 		Assert::AreEqual<GLenum>(GL_RED, texture_sub_image_format(Image_format::red_8));
 		Assert::AreEqual<GLenum>(GL_RGB, texture_sub_image_format(Image_format::rgb_8));
 		Assert::AreEqual<GLenum>(GL_RGBA, texture_sub_image_format(Image_format::rgba_8));
@@ -95,6 +116,7 @@ public:
 	{
 		using cg::opengl::texture_sub_image_type;
 
+		Assert::AreEqual<GLenum>(GL_NONE, texture_sub_image_type(Image_format::none));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::red_8));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::rgb_8));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::rgba_8));

@@ -10,8 +10,10 @@ using cg::data::Image_format;
 namespace cg {
 namespace opengl {
 
-Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, const Image_2d& image) noexcept :
-	mip_level(mip_level), offset(offset), size(image.size()),
+// ----- Texture_2d_sub_image -----
+
+Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
+	mipmap_index(mipmap_index), offset(offset), size(image.size()),
 	pixel_format(texture_sub_image_format(image.format())),
 	pixel_type(texture_sub_image_type(image.format())),
 	pixels(static_cast<const void*>(image.data()))
@@ -22,9 +24,9 @@ Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, c
 	assert(pixels != nullptr);
 }
 
-Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, cg::uint2 size,
+Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, cg::uint2 size,
 	GLenum pixel_format, GLenum pixel_type, const void* pixels) noexcept :
-	offset(offset), size(size), mip_level(mip_level), 
+	offset(offset), size(size), mipmap_index(mipmap_index), 
 	pixel_format(pixel_format), pixel_type(pixel_type), pixels(pixels)
 {
 	assert(greater_than(size, 0));
@@ -33,12 +35,20 @@ Texture_2d_sub_image::Texture_2d_sub_image(size_t mip_level, cg::uint2 offset, c
 	assert(pixels != nullptr);
 }
 
-// ---- funcs ----
+// ----- Texture_2d -----
+
+Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept
+{
+	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+	//glTextureStorage2D(_id, 1, 
+}
+
+// ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg)
 {
 	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mip_level << ", " << subimg.pixel_type << ", "
+		<< subimg.mipmap_index << ", " << subimg.pixel_type << ", "
 		<< subimg.pixel_format << ", " << subimg.pixels << ')';
 	return out;
 }
@@ -46,7 +56,7 @@ std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& subimg)
 std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& subimg)
 {
 	out << "Texture_2d_sub_image(" << subimg.offset << ", " << subimg.size << ", "
-		<< subimg.mip_level << ", " << subimg.pixel_type << ", "
+		<< subimg.mipmap_index << ", " << subimg.pixel_type << ", "
 		<< subimg.pixel_format << ", " << subimg.pixels << ')';
 	return out;
 }
@@ -197,10 +207,30 @@ Texture_format texture_format(cg::data::Image_format fmt) noexcept
 	}
 }
 
+GLenum texture_internal_format(Texture_format fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Texture_format::none: return GL_NONE;
+
+		case Texture_format::red_8: return GL_R8;
+		case Texture_format::red_32f: return GL_R32F;
+		case Texture_format::rg_8: return GL_RG8;
+		case Texture_format::rg_32f: return GL_RG32F;
+		case Texture_format::rgb_8: return GL_RGB8;
+		case Texture_format::rgb_32f: return GL_RGB32F;
+		case Texture_format::rgba_8: return GL_RGBA8;
+		case Texture_format::rgba_32f: return GL_RGBA32F;
+		case Texture_format::depth_24: return GL_DEPTH_COMPONENT24;
+		case Texture_format::depth_24_stencil_8: return GL_DEPTH24_STENCIL8;
+		case Texture_format::depth_32: return GL_DEPTH_COMPONENT32;
+		case Texture_format::depth_32f: return GL_DEPTH_COMPONENT32F;
+		case Texture_format::depth_32f_stencil_8: return GL_DEPTH32F_STENCIL8;
+	}
+}
+
 GLenum texture_sub_image_format(Image_format fmt) noexcept
 {
-	assert(fmt != Image_format::none);
-
 	switch (fmt) {
 		default:
 		case Image_format::none: return GL_NONE;
@@ -215,8 +245,6 @@ GLenum texture_sub_image_format(Image_format fmt) noexcept
 
 GLenum texture_sub_image_type(cg::data::Image_format fmt) noexcept
 {
-	assert(fmt != Image_format::none);
-
 	switch (fmt) {
 		default:
 		case Image_format::none: return GL_NONE;
