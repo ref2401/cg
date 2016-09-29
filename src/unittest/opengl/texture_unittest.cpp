@@ -9,6 +9,7 @@ using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::opengl::Texture_2d_sub_image;
 using cg::opengl::Texture_format;
+using cg::opengl::Wrap_mode;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -18,6 +19,7 @@ template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STR
 template<> inline std::wstring ToString<Image_format>(const Image_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_2d_sub_image>(const Texture_2d_sub_image& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_format>(const Texture_format& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
@@ -122,6 +124,17 @@ public:
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgba_8));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgr_8));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgra_8));
+	}
+
+	TEST_METHOD(get_wrap)
+	{
+		using cg::opengl::get_wrap;
+
+		Assert::AreEqual<GLenum>(GL_REPEAT, get_wrap(Wrap_mode::repeat));
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER , get_wrap(Wrap_mode::clamp_to_border));
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, get_wrap(Wrap_mode::clamp_to_edge));
+		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, get_wrap(Wrap_mode::mirror_repeat));
+		Assert::AreEqual<GLenum>(GL_MIRROR_CLAMP_TO_EDGE, get_wrap(Wrap_mode::mirror_clamp_to_edge));
 	}
 };
 

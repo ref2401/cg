@@ -233,6 +233,64 @@ std::wostream& operator<<(std::wostream& out, const Texture_format& fmt)
 	return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode)
+{
+	out << "Wrap_mode::";
+
+	switch (wrap_mode) {
+		case Wrap_mode::repeat :
+			out << "repeat";
+			break;
+
+		case Wrap_mode::clamp_to_border:
+			out << "clamp_to_border";
+			break;
+
+		case Wrap_mode::clamp_to_edge:
+			out << "clamp_to_edge";
+			break;
+
+		case Wrap_mode::mirror_repeat:
+			out << "mirror_repeat";
+			break;
+
+		case Wrap_mode::mirror_clamp_to_edge:
+			out << "mirror_repeat";
+			break;
+	}
+
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode)
+{
+	out << "Wrap_mode::";
+
+	switch (wrap_mode) {
+		case Wrap_mode::repeat:
+			out << "repeat";
+			break;
+
+		case Wrap_mode::clamp_to_border:
+			out << "clamp_to_border";
+			break;
+
+		case Wrap_mode::clamp_to_edge:
+			out << "clamp_to_edge";
+			break;
+
+		case Wrap_mode::mirror_repeat:
+			out << "mirror_repeat";
+			break;
+
+		case Wrap_mode::mirror_clamp_to_edge:
+			out << "mirror_repeat";
+			break;
+	}
+
+	return out;
+}
+
 Texture_format get_texture_format(cg::data::Image_format fmt) noexcept
 {
 	switch (fmt) {
@@ -295,6 +353,20 @@ GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
 		case Image_format::bgr_8: return GL_UNSIGNED_BYTE;
 		case Image_format::bgra_8: return GL_UNSIGNED_BYTE;
 	}
+}
+
+GLenum get_wrap(Wrap_mode wrap_mode) noexcept
+{
+	switch (wrap_mode) {
+		case Wrap_mode::repeat: return GL_REPEAT;
+		case Wrap_mode::clamp_to_border: return GL_CLAMP_TO_BORDER;
+		case Wrap_mode::clamp_to_edge: return GL_CLAMP_TO_EDGE;
+		case Wrap_mode::mirror_repeat: return GL_MIRRORED_REPEAT;
+		case Wrap_mode::mirror_clamp_to_edge: return GL_MIRROR_CLAMP_TO_EDGE;
+	}
+
+	assert(false);
+	return GL_NONE;
 }
 
 } // namespace opengl

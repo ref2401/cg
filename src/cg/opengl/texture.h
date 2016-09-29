@@ -99,6 +99,27 @@ private:
 	Texture_format _format = Texture_format::none;
 };
 
+// Wrap_mode describes what texture sampler will do if texture coordinates fall outside the range [0, 1].
+enum class Wrap_mode : unsigned char {
+	// repeat the texture in the direction in which the texture coordinate has exceeded 1.0.
+	repeat,
+
+	// if the texture coordinate has exceeded 1.0 sample the texel from the constant border color.
+	clamp_to_border,
+
+	// forces texture coordinates out of range to be sampled along the last row or column.
+	clamp_to_edge,
+
+	// similar to repeat, but as the texture coordinate passes 1.0 it starts moving back 
+	// toward the origin of the texture until it reaches 2.0, at which point the pattern repeats.
+	mirror_repeat,
+
+	// The texture coordinate is handled normaly between 0.0 and 1.0.
+	// In ranges [-1.0, 0.0] and [1.0, 2.0] the texture coordinate is handled as mirror_repeat.
+	// Outside the range [-1.0, 2.0] it si clamped to the edge od the texture (clamp_to_edge).
+	mirror_clamp_to_edge
+};
+
 // ---- funcs -----
 
 inline bool operator==(const Texture_2d_sub_image& lhs, const Texture_2d_sub_image& rhs) noexcept
@@ -124,6 +145,10 @@ std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 
 std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
 
+std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode);
+
+std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode);
+
 // Inferes an appropriate texture format based on the specified image format.
 Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;
 
@@ -137,6 +162,9 @@ GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
 // Inferes an appropriate type value for the glTextureSubImage call based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+
+// Converts the specified wrap_mode into OpenGL wrap value.
+GLenum get_wrap(Wrap_mode wrap_mode) noexcept;
 
 // Convenient function to call the glTextureSubImage2D func.
 inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image sub_img) noexcept

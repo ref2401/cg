@@ -26,8 +26,9 @@ Later I would like to do the same using DirectX 11
 	- spotlight
 	- any light
 - on window resize
-- shadow mapping
-- ambient occlusion
+- Shadow pass (can I run it once: computing a shadow factor and apply in to lighting computations?)
+	- shadow mapping
+	- ambient occlusion
 - normal mapping
 	- (Geometry shader)Vertex format. Get rid of tanget_h. Calc tangent space in the geometry shader.
 - post processing
@@ -39,3 +40,8 @@ Later I would like to do the same using DirectX 11
 - uniform arrays -> uniform block (because the number of shader uniform array components is limited)
 - compute shaders: indirect buffer, draw call index buffer, uniform buffer object, ...
 - crytek sponza 
+
+
+batch_size = min(
+GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+GL_MAX_VERTEX_UNIFORM_COMPONENTS / unifrom_struct_component_count);
