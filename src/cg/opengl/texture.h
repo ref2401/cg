@@ -1,6 +1,7 @@
 #ifndef CG_OPENGL_TEXTURE_H_
 #define CG_OPENGL_TEXTURE_H_
 
+#include <cassert>
 #include <ostream>
 #include "cg/data/image.h"
 #include "cg/math/math.h"
@@ -70,7 +71,30 @@ public:
 	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
 	Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept;
 
+	Texture_2d(const Texture_2d& tex) = delete;
+
+	Texture_2d(Texture_2d&& tex) noexcept;
+
+	~Texture_2d() noexcept;
+
+
+	Texture_2d& operator=(Texture_2d&& tex) noexcept;
+
+
+	// Texel format of this texture.
+	Texture_format format() const noexcept
+	{
+		return _format;
+	}
+
+	GLuint id() const noexcept 
+	{
+		return _id;
+	}
+
 private:
+	void dispose() noexcept;
+
 	GLuint _id = Invalid::texture_id;
 	Texture_format _format = Texture_format::none;
 };
@@ -101,18 +125,28 @@ std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
 
 // Inferes an appropriate texture format based on the specified image format.
-Texture_format texture_format(cg::data::Image_format fmt) noexcept;
+Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;
 
 // Converts the specified texture format into OpenGL internal texture format.
-GLenum texture_internal_format(Texture_format fmt) noexcept;
+GLenum get_texture_internal_format(Texture_format fmt) noexcept;
 
 // Inferes an appropriate format value for the glTextureSubImage call based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum texture_sub_image_format(cg::data::Image_format fmt) noexcept;
+GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
 
 // Inferes an appropriate type value for the glTextureSubImage call based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+
+// Convenient function to call the glTextureSubImage2D func.
+inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image sub_img) noexcept
+{
+	assert(texture_id != Invalid::texture_id);
+	glTextureSubImage2D(texture_id, sub_img.mipmap_index,
+		sub_img.offset.x, sub_img.offset.y,
+		sub_img.size.width, sub_img.size.height,
+		sub_img.pixel_format, sub_img.pixel_type, sub_img.pixels);
+}
 
 } // namespace opengl
 } // namespace cg

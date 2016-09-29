@@ -1,6 +1,5 @@
 #include "cg/opengl/texture.h"
 
-#include <cassert>
 
 using cg::greater_than;
 using cg::data::Image_2d;
@@ -14,8 +13,8 @@ namespace opengl {
 
 Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
 	mipmap_index(mipmap_index), offset(offset), size(image.size()),
-	pixel_format(texture_sub_image_format(image.format())),
-	pixel_type(texture_sub_image_type(image.format())),
+	pixel_format(get_texture_sub_image_format(image.format())),
+	pixel_type(get_texture_sub_image_type(image.format())),
 	pixels(static_cast<const void*>(image.data()))
 {
 	assert(greater_than(size, 0));
@@ -37,10 +36,51 @@ Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset
 
 // ----- Texture_2d -----
 
-Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept
+Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept :
+	_format(format)
 {
+	assert(format != Texture_format::none);
+	assert(image.format() != Image_format::none);
+
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	//glTextureStorage2D(_id, 1, 
+	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
+	Texture_2d_sub_image sub_img(0, uint2::zero, image);
+	texture_2d_sub_image(_id, sub_img);
+}
+
+Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
+	_id(tex._id), _format(tex._format)
+{
+	tex._id = Invalid::texture_id;
+	tex._format = Texture_format::none;
+}
+
+Texture_2d::~Texture_2d() noexcept
+{
+	dispose();
+}
+
+Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
+{
+	if (this == &tex) return *this;
+
+	dispose();
+	_id = tex._id;
+	_format = tex._format;
+
+	tex._id = Invalid::texture_id;
+	tex._format = Texture_format::none;
+
+	return *this;
+}
+
+void Texture_2d::dispose() noexcept
+{
+	if (_id == Invalid::texture_id) return;
+
+	glDeleteTextures(1, &_id);
+	_id = Invalid::texture_id;
+	_format = Texture_format::none;
 }
 
 // ----- funcs -----
@@ -193,7 +233,7 @@ std::wostream& operator<<(std::wostream& out, const Texture_format& fmt)
 	return out;
 }
 
-Texture_format texture_format(cg::data::Image_format fmt) noexcept
+Texture_format get_texture_format(cg::data::Image_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
@@ -207,7 +247,7 @@ Texture_format texture_format(cg::data::Image_format fmt) noexcept
 	}
 }
 
-GLenum texture_internal_format(Texture_format fmt) noexcept
+GLenum get_texture_internal_format(Texture_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
@@ -229,7 +269,7 @@ GLenum texture_internal_format(Texture_format fmt) noexcept
 	}
 }
 
-GLenum texture_sub_image_format(Image_format fmt) noexcept
+GLenum get_texture_sub_image_format(Image_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
@@ -243,7 +283,7 @@ GLenum texture_sub_image_format(Image_format fmt) noexcept
 	}
 }
 
-GLenum texture_sub_image_type(cg::data::Image_format fmt) noexcept
+GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
 {
 	switch (fmt) {
 		default:

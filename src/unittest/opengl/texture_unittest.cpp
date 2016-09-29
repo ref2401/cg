@@ -68,60 +68,60 @@ public:
 TEST_CLASS(cg_opengl_texture_Funcs) {
 public:
 
-	TEST_METHOD(texture_format)
+	TEST_METHOD(get_texture_format)
 	{
-		using cg::opengl::texture_format;
+		using cg::opengl::get_texture_format;
 
-		Assert::AreEqual(Texture_format::none, texture_format(Image_format::none));
-		Assert::AreEqual(Texture_format::red_8, texture_format(Image_format::red_8));
-		Assert::AreEqual(Texture_format::rgb_8, texture_format(Image_format::rgb_8));
-		Assert::AreEqual(Texture_format::rgba_8, texture_format(Image_format::rgba_8));
-		Assert::AreEqual(Texture_format::rgb_8, texture_format(Image_format::bgr_8));
-		Assert::AreEqual(Texture_format::rgba_8, texture_format(Image_format::bgra_8));
+		Assert::AreEqual(Texture_format::none, get_texture_format(Image_format::none));
+		Assert::AreEqual(Texture_format::red_8, get_texture_format(Image_format::red_8));
+		Assert::AreEqual(Texture_format::rgb_8, get_texture_format(Image_format::rgb_8));
+		Assert::AreEqual(Texture_format::rgba_8, get_texture_format(Image_format::rgba_8));
+		Assert::AreEqual(Texture_format::rgb_8, get_texture_format(Image_format::bgr_8));
+		Assert::AreEqual(Texture_format::rgba_8, get_texture_format(Image_format::bgra_8));
 	}
 
-	TEST_METHOD(texture_internal_format)
+	TEST_METHOD(get_texture_internal_format)
 	{
-		using cg::opengl::texture_internal_format;
+		using cg::opengl::get_texture_internal_format;
 
-		Assert::AreEqual<GLenum>(GL_NONE, texture_internal_format(Texture_format::none));
-		Assert::AreEqual<GLenum>(GL_R8, texture_internal_format(Texture_format::red_8));
-		Assert::AreEqual<GLenum>(GL_R32F, texture_internal_format(Texture_format::red_32f));
-		Assert::AreEqual<GLenum>(GL_RG8, texture_internal_format(Texture_format::rg_8));
-		Assert::AreEqual<GLenum>(GL_RG32F, texture_internal_format(Texture_format::rg_32f));
-		Assert::AreEqual<GLenum>(GL_RGB8, texture_internal_format(Texture_format::rgb_8));
-		Assert::AreEqual<GLenum>(GL_RGB32F, texture_internal_format(Texture_format::rgb_32f));
-		Assert::AreEqual<GLenum>(GL_RGBA8, texture_internal_format(Texture_format::rgba_8));
-		Assert::AreEqual<GLenum>(GL_RGBA32F, texture_internal_format(Texture_format::rgba_32f));
-		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT24, texture_internal_format(Texture_format::depth_24));
-		Assert::AreEqual<GLenum>(GL_DEPTH24_STENCIL8, texture_internal_format(Texture_format::depth_24_stencil_8));
-		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32, texture_internal_format(Texture_format::depth_32));
-		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32F, texture_internal_format(Texture_format::depth_32f));
-		Assert::AreEqual<GLenum>(GL_DEPTH32F_STENCIL8, texture_internal_format(Texture_format::depth_32f_stencil_8));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_internal_format(Texture_format::none));
+		Assert::AreEqual<GLenum>(GL_R8, get_texture_internal_format(Texture_format::red_8));
+		Assert::AreEqual<GLenum>(GL_R32F, get_texture_internal_format(Texture_format::red_32f));
+		Assert::AreEqual<GLenum>(GL_RG8, get_texture_internal_format(Texture_format::rg_8));
+		Assert::AreEqual<GLenum>(GL_RG32F, get_texture_internal_format(Texture_format::rg_32f));
+		Assert::AreEqual<GLenum>(GL_RGB8, get_texture_internal_format(Texture_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_RGB32F, get_texture_internal_format(Texture_format::rgb_32f));
+		Assert::AreEqual<GLenum>(GL_RGBA8, get_texture_internal_format(Texture_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_RGBA32F, get_texture_internal_format(Texture_format::rgba_32f));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT24, get_texture_internal_format(Texture_format::depth_24));
+		Assert::AreEqual<GLenum>(GL_DEPTH24_STENCIL8, get_texture_internal_format(Texture_format::depth_24_stencil_8));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32, get_texture_internal_format(Texture_format::depth_32));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT32F, get_texture_internal_format(Texture_format::depth_32f));
+		Assert::AreEqual<GLenum>(GL_DEPTH32F_STENCIL8, get_texture_internal_format(Texture_format::depth_32f_stencil_8));
 	}
 
-	TEST_METHOD(texture_sub_image_format)
+	TEST_METHOD(get_texture_sub_image_format)
 	{
-		using cg::opengl::texture_sub_image_format;
+		using cg::opengl::get_texture_sub_image_format;
 
-		Assert::AreEqual<GLenum>(GL_NONE, texture_sub_image_format(Image_format::none));
-		Assert::AreEqual<GLenum>(GL_RED, texture_sub_image_format(Image_format::red_8));
-		Assert::AreEqual<GLenum>(GL_RGB, texture_sub_image_format(Image_format::rgb_8));
-		Assert::AreEqual<GLenum>(GL_RGBA, texture_sub_image_format(Image_format::rgba_8));
-		Assert::AreEqual<GLenum>(GL_BGR, texture_sub_image_format(Image_format::bgr_8));
-		Assert::AreEqual<GLenum>(GL_BGRA, texture_sub_image_format(Image_format::bgra_8));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(Image_format::none));
+		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(Image_format::red_8));
+		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(Image_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(Image_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_BGR, get_texture_sub_image_format(Image_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_BGRA, get_texture_sub_image_format(Image_format::bgra_8));
 	}
 
-	TEST_METHOD(texture_sub_image_type)
+	TEST_METHOD(get_texture_sub_image_type)
 	{
-		using cg::opengl::texture_sub_image_type;
+		using cg::opengl::get_texture_sub_image_type;
 
-		Assert::AreEqual<GLenum>(GL_NONE, texture_sub_image_type(Image_format::none));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::red_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::rgb_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::rgba_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::bgr_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, texture_sub_image_type(Image_format::bgra_8));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(Image_format::none));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::red_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgra_8));
 	}
 };
 

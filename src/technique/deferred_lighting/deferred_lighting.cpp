@@ -10,6 +10,8 @@ using cg::uint2;
 
 using cg::data::Vertex_attribs;
 using cg::opengl::DE_cmd;
+using cg::opengl::Texture_2d;
+using cg::opengl::Texture_format;
 
 
 namespace deferred_lighting {
@@ -25,6 +27,9 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	_renderer = std::make_unique<Renderer>(window_size, src);
 
 	// scene
+	// diffuse texture
+	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
+	_tex_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wall_img);
 	// square geometry
 	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", Vertex_attribs::position);
 	_vs_builder.begin(Vertex_attribs::position, megabytes(4));
