@@ -26,10 +26,14 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	using cg::view_matrix;
 
 	auto src = cg::file::load_glsl_program_source("../data/test");
-	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
-	_renderer = std::make_unique<Renderer>(window_size, src, wall_img);
+	_renderer = std::make_unique<Renderer>(window_size, src);
 
 	// scene
+	// materials
+	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
+	_tex_brick_wall_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wall_img);
+	auto wood_img = cg::file::load_image_tga("../data/wood-diffuse.tga");
+	_tex_wood_fence_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wood_img);
 	// square geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
 	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", vertex_attribs);
@@ -42,10 +46,18 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	_frame = std::make_unique<Frame>(cmd.vao_id());
 	_frame->set_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50));
 	_frame->set_view_matrix(cg::view_matrix(float3(0, 0, 2), float3::zero));
-	// put square three times as different models into frame
-	_frame->push_back_renderable(cmd, tr_matrix(float3(-0.2f, -0.2f, 0), from_axis_angle_rotation(float3::unit_y, cg::pi_4)));
-	_frame->push_back_renderable(cmd, tr_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, -cg::pi_8)));
-	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)));
+	
+	// put square three times as different models into the frame
+	_frame->push_back_renderable(cmd, 
+		tr_matrix(float3(-0.2f, -0.2f, 0), from_axis_angle_rotation(float3::unit_y, cg::pi_4)),
+		_tex_wood_fence_diffuse_rgb.id());
+
+	_frame->push_back_renderable(cmd, 
+		tr_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, -cg::pi_8)),
+		_tex_brick_wall_diffuse_rgb.id());
+	
+	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)),
+		_tex_brick_wall_diffuse_rgb.id());
 }
 
 void Deferred_lighting::render(float blend_state) 

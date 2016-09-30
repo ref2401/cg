@@ -12,18 +12,20 @@
 
 namespace deferred_lighting {
 
-struct Renderable {
+struct Renderable final {
 
 	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, 
-		const cg::mat3& normal_matrix) noexcept	: 
+		const cg::mat3& normal_matrix, GLuint tex_diffuse_rgb_id) noexcept	: 
 		cmd(cmd), 
 		model_matrix(model_matrix),
-		normal_matrix(normal_matrix)
+		normal_matrix(normal_matrix),
+		tex_diffuse_rgb_id(tex_diffuse_rgb_id)
 	{}
 
 	cg::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
 	cg::mat3 normal_matrix;
+	GLuint tex_diffuse_rgb_id;
 };
 
 // ...
@@ -54,7 +56,8 @@ public:
 		_projection_matrix = mat;
 	}
 
-	void push_back_renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix);
+	void push_back_renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix,
+		GLuint tex_diffuse_rgb_id);
 
 	const std::vector<Renderable>& renderable_objects() const noexcept
 	{
@@ -86,8 +89,7 @@ private:
 class Renderer final {
 public:
 
-	Renderer(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& src,
-		const cg::data::Image_2d& diffuse_rgb);
+	Renderer(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& src);
 
 	Renderer(const Renderer& rnd) = delete;
 
@@ -112,9 +114,11 @@ public:
 private:
 	static constexpr size_t max_draw_call_count = 512;
 
+	const size_t max_texture_unit_count;
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _indirect_buffer;
 	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
+	std::vector<GLint> _texture_units;
 	std::vector<cg::mat4> _model_matrices;
 	std::vector<cg::mat3> _normal_matrices;
 	std::array<GLsync, 3> _sync_objects;
@@ -123,7 +127,7 @@ private:
 	GLint _u_pv_matrix = cg::opengl::Invalid::uniform_location;
 	GLint _u_model_matrix_array = cg::opengl::Invalid::uniform_location;
 	GLint _u_normal_matrix_array = cg::opengl::Invalid::uniform_location;
-	cg::opengl::Texture_2d _tex_diffuse_rgb;
+	GLint _u_tex_diffuse_rgb_array = cg::opengl::Invalid::uniform_location;
 	cg::opengl::Sampler _sampler;
 };
 

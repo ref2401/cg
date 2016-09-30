@@ -7,17 +7,16 @@
 - draw index simulation
 - unform arrays  & tripple buffering
 - loading .tga, simple Material (diffuse texture)
-- (working on) calculate draw batch size (texture unit count, vertex/pixel uniform component count)
+- each renderable has it's own diffuse texture if
+- draw batch size = texture unit count / material texture count
+- (working on) Deferred lighting first pass
+	- Deferred lighting renderer outline (Passes, vaos, ...)
+	- Static_vertex_spec. I need several vaos to perform different passes. Each pass takes only subset of all vertex attribs defined in Static_vertex_spec.
 
 ## roadmap
-- texturing, materials
-	batch_size = min(
-	GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
-	GL_MAX_VERTEX_UNIFORM_COMPONENTS / unifrom_struct_component_count);
-- cube/ball/buddha meshes
-- timestep
-- Static_vertex_spec. I need several vaos to perform different passes. Each pass takes only subset of all vertex attribs defined in Static_vertex_spec.
 
+- timestep
+- cube/ball/buddha meshes
 - deferred lighting (opengl/direct 3d)
 	- hemispheric ambient light 
 	- directional light

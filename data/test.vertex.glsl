@@ -13,7 +13,7 @@ layout(location = 15) in uint draw_index;
 out Frag_data_i {
 	vec3 normal;
 	vec2 tex_coord;
-	flat float draw_index;
+	flat uint draw_index;
 } vs_out;
 
 
@@ -22,5 +22,5 @@ void main()
 	gl_Position = u_projection_view_matrix * (u_model_matrix_array[draw_index] * vec4(vert_position, 1));
 	vs_out.normal = u_normal_matrix_array[draw_index] * vert_normal;
 	vs_out.tex_coord = vert_tex_coord;
-	vs_out.draw_index = float(draw_index);
+	vs_out.draw_index = draw_index;
 }

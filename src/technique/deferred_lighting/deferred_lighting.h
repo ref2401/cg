@@ -32,6 +32,9 @@ private:
 	// scene
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
+	// scene.textures
+	cg::opengl::Texture_2d _tex_brick_wall_diffuse_rgb;
+	cg::opengl::Texture_2d _tex_wood_fence_diffuse_rgb;
 	// renderer stuff
 	std::unique_ptr<Renderer> _renderer;
 	std::unique_ptr<Frame> _frame;

@@ -133,48 +133,8 @@ struct Vertex_attrib_layout {
 template<typename T>
 void set_uniform(GLint location, const T& value) noexcept;
 
-template<>
-inline void set_uniform<cg::mat4>(GLint location, const cg::mat4& mat) noexcept
-{
-	assert(location != Invalid::uniform_location);
-
-	float arr[16];
-	cg::put_in_column_major_order(mat, arr);
-	glUniformMatrix4fv(location, 1, false, arr);
-}
-
 template<typename T>
 void set_uniform_array(GLint location, const T* ptr, size_t count) noexcept;
-
-template<>
-inline void set_uniform_array<mat3>(GLint location, const mat3* ptr, size_t count) noexcept
-{
-	assert(location != Invalid::uniform_location);
-	assert(count > 0);
-
-	constexpr size_t component_count = 9; // each mat3 has exactly 3 components
-	std::vector<float> arr(count * component_count);
-	for (size_t i = 0; i < count; ++i) {
-		cg::put_in_column_major_order(ptr[i], arr.data() + i * component_count);
-	}
-
-	glUniformMatrix3fv(location, count, false, arr.data());
-}
-
-template<>
-inline void set_uniform_array<mat4>(GLint location, const mat4* ptr, size_t count) noexcept
-{
-	assert(location != Invalid::uniform_location);
-	assert(count > 0);
-
-	constexpr size_t component_count = 16; // each mat4 has exactly 16 components
-	std::vector<float> arr(count * component_count);
-	for (size_t i = 0; i < count; ++i) {
-		cg::put_in_column_major_order(ptr[i], arr.data() + i * component_count);
-	}
-
-	glUniformMatrix4fv(location, count, false, arr.data());
-}
 
 } // namespace opengl
 } // namespace cg
