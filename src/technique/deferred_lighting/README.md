@@ -1,4 +1,4 @@
-# deferred lighing steps
+# deferred lighting steps
 ## done
 - IGame impl, clear screen
 - Single vertex/fragment shader -> one pixel. SetPixelSize(px)
