@@ -9,6 +9,7 @@ using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::opengl::Mag_filter;
 using cg::opengl::Min_filter;
+using cg::opengl::Sampler_config;
 using cg::opengl::Texture_2d_sub_image;
 using cg::opengl::Texture_format;
 using cg::opengl::Wrap_mode;
@@ -21,6 +22,7 @@ template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STR
 template<> inline std::wstring ToString<Image_format>(const Image_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Mag_filter>(const Mag_filter& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Min_filter>(const Min_filter& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Sampler_config>(const Sampler_config& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_2d_sub_image>(const Texture_2d_sub_image& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_format>(const Texture_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_WIDE_STRING(t); }
@@ -29,6 +31,55 @@ template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_
 
 
 namespace unittest {
+
+TEST_CLASS(cg_opengl_texture_Sampler_config) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		Sampler_config cfg0;
+		Assert::AreEqual<GLenum>(GL_LINEAR, cfg0.min_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR, cfg0.mag_filter);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, cfg0.wrap_u);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, cfg0.wrap_v);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, cfg0.wrap_w);
+
+		Sampler_config cfg1(Min_filter::lerp_bilinear_mipmaps, Mag_filter::nearest, Wrap_mode::repeat);
+		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_LINEAR, cfg1.min_filter);
+		Assert::AreEqual<GLenum>(GL_NEAREST, cfg1.mag_filter);
+		Assert::AreEqual<GLenum>(GL_REPEAT, cfg1.wrap_u);
+		Assert::AreEqual<GLenum>(GL_REPEAT, cfg1.wrap_v);
+		Assert::AreEqual<GLenum>(GL_REPEAT, cfg1.wrap_w);
+
+		Sampler_config cfg2(Min_filter::nearest_mipmap, Mag_filter::bilinear, 
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_border);
+		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_NEAREST, cfg2.min_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR, cfg2.mag_filter);
+		Assert::AreEqual<GLenum>(GL_REPEAT, cfg2.wrap_u);
+		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, cfg2.wrap_v);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER, cfg2.wrap_w);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		Sampler_config cfg(Min_filter::bilinear_mipmap, Mag_filter::nearest, 
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_edge);
+
+		Assert::AreNotEqual(cfg, Sampler_config(Min_filter::nearest, Mag_filter::nearest,
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_edge));
+		Assert::AreNotEqual(cfg, Sampler_config(Min_filter::bilinear_mipmap, Mag_filter::bilinear,
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_edge));
+		Assert::AreNotEqual(cfg, Sampler_config(Min_filter::bilinear_mipmap, Mag_filter::nearest,
+			Wrap_mode::clamp_to_border, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_edge));
+		Assert::AreNotEqual(cfg, Sampler_config(Min_filter::bilinear_mipmap, Mag_filter::nearest,
+			Wrap_mode::repeat, Wrap_mode::clamp_to_border, Wrap_mode::clamp_to_edge));
+		Assert::AreNotEqual(cfg, Sampler_config(Min_filter::bilinear_mipmap, Mag_filter::nearest,
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_border));
+
+		Assert::AreEqual(cfg, Sampler_config(Min_filter::bilinear_mipmap, Mag_filter::nearest,
+			Wrap_mode::repeat, Wrap_mode::mirror_repeat, Wrap_mode::clamp_to_edge));
+	}
+};
 
 TEST_CLASS(cg_opengl_texture_Texture_2d_sub_image) {
 public:

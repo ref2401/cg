@@ -44,6 +44,80 @@ enum class Min_filter {
 	lerp_bilinear_mipmaps
 };
 
+// Wrap_mode describes what texture sampler will do if texture coordinates fall outside the range [0, 1].
+enum class Wrap_mode : unsigned char {
+	// repeat the texture in the direction in which the texture coordinate has exceeded 1.0.
+	repeat,
+
+	// if the texture coordinate has exceeded 1.0 sample the texel from the constant border color.
+	clamp_to_border,
+
+	// forces texture coordinates out of range to be sampled along the last row or column.
+	clamp_to_edge,
+
+	// similar to repeat, but as the texture coordinate passes 1.0 it starts moving back 
+	// toward the origin of the texture until it reaches 2.0, at which point the pattern repeats.
+	mirror_repeat,
+
+	// The texture coordinate is handled normaly between 0.0 and 1.0.
+	// In ranges [-1.0, 0.0] and [1.0, 2.0] the texture coordinate is handled as mirror_repeat.
+	// Outside the range [-1.0, 2.0] it si clamped to the edge od the texture (clamp_to_edge).
+	mirror_clamp_to_edge
+};
+
+// Describes sampler object parameters.
+struct Sampler_config final {
+
+	Sampler_config() noexcept = default;
+
+	Sampler_config(Min_filter min_filter, Mag_filter mag_filter, Wrap_mode wrap_mode) noexcept;
+
+	Sampler_config(Min_filter min_filter, Mag_filter mag_filter,
+		Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept;
+
+	// Minifying filter is used whenever the pixel being textured maps to an area greater than one texture's texel. 
+	GLenum min_filter = GL_LINEAR;
+
+	// Magnification filter is used when the pixel being textured maps to an area less than or equal to one texture's texel.
+	GLenum mag_filter = GL_LINEAR;
+
+	// Wrap mod for texture coordinate u. It's called 's' in OpenGL.
+	GLenum wrap_u = GL_CLAMP_TO_EDGE;
+
+	// Wrap mod for texture coordinate v. It's called 't' in OpenGL.
+	GLenum wrap_v = GL_CLAMP_TO_EDGE;
+
+	// Wrap mod for texture coordinate w. It's called 'r' in OpenGL.
+	GLenum wrap_w = GL_CLAMP_TO_EDGE;
+};
+
+//class Sampler final {
+//public:
+//
+//	Sampler() noexcept;
+//
+//	Sampler(Min_filter min_filter, Mag_filter mag_filter,
+//		Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept;
+//
+//	Sampler(const Sampler& smp) = delete;
+//
+//	Sampler(Sampler&& smp);
+//
+//
+//	Sampler& operator(Sampler&& smp) noexcept;
+//
+//
+//	GLuint id() const noexcept
+//	{
+//		return _id;
+//	}
+//
+//private:
+//	void dispose() noexcept;
+//
+//	GLuint _id = Invalid::sampler_id;
+//};
+
 struct Texture_2d_sub_image final {
 
 	Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const cg::data::Image_2d& image) noexcept;
@@ -131,28 +205,21 @@ private:
 	Texture_format _format = Texture_format::none;
 };
 
-// Wrap_mode describes what texture sampler will do if texture coordinates fall outside the range [0, 1].
-enum class Wrap_mode : unsigned char {
-	// repeat the texture in the direction in which the texture coordinate has exceeded 1.0.
-	repeat,
-
-	// if the texture coordinate has exceeded 1.0 sample the texel from the constant border color.
-	clamp_to_border,
-
-	// forces texture coordinates out of range to be sampled along the last row or column.
-	clamp_to_edge,
-
-	// similar to repeat, but as the texture coordinate passes 1.0 it starts moving back 
-	// toward the origin of the texture until it reaches 2.0, at which point the pattern repeats.
-	mirror_repeat,
-
-	// The texture coordinate is handled normaly between 0.0 and 1.0.
-	// In ranges [-1.0, 0.0] and [1.0, 2.0] the texture coordinate is handled as mirror_repeat.
-	// Outside the range [-1.0, 2.0] it si clamped to the edge od the texture (clamp_to_edge).
-	mirror_clamp_to_edge
-};
-
 // ---- funcs -----
+
+inline bool operator==(const Sampler_config& lhs, const Sampler_config& rhs) noexcept
+{
+	return (lhs.min_filter == rhs.min_filter)
+		&& (lhs.mag_filter == rhs.mag_filter)
+		&& (lhs.wrap_u == rhs.wrap_u)
+		&& (lhs.wrap_v == rhs.wrap_v)
+		&& (lhs.wrap_w == rhs.wrap_w);
+}
+
+inline bool operator!=(const Sampler_config& lhs, const Sampler_config& rhs) noexcept
+{
+	return !(lhs == rhs);
+}
 
 inline bool operator==(const Texture_2d_sub_image& lhs, const Texture_2d_sub_image& rhs) noexcept
 {
@@ -177,6 +244,14 @@ std::ostream& operator<<(std::ostream& out, const Min_filter& filter);
 
 std::wostream& operator<<(std::wostream& out, const Min_filter& filter);
 
+std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode);
+
+std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode);
+
+std::ostream& operator<<(std::ostream& out, const Sampler_config& sampler_config);
+
+std::wostream& operator<<(std::wostream& out, const Sampler_config& sampler_config);
+
 std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img);
 
 std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img);
@@ -184,10 +259,6 @@ std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_im
 std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 
 std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
-
-std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode);
-
-std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode);
 
 // Inferes an appropriate texture format based on the specified image format.
 Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;

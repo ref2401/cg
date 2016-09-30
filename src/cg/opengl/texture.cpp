@@ -9,6 +9,39 @@ using cg::data::Image_format;
 namespace cg {
 namespace opengl {
 
+// ----- Sampler_config -----
+
+Sampler_config::Sampler_config(Min_filter min_filter, Mag_filter mag_filter, Wrap_mode wrap_mode) noexcept :
+	Sampler_config(min_filter, mag_filter, wrap_mode, wrap_mode, wrap_mode)
+{}
+
+Sampler_config::Sampler_config(Min_filter min_filter, Mag_filter mag_filter,
+	Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept :
+	min_filter(get_texture_min_filter(min_filter)),
+	mag_filter(get_texture_mag_filter(mag_filter)),
+	wrap_u(get_texture_wrap(wrap_u)),
+	wrap_v(get_texture_wrap(wrap_v)),
+	wrap_w(get_texture_wrap(wrap_w))
+{}
+
+// ----- Sampler -----
+
+//Sampler::Sampler() noexcept :
+//	Sampler(Min_filter::bilinear, Mag_filter::bilinear,
+//		Wrap_mode::repeat, Wrap_mode::repeat, Wrap_mode::repeat)
+//{}
+//
+//Sampler::Sampler(Min_filter min_filter, Mag_filter mag_filter,
+//	Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept
+//{
+//	glCreateSamplers(1, &_id);
+//	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, get_texture_min_filter(min_filter));
+//	glSamplerParameteri(_id, GL_TEXTURE_MAG_FILTER, get_texture_mag_filter(mag_filter));
+//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_S, get_texture_wrap(wrap_u));
+//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_T, get_texture_wrap(wrap_v));
+//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_R, get_texture_wrap(wrap_w));
+//}
+
 // ----- Texture_2d_sub_image -----
 
 Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
@@ -185,6 +218,80 @@ std::wostream& operator<<(std::wostream& out, const Min_filter& filter)
 	return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode)
+{
+	out << "Wrap_mode::";
+
+	switch (wrap_mode) {
+		case Wrap_mode::repeat:
+			out << "repeat";
+			break;
+
+		case Wrap_mode::clamp_to_border:
+			out << "clamp_to_border";
+			break;
+
+		case Wrap_mode::clamp_to_edge:
+			out << "clamp_to_edge";
+			break;
+
+		case Wrap_mode::mirror_repeat:
+			out << "mirror_repeat";
+			break;
+
+		case Wrap_mode::mirror_clamp_to_edge:
+			out << "mirror_repeat";
+			break;
+	}
+
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode)
+{
+	out << "Wrap_mode::";
+
+	switch (wrap_mode) {
+		case Wrap_mode::repeat:
+			out << "repeat";
+			break;
+
+		case Wrap_mode::clamp_to_border:
+			out << "clamp_to_border";
+			break;
+
+		case Wrap_mode::clamp_to_edge:
+			out << "clamp_to_edge";
+			break;
+
+		case Wrap_mode::mirror_repeat:
+			out << "mirror_repeat";
+			break;
+
+		case Wrap_mode::mirror_clamp_to_edge:
+			out << "mirror_repeat";
+			break;
+	}
+
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Sampler_config& sampler_config)
+{
+	out << "Sampler_config(" << sampler_config.min_filter << ", "
+		<< sampler_config.mag_filter << ", " << sampler_config.wrap_u << ", "
+		<< sampler_config.wrap_v << ", " << sampler_config.wrap_w << ')';
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Sampler_config& sampler_config)
+{
+	out << "Sampler_config(" << sampler_config.min_filter << ", "
+		<< sampler_config.mag_filter << ", " << sampler_config.wrap_u << ", "
+		<< sampler_config.wrap_v << ", " << sampler_config.wrap_w << ')';
+	return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img)
 {
 	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
@@ -327,64 +434,6 @@ std::wostream& operator<<(std::wostream& out, const Texture_format& fmt)
 
 		case Texture_format::depth_32f_stencil_8:
 			out << "depth_32f_stencil_8";
-			break;
-	}
-
-	return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode)
-{
-	out << "Wrap_mode::";
-
-	switch (wrap_mode) {
-		case Wrap_mode::repeat :
-			out << "repeat";
-			break;
-
-		case Wrap_mode::clamp_to_border:
-			out << "clamp_to_border";
-			break;
-
-		case Wrap_mode::clamp_to_edge:
-			out << "clamp_to_edge";
-			break;
-
-		case Wrap_mode::mirror_repeat:
-			out << "mirror_repeat";
-			break;
-
-		case Wrap_mode::mirror_clamp_to_edge:
-			out << "mirror_repeat";
-			break;
-	}
-
-	return out;
-}
-
-std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode)
-{
-	out << "Wrap_mode::";
-
-	switch (wrap_mode) {
-		case Wrap_mode::repeat:
-			out << "repeat";
-			break;
-
-		case Wrap_mode::clamp_to_border:
-			out << "clamp_to_border";
-			break;
-
-		case Wrap_mode::clamp_to_edge:
-			out << "clamp_to_edge";
-			break;
-
-		case Wrap_mode::mirror_repeat:
-			out << "mirror_repeat";
-			break;
-
-		case Wrap_mode::mirror_clamp_to_edge:
-			out << "mirror_repeat";
 			break;
 	}
 

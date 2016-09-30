@@ -13,6 +13,7 @@ class Invalid final {
 public:
 
 	static constexpr GLuint buffer_id = 0;
+	static constexpr GLuint sampler_id = 0;
 	static constexpr GLuint shader_id = 0;
 	static constexpr GLuint shader_program_id = 0;
 	static constexpr GLuint texture_id = 0;

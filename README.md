@@ -11,11 +11,14 @@ Later I would like to do the same using DirectX 11
 - Static_vertex_spec, DE_indirect_params, sync, MultiDrawIndirect
 - draw index simulation
 - unform arrays  & tripple buffering
--> loading .tga, simple Material (diffuse texture)
+- (working on) loading .tga, simple Material (diffuse texture)
 
 ## roadmap
+- texturing, materials
+	batch_size = min(
+	GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+	GL_MAX_VERTEX_UNIFORM_COMPONENTS / unifrom_struct_component_count);
 - cube/ball/buddha meshes
-- texturing
 - timestep
 - Static_vertex_spec. I need several vaos to perform different passes. Each pass takes only subset of all vertex attribs defined in Static_vertex_spec.
 
@@ -40,8 +43,3 @@ Later I would like to do the same using DirectX 11
 - uniform arrays -> uniform block (because the number of shader uniform array components is limited)
 - compute shaders: indirect buffer, draw call index buffer, uniform buffer object, ...
 - crytek sponza 
-
-
-batch_size = min(
-GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
-GL_MAX_VERTEX_UNIFORM_COMPONENTS / unifrom_struct_component_count);
