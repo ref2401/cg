@@ -91,38 +91,40 @@ struct Sampler_config final {
 	GLenum wrap_w = GL_CLAMP_TO_EDGE;
 };
 
-//class Sampler final {
-//public:
-//
-//	Sampler() noexcept;
-//
-//	Sampler(Min_filter min_filter, Mag_filter mag_filter,
-//		Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept;
-//
-//	Sampler(const Sampler& smp) = delete;
-//
-//	Sampler(Sampler&& smp);
-//
-//
-//	Sampler& operator(Sampler&& smp) noexcept;
-//
-//
-//	GLuint id() const noexcept
-//	{
-//		return _id;
-//	}
-//
-//private:
-//	void dispose() noexcept;
-//
-//	GLuint _id = Invalid::sampler_id;
-//};
+// Incapsulates the sampler state of a texture object.
+class Sampler final {
+public:
 
-struct Texture_2d_sub_image final {
+	Sampler() noexcept = default;
 
-	Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const cg::data::Image_2d& image) noexcept;
+	explicit Sampler(const Sampler_config& config) noexcept;
 
-	Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, cg::uint2 size,
+	Sampler(const Sampler& smp) = delete;
+
+	Sampler(Sampler&& smp) noexcept;
+
+	~Sampler() noexcept;
+
+
+	Sampler& operator==(Sampler&& smp) noexcept;
+
+
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+private:
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::sampler_id;
+};
+
+struct Texture_2d_sub_image_params final {
+
+	Texture_2d_sub_image_params(size_t mipmap_index, cg::uint2 offset, const cg::data::Image_2d& image) noexcept;
+
+	Texture_2d_sub_image_params(size_t mipmap_index, cg::uint2 offset, cg::uint2 size,
 		GLenum pixel_format, GLenum pixel_type, const void* pixels) noexcept;
 
 
@@ -221,7 +223,7 @@ inline bool operator!=(const Sampler_config& lhs, const Sampler_config& rhs) noe
 	return !(lhs == rhs);
 }
 
-inline bool operator==(const Texture_2d_sub_image& lhs, const Texture_2d_sub_image& rhs) noexcept
+inline bool operator==(const Texture_2d_sub_image_params& lhs, const Texture_2d_sub_image_params& rhs) noexcept
 {
 	return (lhs.offset == rhs.offset)
 		&& (lhs.size == rhs.size)
@@ -231,7 +233,7 @@ inline bool operator==(const Texture_2d_sub_image& lhs, const Texture_2d_sub_ima
 		&& (lhs.pixels == rhs.pixels);
 }
 
-inline bool operator!=(const Texture_2d_sub_image& lhs, const Texture_2d_sub_image& rhs) noexcept
+inline bool operator!=(const Texture_2d_sub_image_params& lhs, const Texture_2d_sub_image_params& rhs) noexcept
 {
 	return !(lhs == rhs);
 }
@@ -248,13 +250,13 @@ std::ostream& operator<<(std::ostream& out, const Wrap_mode& wrap_mode);
 
 std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode);
 
-std::ostream& operator<<(std::ostream& out, const Sampler_config& sampler_config);
+std::ostream& operator<<(std::ostream& out, const Sampler_config& config);
 
-std::wostream& operator<<(std::wostream& out, const Sampler_config& sampler_config);
+std::wostream& operator<<(std::wostream& out, const Sampler_config& config);
 
-std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img);
+std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image_params& sub_img);
 
-std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img);
+std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image_params& sub_img);
 
 std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 
@@ -284,7 +286,7 @@ GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
 GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept;
 
 // Convenient function to call the glTextureSubImage2D func.
-inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image sub_img) noexcept
+inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image_params sub_img) noexcept
 {
 	assert(texture_id != Invalid::texture_id);
 	glTextureSubImage2D(texture_id, sub_img.mipmap_index,

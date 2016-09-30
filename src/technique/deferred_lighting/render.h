@@ -5,6 +5,8 @@
 #include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
+#include "cg/data/image.h"
+#include "cg/data/shader.h"
 #include "cg/opengl/opengl.h"
 
 
@@ -12,12 +14,16 @@ namespace deferred_lighting {
 
 struct Renderable {
 
-	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix) noexcept
-	:	cmd(cmd), model_matrix(model_matrix)
+	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, 
+		const cg::mat3& normal_matrix) noexcept	: 
+		cmd(cmd), 
+		model_matrix(model_matrix),
+		normal_matrix(normal_matrix)
 	{}
 
 	cg::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
+	cg::mat3 normal_matrix;
 };
 
 // ...
@@ -80,7 +86,8 @@ private:
 class Renderer final {
 public:
 
-	Renderer(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& src);
+	Renderer(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& src,
+		const cg::data::Image_2d& diffuse_rgb);
 
 	Renderer(const Renderer& rnd) = delete;
 
@@ -109,11 +116,15 @@ private:
 	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _indirect_buffer;
 	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
 	std::vector<cg::mat4> _model_matrices;
+	std::vector<cg::mat3> _normal_matrices;
 	std::array<GLsync, 3> _sync_objects;
 	// temporary here
 	cg::opengl::Shader_program _prog;
 	GLint _u_pv_matrix = cg::opengl::Invalid::uniform_location;
 	GLint _u_model_matrix_array = cg::opengl::Invalid::uniform_location;
+	GLint _u_normal_matrix_array = cg::opengl::Invalid::uniform_location;
+	cg::opengl::Texture_2d _tex_diffuse_rgb;
+	cg::opengl::Sampler _sampler;
 };
 
 } // namespace deferred_lighting

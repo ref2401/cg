@@ -34,12 +34,12 @@ Later I would like to do the same using DirectX 11
 	- ambient occlusion
 - normal mapping
 	- (Geometry shader)Vertex format. Get rid of tanget_h. Calc tangent space in the geometry shader.
+- uniform arrays -> uniform block (because the number of shader uniform array components is limited)
 - post processing
 	- bloom (bockeh)
 	- good rays
 - mouse, keyboard
 	- fullscreen (F11), max/min window
 	- camera controls
-- uniform arrays -> uniform block (because the number of shader uniform array components is limited)
 - compute shaders: indirect buffer, draw call index buffer, uniform buffer object, ...
 - crytek sponza 

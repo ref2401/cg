@@ -147,6 +147,21 @@ template<typename T>
 void set_uniform_array(GLint location, const T* ptr, size_t count) noexcept;
 
 template<>
+inline void set_uniform_array<mat3>(GLint location, const mat3* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	constexpr size_t component_count = 9; // each mat3 has exactly 3 components
+	std::vector<float> arr(count * component_count);
+	for (size_t i = 0; i < count; ++i) {
+		cg::put_in_column_major_order(ptr[i], arr.data() + i * component_count);
+	}
+
+	glUniformMatrix3fv(location, count, false, arr.data());
+}
+
+template<>
 inline void set_uniform_array<mat4>(GLint location, const mat4* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);

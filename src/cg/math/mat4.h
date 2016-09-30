@@ -7,6 +7,8 @@
 #include "cg/math/float2.h"
 #include "cg/math/float3.h"
 #include "cg/math/float4.h"
+#include "cg/math/mat3.h"
+#include "cg/math/quat.h"
 #include "cg/math/utility.h"
 
 
@@ -112,6 +114,11 @@ struct mat4 {
 		m20 /= val; m21 /= val; m22 /= val; m23 /= val;
 		m30 /= val; m31 /= val; m32 /= val; m33 /= val;
 		return *this;
+	}
+
+	explicit operator mat3() const noexcept
+	{
+		return mat3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
 	}
 
 

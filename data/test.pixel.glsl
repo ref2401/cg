@@ -1,5 +1,7 @@
 #version 450 core
 
+layout(binding = 0) uniform sampler2D u_tex_diffuse_rgb;
+
 out vec4 rt_color;
 
 in Frag_data_i {
@@ -11,7 +13,11 @@ in Frag_data_i {
 
 void main()
 {
-	float cosT = clamp(dot(frag.normal, vec3(1, 1, 1)), 0, 1);
-	vec3 color = vec3(frag.draw_index * 0.5) * cosT * vec3(frag.tex_coord.s, frag.tex_coord.t, 1) / 3.14159265;
+	const vec3 dir_to_light = normalize(vec3(1, 1, 1));
+	const vec3 light_intensity = vec3(1);
+
+	float cosT = clamp(dot(frag.normal, dir_to_light), 0, 1);
+	vec3 diffuse_rgb = (texture(u_tex_diffuse_rgb, frag.tex_coord).rgb) / 3.14159265;
+	vec3 color = diffuse_rgb * cosT * light_intensity;
 	rt_color = vec4(color, 1);
 }

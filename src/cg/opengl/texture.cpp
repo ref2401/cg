@@ -26,25 +26,48 @@ Sampler_config::Sampler_config(Min_filter min_filter, Mag_filter mag_filter,
 
 // ----- Sampler -----
 
-//Sampler::Sampler() noexcept :
-//	Sampler(Min_filter::bilinear, Mag_filter::bilinear,
-//		Wrap_mode::repeat, Wrap_mode::repeat, Wrap_mode::repeat)
-//{}
-//
-//Sampler::Sampler(Min_filter min_filter, Mag_filter mag_filter,
-//	Wrap_mode wrap_u, Wrap_mode wrap_v, Wrap_mode wrap_w) noexcept
-//{
-//	glCreateSamplers(1, &_id);
-//	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, get_texture_min_filter(min_filter));
-//	glSamplerParameteri(_id, GL_TEXTURE_MAG_FILTER, get_texture_mag_filter(mag_filter));
-//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_S, get_texture_wrap(wrap_u));
-//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_T, get_texture_wrap(wrap_v));
-//	glSamplerParameteri(_id, GL_TEXTURE_WRAP_R, get_texture_wrap(wrap_w));
-//}
+Sampler::Sampler(const Sampler_config& config) noexcept
+{
+	glCreateSamplers(1, &_id);
+	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, config.min_filter);
+	glSamplerParameteri(_id, GL_TEXTURE_MAG_FILTER, config.mag_filter);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_S, config.wrap_u);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_T, config.wrap_v);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_R, config.wrap_w);
+}
+
+Sampler::Sampler(Sampler&& smp) noexcept :
+	_id(smp._id)
+{
+	smp._id = Invalid::sampler_id;
+}
+
+Sampler::~Sampler() noexcept
+{
+	dispose();
+}
+
+Sampler& Sampler::operator==(Sampler&& smp) noexcept
+{
+	if (this == &smp) return *this;
+
+	dispose();
+	_id = smp._id;
+	smp._id = Invalid::sampler_id;
+	return *this;
+}
+
+void Sampler::dispose() noexcept
+{
+	if (_id == Invalid::sampler_id) return;
+
+	glDeleteSamplers(1, &_id);
+	_id = Invalid::sampler_id;
+}
 
 // ----- Texture_2d_sub_image -----
 
-Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
+Texture_2d_sub_image_params::Texture_2d_sub_image_params(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
 	mipmap_index(mipmap_index), offset(offset), size(image.size()),
 	pixel_format(get_texture_sub_image_format(image.format())),
 	pixel_type(get_texture_sub_image_type(image.format())),
@@ -56,7 +79,7 @@ Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset
 	assert(pixels != nullptr);
 }
 
-Texture_2d_sub_image::Texture_2d_sub_image(size_t mipmap_index, cg::uint2 offset, cg::uint2 size,
+Texture_2d_sub_image_params::Texture_2d_sub_image_params(size_t mipmap_index, cg::uint2 offset, cg::uint2 size,
 	GLenum pixel_format, GLenum pixel_type, const void* pixels) noexcept :
 	offset(offset), size(size), mipmap_index(mipmap_index), 
 	pixel_format(pixel_format), pixel_type(pixel_type), pixels(pixels)
@@ -77,7 +100,7 @@ Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) n
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
 	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
-	Texture_2d_sub_image sub_img(0, uint2::zero, image);
+	Texture_2d_sub_image_params sub_img(0, uint2::zero, image);
 	texture_2d_sub_image(_id, sub_img);
 }
 
@@ -276,23 +299,23 @@ std::wostream& operator<<(std::wostream& out, const Wrap_mode& wrap_mode)
 	return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const Sampler_config& sampler_config)
+std::ostream& operator<<(std::ostream& out, const Sampler_config& config)
 {
-	out << "Sampler_config(" << sampler_config.min_filter << ", "
-		<< sampler_config.mag_filter << ", " << sampler_config.wrap_u << ", "
-		<< sampler_config.wrap_v << ", " << sampler_config.wrap_w << ')';
+	out << "Sampler_config(" << config.min_filter << ", "
+		<< config.mag_filter << ", " << config.wrap_u << ", "
+		<< config.wrap_v << ", " << config.wrap_w << ')';
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Sampler_config& sampler_config)
+std::wostream& operator<<(std::wostream& out, const Sampler_config& config)
 {
-	out << "Sampler_config(" << sampler_config.min_filter << ", "
-		<< sampler_config.mag_filter << ", " << sampler_config.wrap_u << ", "
-		<< sampler_config.wrap_v << ", " << sampler_config.wrap_w << ')';
+	out << "Sampler_config(" << config.min_filter << ", "
+		<< config.mag_filter << ", " << config.wrap_u << ", "
+		<< config.wrap_v << ", " << config.wrap_w << ')';
 	return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img)
+std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image_params& sub_img)
 {
 	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
 		<< sub_img.mipmap_index << ", " << sub_img.pixel_type << ", "
@@ -300,7 +323,7 @@ std::ostream& operator<<(std::ostream& out, const Texture_2d_sub_image& sub_img)
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image& sub_img)
+std::wostream& operator<<(std::wostream& out, const Texture_2d_sub_image_params& sub_img)
 {
 	out << "Texture_2d_sub_image(" << sub_img.offset << ", " << sub_img.size << ", "
 		<< sub_img.mipmap_index << ", " << sub_img.pixel_type << ", "

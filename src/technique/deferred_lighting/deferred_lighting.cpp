@@ -18,21 +18,22 @@ namespace deferred_lighting {
 
 Deferred_lighting::Deferred_lighting(uint2 window_size)
 {
+	using cg::from_axis_angle_rotation;
 	using cg::megabytes;
 	using cg::perspective_matrix;
+	using cg::tr_matrix;
 	using cg::translation_matrix;
 	using cg::view_matrix;
 
 	auto src = cg::file::load_glsl_program_source("../data/test");
-	_renderer = std::make_unique<Renderer>(window_size, src);
+	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
+	_renderer = std::make_unique<Renderer>(window_size, src, wall_img);
 
 	// scene
-	// diffuse texture
-	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
-	_tex_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wall_img);
 	// square geometry
-	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", Vertex_attribs::position);
-	_vs_builder.begin(Vertex_attribs::position, megabytes(4));
+	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
+	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", vertex_attribs);
+	_vs_builder.begin(vertex_attribs, megabytes(4));
 	DE_cmd cmd = _vs_builder.push_back(mesh_data);
 	// ... load other geometry ...
 	_vertex_spec = _vs_builder.end(_renderer->vertex_attrib_layout());
@@ -42,8 +43,8 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 	_frame->set_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50));
 	_frame->set_view_matrix(cg::view_matrix(float3(0, 0, 2), float3::zero));
 	// put square three times as different models into frame
-	_frame->push_back_renderable(cmd, translation_matrix(float3(-0.2f, -0.2f, 0)));
-	_frame->push_back_renderable(cmd, translation_matrix(float3::zero));
+	_frame->push_back_renderable(cmd, tr_matrix(float3(-0.2f, -0.2f, 0), from_axis_angle_rotation(float3::unit_y, cg::pi_4)));
+	_frame->push_back_renderable(cmd, tr_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, -cg::pi_8)));
 	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)));
 }
 

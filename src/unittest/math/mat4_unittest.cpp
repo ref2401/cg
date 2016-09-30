@@ -4,8 +4,10 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
+#include "cg/math/mat3.h"
 #include "unittest/math/common_math.h"
 
+using cg::mat3;
 using cg::mat4;
 
 
@@ -18,6 +20,76 @@ public:
 	{
 		Assert::AreEqual(mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1), mat4::identity);
 		Assert::AreEqual(mat4(), mat4::zero);
+	}
+
+
+	TEST_METHOD(assignments)
+	{
+		mat4 m(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+
+		// copy assignment
+		mat4 mc = m;
+		Assert::IsTrue(mc.m00 == m.m00 && mc.m01 == m.m01 && mc.m02 == m.m02 && mc.m03 == m.m03);
+		Assert::IsTrue(mc.m10 == m.m10 && mc.m11 == m.m11 && mc.m12 == m.m12 && mc.m13 == m.m13);
+		Assert::IsTrue(mc.m20 == m.m20 && mc.m21 == m.m21 && mc.m22 == m.m22 && mc.m23 == m.m23);
+		Assert::IsTrue(mc.m30 == m.m30 && mc.m31 == m.m31 && mc.m32 == m.m32 && mc.m33 == m.m33);
+
+		// move assignment
+
+		mat4 mv;
+		mv = std::move(mc);
+		Assert::IsTrue(mv.m00 == m.m00 && mv.m01 == m.m01 && mv.m02 == m.m02 && mv.m03 == m.m03);
+		Assert::IsTrue(mv.m10 == m.m10 && mv.m11 == m.m11 && mv.m12 == m.m12 && mv.m13 == m.m13);
+		Assert::IsTrue(mv.m20 == m.m20 && mv.m21 == m.m21 && mv.m22 == m.m22 && mv.m23 == m.m23);
+		Assert::IsTrue(mv.m30 == m.m30 && mv.m31 == m.m31 && mv.m32 == m.m32 && mv.m33 == m.m33);
+	}
+
+	TEST_METHOD(binary_operators)
+	{
+		mat4 m(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+		mat4 l(5, 7, -9, 0, 3, 4, 4, 3, 9, 8, 7, 6, 1, 2, 1, 2);
+		mat4 n(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
+
+		Assert::AreEqual(m + l, mat4(5, 8, -7, 3, 7, 9, 10, 10, 17, 17, 17, 17, 13, 15, 15, 17));
+		Assert::AreEqual(m - l, mat4(-5, -6, 11, 3, 1, 1, 2, 4, -1, 1, 3, 5, 11, 11, 13, 13));
+
+		Assert::AreEqual(m + l, l + m);
+		Assert::AreEqual((m + l) + n, m + (l + n));
+		Assert::AreEqual(m, m + mat4::zero);
+		Assert::AreEqual(mat4::zero, m - m);
+
+		Assert::AreEqual(m * 2, mat4(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+		Assert::AreEqual(2 * m, mat4(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+		Assert::AreEqual(m / 2, mat4(0, 0.5f, 1, 1.5f, 2, 2.5f, 3, 3.5f, 4, 4.5f, 5, 5.5f, 6, 6.5f, 7, 7.5f));
+
+		// matrix product
+		Assert::AreEqual(m * mat4::identity, mat4::identity * m);
+		Assert::AreEqual(mat4::zero, m * mat4::zero);
+		Assert::AreEqual((l * m) * n, l * (m * n));
+		Assert::AreEqual((l + m) * n, (l * n) + (m * n));
+		Assert::AreEqual(l * (m + n), (l * m) + (l * n));
+
+		mat4 mA(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+		mat4 mB(80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95);
+		mat4 expectedAB(880, 890, 900, 910, 2256, 2282, 2308, 2334, 3632, 3674, 3716, 3758, 5008, 5066, 5124, 5182);
+		Assert::AreEqual(expectedAB, mA * mB);
+	}
+
+	TEST_METHOD(cast_operator_mat3)
+	{
+		mat4 m4(
+			1,	2,	3,	4, 
+			5,	6,	7,	8, 
+			9,	10, 11, 12, 
+			13, 14, 15, 16);
+
+		mat3 expected_m3(
+			1,	2,	3,
+			5,	6,	7,
+			9,	10, 11);
+
+		mat3 m3 = static_cast<mat3>(m4);
+		Assert::AreEqual(expected_m3, m3);
 	}
 
 	TEST_METHOD(ctors)
@@ -47,27 +119,6 @@ public:
 		Assert::IsTrue(mm.m10 == m1.m10 && mm.m11 == m1.m11 && mm.m12 == m1.m12 && mm.m13 == m1.m13);
 		Assert::IsTrue(mm.m20 == m1.m20 && mm.m21 == m1.m21 && mm.m22 == m1.m22 && mm.m23 == m1.m23);
 		Assert::IsTrue(mm.m30 == m1.m30 && mm.m31 == m1.m31 && mm.m32 == m1.m32 && mm.m33 == m1.m33);
-	}
-
-	TEST_METHOD(assignments)
-	{
-		mat4 m(0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15);
-
-		// copy assignment
-		mat4 mc = m;
-		Assert::IsTrue(mc.m00 == m.m00 && mc.m01 == m.m01 && mc.m02 == m.m02 && mc.m03 == m.m03);
-		Assert::IsTrue(mc.m10 == m.m10 && mc.m11 == m.m11 && mc.m12 == m.m12 && mc.m13 == m.m13);
-		Assert::IsTrue(mc.m20 == m.m20 && mc.m21 == m.m21 && mc.m22 == m.m22 && mc.m23 == m.m23);
-		Assert::IsTrue(mc.m30 == m.m30 && mc.m31 == m.m31 && mc.m32 == m.m32 && mc.m33 == m.m33);
-
-		// move assignment
-
-		mat4 mv;
-		mv = std::move(mc);
-		Assert::IsTrue(mv.m00 == m.m00 && mv.m01 == m.m01 && mv.m02 == m.m02 && mv.m03 == m.m03);
-		Assert::IsTrue(mv.m10 == m.m10 && mv.m11 == m.m11 && mv.m12 == m.m12 && mv.m13 == m.m13);
-		Assert::IsTrue(mv.m20 == m.m20 && mv.m21 == m.m21 && mv.m22 == m.m22 && mv.m23 == m.m23);
-		Assert::IsTrue(mv.m30 == m.m30 && mv.m31 == m.m31 && mv.m32 == m.m32 && mv.m33 == m.m33);
 	}
 
 	TEST_METHOD(compound_assignment_operators)
@@ -120,38 +171,6 @@ public:
 		m.set_oy(float3(24, 25, 26));
 		m.set_oz(float3(27, 28, 29));
 		Assert::AreEqual(mat4(21, 24, 27, 3, 22, 25, 28, 7, 23, 26, 29, 11, 12, 13, 14, 15), m);
-	}
-
-
-	TEST_METHOD(binary_operators)
-	{
-		mat4 m(0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15);
-		mat4 l(5, 7, -9, 0,  3, 4, 4, 3,  9, 8, 7, 6,  1, 2, 1, 2);
-		mat4 n(4, 5, 6, 7, 9, 8, -7, 6, 1, 2, 3, 4, 0, 0, -3, -4);
-
-		Assert::AreEqual(m + l, mat4(5, 8, -7, 3,  7, 9, 10, 10,  17, 17, 17, 17,  13, 15, 15, 17));
-		Assert::AreEqual(m - l, mat4(-5, -6, 11, 3, 1, 1, 2, 4, -1, 1, 3, 5,  11, 11, 13, 13));
-
-		Assert::AreEqual(m + l, l + m);
-		Assert::AreEqual((m + l) + n, m + (l + n));
-		Assert::AreEqual(m, m + mat4::zero);
-		Assert::AreEqual(mat4::zero, m - m);
-
-		Assert::AreEqual(m * 2, mat4(0, 2, 4, 6,  8, 10, 12, 14,  16, 18, 20, 22,  24, 26, 28, 30));
-		Assert::AreEqual(2 * m, mat4(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
-		Assert::AreEqual(m / 2, mat4(0, 0.5f, 1, 1.5f,  2, 2.5f, 3, 3.5f,  4, 4.5f, 5, 5.5f,  6, 6.5f, 7, 7.5f));
-
-		// matrix product
-		Assert::AreEqual(m * mat4::identity, mat4::identity * m);
-		Assert::AreEqual(mat4::zero, m * mat4::zero);
-		Assert::AreEqual((l * m) * n, l * (m * n));
-		Assert::AreEqual((l + m) * n, (l * n) + (m * n));
-		Assert::AreEqual(l * (m + n), (l * m) + (l * n));
-
-		mat4 mA(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-		mat4 mB(80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95);
-		mat4 expectedAB(880, 890, 900, 910, 2256, 2282, 2308, 2334, 3632, 3674, 3716, 3758, 5008, 5066, 5124, 5182);
-		Assert::AreEqual(expectedAB, mA * mB);
 	}
 
 	TEST_METHOD(det)

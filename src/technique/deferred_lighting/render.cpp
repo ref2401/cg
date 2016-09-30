@@ -5,6 +5,7 @@
 #include <memory>
 
 using cg::float3;
+using cg::mat3;
 using cg::mat4;
 using cg::uint2;
 using cg::put_in_column_major_order;
@@ -13,8 +14,11 @@ using cg::opengl::DE_indirect_params;
 using cg::opengl::DE_cmd;
 using cg::opengl::Invalid;
 using cg::opengl::Persistent_buffer;
+using cg::opengl::Sampler;
+using cg::opengl::Sampler_config;
 using cg::opengl::Shader_program;
 using cg::opengl::Static_buffer;
+using cg::opengl::Texture_format;
 using cg::opengl::Vertex_attrib_layout;
 using cg::opengl::set_uniform;
 using cg::opengl::set_uniform_array;
@@ -62,18 +66,21 @@ void Frame::clear() noexcept
 void Frame::push_back_renderable(const DE_cmd& cmd, const mat4& model_matrix)
 {
 	assert(cmd.vao_id() == _vao_id);
-	_renderable_objects.emplace_back(cmd, model_matrix);
+	_renderable_objects.emplace_back(cmd, model_matrix, static_cast<mat3>(model_matrix));
 }
 
 // ----- Renderer -----
 
-Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src)
-	: _vertex_attrib_layout(0, 1, 2, 3),
+Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src, const cg::data::Image_2d& diffuse_rgb) : 
+	_vertex_attrib_layout(0, 1, 2, 3),
 	_indirect_buffer(3, max_draw_call_count * sizeof(DE_indirect_params)),
 	_draw_index_buffer(make_draw_index_buffer(max_draw_call_count)),
 	_prog("test-shader", src),
 	_u_pv_matrix(_prog.get_uniform_location("u_projection_view_matrix")),
-	_u_model_matrix_array(_prog.get_uniform_location("u_model_matrix_array"))
+	_u_model_matrix_array(_prog.get_uniform_location("u_model_matrix_array")),
+	_u_normal_matrix_array(_prog.get_uniform_location("u_normal_matrix_array")),
+	_tex_diffuse_rgb(Texture_format::rgb_8, diffuse_rgb),
+	_sampler(Sampler_config())
 {
 	resize_viewport(viewport_size);
 }
@@ -88,11 +95,16 @@ void Renderer::render(const Frame& frame) noexcept
 	_sync_objects[_indirect_buffer.current_partition_index()] = nullptr;
 
 	static constexpr float clear_color[4] = { 0.5f, 0.5f, 0.55f, 1.f };
+	static constexpr float clear_depth = 1.f;
 	glClearBufferfv(GL_COLOR, 0, clear_color);
+	glEnable(GL_DEPTH_TEST);
+	glClearBufferfv(GL_DEPTH, 0, &clear_depth);
 
 	// material
 	glUseProgram(_prog.id());
 	set_uniform(_u_pv_matrix, frame.projection_matrix() * frame.view_matrix());
+	glBindSampler(0, _sampler.id());
+	glBindTextureUnit(0, _tex_diffuse_rgb.id());
 
 	// vertex format
 	glBindVertexArray(frame.vao_id());
@@ -103,13 +115,16 @@ void Renderer::render(const Frame& frame) noexcept
 	size_t offset_indirect = 0;
 	size_t offset_draw_index = 0;
 	_model_matrices.clear();
+	_normal_matrices.clear();
 	_model_matrices.reserve(draw_call_count);
+	_normal_matrices.reserve(draw_call_count);
 
 	for (size_t i = 0; i < draw_call_count; ++i) {
 		const auto& rnd_object = frame.renderable_objects()[i];
 
-		// put model matrix into uniform array buffer data.
+		// put model & normal matrices into uniform array buffer data.
 		_model_matrices.push_back(rnd_object.model_matrix);
+		_normal_matrices.push_back(rnd_object.normal_matrix);
 
 		// put cmd into the indirect buffer
 		auto params = rnd_object.cmd.get_indirect_params();
@@ -118,6 +133,7 @@ void Renderer::render(const Frame& frame) noexcept
 	}
 
 	set_uniform_array(_u_model_matrix_array, _model_matrices.data(), _model_matrices.size());
+	set_uniform_array(_u_normal_matrix_array, _normal_matrices.data(), _normal_matrices.size());
 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, draw_call_count, 0);
 
 	_sync_objects[_indirect_buffer.current_partition_index()] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);

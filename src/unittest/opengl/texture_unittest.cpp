@@ -10,7 +10,7 @@ using cg::data::Image_format;
 using cg::opengl::Mag_filter;
 using cg::opengl::Min_filter;
 using cg::opengl::Sampler_config;
-using cg::opengl::Texture_2d_sub_image;
+using cg::opengl::Texture_2d_sub_image_params;
 using cg::opengl::Texture_format;
 using cg::opengl::Wrap_mode;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -23,7 +23,7 @@ template<> inline std::wstring ToString<Image_format>(const Image_format& t) { R
 template<> inline std::wstring ToString<Mag_filter>(const Mag_filter& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Min_filter>(const Min_filter& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Sampler_config>(const Sampler_config& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<Texture_2d_sub_image>(const Texture_2d_sub_image& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Texture_2d_sub_image_params>(const Texture_2d_sub_image_params& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Texture_format>(const Texture_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_WIDE_STRING(t); }
 
@@ -81,13 +81,13 @@ public:
 	}
 };
 
-TEST_CLASS(cg_opengl_texture_Texture_2d_sub_image) {
+TEST_CLASS(cg_opengl_texture_Texture_2d_sub_image_params) {
 public:
 
 	TEST_METHOD(ctors)
 	{
 		float data[3];
-		Texture_2d_sub_image tex_img0(0, uint2::zero, uint2(8, 4), GL_RGB, GL_FLOAT, data);
+		Texture_2d_sub_image_params tex_img0(0, uint2::zero, uint2(8, 4), GL_RGB, GL_FLOAT, data);
 		Assert::AreEqual<size_t>(0, tex_img0.mipmap_index);
 		Assert::AreEqual(uint2::zero, tex_img0.offset);
 		Assert::AreEqual(uint2(8, 4), tex_img0.size);
@@ -96,7 +96,7 @@ public:
 		Assert::AreEqual<const void*>(data, tex_img0.pixels);
 
 		Image_2d img(uint2(4, 3), Image_format::bgra_8);
-		Texture_2d_sub_image tex_img1(1, uint2(1), img);
+		Texture_2d_sub_image_params tex_img1(1, uint2(1), img);
 		Assert::AreEqual<size_t>(1, tex_img1.mipmap_index);
 		Assert::AreEqual(uint2(1), tex_img1.offset);
 		Assert::AreEqual(uint2(4, 3), tex_img1.size);
@@ -109,16 +109,16 @@ public:
 	{
 		unsigned char data[3];
 		unsigned char data_other[3];
-		Texture_2d_sub_image sub_imt(0, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data);
+		Texture_2d_sub_image_params sub_imt(0, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data);
 
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(100, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(0, uint2(100), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(0, uint2(1), uint2(200), GL_RED, GL_UNSIGNED_INT, data));
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(0, uint2(1), uint2(2), GL_BGRA, GL_UNSIGNED_INT, data));
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(0, uint2(1), uint2(2), GL_RED, GL_FLOAT, data));
-		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image(1, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data_other));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(100, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(0, uint2(100), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(0, uint2(1), uint2(200), GL_RED, GL_UNSIGNED_INT, data));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(0, uint2(1), uint2(2), GL_BGRA, GL_UNSIGNED_INT, data));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(0, uint2(1), uint2(2), GL_RED, GL_FLOAT, data));
+		Assert::AreNotEqual(sub_imt, Texture_2d_sub_image_params(1, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data_other));
 
-		Assert::AreEqual(sub_imt, Texture_2d_sub_image(0, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
+		Assert::AreEqual(sub_imt, Texture_2d_sub_image_params(0, uint2(1), uint2(2), GL_RED, GL_UNSIGNED_INT, data));
 	}
 };
 
