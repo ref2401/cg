@@ -4,7 +4,7 @@ Deferred lighting is devided into three passes:
 input:
 	vertex_attribs: position, normal, tex_coord, tangent_h
 	model_matrix
-	normal_matrix
+	normal_matrix (normal, tangent, bitangent)
 	tex_normal_map_id (sRGB?)
 	tex_smoothness_id (sRGB?)
 

@@ -283,7 +283,7 @@ public:
 
 		Assert::IsTrue(exists(Filenames::empty_file));
 		Assert::IsTrue(exists(Filenames::ascii_single_line));
-		Assert::IsTrue(exists(Filenames::wavefront_triangle_p.c_str()));
+		Assert::IsTrue(exists(Filenames::wavefront_rect_positive_indices_p.c_str()));
 		Assert::IsFalse(exists(""));
 		Assert::IsFalse(exists("unknown_director/unknown_file.some_ext"));
 	}
@@ -396,10 +396,13 @@ public:
 		using cg::data::Vertex_attribs;
 		using cg::file::load_mesh_wavefront;
 
-		uint32_t expected_indices[3] = { 0, 1, 2 };
+		uint32_t expected_indices[6] = { 0, 1, 2, 3, 4, 5 };
 		{ // positions only
-			float expected_data[9] = { -1, 0, 1, 1, 0, 1, 1, 0, -1 };
-			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_p, Vertex_attribs::position);
+			float expected_data[18] = { 
+				-2, -1, 0,	 2, -1, 0,	2, 1, 0,
+				-2,	 1, 0,	-2, -1, 0,	2, 1, 0  
+			};
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_p, Vertex_attribs::position);
 
 			Assert::IsTrue(std::equal(
 				md.data().cbegin(), md.data().cend(),
@@ -411,13 +414,12 @@ public:
 		}
 
 		{ // positions & normals
-			float expected_data[18] = { 
-				-1, 0, 1, 0, 1, 0,
-				1, 0, 1, 0, 1, 0,
-				1, 0, -1, 0, 1, 0
+			float expected_data[36] = {
+				-2, -1, 0, 0, 0, 1,	 2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1,
+				-2,	 1, 0, 0, 0, 1,	-2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pn, 
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_pn,
 				Vertex_attribs::position | Vertex_attribs::normal);
 
 			Assert::IsTrue(std::equal(
@@ -430,13 +432,12 @@ public:
 		}
 
 		{ // positions & tex_coords
-			float expected_data[15] = {
-				-1, 0, 1, 0, 1,
-				1, 0, 1, 0, 0,
-				1, 0, -1, 1, 0
+			float expected_data[30] = {
+				-2, -1, 0, 1, 0,   2, -1, 0, 1, 1,  2, 1, 0, 0, 1,
+				-2,	 1, 0, 0, 0,  -2, -1, 0, 1, 0,  2, 1, 0, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_ptc, Vertex_attribs::mesh_textured);
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_ptc, Vertex_attribs::mesh_textured);
 
 			Assert::IsTrue(std::equal(
 				md.data().cbegin(), md.data().cend(),
@@ -448,13 +449,12 @@ public:
 		}
 
 		{ // positions, normal & tex_coords
-			float expected_data[24] = {
-				-1, 0, 1,  0, 1, 0,  0, 1,
-				1, 0, 1,  0, 1, 0,  0, 0,
-				1, 0, -1,  0, 1, 0,  1, 0
+			float expected_data[48] = {
+				-2, -1, 0, 0, 0, 1, 1, 0,   2, -1, 0, 0, 0, 1, 1, 1,  2, 1, 0, 0, 0, 1, 0, 1,
+				-2,	 1, 0, 0, 0, 1, 0, 0,  -2, -1, 0, 0, 0, 1, 1, 0,  2, 1, 0, 0, 0, 1, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pntc, 
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_pntc,
 				Vertex_attribs::mesh_textured | Vertex_attribs::normal);
 
 			Assert::IsTrue(std::equal(
@@ -467,13 +467,12 @@ public:
 		}
 
 		{ // positions, normal, tex_coords, tangent_h
-			float expected_data[36] = {
-				-1, 0, 1,  0, 1, 0,  0, 1,  0, 0, -1, 1,
-				1, 0, 1,  0, 1, 0,  0, 0,  0, 0, -1, 1,
-				1, 0, -1,  0, 1, 0,  1, 0,  0, 0, -1, 1
+			float expected_data[72] = {
+				-2, -1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 1,   2, -1, 0, 0, 0, 1, 1, 1, 0, -1, 0, 1,  2, 1, 0, 0, 0, 1, 0, 1, 0, -1, 0, 1,
+				-2,	 1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1,  -2, -1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 1,  2, 1, 0, 0, 0, 1, 0, 1, 0, -1, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_triangle_pntc, Vertex_attribs::mesh_tangent_h);
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_pntc, Vertex_attribs::mesh_tangent_h);
 
 			Assert::IsTrue(std::equal(
 				md.data().cbegin(), md.data().cend(),

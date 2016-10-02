@@ -12,9 +12,10 @@ const std::string Filenames::tga_gayscale_r_compressed_rect_3x2("../data/unittes
 const std::string Filenames::tga_grayscale_r_square_2x2("../data/unittest/tga_grayscale_r_square_2x2.tga");
 const std::string Filenames::tga_true_color_rgb_compressed_rect_3x2("../data/unittest/tga_true_color_rgb_compressed_rect_3x2.tga");
 const std::string Filenames::tga_true_color_rgb_square_2x2("../data/unittest/tga_true_color_rgb_square_2x2.tga");
-const std::string Filenames::wavefront_triangle_p("../data/unittest/wavefront_triangle_p.obj");
-const std::string Filenames::wavefront_triangle_pn("../data/unittest/wavefront_triangle_pn.obj");
-const std::string Filenames::wavefront_triangle_ptc("../data/unittest/wavefront_triangle_ptc.obj");
-const std::string Filenames::wavefront_triangle_pntc("../data/unittest/wavefront_triangle_pntc.obj");
+
+const std::string Filenames::wavefront_rect_positive_indices_p("../data/unittest/wavefront_rect_positive_indices_p.obj");
+const std::string Filenames::wavefront_rect_positive_indices_pn("../data/unittest/wavefront_rect_positive_indices_pn.obj");
+const std::string Filenames::wavefront_rect_positive_indices_pntc("../data/unittest/wavefront_rect_positive_indices_pntc.obj");
+const std::string Filenames::wavefront_rect_positive_indices_ptc("../data/unittest/wavefront_rect_positive_indices_ptc.obj");
 
 } // namespace unittest

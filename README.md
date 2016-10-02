@@ -13,6 +13,6 @@ Later I would like to do the same using DirectX 11
 3. anisotropic brdf
 4. point sprites
 5. wavefront loading
-- negative face indices
+- shared vertices
 - several models (objects) in a single .obj file
 
