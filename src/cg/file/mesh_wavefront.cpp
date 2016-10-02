@@ -87,9 +87,9 @@ Wf_mesh_data::Wf_mesh_data()
 // In this case normalized index is max_count - wavefront index.
 inline void normalize_wf_indices(long long max_count, long long& i0, long long& i1, long long& i2) noexcept
 {
-	i0 = (i0 > 0) ? (i0 - 1) : (max_count - i0);
-	i1 = (i1 > 0) ? (i1 - 1) : (max_count - i1);
-	i2 = (i2 > 0) ? (i2 - 1) : (max_count - i2);
+	i0 = (i0 > 0) ? (i0 - 1) : (max_count + i0);
+	i1 = (i1 > 0) ? (i1 - 1) : (max_count + i1);
+	i2 = (i2 > 0) ? (i2 - 1) : (max_count + i2);
 
 	assert(0 <= i0 && i0 <= std::numeric_limits<size_t>::max());
 	assert(0 <= i1 && i1 <= std::numeric_limits<size_t>::max());

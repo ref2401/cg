@@ -24,6 +24,10 @@ public:
 	static const std::string tga_grayscale_r_square_2x2;
 	static const std::string tga_true_color_rgb_compressed_rect_3x2;
 	static const std::string tga_true_color_rgb_square_2x2;
+	static const std::string wavefront_rect_negative_indices_p;
+	static const std::string wavefront_rect_negative_indices_pn;
+	static const std::string wavefront_rect_negative_indices_pntc;
+	static const std::string wavefront_rect_negative_indices_ptc;
 	static const std::string wavefront_rect_positive_indices_p;
 	static const std::string wavefront_rect_positive_indices_pn;
 	static const std::string wavefront_rect_positive_indices_pntc;
