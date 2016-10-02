@@ -10,10 +10,6 @@
 
 namespace deferred_lighting {
 
-// ...
-// Deferred_lighting renderer (embedded) uses persistent mapped buffer technique
-// for multi-indirect rendering and gl_DrawID simulation. Indirect buffer and draw index buffer use
-// tripple buffering technique to metigate synchronization with OpenGL command queue.
 class Deferred_lighting final : public cg::sys::IGame {
 public:
 

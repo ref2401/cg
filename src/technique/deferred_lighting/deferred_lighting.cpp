@@ -5,6 +5,7 @@
 #include "cg/file/file.h"
 
 using cg::float3;
+using cg::mat3;
 using cg::mat4;
 using cg::uint2;
 

@@ -389,7 +389,7 @@ public:
 		}
 	}
 
-	TEST_METHOD(load_mesh_triangle)
+	TEST_METHOD(load_mesh_wavefront_triangle_positive_vertex_indices)
 	{
 		using cg::approx_equal;
 		using cg::data::Interleaved_mesh_data;
