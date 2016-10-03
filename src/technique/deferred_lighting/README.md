@@ -8,8 +8,7 @@ input:
 	tex_normal_map_id (sRGB?)
 	tex_smoothness_id (sRGB?)
 
-- buddha mesh
-
+- detach shader
 
 2. Lighting_pass
 	- depth_unchanged gl_FragDepth

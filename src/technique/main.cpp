@@ -13,10 +13,6 @@ using cg::sys::make_win32_application;
 
 int main(int argc, char* argv[])
 {
-	auto imd = cg::file::load_mesh_wavefront(
-		"../data/unittest/wavefront_rect_negative_indices_p.obj",
-		cg::data::Vertex_attribs::position);
-
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);
 	auto app = make_win32_application(wnd_position, wnd_size);

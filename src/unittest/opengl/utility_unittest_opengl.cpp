@@ -10,6 +10,25 @@ namespace unittest {
 TEST_CLASS(cg_opengl_utility_Funcs) {
 public:
 
+	TEST_METHOD(is_valid_color_attachment)
+	{
+		using cg::opengl::is_valid_color_attachment;
+
+		Assert::IsTrue(is_valid_color_attachment(GL_NONE));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT0));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT1));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT2));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT3));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT4));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT5));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT6));
+		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT7));
+
+		Assert::IsFalse(is_valid_color_attachment(GL_RGB));
+		Assert::IsFalse(is_valid_color_attachment(GL_TEXTURE0));
+		Assert::IsFalse(is_valid_color_attachment(GL_TEXTURE_2D));
+	}
+
 	TEST_METHOD(is_valid_texture_sub_image_format)
 	{
 		using cg::opengl::is_valid_texture_sub_image_format;

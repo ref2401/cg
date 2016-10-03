@@ -2,6 +2,7 @@
 #define CG_OPENGL_OPENGL_H_
 
 #include "cg/opengl/buffer.h"
+#include "cg/opengl/framebuffer.h"
 #include "cg/opengl/opengl_def.h"
 #include "cg/opengl/shader.h"
 #include "cg/opengl/texture.h"

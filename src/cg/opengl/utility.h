@@ -13,6 +13,7 @@ class Invalid final {
 public:
 
 	static constexpr GLuint buffer_id = 0;
+	static constexpr GLuint framebuffer_id = 0;
 	static constexpr GLuint sampler_id = 0;
 	static constexpr GLuint shader_id = 0;
 	static constexpr GLuint shader_program_id = 0;
@@ -22,7 +23,21 @@ public:
 	static constexpr GLint vertex_attrib_location = -1;
 };
 
-// Validate glTextureSubImage format argument value.
+// Validate glFramebufferTexture{1/2/3D}, glNamedFramebufferTexture 'attachment' argument value.
+constexpr bool is_valid_color_attachment(const GLenum& v) noexcept
+{
+	return (v == GL_NONE)
+		|| (v == GL_COLOR_ATTACHMENT0)
+		|| (v == GL_COLOR_ATTACHMENT1)
+		|| (v == GL_COLOR_ATTACHMENT2)
+		|| (v == GL_COLOR_ATTACHMENT3)
+		|| (v == GL_COLOR_ATTACHMENT4)
+		|| (v == GL_COLOR_ATTACHMENT5)
+		|| (v == GL_COLOR_ATTACHMENT6)
+		|| (v == GL_COLOR_ATTACHMENT7);
+}
+
+// Validate glTextureSubImage 'format' argument value.
 constexpr bool is_valid_texture_sub_image_format(const GLenum& v) noexcept
 {
 	return (v == GL_RED)
@@ -35,7 +50,7 @@ constexpr bool is_valid_texture_sub_image_format(const GLenum& v) noexcept
 		|| (v == GL_STENCIL_INDEX);
 }
 
-// Validate glTextureSubImage type argument value.
+// Validate glTextureSubImage 'type' argument value.
 constexpr bool is_valid_texture_sub_image_type(const GLenum& v) noexcept
 {
 	return (v == GL_UNSIGNED_BYTE)

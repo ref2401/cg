@@ -17,7 +17,9 @@ using cg::opengl::Texture_format;
 
 namespace deferred_lighting {
 
-Deferred_lighting::Deferred_lighting(uint2 window_size)
+Deferred_lighting::Deferred_lighting(uint2 window_size) :
+	_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50)),
+	_view_matrix(cg::view_matrix(float3(0, 0, 5), float3::zero))
 {
 	using cg::from_axis_angle_rotation;
 	using cg::megabytes;
@@ -31,39 +33,31 @@ Deferred_lighting::Deferred_lighting(uint2 window_size)
 
 	// scene
 	// materials
-	auto wall_img = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
-	_tex_brick_wall_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wall_img);
-	auto wood_img = cg::file::load_image_tga("../data/wood-diffuse.tga");
-	_tex_wood_fence_diffuse_rgb = Texture_2d(Texture_format::rgb_8, wood_img);
-	// square geometry
+
+	// cube geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
-	auto mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", vertex_attribs);
+	auto mesh_data = cg::file::load_mesh_wavefront("../data/cube.obj", vertex_attribs);
 	_vs_builder.begin(vertex_attribs, megabytes(4));
 	DE_cmd cmd = _vs_builder.push_back(mesh_data);
 	// ... load other geometry ...
-	_vertex_spec = _vs_builder.end(_renderer->vertex_attrib_layout());
-	_renderer->register_vao(_vertex_spec->vao_id(), _vertex_spec->vertex_buffer_binding_index() + 1);
+	_vertex_spec0 = _vs_builder.end(_renderer->vertex_attrib_layout());
+	_renderer->register_vao(_vertex_spec0->vao_id(), _vertex_spec0->vertex_buffer_binding_index() + 1);
 
-	_frame = std::make_unique<Frame>(cmd.vao_id());
-	_frame->set_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50));
-	_frame->set_view_matrix(cg::view_matrix(float3(0, 0, 2), float3::zero));
-	
-	// put square three times as different models into the frame
-	_frame->push_back_renderable(cmd, 
-		tr_matrix(float3(-0.2f, -0.2f, 0), from_axis_angle_rotation(float3::unit_y, cg::pi_4)),
-		_tex_wood_fence_diffuse_rgb.id());
-
-	_frame->push_back_renderable(cmd, 
-		tr_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, -cg::pi_8)),
-		_tex_brick_wall_diffuse_rgb.id());
-	
-	_frame->push_back_renderable(cmd, translation_matrix(float3(0.2f, 0.2f, 0)),
-		_tex_brick_wall_diffuse_rgb.id());
 }
 
 void Deferred_lighting::render(float blend_state) 
 {
-	_renderer->render(*_frame.get());
+	_frame.begin();
+
+	_frame.set_projection_matrix(_projection_matrix);
+	_frame.set_view_matrix(_view_matrix);
+
+	// populate the frame here...
+	//_frame->push_back_renderable(cmd, 
+	//	trs_matrix(float3(-0.2f, -0.2f, 0), from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)));
+	_frame.end();
+	
+	_renderer->render(_frame);
 }
 
 } // namespace deferred_lighting

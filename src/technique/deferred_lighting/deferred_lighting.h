@@ -5,6 +5,7 @@
 #include "cg/math/math.h"
 #include "cg/opengl/opengl.h"
 #include "cg/sys/app.h"
+#include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render.h"
 
 
@@ -25,15 +26,15 @@ public:
 	void update(float dt) override {}
 
 private:
-	// scene
+	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
-	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec;
-	// scene.textures
-	cg::opengl::Texture_2d _tex_brick_wall_diffuse_rgb;
-	cg::opengl::Texture_2d _tex_wood_fence_diffuse_rgb;
+	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec0;
 	// renderer stuff
 	std::unique_ptr<Renderer> _renderer;
-	std::unique_ptr<Frame> _frame;
+	// scene
+	Frame _frame;
+	cg::mat4 _projection_matrix;
+	cg::mat4 _view_matrix;
 };
 
 } // namespace deferred_lighting

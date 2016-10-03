@@ -43,6 +43,9 @@
     <ClCompile Include="opengl\texture.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
+    <ClCompile Include="opengl\framebuffer.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -135,6 +138,9 @@
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="opengl\texture.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\framebuffer.h">
       <Filter>opengl</Filter>
     </ClInclude>
   </ItemGroup>

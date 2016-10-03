@@ -103,7 +103,10 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 		glAttachShader(_id, vertex_shader.id());
 		glAttachShader(_id, pixel_shader.id());
 		glLinkProgram(_id); 
+		
 		// once shaders have been linked into a program they are no longer needed.
+		glDetachShader(_id, vertex_shader.id());
+		glDetachShader(_id, pixel_shader.id());
 	}
 	catch (...) {
 		std::string exc_msg = concat(EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program."));

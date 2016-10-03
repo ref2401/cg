@@ -8,6 +8,9 @@
     <ClCompile Include="deferred_lighting\render.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
+    <ClCompile Include="deferred_lighting\frame.cpp">
+      <Filter>deferred_lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
@@ -19,6 +22,9 @@
       <Filter>deferred_lighting</Filter>
     </ClInclude>
     <ClInclude Include="deferred_lighting\render.h">
+      <Filter>deferred_lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\frame.h">
       <Filter>deferred_lighting</Filter>
     </ClInclude>
   </ItemGroup>

@@ -49,113 +49,58 @@ Static_buffer make_draw_index_buffer(size_t draw_call_count)
 
 namespace deferred_lighting {
 
-// ----- Frame -----
+// ----- Gbuffer -----
 
-Frame::Frame(GLuint vao_id)
-:	_vao_id(vao_id)
+Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
+	_max_tex_unit_count(get_max_texture_unit_count())
 {
-	_renderable_objects.reserve(16);
+	resize(viewport_size);
 }
 
-Frame::Frame(Frame&& frame) noexcept
-	: _renderable_objects(std::move(frame._renderable_objects))
-{}
-
-Frame& Frame::operator=(Frame&& frame) noexcept
+void Gbuffer::resize(uint2 viewport_size) noexcept
 {
-	_renderable_objects = std::move(frame._renderable_objects);
-	return *this;
+	_pixel_size = viewport_size;
+	_tex_depth_map = Texture_2d(Texture_format::depth_32, viewport_size);
+	_tex_normal_smoothness = Texture_2d(Texture_format::rgba_32f, viewport_size);
 }
 
-void Frame::clear() noexcept
-{
-	_renderable_objects.clear();
-	_projection_matrix = mat4::identity;
-	_view_matrix = mat4::identity;
-}
+// ----- Gbuffer_pass -----
 
-void Frame::push_back_renderable(const DE_cmd& cmd, const mat4& model_matrix, GLuint tex_diffuse_rgb_id)
+Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer) noexcept :
+	_gbuffer(gbuffer)
 {
-	assert(cmd.vao_id() == _vao_id);
-	assert(tex_diffuse_rgb_id != Invalid::texture_id);
-
-	_renderable_objects.emplace_back(cmd, model_matrix, 
-		static_cast<mat3>(model_matrix), tex_diffuse_rgb_id);
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_normal_smoothness());
+	_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.set_read_buffer(GL_NONE);
+	_fbo.validate();
 }
 
 // ----- Renderer -----
 
-Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src) : 
-	max_texture_unit_count(get_max_texture_unit_count()),
+Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src) :
 	_vertex_attrib_layout(0, 1, 2, 3),
-	_indirect_buffer(3, max_texture_unit_count * sizeof(DE_indirect_params)),
-	_draw_index_buffer(make_draw_index_buffer(max_texture_unit_count)),
-	_texture_units(max_texture_unit_count),
-	_prog("test-shader", src),
-	_u_pv_matrix(_prog.get_uniform_location("u_projection_view_matrix")),
-	_u_model_matrix_array(_prog.get_uniform_location("u_model_matrix_array")),
-	_u_normal_matrix_array(_prog.get_uniform_location("u_normal_matrix_array")),
-	_u_tex_diffuse_rgb_array(_prog.get_uniform_location("u_tex_diffuse_rgb_array")),
-	_sampler(Sampler_config())
+	_gbuffer(viewport_size),
+	_gbuffer_pass(_gbuffer),
+	_indirect_buffer(3, _gbuffer.max_tex_unit_count() * sizeof(DE_indirect_params)),
+	_draw_index_buffer(make_draw_index_buffer(_gbuffer.max_tex_unit_count()))
 {
-	std::iota(_texture_units.begin(), _texture_units.end(), 0);
-	resize_viewport(viewport_size);
 }
 
 void Renderer::render(const Frame& frame) noexcept
 {
-	assert(frame.renderable_objects().size() <= 512); // use uniform blocks for renderable list that is greater than 512.
-
 	GLsync sync_obj = _sync_objects[_indirect_buffer.current_partition_index()];
 	wait_for(sync_obj);
 	glDeleteSync(sync_obj);
 	_sync_objects[_indirect_buffer.current_partition_index()] = nullptr;
 
 	static constexpr float clear_color[4] = { 0.5f, 0.5f, 0.55f, 1.f };
-	static constexpr float clear_depth = 1.f;
 	glClearBufferfv(GL_COLOR, 0, clear_color);
-	glEnable(GL_DEPTH_TEST);
-	glClearBufferfv(GL_DEPTH, 0, &clear_depth);
 
-	// material
-	glUseProgram(_prog.id());
-	set_uniform(_u_pv_matrix, frame.projection_matrix() * frame.view_matrix());
-
-	// vertex format
-	glBindVertexArray(frame.vao_id());
-
-	// renderable
-	const size_t draw_call_count = frame.renderable_objects().size();
-	assert(draw_call_count <= max_texture_unit_count);
-	assert(draw_call_count <= Renderer::max_draw_call_count);
-	size_t offset_indirect = 0;
-	size_t offset_draw_index = 0;
-	_model_matrices.clear();
-	_normal_matrices.clear();
-	_model_matrices.reserve(draw_call_count);
-	_normal_matrices.reserve(draw_call_count);
-
-	for (size_t i = 0; i < draw_call_count; ++i) {
-		const auto& rnd_object = frame.renderable_objects()[i];
-
-		// put model & normal matrices into uniform array buffer.
-		_model_matrices.push_back(rnd_object.model_matrix);
-		_normal_matrices.push_back(rnd_object.normal_matrix);
-
-		// put diffuse textures into uniform array buffer.
-		glBindSampler(i, _sampler.id());
-		glBindTextureUnit(i, rnd_object.tex_diffuse_rgb_id);
-
-		// put cmd into the indirect buffer
-		auto params = rnd_object.cmd.get_indirect_params();
-		params.base_instance = i; // base index is required to calculate an index to draw_index_buffer
-		offset_indirect = _indirect_buffer.write(offset_indirect, &params);
-	}
-
-	set_uniform_array(_u_model_matrix_array, _model_matrices.data(), _model_matrices.size());
-	set_uniform_array(_u_normal_matrix_array, _normal_matrices.data(), _normal_matrices.size());
-	set_uniform_array(_u_tex_diffuse_rgb_array, _texture_units.data(), _texture_units.size());
-	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, draw_call_count, 0);
+	// bind vao, 
+	// for each Rnd_obj until vao_id has not changed do:
+	// current_pass.batch_size() - how many object may be in one indirect call for the current pass.
+	// populate indirect buffer
 
 	_sync_objects[_indirect_buffer.current_partition_index()] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	_indirect_buffer.move_next_partition();
@@ -184,7 +129,10 @@ void Renderer::register_vao(GLuint vao_id, GLuint draw_index_binding_index) noex
 
 void Renderer::resize_viewport(uint2 size) noexcept
 {
+	assert(cg::greater_than(size, 0));
+
 	glViewport(0, 0, size.width, size.height);
+	_gbuffer.resize(size);
 }
 
 } // namespace deferred_lighting

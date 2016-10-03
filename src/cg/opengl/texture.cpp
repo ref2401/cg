@@ -92,6 +92,14 @@ Texture_2d_sub_image_params::Texture_2d_sub_image_params(size_t mipmap_index, cg
 
 // ----- Texture_2d -----
 
+Texture_2d::Texture_2d(Texture_format format, uint2 size, size_t mipmap_count) noexcept
+{
+	assert(greater_than(size, 0));
+	assert(mipmap_count > 0);
+	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+	glTextureStorage2D(_id, mipmap_count, get_texture_internal_format(format), size.width, size.height);
+}
+
 Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept :
 	_format(format)
 {

@@ -132,6 +132,7 @@
     <ClCompile Include="file\mesh_wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
     <ClCompile Include="opengl\buffer.cpp" />
+    <ClCompile Include="opengl\framebuffer.cpp" />
     <ClCompile Include="opengl\texture.cpp" />
     <ClCompile Include="opengl\utility.cpp" />
     <ClCompile Include="opengl\opengl_def.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="math\utility.h" />
     <ClInclude Include="math\float3.h" />
     <ClInclude Include="opengl\buffer.h" />
+    <ClInclude Include="opengl\framebuffer.h" />
     <ClInclude Include="opengl\glcorearb.h" />
     <ClInclude Include="opengl\opengl.h" />
     <ClInclude Include="opengl\opengl_def.h" />
