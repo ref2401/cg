@@ -11,6 +11,14 @@
 
 namespace deferred_lighting {
 
+struct Renderable final {
+
+	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix) noexcept;
+
+	cg::opengl::DE_cmd cmd;
+	cg::mat4 model_matrix;
+};
+
 class Deferred_lighting final : public cg::sys::IGame {
 public:
 
@@ -32,6 +40,7 @@ private:
 	// renderer stuff
 	std::unique_ptr<Renderer> _renderer;
 	// scene
+	std::vector<Renderable> _rednerable_objects;
 	Frame _frame;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;

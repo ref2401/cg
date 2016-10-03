@@ -6,6 +6,7 @@
 using cg::float3;
 using cg::mat3;
 using cg::mat4;
+using cg::put_in_column_major_order;
 using cg::opengl::DE_indirect_params;
 using cg::opengl::DE_cmd;
 using cg::opengl::Invalid;
@@ -16,7 +17,7 @@ namespace deferred_lighting {
 // ----- Rnd_obj -----
 
 Rnd_obj::Rnd_obj(GLuint vao_id, const cg::opengl::DE_indirect_params& de_indirect_params,
-	const cg::mat4& model_matrix, const cg::mat3& normal_matrix) noexcept :
+	const std::array<float, 16>& model_matrix, const std::array<float, 9>& normal_matix) noexcept :
 	vao_id(vao_id),
 	de_indirect_params(de_indirect_params),
 	model_matrix(model_matrix),
@@ -47,7 +48,14 @@ void Frame::end()
 
 void Frame::push_back_renderable(const DE_cmd& cmd, const mat4& model_matrix)
 {
-	//_rnd_objects.emplace_back(cmd, model_matrix, static_cast<mat3>(model_matrix));
+	std::array<float, 16> model_matrix_arr;
+	std::array<float, 9> normal_matrix_arr;
+
+	put_in_column_major_order(model_matrix, model_matrix_arr.data());
+	put_in_column_major_order(static_cast<mat3>(model_matrix), normal_matrix_arr.data());
+
+	_rnd_objects.emplace_back(cmd.vao_id(), cmd.get_indirect_params(), 
+		model_matrix_arr, normal_matrix_arr);
 }
 
 

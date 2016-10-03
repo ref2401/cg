@@ -59,14 +59,15 @@ Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
 
 void Gbuffer::resize(uint2 viewport_size) noexcept
 {
-	_pixel_size = viewport_size;
+	_viewport_size = viewport_size;
 	_tex_depth_map = Texture_2d(Texture_format::depth_32, viewport_size);
 	_tex_normal_smoothness = Texture_2d(Texture_format::rgba_32f, viewport_size);
 }
 
 // ----- Gbuffer_pass -----
 
-Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer) noexcept :
+Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code) :
+	_prog(source_code),
 	_gbuffer(gbuffer)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_normal_smoothness());
@@ -76,15 +77,46 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer) noexcept :
 	_fbo.validate();
 }
 
+void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
+{
+	glEnable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
+	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+
+	glClearBufferfv(GL_COLOR, 0, _clear_value_normal_smoothness);
+	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth_map);
+
+	_prog.use(projection_matrix, view_matrix);
+}
+
+void Gbuffer_pass::end() noexcept
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+}
+
+// ----- Renderer_config -----
+
+Renderer_config::Renderer_config(cg::uint2 viewport_size, 
+	const cg::data::Shader_program_source_code& gbuffer_pass_code) noexcept :
+	viewport_size(viewport_size),
+	gbuffer_pass_code(gbuffer_pass_code)
+{
+	assert(greater_than(viewport_size, 0));
+	assert(gbuffer_pass_code.vertex_source.size() > 0);
+	assert(gbuffer_pass_code.pixel_source.size() > 0);
+}
+
 // ----- Renderer -----
 
-Renderer::Renderer(uint2 viewport_size, const Shader_program_source_code& src) :
+Renderer::Renderer(const Renderer_config& config) :
 	_vertex_attrib_layout(0, 1, 2, 3),
-	_gbuffer(viewport_size),
-	_gbuffer_pass(_gbuffer),
+	_gbuffer(config.viewport_size),
+	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
 	_indirect_buffer(3, _gbuffer.max_tex_unit_count() * sizeof(DE_indirect_params)),
 	_draw_index_buffer(make_draw_index_buffer(_gbuffer.max_tex_unit_count()))
 {
+	size_t max_draw_call_count = _gbuffer_pass.batch_size();
+	_model_matrix_uniform_data.reserve(max_draw_call_count * 16);
 }
 
 void Renderer::render(const Frame& frame) noexcept
@@ -94,9 +126,22 @@ void Renderer::render(const Frame& frame) noexcept
 	glDeleteSync(sync_obj);
 	_sync_objects[_indirect_buffer.current_partition_index()] = nullptr;
 
-	static constexpr float clear_color[4] = { 0.5f, 0.5f, 0.55f, 1.f };
-	glClearBufferfv(GL_COLOR, 0, clear_color);
+	// Gbuffer_pass
+	_gbuffer_pass.begin(frame.projection_matrix(), frame.view_matrix());
 
+	// batch_size, different vao id
+
+	//GLuint curr_vao_id = Invalid::vao_id;
+	//_model_matrix_uniform_data.clear();
+
+	//for (const auto& rnd : frame.rnd_objects()) {
+		//glBindVertexArray(rnd.vao_id);
+		//_model_matrix_uniform_data.push_back(rnd.model_matrix);
+	//}
+
+	_gbuffer_pass.end();
+	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
+	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
 	// bind vao, 
 	// for each Rnd_obj until vao_id has not changed do:
 	// current_pass.batch_size() - how many object may be in one indirect call for the current pass.

@@ -9,6 +9,7 @@
 #include "cg/data/shader.h"
 #include "cg/opengl/opengl.h"
 #include "technique/deferred_lighting/frame.h"
+#include "technique/deferred_lighting/render_pass_shader.h"
 
 
 namespace deferred_lighting {
@@ -31,12 +32,6 @@ public:
 		return _max_tex_unit_count;
 	}
 
-	// The current size of all the render target textures.
-	const cg::uint2& pixel_size() const noexcept
-	{
-		return _pixel_size;
-	}
-
 	// Resizes all the render target textures.
 	void resize(cg::uint2 viewport_size) noexcept;
 
@@ -52,17 +47,23 @@ public:
 		return _tex_normal_smoothness;
 	}
 
+	// The current size of all the render target textures.
+	const cg::uint2& viewport_size() const noexcept
+	{
+		return _viewport_size;
+	}
+
 private:
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
-	cg::uint2 _pixel_size;
+	cg::uint2 _viewport_size;
 	const size_t _max_tex_unit_count;
 };
 
 class Gbuffer_pass final {
 public:
 
-	Gbuffer_pass(Gbuffer& gbuffer) noexcept;
+	Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code);
 
 	Gbuffer_pass(const Gbuffer_pass& pass) = delete;
 
@@ -70,20 +71,45 @@ public:
 
 	~Gbuffer_pass() noexcept = default;
 
+
+	// Perform various preparations before rendering using this pass.
+	void begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+
+	// Clear renderer states after rendring using this pass.
+	void end() noexcept;
+
+	// How many draw indirect commands can be performed in one multi-draw indirect call.
+	size_t batch_size() const noexcept
+	{
+		return _batch_size;
+	}
+
 private:
+	const size_t _batch_size = 62; // see gbuffer_pass.vertex.glsl
+	float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
+	float _clear_value_depth_map = 1.f;
 	cg::opengl::Framebuffer _fbo;
+	Gbuffer_pass_shader_program _prog;
 	Gbuffer& _gbuffer;
-	
+};
+
+struct Renderer_config final {
+	Renderer_config(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& gbuffer_pass_code) noexcept;
+
+	cg::uint2 viewport_size;
+	cg::data::Shader_program_source_code gbuffer_pass_code;
 };
 
 class Renderer final {
 public:
 
-	Renderer(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& src);
+	Renderer(const Renderer_config& config);
 
 	Renderer(const Renderer& rnd) = delete;
 
 	Renderer(Renderer&& rnd) noexcept = delete;
+
+	~Renderer() noexcept = default;
 
 
 	// The method adds additional bindings to the specified vao object hence makeing it sutable for rendering.
@@ -108,8 +134,7 @@ private:
 	// indirect rendering gears
 	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _indirect_buffer;
 	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
-	std::vector<cg::mat4> _model_matrices;
-	std::vector<cg::mat3> _normal_matrices;
+	std::vector<float> _model_matrix_uniform_data;
 	std::array<GLsync, 3> _sync_objects;
 };
 

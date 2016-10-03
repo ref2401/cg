@@ -132,6 +132,7 @@
     <ClCompile Include="deferred_lighting\deferred_lighting.cpp" />
     <ClCompile Include="deferred_lighting\frame.cpp" />
     <ClCompile Include="deferred_lighting\render.cpp" />
+    <ClCompile Include="deferred_lighting\render_pass_shader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +144,7 @@
     <ClInclude Include="deferred_lighting\deferred_lighting.h" />
     <ClInclude Include="deferred_lighting\frame.h" />
     <ClInclude Include="deferred_lighting\render.h" />
+    <ClInclude Include="deferred_lighting\render_pass_shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

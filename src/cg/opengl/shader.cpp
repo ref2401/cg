@@ -294,6 +294,16 @@ Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
 // ----- funcs -----
 
 template<>
+void set_uniform<cg::mat3>(GLint location, const cg::mat3& mat) noexcept
+{
+	assert(location != Invalid::uniform_location);
+
+	float arr[9];
+	cg::put_in_column_major_order(mat, arr);
+	glUniformMatrix3fv(location, 1, false, arr);
+}
+
+template<>
 void set_uniform<cg::mat4>(GLint location, const cg::mat4& mat) noexcept
 {
 	assert(location != Invalid::uniform_location);
@@ -310,6 +320,15 @@ void set_uniform_array<GLint>(GLint location, const GLint* ptr, size_t count) no
 	assert(count > 0);
 
 	glUniform1iv(location, count, ptr);
+}
+
+template<>
+void set_uniform_array<float>(GLint location, const float* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniform1fv(location, count, ptr);
 }
 
 template<>
