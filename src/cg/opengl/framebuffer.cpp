@@ -41,7 +41,7 @@ Framebuffer::Framebuffer() noexcept
 }
 
 Framebuffer::Framebuffer(Framebuffer&& fb) noexcept :
-	_id(fb._id)
+_id(fb._id)
 {
 	fb._id = Invalid::framebuffer_id;
 }
@@ -66,7 +66,7 @@ void Framebuffer::attach_color_texture(GLenum color_attachment, const
 	Texture_2d& texture, size_t mipmap_index) noexcept
 {
 	assert(_id != Invalid::framebuffer_id);
-	assert(is_valid_color_attachment(color_attachment));
+	assert(is_valid_color_attachment(color_attachment) && color_attachment != GL_NONE);
 	assert(texture.id() != Invalid::texture_id);
 
 	glNamedFramebufferTexture(_id, color_attachment, texture.id(), mipmap_index);
@@ -78,6 +78,17 @@ void Framebuffer::attach_depth_texture(const Texture_2d& texture, size_t mipmap_
 	assert(texture.id() != Invalid::texture_id);
 
 	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, texture.id(), mipmap_index);
+}
+
+void Framebuffer::detach_color_texture(GLenum color_attachment) noexcept
+{
+	assert(is_valid_color_attachment(color_attachment) && color_attachment != GL_NONE);
+	glNamedFramebufferTexture(_id, color_attachment, Invalid::texture_id, 0);
+}
+
+void Framebuffer::detach_depth_texture() noexcept
+{
+	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, Invalid::texture_id, 0);
 }
 
 void Framebuffer::dispose() noexcept

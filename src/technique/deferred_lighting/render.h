@@ -26,12 +26,6 @@ public:
 	~Gbuffer() noexcept = default;
 
 
-	// Maximum supported texture unites that can be used to access texture object from vertex/fragment shaders.
-	size_t max_tex_unit_count() const noexcept
-	{
-		return _max_tex_unit_count;
-	}
-
 	// Resizes all the render target textures.
 	void resize(cg::uint2 viewport_size) noexcept;
 
@@ -57,7 +51,6 @@ private:
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::uint2 _viewport_size;
-	const size_t _max_tex_unit_count;
 };
 
 class Gbuffer_pass final {
@@ -78,14 +71,11 @@ public:
 	// Clear renderer states after rendring using this pass.
 	void end() noexcept;
 
-	// How many draw indirect commands can be performed in one multi-draw indirect call.
-	size_t batch_size() const noexcept
-	{
-		return _batch_size;
-	}
+	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count, 
+		const std::vector<float>& uniform_array_model_matrix) noexcept;
 
 private:
-	const size_t _batch_size = 62; // see gbuffer_pass.vertex.glsl
+	
 	float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
 	float _clear_value_depth_map = 1.f;
 	cg::opengl::Framebuffer _fbo;
@@ -112,11 +102,6 @@ public:
 	~Renderer() noexcept = default;
 
 
-	// The method adds additional bindings to the specified vao object hence makeing it sutable for rendering.
-	// Each vao that is goint to be rendered by this renderer has to be registered.
-	// Side effect: before method returns it resets vertex array binding to zero.
-	void register_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept;
-
 	void render(const Frame& frame) noexcept;
 
 	void resize_viewport(cg::uint2 size) noexcept;
@@ -128,14 +113,13 @@ public:
 
 
 private:
+
+	void perform_gbuffer_pass(const Frame& frame) noexcept;
+
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
-	// indirect rendering gears
-	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _indirect_buffer;
-	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
-	std::vector<float> _model_matrix_uniform_data;
-	std::array<GLsync, 3> _sync_objects;
+	
 };
 
 } // namespace deferred_lighting

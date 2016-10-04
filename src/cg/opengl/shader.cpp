@@ -314,7 +314,7 @@ void set_uniform<cg::mat4>(GLint location, const cg::mat4& mat) noexcept
 }
 
 template<>
-void set_uniform_array<GLint>(GLint location, const GLint* ptr, size_t count) noexcept
+void set_uniform_array<GLint, GLint>(GLint location, const GLint* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);
 	assert(count > 0);
@@ -323,7 +323,7 @@ void set_uniform_array<GLint>(GLint location, const GLint* ptr, size_t count) no
 }
 
 template<>
-void set_uniform_array<float>(GLint location, const float* ptr, size_t count) noexcept
+void set_uniform_array<float, float>(GLint location, const float* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);
 	assert(count > 0);
@@ -332,7 +332,7 @@ void set_uniform_array<float>(GLint location, const float* ptr, size_t count) no
 }
 
 template<>
-void set_uniform_array<mat3>(GLint location, const mat3* ptr, size_t count) noexcept
+void set_uniform_array<mat3, mat3>(GLint location, const mat3* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);
 	assert(count > 0);
@@ -347,7 +347,15 @@ void set_uniform_array<mat3>(GLint location, const mat3* ptr, size_t count) noex
 }
 
 template<>
-void set_uniform_array<mat4>(GLint location, const mat4* ptr, size_t count) noexcept
+void set_uniform_array<mat4, float>(GLint location, const float* ptr, size_t count)
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+	glUniformMatrix4fv(location, count, false, ptr);
+}
+
+template<>
+void set_uniform_array<mat4, mat4>(GLint location, const mat4* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);
 	assert(count > 0);

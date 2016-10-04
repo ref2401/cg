@@ -8,35 +8,35 @@
 
 namespace deferred_lighting {
 
-struct Rnd_obj final {
-
-	Rnd_obj(GLuint vao_id, const cg::opengl::DE_indirect_params& de_indirect_params,
-		const std::array<float, 16>& model_matrix, const std::array<float, 9>& normal_matix) noexcept;
-
-	GLuint vao_id;
-	cg::opengl::DE_indirect_params de_indirect_params;
-	std::array<float, 16> model_matrix;
-	std::array<float, 9> normal_matrix;
-};
-
 // ...
 // Implementation notes: Frame temporary contains an vao id and assumes 
 // that all the DE_cmd objects added to it refere to the vao id.
 class Frame final {
 public:
 
-	Frame();
+	Frame(size_t max_renderable_count);
 
 	Frame(const Frame& frame) = delete;
 
 	Frame(Frame&& frame) = delete;
 
 
-	// Call begin before filling the frame with scene data.
-	void begin() noexcept;
+	// How many batches are in the frame.
+	size_t batch_count() const noexcept
+	{
+		size_t partial_batch = (_renderable_count % _batch_size > 0) ? 1 : 0;
+		return _renderable_count / _batch_size + partial_batch;
+	}
 
-	// Call end after frame has been filled with scene data and must be renderer.
-	void end();
+	// How many draw indirect commands can be performed in one multi-draw indirect call.
+	size_t batch_size() const noexcept
+	{
+		return _batch_size;
+	}
+
+	void begin_rendering() noexcept;
+
+	void end_rendering() noexcept;
 
 	const cg::mat4& projection_matrix() const noexcept
 	{
@@ -56,9 +56,21 @@ public:
 
 	void push_back_renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix);
 
-	const std::vector<Rnd_obj>& rnd_objects() const noexcept
+	void reset(const cg::opengl::Static_vertex_spec& vertex_spec) noexcept;
+
+	size_t renderable_count() const noexcept
 	{
-		return _rnd_objects;
+		return _renderable_count;
+	}
+
+	const std::vector<float>& uniform_array_model_matrix() const noexcept
+	{
+		return _uniform_arr_model_matrix;
+	}
+
+	GLuint vao_id() const noexcept
+	{
+		return _vao_id;
 	}
 
 	const cg::mat4& view_matrix() const noexcept
@@ -72,9 +84,25 @@ public:
 	}
 
 private:
-	std::vector<Rnd_obj> _rnd_objects;
+	// The method adds additional bindings to the specified vao object hence makeing it sutable for rendering.
+	// Side effect: before method returns it resets vertex array binding to zero.
+	void prepare_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept;
+
+	const size_t _max_renderable_count;
 	cg::mat4 _projection_matrix = cg::mat4::identity;
 	cg::mat4 _view_matrix = cg::mat4::identity;
+	
+	// indirect rendering gears
+	const size_t _batch_size;
+	std::array<GLsync, 3> _sync_objects;
+	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _draw_indirect_buffer;
+	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
+	size_t _offset_draw_indirect = 0;
+
+	// future Frame_packet stuff:
+	GLuint _vao_id = cg::opengl::Invalid::vao_id;
+	size_t _renderable_count;
+	std::vector<float> _uniform_arr_model_matrix;
 };
 
 } // namespace deferred_lighting

@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <algorithm>
-#include <numeric>
 #include <memory>
 
 using cg::float3;
@@ -38,21 +37,13 @@ size_t get_max_texture_unit_count() noexcept
 	return value;
 }
 
-Static_buffer make_draw_index_buffer(size_t draw_call_count)
-{
-	std::vector<GLuint> draw_indices(draw_call_count);
-	std::iota(draw_indices.begin(), draw_indices.end(), 0);
-	return Static_buffer(draw_indices.data(), draw_call_count);
-}
-
 } // namespace
 
 namespace deferred_lighting {
 
 // ----- Gbuffer -----
 
-Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
-	_max_tex_unit_count(get_max_texture_unit_count())
+Gbuffer::Gbuffer(uint2 viewport_size) noexcept
 {
 	resize(viewport_size);
 }
@@ -91,7 +82,24 @@ void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view
 
 void Gbuffer_pass::end() noexcept
 {
+	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+
+	glBlitFramebuffer(
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	_fbo.set_read_buffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);
+}
+
+void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
+	const std::vector<float>& uniform_array_model_matrix) noexcept
+{
+	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
 }
 
 // ----- Renderer_config -----
@@ -111,65 +119,49 @@ Renderer_config::Renderer_config(cg::uint2 viewport_size,
 Renderer::Renderer(const Renderer_config& config) :
 	_vertex_attrib_layout(0, 1, 2, 3),
 	_gbuffer(config.viewport_size),
-	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
-	_indirect_buffer(3, _gbuffer.max_tex_unit_count() * sizeof(DE_indirect_params)),
-	_draw_index_buffer(make_draw_index_buffer(_gbuffer.max_tex_unit_count()))
+	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code)
 {
-	size_t max_draw_call_count = _gbuffer_pass.batch_size();
-	_model_matrix_uniform_data.reserve(max_draw_call_count * 16);
 }
 
-void Renderer::render(const Frame& frame) noexcept
+void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 {
-	GLsync sync_obj = _sync_objects[_indirect_buffer.current_partition_index()];
-	wait_for(sync_obj);
-	glDeleteSync(sync_obj);
-	_sync_objects[_indirect_buffer.current_partition_index()] = nullptr;
-
-	// Gbuffer_pass
 	_gbuffer_pass.begin(frame.projection_matrix(), frame.view_matrix());
 
-	// batch_size, different vao id
+	// for each frame packet
+	glBindVertexArray(frame.vao_id());
 
-	//GLuint curr_vao_id = Invalid::vao_id;
-	//_model_matrix_uniform_data.clear();
+	// for each batch is the frame packet
+	auto r = frame.batch_count();
+	for (size_t bi = 0; bi < frame.batch_count(); ++bi) {
+		// rnd_offset: processed renderable object count.
+		// rnd_count: The number of renderable objects in the current batch #bi.
+		size_t rnd_offset = bi * frame.batch_size();
+		size_t rnd_count = std::min(frame.batch_size(), frame.renderable_count() - rnd_offset);
 
-	//for (const auto& rnd : frame.rnd_objects()) {
-		//glBindVertexArray(rnd.vao_id);
-		//_model_matrix_uniform_data.push_back(rnd.model_matrix);
-	//}
+		// uniform arrays
+		_gbuffer_pass.set_uniform_arrays(rnd_offset, rnd_count, frame.uniform_array_model_matrix());
+		
+		// draw indirect
+		unsigned char* draw_indirect_ptr = nullptr;
+		draw_indirect_ptr += rnd_offset * sizeof(DE_indirect_params);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, rnd_count, 0);
+	}
 
 	_gbuffer_pass.end();
 	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
 	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
+}
+
+void Renderer::render(const Frame& frame) noexcept
+{
+	perform_gbuffer_pass(frame);
+	
 	// bind vao, 
 	// for each Rnd_obj until vao_id has not changed do:
 	// current_pass.batch_size() - how many object may be in one indirect call for the current pass.
 	// populate indirect buffer
 
-	_sync_objects[_indirect_buffer.current_partition_index()] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	_indirect_buffer.move_next_partition();
-}
-
-void Renderer::register_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept
-{
-	assert(vao_id != Invalid::vao_id);
-
-	glBindVertexArray(vao_id);
 	
-	// bind indirect buffer & draw index buffer to vao
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _indirect_buffer.id());
-	
-	// draw_index attrib location == buffer binding index.
-	static constexpr GLuint draw_index_attrib_location = 15;
-
-	glVertexArrayVertexBuffer(vao_id, draw_index_binding_index, _draw_index_buffer.id(), 0, sizeof(GLuint));
-	glVertexArrayAttribBinding(vao_id, draw_index_attrib_location, draw_index_binding_index);
-	glVertexArrayAttribIFormat(vao_id, draw_index_attrib_location, 1, GL_UNSIGNED_INT, 0);
-	glVertexArrayBindingDivisor(vao_id, draw_index_binding_index, 1);
-	glEnableVertexArrayAttrib(vao_id, draw_index_attrib_location);
-
-	glBindVertexArray(Invalid::vao_id);
 }
 
 void Renderer::resize_viewport(uint2 size) noexcept

@@ -18,6 +18,11 @@ Gbuffer_pass_shader_program::Gbuffer_pass_shader_program(const Shader_program_so
 	_u_arr_model_matrix_location(_prog.get_uniform_location("u_arr_model_matrix"))
 {}
 
+void Gbuffer_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
+{
+	set_uniform_array<mat4>(_u_arr_model_matrix_location, ptr, count);
+}
+
 void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4& view_matrix) noexcept
 {
 	glUseProgram(_prog.id());

@@ -19,6 +19,8 @@ public:
 	~Gbuffer_pass_shader_program() noexcept = default;
 
 
+	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
+
 	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
 
 private:

@@ -37,13 +37,13 @@ private:
 	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec0;
-	// renderer stuff
-	std::unique_ptr<Renderer> _renderer;
 	// scene
 	std::vector<Renderable> _rednerable_objects;
-	Frame _frame;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
+	// renderer stuff
+	Renderer _renderer;
+	Frame _frame;
 };
 
 } // namespace deferred_lighting

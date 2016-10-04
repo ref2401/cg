@@ -1,4 +1,10 @@
 # deferred lighting steps
+
+single vertex array object.
+uniform arrays are used heavily, uniform block would have done better.
+unifrom array limitations: ...
+
+
 Deferred lighting is devided into three passes:
 1. GBuffer_pass
 input:
@@ -8,7 +14,7 @@ input:
 	tex_normal_map_id (sRGB?)
 	tex_smoothness_id (sRGB?)
 
-- detach shader
+test batch rendering: 3-4 materials, ~100 objects.
 
 2. Lighting_pass
 	- depth_unchanged gl_FragDepth

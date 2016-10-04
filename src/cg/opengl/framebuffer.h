@@ -31,6 +31,10 @@ public:
 	// Attach a texture as depth attachment.
 	void attach_depth_texture(const Texture_2d& texture, size_t mipmap_index = 0) noexcept;
 
+	void detach_color_texture(GLenum color_attachment) noexcept;
+
+	void detach_depth_texture() noexcept;
+
 	GLuint id() const noexcept
 	{
 		return _id;

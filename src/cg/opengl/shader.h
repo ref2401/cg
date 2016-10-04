@@ -133,8 +133,21 @@ struct Vertex_attrib_layout {
 template<typename T>
 void set_uniform(GLint location, const T& value) noexcept;
 
-template<typename T>
-void set_uniform_array(GLint location, const T* ptr, size_t count) noexcept;
+// Sets a uniform array variable.
+// Template params:
+// -	T:		Uniform array variable type which is specified in the shaderp.
+//				T defines which glUnifrom fucntion will be called.
+//				Example: T = float -> glUnifrom1fv, T = mat4 -> glUnifromMatrix4fv.
+//
+// -	TPtr:	Type of the data pointer. Ususally T and TPtr are the same.
+//				Example: T = mat4, TPtr = float. 
+//				That means that matrices are already packed into an array pointed to by ptr.
+//
+// Params:
+// -	ptr:	Pointer to the first element of the data.
+// -	count:	How many elements of type T are stored in the array pointer to by ptr.
+template<typename T, typename TPtr>
+void set_uniform_array(GLint location, const TPtr* ptr, size_t count) noexcept;
 
 } // namespace opengl
 } // namespace cg
