@@ -62,6 +62,11 @@ public:
 		return _tex_normal_smoothness;
 	}
 
+	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	{
+		return _vertex_attrib_layout;
+	}
+
 	// The current size of all the render target textures.
 	const cg::uint2& viewport_size() const noexcept
 	{
@@ -69,6 +74,7 @@ public:
 	}
 
 private:
+	const cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	cg::opengl::Sampler _bilinear_sampler;
 	cg::opengl::Sampler _nearest_sampler;
 	cg::opengl::Texture_2d _tex_depth_map;
@@ -127,13 +133,9 @@ private:
 
 struct Renderer_config final {
 
-	Renderer_config() noexcept = default;
-
-	Renderer_config(cg::uint2 viewport_size, 
-		const cg::data::Shader_program_source_code& gbuffer_pass_code,
-		const cg::data::Shader_program_source_code& lighting_pass_dir_code) noexcept;
-
 	cg::uint2 viewport_size;
+	cg::opengl::Static_vertex_spec shapes_vertex_space;
+	cg::opengl::DE_cmd rect_1x1_cmd;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
 };
@@ -156,9 +158,8 @@ public:
 
 	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
-		return _vertex_attrib_layout;
+		return _gbuffer.vertex_attrib_layout();
 	}
-
 
 private:
 
@@ -166,7 +167,6 @@ private:
 
 	void perform_lighting_pass(const Frame& frame) noexcept;
 
-	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
 	Lighting_pass _lighting_pass;

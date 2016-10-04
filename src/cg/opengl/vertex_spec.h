@@ -170,14 +170,19 @@ private:
 class Static_vertex_spec final {
 public:
 
+	Static_vertex_spec() noexcept = default;
+
 	Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id, 
 		GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
 
-	Static_vertex_spec(const Static_vertex_spec& spec) = delete;
+	Static_vertex_spec(const Static_vertex_spec&) = delete;
 
-	Static_vertex_spec(Static_vertex_spec&& spec) = delete;
+	Static_vertex_spec(Static_vertex_spec&& spec) noexcept;
 
 	~Static_vertex_spec() noexcept;
+
+
+	Static_vertex_spec& operator=(Static_vertex_spec&& spec) noexcept;
 
 
 	cg::data::Interleaved_vertex_format format() const noexcept
@@ -206,11 +211,12 @@ public:
 	}
 
 private:
+	void dispose() noexcept;
 
 	GLuint _vao_id = Invalid::vao_id;
 	cg::data::Interleaved_vertex_format _format;
 	Static_buffer _vertex_buffer;
-	GLuint _vertex_buffer_binding_index;
+	GLuint _vertex_buffer_binding_index = 0;
 	Static_buffer _index_buffer;
 };
 
@@ -231,7 +237,7 @@ public:
 	// Ends the building process and returns a Static_vertex_spec object 
 	// that manages internal OpenGL resources.
 	// Returns: a spec object which is responsible for internal vao and buffers.
-	std::unique_ptr<Static_vertex_spec> end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao = false);
+	Static_vertex_spec end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao = false);
 
 	// Returns true if the building process has been started.
 	// The process is considered started between begin() and end() calls.

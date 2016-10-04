@@ -42,7 +42,7 @@ public:
 private:
 	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
-	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec0;
+	cg::opengl::Static_vertex_spec _vertex_spec0;
 	Material _material;
 	cg::opengl::Texture_2d _tex_default_normal_map;
 	// scene

@@ -22,6 +22,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 {
 	Renderer_config config;
 	config.viewport_size = viewport_size;
+	//config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
 
@@ -92,7 +93,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 
 void Deferred_lighting::render(float blend_state) 
 {
-	_frame.reset(*_vertex_spec0.get());
+	_frame.reset(_vertex_spec0);
 
 	_frame.set_projection_matrix(_projection_matrix);
 	_frame.set_view_matrix(_view_matrix);

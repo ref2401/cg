@@ -174,17 +174,14 @@ struct Vertex {
 class Interleaved_mesh_data final {
 public:
 
+	Interleaved_mesh_data() noexcept = default;
+
 	explicit Interleaved_mesh_data(Vertex_attribs attribs)
 		: Interleaved_mesh_data(attribs, 0, 0)
 	{}
 
-	Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
-		: _format(attribs)
-	{
-		assert(attribs != Vertex_attribs::none);
-		_data.reserve(_format.component_count() * vertex_count);
-		_indices.reserve(index_count);
-	}
+	Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count);
+	
 
 
 	Vertex_attribs attribs() const

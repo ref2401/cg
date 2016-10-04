@@ -17,6 +17,18 @@ namespace opengl {
 
 // ----- Static_vertex_spec
 
+Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept :
+	_vao_id(spec._vao_id),
+	_format(spec._format),
+	_vertex_buffer(std::move(spec._vertex_buffer)),
+	_vertex_buffer_binding_index(spec._vertex_buffer_binding_index),
+	_index_buffer(std::move(spec._index_buffer))
+{
+	spec._vao_id = Invalid::vao_id;
+	spec._format.attribs = Vertex_attribs::none;
+	spec._vertex_buffer_binding_index = 0;
+}
+
 Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id,
 	GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept
 :	_format(format), 
@@ -30,6 +42,34 @@ Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format forma
 }
 
 Static_vertex_spec::~Static_vertex_spec() noexcept
+{
+	dispose();
+
+	_vao_id = Invalid::vao_id;
+	_format.attribs = Vertex_attribs::none;
+	_vertex_buffer_binding_index = 0;
+}
+
+Static_vertex_spec& Static_vertex_spec::operator=(Static_vertex_spec&& spec) noexcept
+{
+	if (this == &spec) return *this;
+
+	dispose();
+
+	_vao_id = spec._vao_id;
+	_format = spec._format;
+	_vertex_buffer = std::move(spec._vertex_buffer);
+	_vertex_buffer_binding_index = spec._vertex_buffer_binding_index;
+	_index_buffer = std::move(spec._index_buffer);
+
+	spec._vao_id = Invalid::vao_id;
+	spec._format.attribs = Vertex_attribs::none;
+	spec._vertex_buffer_binding_index = 0;
+
+	return *this;
+}
+
+void Static_vertex_spec::dispose() noexcept
 {
 	if (_vao_id != Invalid::vao_id) {
 		glDeleteVertexArrays(1, &_vao_id);
@@ -59,7 +99,7 @@ void Static_vertex_spec_builder::begin(Vertex_attribs attribs, size_t vertex_lim
 	glCreateVertexArrays(1, &_vao_id);
 }
 
-std::unique_ptr<Static_vertex_spec> Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
+Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
 {
 	assert(building_process());
 	assert(is_superset_of(attrib_layout.attribs(), _format.attribs));
@@ -113,10 +153,9 @@ std::unique_ptr<Static_vertex_spec> Static_vertex_spec_builder::end(const Vertex
 	if (unbind_vao)
 		glBindVertexArray(Invalid::vao_id);
 
-	// reset members
-	auto spec = std::make_unique<Static_vertex_spec>(_format, _vao_id, ids[0], vb_binding_index, ids[1]);
+	GLuint vao_id_temp = _vao_id;
 	_vao_id = Invalid::vao_id; // this ends building process
-	return spec;
+	return Static_vertex_spec(_format, vao_id_temp, ids[0], vb_binding_index, ids[1]);
 }
 
 DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_data& mesh_data)

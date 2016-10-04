@@ -5,6 +5,14 @@ namespace data {
 
 // ----- Interleaved_mesh_data -----
 
+Interleaved_mesh_data::Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
+	: _format(attribs)
+{
+	assert(attribs != Vertex_attribs::none);
+	_data.reserve(_format.component_count() * vertex_count);
+	_indices.reserve(index_count);
+}
+
 void Interleaved_mesh_data::push_back_index(uint32_t i)
 {
 	_indices.push_back(i);

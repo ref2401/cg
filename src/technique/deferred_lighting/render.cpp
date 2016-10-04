@@ -7,6 +7,7 @@
 
 using namespace cg;
 using namespace cg::opengl;
+using cg::data::Interleaved_mesh_data;
 using cg::data::Shader_program_source_code;
 
 
@@ -15,6 +16,7 @@ namespace deferred_lighting {
 // ----- Gbuffer -----
 
 Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
+	_vertex_attrib_layout(0, 1, 2, 3),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge))
 {
@@ -90,25 +92,9 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_so
 	_dir_prog(dir_source_code)
 {}
 
-
-// ----- Renderer_config -----
-
-Renderer_config::Renderer_config(cg::uint2 viewport_size, 
-	const cg::data::Shader_program_source_code& gbuffer_pass_code,
-	const cg::data::Shader_program_source_code& lighting_pass_dir_code) noexcept :
-	viewport_size(viewport_size),
-	gbuffer_pass_code(gbuffer_pass_code),
-	lighting_pass_dir_code(lighting_pass_dir_code)
-{
-	assert(greater_than(viewport_size, 0));
-	assert(gbuffer_pass_code.vertex_source.size() > 0);
-	assert(gbuffer_pass_code.pixel_source.size() > 0);
-}
-
 // ----- Renderer -----
 
 Renderer::Renderer(const Renderer_config& config) :
-	_vertex_attrib_layout(0, 1, 2, 3),
 	_gbuffer(config.viewport_size),
 	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
 	_lighting_pass(_gbuffer, config.lighting_pass_dir_code)
@@ -149,7 +135,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
 }
 
-void perform_lighting_pass(const Frame& frame) noexcept
+void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 {
 
 }
