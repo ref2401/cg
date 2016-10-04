@@ -330,6 +330,8 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 	// pack data
 	cg::data::Interleaved_mesh_data imd(attribs, mesh_data.positions.size(), mesh_data.positions.size());
 
+	auto n = mesh_data.has_normals();
+	auto tc = mesh_data.has_tex_coords();
 	if (mesh_data.has_normals() && mesh_data.has_tex_coords()) {
 		parse_face_pntc(it, mesh_data, imd, has_tangent_h(attribs));
 	}

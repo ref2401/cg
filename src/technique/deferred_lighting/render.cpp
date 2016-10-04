@@ -28,7 +28,7 @@ Gbuffer::Gbuffer(uint2 viewport_size,
 		auto rect_1x1_cmd = vs_builder.push_back(rect_1x1_mesh_data);
 		_aux_geometry_rect_1x1_params = rect_1x1_cmd.get_base_vertex_params();
 	}
-	vs_builder.end(_vertex_attrib_layout, true);
+	_aux_geometry_vertex_spec = vs_builder.end(_vertex_attrib_layout, true);
 	resize(viewport_size);
 }
 
@@ -56,9 +56,9 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_sour
 void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-
 	glClearBufferfv(GL_COLOR, 0, _clear_value_normal_smoothness);
 	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth_map);
 
@@ -70,7 +70,7 @@ void Gbuffer_pass::end() noexcept
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 	
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
+	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
 	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 
 	glBlitFramebuffer(
@@ -78,7 +78,7 @@ void Gbuffer_pass::end() noexcept
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	_fbo.set_read_buffer(GL_NONE);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);*/
 }
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -99,11 +99,50 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& dir_source_code) :
 	_gbuffer(gbuffer),
 	_dir_prog(dir_source_code)
-{}
+{
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
+	_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
+	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0);
+	_fbo.set_read_buffer(GL_NONE);
+	_fbo.validate();
+}
+
+void Lighting_pass::begin() noexcept
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
+	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glClearBufferfv(GL_COLOR, 0, _clear_value_color);
+
+	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
+}
+
+void Lighting_pass::end() noexcept
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+
+	glBlitFramebuffer(
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	_fbo.set_read_buffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);
+}
+
+void Lighting_pass::perform_directional_light_pass(const cg::float3& ambient_up_irradiance,
+	const cg::float3& ambient_down_irradiance) noexcept
+{
+	_dir_prog.use(ambient_up_irradiance, ambient_down_irradiance);
+	
+	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
+	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
+}
 
 // ----- Renderer -----
 
-Renderer::Renderer(Renderer_config& config) :
+Renderer::Renderer(const Renderer_config& config) :
 	_gbuffer(config.viewport_size, config.vertex_attrib_layout, config.rect_1x1_mesh_data),
 	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
 	_lighting_pass(_gbuffer, config.lighting_pass_dir_code)
@@ -140,25 +179,20 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 	}
 
 	_gbuffer_pass.end();
-	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
-	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
 }
 
 void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 {
-
+	_lighting_pass.begin();
+	_lighting_pass.perform_directional_light_pass(float3(1), float3(0.1));
+	_lighting_pass.end();
+	glBindTextureUnit(0, _gbuffer.tex_lighting_ambient_term().id());
 }
 
 void Renderer::render(const Frame& frame) noexcept
 {
 	perform_gbuffer_pass(frame);
-	
-	// bind vao, 
-	// for each Rnd_obj until vao_id has not changed do:
-	// current_pass.batch_size() - how many object may be in one indirect call for the current pass.
-	// populate indirect buffer
-
-	
+	perform_lighting_pass(frame);
 }
 
 void Renderer::resize_viewport(uint2 size) noexcept

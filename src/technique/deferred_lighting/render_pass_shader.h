@@ -47,6 +47,7 @@ public:
 	~Lighting_pass_dir_shader_program() noexcept = default;
 
 
+	void use(const cg::float3& ambient_up_irradiance, const cg::float3& ambient_down_irradiance) noexcept;
 
 private:
 	cg::opengl::Shader_program _prog;

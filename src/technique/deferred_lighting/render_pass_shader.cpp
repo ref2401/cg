@@ -44,7 +44,14 @@ Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
 	_prog("lighting-pass-dir-shader", dir_source_code),
 	_u_light_ambient_up_irradiance_location(_prog.get_uniform_location("u_light_ambient_up_irradiance")),
 	_u_light_ambient_down_irradiance_location(_prog.get_uniform_location("u_light_ambient_down_irradiance"))
+{}
+
+void Lighting_pass_dir_shader_program::use(const cg::float3& ambient_up_irradiance,
+	const cg::float3& ambient_down_irradiance) noexcept
 {
+	glUseProgram(_prog.id());
+	set_uniform(_u_light_ambient_up_irradiance_location, ambient_up_irradiance);
+	set_uniform(_u_light_ambient_down_irradiance_location, ambient_down_irradiance);
 }
 
 } // namespace deferred_lighting

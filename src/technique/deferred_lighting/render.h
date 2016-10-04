@@ -124,7 +124,6 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept;
 
 private:
-	
 	float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
 	float _clear_value_depth_map = 1.f;
 	cg::opengl::Framebuffer _fbo;
@@ -143,8 +142,18 @@ public:
 
 	~Lighting_pass() noexcept = default;
 
+
+	void begin() noexcept;
+
+	void end() noexcept;
+
+	void perform_directional_light_pass(const cg::float3& ambient_up_irradiance,
+		const cg::float3& ambient_down_irradiance) noexcept;
+
 private:
+	float _clear_value_color[4] = { 0, 0, 0, 0 };
 	Gbuffer& _gbuffer;
+	cg::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
 };
 
@@ -160,11 +169,11 @@ struct Renderer_config final {
 class Renderer final {
 public:
 
-	Renderer(Renderer_config& config);
+	Renderer(const Renderer_config& config);
 
-	Renderer(const Renderer& rnd) = delete;
+	Renderer(const Renderer&) = delete;
 
-	Renderer(Renderer&& rnd) noexcept = delete;
+	Renderer(Renderer&&) = delete;
 
 	~Renderer() noexcept = default;
 
