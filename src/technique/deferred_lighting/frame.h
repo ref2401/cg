@@ -8,6 +8,17 @@
 
 namespace deferred_lighting {
 
+struct Renderable final {
+
+	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix,
+		GLuint tex_normal_map_id) noexcept;
+
+	cg::opengl::DE_cmd cmd;
+	cg::mat4 model_matrix;
+	GLuint tex_normal_map_id = cg::opengl::Invalid::texture_id;
+};
+
+
 // ...
 // Implementation notes: Frame temporary contains an vao id and assumes 
 // that all the DE_cmd objects added to it refere to the vao id.
@@ -54,24 +65,9 @@ public:
 		return _projection_matrix * _view_matrix;
 	}
 
-	void push_back_renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix);
+	void push_back_renderable(const Renderable& rnd);
 
-	void reset(const cg::opengl::Static_vertex_spec& vertex_spec) noexcept;
-
-	size_t renderable_count() const noexcept
-	{
-		return _renderable_count;
-	}
-
-	const std::vector<float>& uniform_array_model_matrix() const noexcept
-	{
-		return _uniform_arr_model_matrix;
-	}
-
-	GLuint vao_id() const noexcept
-	{
-		return _vao_id;
-	}
+	void reset(const cg::opengl::Static_vertex_spec& vertex_spec) noexcept;	
 
 	const cg::mat4& view_matrix() const noexcept
 	{
@@ -81,6 +77,28 @@ public:
 	void set_view_matrix(const cg::mat4& mat) noexcept
 	{
 		_view_matrix = mat;
+	}
+
+	// frame packet stuff:
+
+	GLuint vao_id() const noexcept
+	{
+		return _vao_id;
+	}
+
+	size_t renderable_count() const noexcept
+	{
+		return _renderable_count;
+	}
+
+	const std::vector<float>& uniform_array_model_matrix() const noexcept
+	{
+		return _uniform_array_model_matrix;
+	}
+
+	const std::vector<GLuint>& uniform_array_tex_normal_map() const noexcept
+	{
+		return _uniform_array_tex_normal_map;
 	}
 
 private:
@@ -102,7 +120,8 @@ private:
 	// future Frame_packet stuff:
 	GLuint _vao_id = cg::opengl::Invalid::vao_id;
 	size_t _renderable_count;
-	std::vector<float> _uniform_arr_model_matrix;
+	std::vector<float> _uniform_array_model_matrix;
+	std::vector<GLuint> _uniform_array_tex_normal_map;
 };
 
 } // namespace deferred_lighting

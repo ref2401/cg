@@ -41,6 +41,13 @@ public:
 		return _tex_normal_smoothness;
 	}
 
+	// Returns an ordered sequence of numbers which represents all the available texture units.
+	// [0, GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+	const std::vector<GLint> texture_units() const noexcept
+	{
+		return _texture_units;
+	}
+
 	// The current size of all the render target textures.
 	const cg::uint2& viewport_size() const noexcept
 	{
@@ -51,6 +58,7 @@ private:
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::uint2 _viewport_size;
+	std::vector<GLint> _texture_units;
 };
 
 class Gbuffer_pass final {
@@ -72,7 +80,8 @@ public:
 	void end() noexcept;
 
 	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count, 
-		const std::vector<float>& uniform_array_model_matrix) noexcept;
+		const std::vector<float>& uniform_array_model_matrix,
+		const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept;
 
 private:
 	
@@ -119,7 +128,7 @@ private:
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
-	
+	cg::opengl::Sampler _default_sampler;
 };
 
 } // namespace deferred_lighting

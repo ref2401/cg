@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <numeric>
 #include <memory>
 
 using cg::float3;
@@ -43,8 +44,10 @@ namespace deferred_lighting {
 
 // ----- Gbuffer -----
 
-Gbuffer::Gbuffer(uint2 viewport_size) noexcept
+Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
+	_texture_units(get_max_texture_unit_count())
 {
+	std::iota(_texture_units.begin(), _texture_units.end(), 0);
 	resize(viewport_size);
 }
 
@@ -97,9 +100,14 @@ void Gbuffer_pass::end() noexcept
 }
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
-	const std::vector<float>& uniform_array_model_matrix) noexcept
+	const std::vector<float>& uniform_array_model_matrix,
+	const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept
 {
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
+
+	size_t curr_unit = 0;
+	for (; curr_unit < rnd_count; ++curr_unit)
+		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
 }
 
 // ----- Renderer_config -----
@@ -119,7 +127,8 @@ Renderer_config::Renderer_config(cg::uint2 viewport_size,
 Renderer::Renderer(const Renderer_config& config) :
 	_vertex_attrib_layout(0, 1, 2, 3),
 	_gbuffer(config.viewport_size),
-	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code)
+	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
+	_default_sampler(Sampler_config())
 {
 }
 
@@ -132,14 +141,19 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 
 	// for each batch is the frame packet
 	auto r = frame.batch_count();
-	for (size_t bi = 0; bi < frame.batch_count(); ++bi) {
+	for (GLuint bi = 0; bi < frame.batch_count(); ++bi) {
+		glBindSampler(bi, _default_sampler.id());
+
 		// rnd_offset: processed renderable object count.
 		// rnd_count: The number of renderable objects in the current batch #bi.
 		size_t rnd_offset = bi * frame.batch_size();
 		size_t rnd_count = std::min(frame.batch_size(), frame.renderable_count() - rnd_offset);
 
 		// uniform arrays
-		_gbuffer_pass.set_uniform_arrays(rnd_offset, rnd_count, frame.uniform_array_model_matrix());
+		_gbuffer_pass.set_uniform_arrays(rnd_offset, rnd_count, 
+			frame.uniform_array_model_matrix(),
+			frame.uniform_array_tex_normal_map());
+		
 		
 		// draw indirect
 		unsigned char* draw_indirect_ptr = nullptr;

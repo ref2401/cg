@@ -28,13 +28,13 @@ Renderer_config make_render_config(uint2 viewport_size)
 
 } // namespace
 
+
 namespace deferred_lighting {
 
-// ----- Renderable -----
+// ----- Material -----
 
-Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix) noexcept :
-	cmd(cmd),
-	model_matrix(model_matrix)
+Material::Material(Texture_2d tex_normal_map) noexcept :
+	tex_normal_map(std::move(tex_normal_map))
 {}
 
 // ----- Deferred_lighting -----
@@ -52,6 +52,11 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 
 	// scene
 	// materials
+	auto normal_map_image = cg::file::load_image_tga("../data/normal_map.tga");
+	_material.tex_normal_map = Texture_2d(Texture_format::rgb_8, normal_map_image);
+
+	auto default_normal_map_image = cg::file::load_image_tga("../data/material-default-normal_map.tga");
+	_tex_default_normal_map = Texture_2d(Texture_format::rgb_8, default_normal_map_image);
 
 	// cube geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
@@ -66,11 +71,16 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	// scene objects
 	_rednerable_objects.reserve(16);
 	_rednerable_objects.emplace_back(cube_cmd, 
-		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)));
-	_rednerable_objects.emplace_back(square_cmd, translation_matrix(float3(-2.f, 1, 1)));
+		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)),
+		_material.tex_normal_map.id());
+	
+	_rednerable_objects.emplace_back(square_cmd, 
+		translation_matrix(float3(-2.f, 1, 1)),
+		_material.tex_normal_map.id());
 
 	_rednerable_objects.emplace_back(square_cmd, 
-		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, -cg::pi_8)));
+		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, -cg::pi_8)),
+		_tex_default_normal_map.id());
 }
 
 void Deferred_lighting::render(float blend_state) 
@@ -81,7 +91,7 @@ void Deferred_lighting::render(float blend_state)
 	_frame.set_view_matrix(_view_matrix);
 
 	for (const auto& rnd : _rednerable_objects) {
-		_frame.push_back_renderable(rnd.cmd, rnd.model_matrix);
+		_frame.push_back_renderable(rnd);
 	}
 	
 	_frame.begin_rendering();

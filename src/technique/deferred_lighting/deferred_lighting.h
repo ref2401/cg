@@ -11,12 +11,17 @@
 
 namespace deferred_lighting {
 
-struct Renderable final {
+class Material final {
+public:
 
-	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix) noexcept;
+	Material() noexcept = default;
 
-	cg::opengl::DE_cmd cmd;
-	cg::mat4 model_matrix;
+	Material(cg::opengl::Texture_2d tex_normal_map) noexcept;
+
+	~Material() noexcept = default;
+
+
+	cg::opengl::Texture_2d tex_normal_map;
 };
 
 class Deferred_lighting final : public cg::sys::IGame {
@@ -37,6 +42,8 @@ private:
 	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	std::unique_ptr<cg::opengl::Static_vertex_spec> _vertex_spec0;
+	Material _material;
+	cg::opengl::Texture_2d _tex_default_normal_map;
 	// scene
 	std::vector<Renderable> _rednerable_objects;
 	cg::mat4 _projection_matrix;

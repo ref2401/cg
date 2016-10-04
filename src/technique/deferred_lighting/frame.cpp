@@ -13,6 +13,7 @@ using cg::opengl::DE_cmd;
 using cg::opengl::Invalid;
 using cg::opengl::Static_buffer;
 using cg::opengl::Static_vertex_spec;
+using cg::opengl::Texture_2d;
 using cg::opengl::wait_for;
 
 
@@ -20,6 +21,7 @@ namespace {
 
 size_t get_batch_size() noexcept
 {
+	// max_texture_unit_count
 	// const size_t _batch_size = 62; // see gbuffer_pass.vertex.glsl
 	return 2;
 }
@@ -36,6 +38,16 @@ Static_buffer make_draw_index_buffer(size_t draw_call_count)
 
 namespace deferred_lighting {
 
+// ----- Renderable -----
+
+Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix,
+	GLuint tex_normal_map_id) noexcept :
+	cmd(cmd),
+	model_matrix(model_matrix),
+	tex_normal_map_id(tex_normal_map_id)
+{}
+
+
 // ----- Frame -----
 
 Frame::Frame(size_t max_renderable_count) :
@@ -44,15 +56,16 @@ Frame::Frame(size_t max_renderable_count) :
 	_draw_indirect_buffer(3, max_renderable_count * sizeof(DE_indirect_params)),
 	_draw_index_buffer(make_draw_index_buffer(_batch_size))
 {
-	_uniform_arr_model_matrix.reserve(16 * 16);
+	const size_t initial_capacity = 16;
+	_uniform_array_model_matrix.reserve(initial_capacity * 16);
+	_uniform_array_tex_normal_map.reserve(initial_capacity);
 }
 
 void Frame::begin_rendering() noexcept
 {
 	assert(_renderable_count > 0);
-	// _offset_indirect / sizeof(DE_indirect_params) == _offset_indirect
-	// _uniform_arr_model_matrix.size() / 16 == _rnd_obj_count
-	// _uniform_arr_smoothness.size() = _rnd_obj_count;
+	assert(_uniform_array_model_matrix.size() / 16 == _renderable_count);
+	assert(_uniform_array_tex_normal_map.size() == _renderable_count);
 }
 
 void Frame::end_rendering() noexcept
@@ -61,21 +74,24 @@ void Frame::end_rendering() noexcept
 	_draw_indirect_buffer.move_next_partition();
 }
 
-void Frame::push_back_renderable(const DE_cmd& cmd, const mat4& model_matrix)
+void Frame::push_back_renderable(const Renderable& rnd)
 {
-	assert(cmd.vao_id() == _vao_id);
+	assert(rnd.cmd.vao_id() == _vao_id);
 	assert(_renderable_count < _max_renderable_count);
 
-	// put indirect params into _draw_indirect_buffer
-	auto params = cmd.get_indirect_params();
+	// indirect params -> _draw_indirect_buffer
+	auto params = rnd.cmd.get_indirect_params();
 	params.base_instance = _renderable_count % _batch_size; // base index is required to calculate an index to draw_index_buffer
 	_offset_draw_indirect = _draw_indirect_buffer.write(_offset_draw_indirect, &params);
 
-	// put model matrix into _uniform_arr_model_matrix
+	// model matrix -> _uniform_arr_model_matrix
 	float model_matrix_arr[16];
-	put_in_column_major_order(model_matrix, model_matrix_arr);
-	_uniform_arr_model_matrix.insert(_uniform_arr_model_matrix.end(),
+	put_in_column_major_order(rnd.model_matrix, model_matrix_arr);
+	_uniform_array_model_matrix.insert(_uniform_array_model_matrix.end(),
 		std::begin(model_matrix_arr), std::end(model_matrix_arr));
+
+	// tex_normal_map_id -> _uniform_array_tex_normal_map
+	_uniform_array_tex_normal_map.push_back(rnd.tex_normal_map_id);
 
 	++_renderable_count;
 }
@@ -117,7 +133,8 @@ void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept
 	_vao_id = vertex_spec.vao_id();
 	_renderable_count = 0;
 	_offset_draw_indirect = 0;
-	_uniform_arr_model_matrix.clear();
+	_uniform_array_model_matrix.clear();
+	_uniform_array_tex_normal_map.clear();
 }
 
 } // namespace deferred_lighting
