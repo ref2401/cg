@@ -29,7 +29,7 @@ void main()
 	mat3 view_space_matrix = mat3(tangent_vs, bitangent_vs, normal_vs);
 
 	vec3 normal_ts = texture(u_arr_tex_normal_map[ps_in.draw_call_index], ps_in.tex_coord).xyz;
-	normal_ts = 2 * normal_ts - vec3(1);
+	normal_ts = 2 * normal_ts + vec3(-1);
 	vec3 actual_normal_vs = normalize(view_space_matrix * normal_ts);
 
 	rt_normal_smoothness = vec4(actual_normal_vs, u_arr_smoothness[ps_in.draw_call_index].x);

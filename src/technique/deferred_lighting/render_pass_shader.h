@@ -7,6 +7,7 @@
 
 namespace deferred_lighting {
 
+// Gbuffer_pass_shader_program is used by the Gbuffer_pass to populate Gbuffer's tex_normal_smoothness.
 class Gbuffer_pass_shader_program final {
 public:
 
@@ -32,6 +33,25 @@ private:
 	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_smoothness_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_normal_map_location = cg::opengl::Invalid::uniform_location;
+};
+
+class Lighting_pass_dir_shader_program final {
+public:
+
+	Lighting_pass_dir_shader_program(const cg::data::Shader_program_source_code& dir_source_code);
+
+	Lighting_pass_dir_shader_program(const Lighting_pass_dir_shader_program&) = delete;
+
+	Lighting_pass_dir_shader_program(Lighting_pass_dir_shader_program&&) = delete;
+
+	~Lighting_pass_dir_shader_program() noexcept = default;
+
+
+
+private:
+	cg::opengl::Shader_program _prog;
+	GLint _u_light_ambient_up_irradiance_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_light_ambient_down_irradiance_location = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

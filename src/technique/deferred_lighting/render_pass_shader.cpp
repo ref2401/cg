@@ -37,4 +37,14 @@ void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4&
 	set_uniform(_u_view_matrix_location, static_cast<mat3>(view_matrix));
 }
 
+// ----- Lighting_pass_dir_shader_program -----
+
+Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
+	const Shader_program_source_code& dir_source_code) :
+	_prog("lighting-pass-dir-shader", dir_source_code),
+	_u_light_ambient_up_irradiance_location(_prog.get_uniform_location("u_light_ambient_up_irradiance")),
+	_u_light_ambient_down_irradiance_location(_prog.get_uniform_location("u_light_ambient_down_irradiance"))
+{
+}
+
 } // namespace deferred_lighting

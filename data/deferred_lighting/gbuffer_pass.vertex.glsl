@@ -2,7 +2,7 @@
 
 // assume that GL_MAX_VERTEX_UNIFORM_COMPONENTS = 1024
 //
-// a mat3 consumes 12 component, a mat4 uniform consumes 16 comopnents
+// a mat3 consumes 12 components, a mat4 uniform consumes 16 components
 // see https://www.opengl.org/wiki/Uniform_(GLSL)#Implementation_limits
 //
 // 16 * 62 + 9 + 16 = 1017 < 1024
@@ -10,7 +10,7 @@
 // batch_size for the pixel shader = 32 (see gbuffer_pass.pixel.glsl)
 
 uniform mat4 u_projection_view_matrix;
-uniform mat3 u_view_matrix;				// is use to calculate tangent space basis in the view space
+uniform mat3 u_view_matrix;				// is used to calculate tangent space basis in the view space
 uniform mat4 u_arr_model_matrix[32];
 
 layout(location = 0) in vec3 vert_position;
@@ -19,7 +19,7 @@ layout(location = 2) in vec2 vert_tex_coord;
 layout(location = 3) in vec4 vert_tangent_h;
 layout(location = 15) in uint draw_call_index;
 
-out Pixel_data_i{
+out Pixel_data_i {
 	vec3 normal_vs;
 	vec3 tangent_vs;
 	vec3 bitanget_vs;

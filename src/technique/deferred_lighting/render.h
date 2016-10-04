@@ -25,6 +25,18 @@ public:
 
 	~Gbuffer() noexcept = default;
 
+	
+	// Default bilinear sampler (clamp_to_edge).
+	const cg::opengl::Sampler& bilinear_sampler() const noexcept
+	{
+		return _bilinear_sampler;
+	}
+
+	// Default nearest sampler (clamp_to_edge).
+	const cg::opengl::Sampler& nearest_sampler() const noexcept
+	{
+		return _nearest_sampler;
+	}
 
 	// Resizes all the render target textures.
 	void resize(cg::uint2 viewport_size) noexcept;
@@ -35,17 +47,19 @@ public:
 		return _tex_depth_map;
 	}
 
-	// The first pass render target texture.
+	// Lighting_pass's render target texture.
+	// xyz components contain ambient lighting intensity.
+	cg::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
+	{
+		return _tex_lighting_ambient_term;
+	}
+
+	// Gbuffer_pass's render target texture.
+	// xyz components contain normal in the view space.
+	// w component contains material.smoothness parameter.
 	cg::opengl::Texture_2d& tex_normal_smoothness() noexcept
 	{
 		return _tex_normal_smoothness;
-	}
-
-	// Returns an ordered sequence of numbers which represents all the available texture units.
-	// [0, GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
-	const std::vector<GLint> texture_units() const noexcept
-	{
-		return _texture_units;
 	}
 
 	// The current size of all the render target textures.
@@ -55,10 +69,12 @@ public:
 	}
 
 private:
+	cg::opengl::Sampler _bilinear_sampler;
+	cg::opengl::Sampler _nearest_sampler;
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
+	cg::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::uint2 _viewport_size;
-	std::vector<GLint> _texture_units;
 };
 
 class Gbuffer_pass final {
@@ -93,11 +109,33 @@ private:
 	Gbuffer& _gbuffer;
 };
 
+class Lighting_pass final {
+public:
+
+	Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& dir_source_code);
+
+	Lighting_pass(const Lighting_pass&) = delete;
+
+	Lighting_pass(Lighting_pass&& pass) = delete;
+
+	~Lighting_pass() noexcept = default;
+
+private:
+	Gbuffer& _gbuffer;
+	Lighting_pass_dir_shader_program _dir_prog;
+};
+
 struct Renderer_config final {
-	Renderer_config(cg::uint2 viewport_size, const cg::data::Shader_program_source_code& gbuffer_pass_code) noexcept;
+
+	Renderer_config() noexcept = default;
+
+	Renderer_config(cg::uint2 viewport_size, 
+		const cg::data::Shader_program_source_code& gbuffer_pass_code,
+		const cg::data::Shader_program_source_code& lighting_pass_dir_code) noexcept;
 
 	cg::uint2 viewport_size;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
+	cg::data::Shader_program_source_code lighting_pass_dir_code;
 };
 
 class Renderer final {
@@ -126,10 +164,12 @@ private:
 
 	void perform_gbuffer_pass(const Frame& frame) noexcept;
 
+	void perform_lighting_pass(const Frame& frame) noexcept;
+
 	cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
-	cg::opengl::Sampler _default_sampler;
+	Lighting_pass _lighting_pass;
 };
 
 } // namespace deferred_lighting

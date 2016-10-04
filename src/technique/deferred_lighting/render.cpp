@@ -5,49 +5,19 @@
 #include <numeric>
 #include <memory>
 
-using cg::float3;
-using cg::mat3;
-using cg::mat4;
-using cg::uint2;
-using cg::put_in_column_major_order;
+using namespace cg;
+using namespace cg::opengl;
 using cg::data::Shader_program_source_code;
-using cg::opengl::DE_indirect_params;
-using cg::opengl::DE_cmd;
-using cg::opengl::Invalid;
-using cg::opengl::Persistent_buffer;
-using cg::opengl::Sampler;
-using cg::opengl::Sampler_config;
-using cg::opengl::Shader_program;
-using cg::opengl::Static_buffer;
-using cg::opengl::Texture_2d;
-using cg::opengl::Texture_format;
-using cg::opengl::Vertex_attrib_layout;
-using cg::opengl::set_uniform;
-using cg::opengl::set_uniform_array;
-using cg::opengl::wait_for;
 
-
-namespace {
-
-size_t get_max_texture_unit_count() noexcept
-{
-	GLint value = -1;
-	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &value);
-	
-	assert(value > -1);
-	return value;
-}
-
-} // namespace
 
 namespace deferred_lighting {
 
 // ----- Gbuffer -----
 
 Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
-	_texture_units(get_max_texture_unit_count())
+	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
+	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge))
 {
-	std::iota(_texture_units.begin(), _texture_units.end(), 0);
 	resize(viewport_size);
 }
 
@@ -56,6 +26,7 @@ void Gbuffer::resize(uint2 viewport_size) noexcept
 	_viewport_size = viewport_size;
 	_tex_depth_map = Texture_2d(Texture_format::depth_32, viewport_size);
 	_tex_normal_smoothness = Texture_2d(Texture_format::rgba_32f, viewport_size);
+	_tex_lighting_ambient_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
 }
 
 // ----- Gbuffer_pass -----
@@ -112,12 +83,22 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
 }
 
+// ----- Lighting_pass -----
+
+Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& dir_source_code) :
+	_gbuffer(gbuffer),
+	_dir_prog(dir_source_code)
+{}
+
+
 // ----- Renderer_config -----
 
 Renderer_config::Renderer_config(cg::uint2 viewport_size, 
-	const cg::data::Shader_program_source_code& gbuffer_pass_code) noexcept :
+	const cg::data::Shader_program_source_code& gbuffer_pass_code,
+	const cg::data::Shader_program_source_code& lighting_pass_dir_code) noexcept :
 	viewport_size(viewport_size),
-	gbuffer_pass_code(gbuffer_pass_code)
+	gbuffer_pass_code(gbuffer_pass_code),
+	lighting_pass_dir_code(lighting_pass_dir_code)
 {
 	assert(greater_than(viewport_size, 0));
 	assert(gbuffer_pass_code.vertex_source.size() > 0);
@@ -130,9 +111,8 @@ Renderer::Renderer(const Renderer_config& config) :
 	_vertex_attrib_layout(0, 1, 2, 3),
 	_gbuffer(config.viewport_size),
 	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
-	_default_sampler(Sampler_config())
-{
-}
+	_lighting_pass(_gbuffer, config.lighting_pass_dir_code)
+{}
 
 void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 {
@@ -144,7 +124,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 	// for each batch is the frame packet
 	auto r = frame.batch_count();
 	for (GLuint bi = 0; bi < frame.batch_count(); ++bi) {
-		glBindSampler(bi, _default_sampler.id());
+		glBindSampler(bi, _gbuffer.bilinear_sampler().id());
 
 		// rnd_offset: processed renderable object count.
 		// rnd_count: The number of renderable objects in the current batch #bi.
@@ -167,6 +147,11 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 	_gbuffer_pass.end();
 	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
 	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
+}
+
+void perform_lighting_pass(const Frame& frame) noexcept
+{
+
 }
 
 void Renderer::render(const Frame& frame) noexcept

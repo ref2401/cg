@@ -8,7 +8,6 @@ using cg::float3;
 using cg::mat3;
 using cg::mat4;
 using cg::uint2;
-
 using cg::data::Vertex_attribs;
 using cg::opengl::DE_cmd;
 using cg::opengl::Texture_2d;
@@ -21,9 +20,12 @@ using deferred_lighting::Renderer_config;
 
 Renderer_config make_render_config(uint2 viewport_size)
 {
-	auto gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
+	Renderer_config config;
+	config.viewport_size = viewport_size;
+	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
 
-	return Renderer_config(viewport_size, gbuffer_pass_code);
+	return config;
 }
 
 } // namespace
@@ -57,7 +59,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	_material.smoothness = 11.f;
 	_material.tex_normal_map = Texture_2d(Texture_format::rgb_8, normal_map_image);
 
-	auto default_normal_map_image = cg::file::load_image_tga("../data/material-default-normal_map.tga");
+	auto default_normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
 	_tex_default_normal_map = Texture_2d(Texture_format::rgb_8, default_normal_map_image);
 
 	// cube geometry

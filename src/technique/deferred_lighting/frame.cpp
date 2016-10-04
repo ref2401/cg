@@ -4,17 +4,8 @@
 #include <algorithm>
 #include <numeric>
 
-using cg::float3;
-using cg::mat3;
-using cg::mat4;
-using cg::put_in_column_major_order;
-using cg::opengl::DE_indirect_params;
-using cg::opengl::DE_cmd;
-using cg::opengl::Invalid;
-using cg::opengl::Static_buffer;
-using cg::opengl::Static_vertex_spec;
-using cg::opengl::Texture_2d;
-using cg::opengl::wait_for;
+using namespace cg;
+using namespace cg::opengl;
 
 
 namespace {
