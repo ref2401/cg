@@ -17,7 +17,9 @@ namespace deferred_lighting {
 class Gbuffer final {
 public:
 
-	Gbuffer(cg::uint2 viewport_size) noexcept;
+	Gbuffer(cg::uint2 viewport_size, 
+		const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout,
+		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data) noexcept;
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
 
@@ -25,6 +27,19 @@ public:
 
 	~Gbuffer() noexcept = default;
 
+
+	// Rect 1x1 (a square) is usually used to perform a full screen pass.
+	const cg::opengl::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
+	{
+		return _aux_geometry_rect_1x1_params;
+	}
+
+	// Returns the vertex array object's id that must be bound before 
+	// auxilary geometry (rect_1x1, ...other...) is renderer.
+	GLuint aux_geometry_vao_id() const noexcept
+	{
+		return _aux_geometry_vertex_spec.vao_id();
+	}
 	
 	// Default bilinear sampler (clamp_to_edge).
 	const cg::opengl::Sampler& bilinear_sampler() const noexcept
@@ -77,6 +92,8 @@ private:
 	const cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	cg::opengl::Sampler _bilinear_sampler;
 	cg::opengl::Sampler _nearest_sampler;
+	cg::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
+	cg::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
@@ -133,9 +150,9 @@ private:
 
 struct Renderer_config final {
 
+	cg::opengl::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
-	cg::opengl::Static_vertex_spec shapes_vertex_space;
-	cg::opengl::DE_cmd rect_1x1_cmd;
+	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
 };
@@ -143,7 +160,7 @@ struct Renderer_config final {
 class Renderer final {
 public:
 
-	Renderer(const Renderer_config& config);
+	Renderer(Renderer_config& config);
 
 	Renderer(const Renderer& rnd) = delete;
 

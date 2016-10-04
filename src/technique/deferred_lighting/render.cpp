@@ -15,11 +15,20 @@ namespace deferred_lighting {
 
 // ----- Gbuffer -----
 
-Gbuffer::Gbuffer(uint2 viewport_size) noexcept :
-	_vertex_attrib_layout(0, 1, 2, 3),
+Gbuffer::Gbuffer(uint2 viewport_size,
+	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout,
+	const Interleaved_mesh_data& rect_1x1_mesh_data) noexcept :
+	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge))
 {
+	Static_vertex_spec_builder vs_builder(8, 8);
+	vs_builder.begin(rect_1x1_mesh_data.attribs(), kilobytes(1));
+	{
+		auto rect_1x1_cmd = vs_builder.push_back(rect_1x1_mesh_data);
+		_aux_geometry_rect_1x1_params = rect_1x1_cmd.get_base_vertex_params();
+	}
+	vs_builder.end(_vertex_attrib_layout, true);
 	resize(viewport_size);
 }
 
@@ -94,8 +103,8 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_so
 
 // ----- Renderer -----
 
-Renderer::Renderer(const Renderer_config& config) :
-	_gbuffer(config.viewport_size),
+Renderer::Renderer(Renderer_config& config) :
+	_gbuffer(config.viewport_size, config.vertex_attrib_layout, config.rect_1x1_mesh_data),
 	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
 	_lighting_pass(_gbuffer, config.lighting_pass_dir_code)
 {}

@@ -9,9 +9,7 @@ using cg::mat3;
 using cg::mat4;
 using cg::uint2;
 using cg::data::Vertex_attribs;
-using cg::opengl::DE_cmd;
-using cg::opengl::Texture_2d;
-using cg::opengl::Texture_format;
+using namespace cg::opengl;
 
 
 namespace {
@@ -20,11 +18,19 @@ using deferred_lighting::Renderer_config;
 
 Renderer_config make_render_config(uint2 viewport_size)
 {
+	using cg::kilobytes;
+
 	Renderer_config config;
+	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	//config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
+	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
+
+	/*auto vertex_attribs = Vertex_attribs::position;
+	
+	
+	config.vertex_spec_shapes = vs_builder.end(config.vertex_attrib_layout);*/
 
 	return config;
 }
