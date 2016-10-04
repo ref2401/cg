@@ -21,17 +21,17 @@ public:
 
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
-	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+	void set_uniform_array_smoothness(const float* ptr, size_t count) noexcept;
 
-	void foo();
+	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
 
 private:
 	cg::opengl::Shader_program _prog;
 	GLint _u_projection_view_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_view_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_arr_smoothness_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_normal_map_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_specular_intensity_location = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

@@ -41,9 +41,10 @@ namespace deferred_lighting {
 // ----- Renderable -----
 
 Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix,
-	GLuint tex_normal_map_id) noexcept :
+	float smoothness, GLuint tex_normal_map_id) noexcept :
 	cmd(cmd),
 	model_matrix(model_matrix),
+	smoothness(smoothness),
 	tex_normal_map_id(tex_normal_map_id)
 {}
 
@@ -58,6 +59,7 @@ Frame::Frame(size_t max_renderable_count) :
 {
 	const size_t initial_capacity = 16;
 	_uniform_array_model_matrix.reserve(initial_capacity * 16);
+	_uniform_array_smoothness.reserve(initial_capacity);
 	_uniform_array_tex_normal_map.reserve(initial_capacity);
 }
 
@@ -65,6 +67,7 @@ void Frame::begin_rendering() noexcept
 {
 	assert(_renderable_count > 0);
 	assert(_uniform_array_model_matrix.size() / 16 == _renderable_count);
+	assert(_uniform_array_smoothness.size() == _renderable_count);
 	assert(_uniform_array_tex_normal_map.size() == _renderable_count);
 }
 
@@ -89,6 +92,9 @@ void Frame::push_back_renderable(const Renderable& rnd)
 	put_in_column_major_order(rnd.model_matrix, model_matrix_arr);
 	_uniform_array_model_matrix.insert(_uniform_array_model_matrix.end(),
 		std::begin(model_matrix_arr), std::end(model_matrix_arr));
+
+	// smoothness -> _uniform_array_smoothness
+	_uniform_array_smoothness.push_back(rnd.smoothness);
 
 	// tex_normal_map_id -> _uniform_array_tex_normal_map
 	_uniform_array_tex_normal_map.push_back(rnd.tex_normal_map_id);
@@ -134,6 +140,7 @@ void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept
 	_renderable_count = 0;
 	_offset_draw_indirect = 0;
 	_uniform_array_model_matrix.clear();
+	_uniform_array_smoothness.clear();
 	_uniform_array_tex_normal_map.clear();
 }
 

@@ -16,11 +16,12 @@ public:
 
 	Material() noexcept = default;
 
-	Material(cg::opengl::Texture_2d tex_normal_map) noexcept;
+	Material(float smoothness, cg::opengl::Texture_2d tex_normal_map) noexcept;
 
 	~Material() noexcept = default;
 
 
+	float smoothness = 0.f;
 	cg::opengl::Texture_2d tex_normal_map;
 };
 

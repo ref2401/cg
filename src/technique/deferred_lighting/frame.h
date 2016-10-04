@@ -11,10 +11,13 @@ namespace deferred_lighting {
 struct Renderable final {
 
 	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix,
-		GLuint tex_normal_map_id) noexcept;
+		float smoothness, GLuint tex_normal_map_id) noexcept;
 
+	// geometry
 	cg::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
+	// material
+	float smoothness = 0.f;
 	GLuint tex_normal_map_id = cg::opengl::Invalid::texture_id;
 };
 
@@ -96,6 +99,11 @@ public:
 		return _uniform_array_model_matrix;
 	}
 
+	const std::vector<float>& uniform_array_smoothness() const noexcept
+	{
+		return _uniform_array_smoothness;
+	}
+
 	const std::vector<GLuint>& uniform_array_tex_normal_map() const noexcept
 	{
 		return _uniform_array_tex_normal_map;
@@ -121,6 +129,7 @@ private:
 	GLuint _vao_id = cg::opengl::Invalid::vao_id;
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
+	std::vector<float> _uniform_array_smoothness;
 	std::vector<GLuint> _uniform_array_tex_normal_map;
 };
 

@@ -101,9 +101,11 @@ void Gbuffer_pass::end() noexcept
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	const std::vector<float>& uniform_array_model_matrix,
+	const std::vector<float>& uniform_array_smoothness,
 	const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept
 {
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
+	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
 
 	size_t curr_unit = 0;
 	for (; curr_unit < rnd_count; ++curr_unit)
@@ -152,6 +154,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 		// uniform arrays
 		_gbuffer_pass.set_uniform_arrays(rnd_offset, rnd_count, 
 			frame.uniform_array_model_matrix(),
+			frame.uniform_array_smoothness(),
 			frame.uniform_array_tex_normal_map());
 		
 		

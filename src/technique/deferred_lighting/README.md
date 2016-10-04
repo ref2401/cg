@@ -1,28 +1,28 @@
 # deferred lighting steps
 
-single vertex array object.
-uniform arrays are used heavily, uniform block would have done better.
+Implementation notes and further improvements
+- single vertex array object. Frame_packet
+2-3 Frame objects
+- uniform arrays are used heavily, uniform block would have done better.
 unifrom array limitations: ...
-
+- point lights, spotlights instanced rendering
+- batch_size deduction
 
 Deferred lighting is devided into three passes:
 1. GBuffer_pass
 input:
 	vertex_attribs: position, normal, tex_coord, tangent_h
 	model_matrix
-	normal_matrix (normal, tangent, bitangent)
-	tex_normal_map_id (sRGB?)
+	tex_normal_map_id (linear space)
 	tex_smoothness_id (sRGB?)
-
-test batch rendering: 3-4 materials, ~100 objects.
 
 2. Lighting_pass
 	- depth_unchanged gl_FragDepth
 3. Material_pass
 
-Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering and gl_DrawID simulation. 
-Indirect buffer and draw index buffer use tripple buffering technique to metigate synchronization with OpenGL command queue.
-
+Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. 
+Draw indirect buffer use tripple buffering technique to metigate synchronization with OpenGL command queue.
+Draw call index buffer is used for and gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size)
 
 
 ## roadmap

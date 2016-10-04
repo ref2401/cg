@@ -33,7 +33,8 @@ namespace deferred_lighting {
 
 // ----- Material -----
 
-Material::Material(Texture_2d tex_normal_map) noexcept :
+Material::Material(float smoothness, Texture_2d tex_normal_map) noexcept :
+	smoothness(smoothness),
 	tex_normal_map(std::move(tex_normal_map))
 {}
 
@@ -53,6 +54,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	// scene
 	// materials
 	auto normal_map_image = cg::file::load_image_tga("../data/normal_map.tga");
+	_material.smoothness = 11.f;
 	_material.tex_normal_map = Texture_2d(Texture_format::rgb_8, normal_map_image);
 
 	auto default_normal_map_image = cg::file::load_image_tga("../data/material-default-normal_map.tga");
@@ -72,14 +74,17 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	_rednerable_objects.reserve(16);
 	_rednerable_objects.emplace_back(cube_cmd, 
 		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)),
+		_material.smoothness,
 		_material.tex_normal_map.id());
 	
 	_rednerable_objects.emplace_back(square_cmd, 
 		translation_matrix(float3(-2.f, 1, 1)),
+		_material.smoothness,
 		_material.tex_normal_map.id());
 
 	_rednerable_objects.emplace_back(square_cmd, 
 		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, -cg::pi_8)),
+		9.f,
 		_tex_default_normal_map.id());
 }
 

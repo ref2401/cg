@@ -81,6 +81,7 @@ public:
 
 	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count, 
 		const std::vector<float>& uniform_array_model_matrix,
+		const std::vector<float>& uniform_array_smoothness,
 		const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept;
 
 private:
