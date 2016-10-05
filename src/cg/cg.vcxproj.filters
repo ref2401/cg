@@ -46,6 +46,9 @@
     <ClCompile Include="opengl\framebuffer.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
+    <ClCompile Include="sys\app.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

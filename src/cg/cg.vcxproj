@@ -138,6 +138,7 @@
     <ClCompile Include="opengl\opengl_def.cpp" />
     <ClCompile Include="opengl\shader.cpp" />
     <ClCompile Include="opengl\vertex_spec.cpp" />
+    <ClCompile Include="sys\app.cpp" />
     <ClCompile Include="sys\win32_app.cpp" />
     <ClCompile Include="sys\win32_opengl.cpp" />
   </ItemGroup>

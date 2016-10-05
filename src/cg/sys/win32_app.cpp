@@ -10,11 +10,7 @@
 namespace {
 
 using cg::uint2;
-using cg::sys::IApplication;
-using cg::sys::IGame;
-using cg::sys::IRender_context;
-using cg::sys::IWindow;
-using cg::sys::make_win32_opengl_render_context;
+using namespace cg::sys;
 
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);
@@ -120,7 +116,7 @@ public:
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages();
 
-	void run(std::unique_ptr<IGame> game) override;
+	Clock_report run(std::unique_ptr<IGame> game) override;
 
 	IWindow* window() const noexcept override
 	{
@@ -155,21 +151,34 @@ bool Win32_app::pump_sys_messages()
 	return false;
 }
 
-void Win32_app::run(std::unique_ptr<IGame> game)
+Clock_report Win32_app::run(std::unique_ptr<IGame> game)
 {
 	assert(!_is_running);
 	assert(game);
 
 	_is_running = true;
 	_window->show();
+	_rnd_context->swap_color_buffers(); //  what for vsync
+	_clock.restart();
 
 	while (true) {
+		_clock.process_loop_iteration();
+
 		bool terminate = pump_sys_messages();
 		if (terminate) break;
 
+		// simulation
+		while (_clock.has_update_time()) {
+			_clock.process_update_call();
+			game->update(Clock::update_delta_time.count());
+		}
+
+		// rendering
 		game->render(1.f);
 		_rnd_context->swap_color_buffers();
-	} // while
+	}
+
+	return _clock.get_report();
 }
 
 
