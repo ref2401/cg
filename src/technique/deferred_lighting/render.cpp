@@ -11,6 +11,24 @@ using cg::data::Interleaved_mesh_data;
 using cg::data::Shader_program_source_code;
 
 
+namespace {
+
+using deferred_lighting::Directional_light;
+using deferred_lighting::Directional_light_params;
+
+Directional_light_params get_directional_light_params(const mat3& view_matrix, const Directional_light& dir_light) noexcept
+{
+	Directional_light_params p;
+	p.direction_vs = mul(view_matrix, normalize(dir_light.target - dir_light.position));
+	p.irradiance = dir_light.rgb * dir_light.intensity;
+	p.ambient_irradiance_up = dir_light.rgb * dir_light.ambient_intensity;
+	p.ambient_irradiance_down = 0.7f * p.ambient_irradiance_up;
+	return p;
+}
+
+} // namespace
+
+
 namespace deferred_lighting {
 
 // ----- Gbuffer -----
@@ -38,6 +56,7 @@ void Gbuffer::resize(uint2 viewport_size) noexcept
 	_tex_depth_map = Texture_2d(Texture_format::depth_32, viewport_size);
 	_tex_normal_smoothness = Texture_2d(Texture_format::rgba_32f, viewport_size);
 	_tex_lighting_ambient_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
+	_tex_lighting_diffuse_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
 }
 
 // ----- Gbuffer_pass -----
@@ -69,16 +88,6 @@ void Gbuffer_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
-	
-	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-
-	glBlitFramebuffer(
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	_fbo.set_read_buffer(GL_NONE);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);*/
 }
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -101,8 +110,9 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_so
 	_dir_prog(dir_source_code)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
-	_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
-	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0);
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
+	//_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
+	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
 }
@@ -111,7 +121,8 @@ void Lighting_pass::begin() noexcept
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-	glClearBufferfv(GL_COLOR, 0, _clear_value_color);
+	glClearColor(_clear_value_color.r, _clear_value_color.g, _clear_value_color.b, _clear_value_color.a);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
 }
@@ -120,21 +131,30 @@ void Lighting_pass::end() noexcept
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
+	size_t hw = _gbuffer.viewport_size().width / 2;
+	size_t hh = _gbuffer.viewport_size().height / 2;
+	
+	// ambient_term -> upper-left
 	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, hh, hw - 1, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-	glBlitFramebuffer(
+	// diffuse_term -> upper-right
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT1);
+	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		hw, hh, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	
 	_fbo.set_read_buffer(GL_NONE);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, Invalid::framebuffer_id);
 }
 
-void Lighting_pass::perform_directional_light_pass(const cg::float3& ambient_up_irradiance,
-	const cg::float3& ambient_down_irradiance) noexcept
+void Lighting_pass::perform_directional_light_pass(const mat3& view_matrix, const Directional_light& dir_light) noexcept
 {
-	_dir_prog.use(ambient_up_irradiance, ambient_down_irradiance);
+	auto dir_light_params = get_directional_light_params(view_matrix, dir_light);
+	_dir_prog.use(dir_light_params);
 	
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
@@ -184,7 +204,11 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 {
 	_lighting_pass.begin();
-	_lighting_pass.perform_directional_light_pass(float3(1), float3(0.1));
+
+	_lighting_pass.perform_directional_light_pass(
+		static_cast<mat3>(frame.view_matrix()), 
+		frame.directional_light());
+	
 	_lighting_pass.end();
 	glBindTextureUnit(0, _gbuffer.tex_lighting_ambient_term().id());
 }

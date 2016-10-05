@@ -49,6 +49,7 @@ private:
 	std::vector<Renderable> _rednerable_objects;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
+	Directional_light _dir_light;
 	// renderer stuff
 	Renderer _renderer;
 	Frame _frame;

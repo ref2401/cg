@@ -29,6 +29,17 @@ Static_buffer make_draw_index_buffer(size_t draw_call_count)
 
 namespace deferred_lighting {
 
+// ----- Directional_light -----
+
+Directional_light::Directional_light(const float3& position, const float3& target,
+	const float3& rgb, float intensity, float ambient_intensity) noexcept :
+	position(position),
+	target(target),
+	rgb(rgb),
+	intensity(intensity),
+	ambient_intensity(ambient_intensity)
+{}
+
 // ----- Renderable -----
 
 Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix,

@@ -63,10 +63,17 @@ public:
 	}
 
 	// Lighting_pass's render target texture.
-	// xyz components contain ambient lighting intensity.
+	// xyz components contain ambient radiance.
 	cg::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
 	{
 		return _tex_lighting_ambient_term;
+	}
+
+	// Lighting_pass's render target texture.
+	// xyz components contain diffuse radiance.
+	cg::opengl::Texture_2d& tex_lighting_diffuse_term() noexcept
+	{
+		return _tex_lighting_diffuse_term;
 	}
 
 	// Gbuffer_pass's render target texture.
@@ -97,6 +104,7 @@ private:
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
+	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
 	cg::uint2 _viewport_size;
 };
 
@@ -147,11 +155,10 @@ public:
 
 	void end() noexcept;
 
-	void perform_directional_light_pass(const cg::float3& ambient_up_irradiance,
-		const cg::float3& ambient_down_irradiance) noexcept;
+	void perform_directional_light_pass(const cg::mat3& view_matrix, const Directional_light& dir_light) noexcept;
 
 private:
-	float _clear_value_color[4] = { 0, 0, 0, 0 };
+	const cg::float4 _clear_value_color = cg::float4::zero;
 	Gbuffer& _gbuffer;
 	cg::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;

@@ -42,16 +42,19 @@ void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4&
 Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
 	const Shader_program_source_code& dir_source_code) :
 	_prog("lighting-pass-dir-shader", dir_source_code),
-	_u_light_ambient_up_irradiance_location(_prog.get_uniform_location("u_light_ambient_up_irradiance")),
-	_u_light_ambient_down_irradiance_location(_prog.get_uniform_location("u_light_ambient_down_irradiance"))
+	_u_dir_light_dir_to_light_vs_location(_prog.get_uniform_location("u_dir_light.dir_to_light_vs")),
+	_u_dir_light_irradiance_location(_prog.get_uniform_location("u_dir_light.irradiance")),
+	_u_dir_light_ambient_irradiance_up_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_up")),
+	_u_dir_light_ambient_irradiance_down_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_down"))
 {}
 
-void Lighting_pass_dir_shader_program::use(const cg::float3& ambient_up_irradiance,
-	const cg::float3& ambient_down_irradiance) noexcept
+void Lighting_pass_dir_shader_program::use(const Directional_light_params& dl_params) noexcept
 {
 	glUseProgram(_prog.id());
-	set_uniform(_u_light_ambient_up_irradiance_location, ambient_up_irradiance);
-	set_uniform(_u_light_ambient_down_irradiance_location, ambient_down_irradiance);
+	set_uniform(_u_dir_light_dir_to_light_vs_location, -dl_params.direction_vs);
+	set_uniform(_u_dir_light_irradiance_location, dl_params.irradiance);
+	set_uniform(_u_dir_light_ambient_irradiance_up_location, dl_params.ambient_irradiance_up);
+	set_uniform(_u_dir_light_ambient_irradiance_down_location, dl_params.ambient_irradiance_down);
 }
 
 } // namespace deferred_lighting

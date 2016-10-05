@@ -8,6 +8,35 @@
 
 namespace deferred_lighting {
 
+// Directional_light respresents extremely distant light sources like sun.
+// The light of sucht light source travels in a single direction that is the same throughout the scene.
+// All the orientation vectors are considered to be in the world space.
+struct Directional_light final {
+
+	Directional_light() noexcept = default;
+
+	Directional_light(const cg::float3& position, const cg::float3& target,
+		const cg::float3& rgb, float intensity, float ambient_intensity) noexcept;
+	
+
+	// Position of the light. 
+	// The value is required in shadow mapping computations.
+	cg::float3 position = cg::float3::unit_z;
+
+	// The point at which light's direction points to.
+	// The value is required in shadow mapping computations.
+	cg::float3 target = cg::float3::zero;
+
+	// The color of the light.
+	cg::float3 rgb = cg::float3::unit_xyz;
+
+	// The value represents factor of the light's irradiance.
+	float intensity = 1.f;
+
+	// The value represents factor of the light's ambient irradiance.
+	float ambient_intensity = 1.f;
+};
+
 struct Renderable final {
 
 	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix,
@@ -51,6 +80,16 @@ public:
 	void begin_rendering() noexcept;
 
 	void end_rendering() noexcept;
+
+	const Directional_light& directional_light() const noexcept
+	{
+		return _dir_light;
+	}
+
+	void set_directional_light(const Directional_light& dir_light) noexcept
+	{
+		_dir_light = dir_light;
+	}
 
 	const cg::mat4& projection_matrix() const noexcept
 	{
@@ -117,6 +156,7 @@ private:
 	const size_t _max_renderable_count;
 	cg::mat4 _projection_matrix = cg::mat4::identity;
 	cg::mat4 _view_matrix = cg::mat4::identity;
+	Directional_light _dir_light;
 	
 	// indirect rendering gears
 	const size_t _batch_size;

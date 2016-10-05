@@ -7,6 +7,22 @@
 
 namespace deferred_lighting {
 
+struct Directional_light_params final {
+	// The direction in which the light travels. 
+	// The value is normalized and in the view space.
+	cg::float3 direction_vs;
+
+	// Irradinace is computed as rgb * intensity and it's value can exceed float3::unit_xyz.
+	cg::float3 irradiance;
+
+	// Ambient irradinace is computed as rgb * ambient_intensity and it's value can exceed float3::unit_xyz.
+	cg::float3 ambient_irradiance_up;
+
+	// Additional ambient irradiance value that is used in the hemispheric ambient lighting.
+	// The value is a portion of the ambient_irradinace_up value.
+	cg::float3 ambient_irradiance_down;
+};
+
 // Gbuffer_pass_shader_program is used by the Gbuffer_pass to populate Gbuffer's tex_normal_smoothness.
 class Gbuffer_pass_shader_program final {
 public:
@@ -47,12 +63,14 @@ public:
 	~Lighting_pass_dir_shader_program() noexcept = default;
 
 
-	void use(const cg::float3& ambient_up_irradiance, const cg::float3& ambient_down_irradiance) noexcept;
+	void use(const Directional_light_params& dl_params) noexcept;
 
 private:
 	cg::opengl::Shader_program _prog;
-	GLint _u_light_ambient_up_irradiance_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_light_ambient_down_irradiance_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_dir_to_light_vs_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_irradiance_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_ambient_irradiance_up_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_ambient_irradiance_down_location = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

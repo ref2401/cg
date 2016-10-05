@@ -80,6 +80,12 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());
 
 	// scene objects
+	_dir_light.position = float3(1000);
+	_dir_light.target = float3::zero;
+	_dir_light.rgb = float3::unit_xyz;
+	_dir_light.intensity = 1.f;
+	_dir_light.ambient_intensity = 0.35f;
+
 	_rednerable_objects.reserve(16);
 	_rednerable_objects.emplace_back(cube_cmd, 
 		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)),
@@ -103,6 +109,7 @@ void Deferred_lighting::render(float blend_state)
 
 	_frame.set_projection_matrix(_projection_matrix);
 	_frame.set_view_matrix(_view_matrix);
+	_frame.set_directional_light(_dir_light);
 
 	for (const auto& rnd : _rednerable_objects) {
 		_frame.push_back_renderable(rnd);
