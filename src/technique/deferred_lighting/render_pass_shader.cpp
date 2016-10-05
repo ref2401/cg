@@ -2,6 +2,7 @@
 
 using cg::mat3;
 using cg::mat4;
+using cg::uint2;
 using cg::data::Shader_program_source_code;
 using cg::opengl::set_uniform;
 using cg::opengl::set_uniform_array;
@@ -42,15 +43,22 @@ void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4&
 Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
 	const Shader_program_source_code& dir_source_code) :
 	_prog("lighting-pass-dir-shader", dir_source_code),
+	_u_viewport_size_location(_prog.get_uniform_location("u_viewport_size")),
+	_u_inv_projection_matrix_location(_prog.get_uniform_location("u_inv_projection_matrix")),
 	_u_dir_light_dir_to_light_vs_location(_prog.get_uniform_location("u_dir_light.dir_to_light_vs")),
 	_u_dir_light_irradiance_location(_prog.get_uniform_location("u_dir_light.irradiance")),
 	_u_dir_light_ambient_irradiance_up_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_up")),
 	_u_dir_light_ambient_irradiance_down_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_down"))
 {}
 
-void Lighting_pass_dir_shader_program::use(const Directional_light_params& dl_params) noexcept
+void Lighting_pass_dir_shader_program::use(const uint2& viewport_size, 
+	const mat4& projection_matrix, const Directional_light_params& dl_params) noexcept
 {
+	using cg::inverse;
+
 	glUseProgram(_prog.id());
+	set_uniform(_u_viewport_size_location, viewport_size);
+	set_uniform(_u_inv_projection_matrix_location, inverse(projection_matrix));
 	set_uniform(_u_dir_light_dir_to_light_vs_location, -dl_params.direction_vs);
 	set_uniform(_u_dir_light_irradiance_location, dl_params.irradiance);
 	set_uniform(_u_dir_light_ambient_irradiance_up_location, dl_params.ambient_irradiance_up);

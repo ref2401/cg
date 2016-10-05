@@ -27,11 +27,6 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
 
-	/*auto vertex_attribs = Vertex_attribs::position;
-	
-	
-	config.vertex_spec_shapes = vs_builder.end(config.vertex_attrib_layout);*/
-
 	return config;
 }
 
@@ -63,7 +58,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	// scene
 	// materials
 	auto normal_map_image = cg::file::load_image_tga("../data/normal_map.tga");
-	_material.smoothness = 11.f;
+	_material.smoothness = 3.f;
 	_material.tex_normal_map = Texture_2d(Texture_format::rgb_8, normal_map_image);
 
 	auto default_normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
@@ -98,7 +93,7 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 		_material.tex_normal_map.id());
 
 	_rednerable_objects.emplace_back(square_cmd, 
-		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, -cg::pi_8)),
+		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, cg::pi_8)),
 		9.f,
 		_tex_default_normal_map.id());
 }

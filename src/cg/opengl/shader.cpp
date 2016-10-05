@@ -7,10 +7,7 @@
 #include "cg/data/shader.h"
 #include "cg/opengl/opengl_def.h"
 
-using cg::float3;
-using cg::mat3;
-using cg::mat4;
-using cg::enforce;
+using namespace cg;
 using cg::data::Vertex_attribs;
 
 
@@ -295,6 +292,13 @@ Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
 }
 
 // ----- funcs -----
+
+template<>
+void set_uniform<uint2>(GLint location, const uint2& v) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform2ui(location, v.x, v.y);
+}
 
 template<>
 void set_uniform<float3>(GLint location, const float3& v) noexcept

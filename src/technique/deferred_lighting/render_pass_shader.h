@@ -63,10 +63,13 @@ public:
 	~Lighting_pass_dir_shader_program() noexcept = default;
 
 
-	void use(const Directional_light_params& dl_params) noexcept;
+	void use(const cg::uint2& viewport_size, const cg::mat4& projection_matrix,
+		const Directional_light_params& dl_params) noexcept;
 
 private:
 	cg::opengl::Shader_program _prog;
+	GLint _u_viewport_size_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_inv_projection_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_dir_light_dir_to_light_vs_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_dir_light_irradiance_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_dir_light_ambient_irradiance_up_location = cg::opengl::Invalid::uniform_location;

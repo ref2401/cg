@@ -76,6 +76,13 @@ public:
 		return _tex_lighting_diffuse_term;
 	}
 
+	// Lighting_pass's render target texture.
+	// xyz components contain specular radiance.
+	cg::opengl::Texture_2d& tex_lighting_specular_term() noexcept
+	{
+		return _tex_lighting_specular_term;
+	}
+
 	// Gbuffer_pass's render target texture.
 	// xyz components contain normal in the view space.
 	// w component contains material.smoothness parameter.
@@ -105,6 +112,7 @@ private:
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
+	cg::opengl::Texture_2d _tex_lighting_specular_term;
 	cg::uint2 _viewport_size;
 };
 
@@ -155,7 +163,8 @@ public:
 
 	void end() noexcept;
 
-	void perform_directional_light_pass(const cg::mat3& view_matrix, const Directional_light& dir_light) noexcept;
+	void perform_directional_light_pass(const cg::mat4& projection_matrix,
+		const cg::mat3& view_matrix, const Directional_light& dir_light) noexcept;
 
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
