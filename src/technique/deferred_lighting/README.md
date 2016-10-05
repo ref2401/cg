@@ -3,31 +3,32 @@
 ## screenshots
 
 ## renderer outline
-Deferred lighting is devided into three main passes:
-1. GBuffer_pass
-populates rgba32f texture. xyz: normal in the view space. w: material's smoothness property.
+Deferred lighting is devided into three main passes.
 
-2. Lighting_pass
-populates rgb32f ambient term, diffuse term, specular term textures.
+1. GBuffer_pass.
+
+	populates rgba32f texture. xyz: normal in the view space. w: material's smoothness property.
+
+2. Lighting_pass.
+
+	populates rgb32f ambient term, diffuse term, specular term textures.
  
-3. Material_pass
+3. Material_pass.
 
-Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. 
-Draw indirect buffer use tripple buffering technique to metigate synchronization with OpenGL command queue.
-Draw call index buffer is used for and gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size)
+	...
+
+Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. Draw indirect buffer use tripple buffering technique to metigate synchronization with OpenGL command queue. Draw call index buffer is used for and gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size).
 
 ## Implementation notes and further improvements
-- single vertex array object. Frame_packet
-2-3 Frame objects
-- uniform arrays are used heavily, uniform block would have done better.
-unifrom array limitations: ...
-- point lights, spotlights instanced rendering
-- batch_size deduction
+- single vertex array object. 
+- Frame_packet, 2-3 Frame objects.
+- Uniform arrays are used heavily, uniform block would have done better. Unifrom array limitations.
+- Point lights, spotlights instanced rendering.
+- Batch_size deduction.
 
 
 ## roadmap
 - teapot model
-
 
 - Material pass
 -  gamma correction sRGB formats?
