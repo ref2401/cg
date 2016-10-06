@@ -40,7 +40,6 @@ inline Mouse_buttons& operator&=(Mouse_buttons& l, Mouse_buttons r) noexcept
 }
 
 
-
 class Mouse final {
 public:
 
@@ -50,6 +49,36 @@ public:
 
 	Mouse(Mouse&&) noexcept = delete;
 
+
+	// Returns the state of all the mouse's buttons.
+	const Mouse_buttons& buttons() const noexcept
+	{
+		return _buttons;
+	}
+
+	// Sets the state of all the mouse's buttons.
+	void set_buttons(const Mouse_buttons mb) noexcept
+	{
+		_buttons = mb;
+	}
+
+	// true if left mouse button has been pressed.
+	bool left_down() const noexcept
+	{
+		return (_buttons & Mouse_buttons::left) == Mouse_buttons::left;
+	}
+
+	// true if middle mouse button has been pressed.
+	bool middle_down() const noexcept 
+	{
+		return (_buttons & Mouse_buttons::middle) == Mouse_buttons::middle;
+	}
+
+	// true if right mouse button has been pressed.
+	bool right_down() const noexcept
+	{
+		return (_buttons & Mouse_buttons::right) == Mouse_buttons::right;
+	}
 
 private:
 	Mouse_buttons _buttons = Mouse_buttons::none;
