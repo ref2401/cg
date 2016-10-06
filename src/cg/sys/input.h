@@ -39,6 +39,22 @@ inline Mouse_buttons& operator&=(Mouse_buttons& l, Mouse_buttons r) noexcept
 	return l;
 }
 
+inline Mouse_buttons operator~(Mouse_buttons mb) noexcept
+{
+	auto res = Mouse_buttons::none;
+
+	if ((mb & Mouse_buttons::left) == Mouse_buttons::none)
+		res |= Mouse_buttons::left;
+
+	if ((mb & Mouse_buttons::middle) == Mouse_buttons::none)
+		res |= Mouse_buttons::middle;
+
+	if ((mb & Mouse_buttons::right) == Mouse_buttons::none)
+		res |= Mouse_buttons::right;
+
+	return res;
+}
+
 
 class Mouse final {
 public:

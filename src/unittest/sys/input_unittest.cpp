@@ -112,6 +112,24 @@ public:
 		Assert::AreEqual(Mouse_buttons::middle, (mb & Mouse_buttons::middle));
 		Assert::AreEqual(Mouse_buttons::right, (mb & Mouse_buttons::right));
 	}
+
+	TEST_METHOD(unary_operators)
+	{
+		auto mb = Mouse_buttons::none;
+		Assert::AreEqual(Mouse_buttons::left | Mouse_buttons::middle | Mouse_buttons::right, ~mb);
+
+		mb = Mouse_buttons::left;
+		Assert::AreEqual(Mouse_buttons::middle | Mouse_buttons::right, ~mb);
+
+		mb = Mouse_buttons::middle;
+		Assert::AreEqual(Mouse_buttons::left | Mouse_buttons::right, ~mb);
+
+		mb = Mouse_buttons::right;
+		Assert::AreEqual(Mouse_buttons::left | Mouse_buttons::middle, ~mb);
+
+		mb = Mouse_buttons::left | Mouse_buttons::middle | Mouse_buttons::right;
+		Assert::AreEqual(Mouse_buttons::none, ~mb);
+	}
 };
 
 } // namespace unittest

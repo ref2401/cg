@@ -10,7 +10,7 @@
 namespace cg {
 namespace sys {
 
-class Opengl_render_context final : public IRender_context {
+class Opengl_render_context final : public Render_context_i {
 public:
 
 	Opengl_render_context(HWND hwnd);
@@ -50,6 +50,10 @@ public:
 		return _hwnd;
 	}
 
+	std::string title() const override;
+
+	void set_title(const char* str) noexcept override;
+
 	void show() noexcept override;
 
 	uint2 size() const noexcept override;
@@ -60,19 +64,19 @@ private:
 	HDC _hdc = nullptr;
 };
 
-class Win_app final : public Application_i {
+class Win_app final : public Application {
 public:
 
 	Win_app(uint2 wnd_position, uint2 wnd_size);
 
-	~Win_app() noexcept override = default;
+	~Win_app() noexcept override;
 
 
 	// Processes all the system messages that are situated in the message queue at the moment.
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages() const noexcept;
 
-	Clock_report run(std::unique_ptr<Game_i> game) override;
+	Clock::Clock_report run(std::unique_ptr<Game_i> game) override;
 
 	Window_i& window() noexcept override
 	{

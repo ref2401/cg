@@ -2,12 +2,19 @@
 
 #include <cassert>
 #include <memory>
+#include <type_traits>
 #include "cg/base/base.h"
 
 
 namespace {
 
 extern "C" using Extern_func_ptr_t = void(*);
+
+// Yay! A global. The Win_app ctor sets its value. The Win_app dtor resets it to nullptr.
+// Only window_proc is supposed to use the global. 
+// If any other chunk of code uses it then your PC will burn. Consider yourself warned.
+cg::sys::Win_app* g_win_app = nullptr;
+
 
 Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 {
@@ -32,7 +39,32 @@ Extern_func_ptr_t load_opengl_func(const char* func_name)
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
 {
+	using cg::sys::Mouse_buttons;
+
+
+	if (g_win_app == nullptr)
+		return DefWindowProc(hwnd, message, w_param, l_param);
+
 	switch (message) {
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		{
+			auto buttons = Mouse_buttons::none;
+			
+			int btn_state = GET_KEYSTATE_WPARAM(w_param);
+			if ((btn_state & MK_LBUTTON) == MK_LBUTTON) buttons |= Mouse_buttons::left;
+			if ((btn_state & MK_MBUTTON) == MK_MBUTTON) buttons |= Mouse_buttons::middle;
+			if ((btn_state & MK_RBUTTON) == MK_RBUTTON) buttons |= Mouse_buttons::right;
+
+			g_win_app->enqueu_mouse_button_message(buttons);
+			return 0;
+		}
+
+
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
@@ -837,6 +869,19 @@ Win_window::~Win_window() noexcept
 	UnregisterClass(Win_window::wnd_class_name, _hinstance);
 }
 
+std::string Win_window::title() const  
+{
+	char buffer[256];
+	int actual_length = GetWindowText(_hwnd, buffer, std::extent<decltype(buffer)>::value);
+
+	return std::string(buffer, actual_length);
+}
+
+void Win_window::set_title(const char* str) noexcept
+{
+	SetWindowTextA(_hwnd, str);
+}
+
 void Win_window::show() noexcept
 {
 	ShowWindow(_hwnd, SW_SHOW);
@@ -854,10 +899,18 @@ uint2 Win_window::size() const noexcept
 // ----- Win_app -----
 
 Win_app::Win_app(uint2 wnd_position, uint2 wnd_size) :
+	Application(),
 	_hinstance(GetModuleHandle(nullptr)),
 	_window(_hinstance, wnd_position, wnd_size),
 	_rnd_context(_window.hwnd())
-{}
+{
+	g_win_app = this;
+}
+
+Win_app::~Win_app() noexcept
+{
+	g_win_app = nullptr;
+}
 
 bool Win_app::pump_sys_messages() const noexcept
 {
@@ -873,7 +926,7 @@ bool Win_app::pump_sys_messages() const noexcept
 	return false;
 }
 
-Clock_report Win_app::run(std::unique_ptr<Game_i> game)
+Clock::Clock_report Win_app::run(std::unique_ptr<Game_i> game)
 {
 	assert(!_is_running);
 	assert(game);
@@ -892,6 +945,7 @@ Clock_report Win_app::run(std::unique_ptr<Game_i> game)
 		// simulation
 		while (_clock.has_update_time()) {
 			_clock.process_update_call();
+			process_sys_messages();
 			game->update(static_cast<float>(Clock::update_delta_time.count()));
 		}
 
@@ -905,7 +959,7 @@ Clock_report Win_app::run(std::unique_ptr<Game_i> game)
 
 // ----- funcs -----
 
-std::unique_ptr<Application_i> make_win32_application(uint2 wnd_position, uint2 wnd_size)
+std::unique_ptr<Application> make_win_application(uint2 wnd_position, uint2 wnd_size)
 {
 	return std::make_unique<Win_app>(wnd_position, wnd_size);
 }

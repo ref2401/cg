@@ -9,10 +9,13 @@
 #include "technique/deferred_lighting/deferred_lighting.h"
 
 using cg::uint2;
-using cg::sys::Clock_report;
-using cg::sys::make_win32_application;
+using cg::sys::Clock;
+using cg::sys::make_win_application;
 
-std::string get_report_message(const Clock_report& report)
+
+namespace {
+
+std::string get_report_message(const Clock::Clock_report& report)
 {
 	std::ostringstream out;
 	out << std::endl << "----- Exec report ----- " << std::endl;
@@ -24,12 +27,14 @@ std::string get_report_message(const Clock_report& report)
 	return out.str();
 }
 
+} // namespace
+
+
 int main(int argc, char* argv[])
 {
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);
-	auto app = make_win32_application(wnd_position, wnd_size);
-	
+	auto app = make_win_application(wnd_position, wnd_size);
 	try {
 		auto game = std::make_unique<deferred_lighting::Deferred_lighting>(app->window().size());
 		auto report = app->run(std::move(game));
