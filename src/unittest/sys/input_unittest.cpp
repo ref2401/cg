@@ -1,7 +1,9 @@
 #include "cg/sys/input.h"
 
+#include "cg/math/math.h"
 #include "CppUnitTest.h"
 
+using cg::uint2;
 using cg::sys::Mouse;
 using cg::sys::Mouse_buttons;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -9,6 +11,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
+template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Mouse_buttons>(const Mouse_buttons& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
@@ -62,6 +65,15 @@ public:
 	{
 		Mouse mouse;
 		Assert::AreEqual(Mouse_buttons::none, mouse.buttons());
+		Assert::IsTrue(mouse.is_out());
+		Assert::AreEqual(uint2::zero, mouse.position());
+	}
+
+	TEST_METHOD(props_get_set)
+	{
+		Mouse mouse;
+		mouse.set_position(uint2(3, 4));
+		Assert::AreEqual(uint2(3, 4), mouse.position());
 	}
 };
 

@@ -45,6 +45,8 @@ public:
 	~Win_window() noexcept;
 
 
+	bool focused() const noexcept override;
+
 	HWND hwnd() const noexcept
 	{
 		return _hwnd;
@@ -71,6 +73,11 @@ public:
 
 	~Win_app() noexcept override;
 
+
+	HWND hwnd() const noexcept 
+	{
+		return _window.hwnd();
+	}
 
 	// Processes all the system messages that are situated in the message queue at the moment.
 	// Returns true if the application has to terminate.

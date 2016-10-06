@@ -8,6 +8,9 @@
 
 namespace {
 
+using cg::uint2;
+using cg::sys::Mouse_buttons;
+
 extern "C" using Extern_func_ptr_t = void(*);
 
 // Yay! A global. The Win_app ctor sets its value. The Win_app dtor resets it to nullptr.
@@ -15,6 +18,23 @@ extern "C" using Extern_func_ptr_t = void(*);
 // If any other chunk of code uses it then your PC will burn. Consider yourself warned.
 cg::sys::Win_app* g_win_app = nullptr;
 
+
+Mouse_buttons get_mouse_buttons(WPARAM w_param) noexcept
+{
+	auto buttons = Mouse_buttons::none;
+
+	int btn_state = GET_KEYSTATE_WPARAM(w_param);
+	if ((btn_state & MK_LBUTTON) == MK_LBUTTON) buttons |= Mouse_buttons::left;
+	if ((btn_state & MK_MBUTTON) == MK_MBUTTON) buttons |= Mouse_buttons::middle;
+	if ((btn_state & MK_RBUTTON) == MK_RBUTTON) buttons |= Mouse_buttons::right;
+
+	return buttons;
+}
+
+uint2 get_mouse_position(LPARAM l_param) noexcept
+{
+	return uint2(LOWORD(l_param), HIWORD(l_param));
+}
 
 Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 {
@@ -39,9 +59,6 @@ Extern_func_ptr_t load_opengl_func(const char* func_name)
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
 {
-	using cg::sys::Mouse_buttons;
-
-
 	if (g_win_app == nullptr)
 		return DefWindowProc(hwnd, message, w_param, l_param);
 
@@ -53,14 +70,32 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 		case WM_RBUTTONDOWN:
 		case WM_RBUTTONUP:
 		{
-			auto buttons = Mouse_buttons::none;
-			
-			int btn_state = GET_KEYSTATE_WPARAM(w_param);
-			if ((btn_state & MK_LBUTTON) == MK_LBUTTON) buttons |= Mouse_buttons::left;
-			if ((btn_state & MK_MBUTTON) == MK_MBUTTON) buttons |= Mouse_buttons::middle;
-			if ((btn_state & MK_RBUTTON) == MK_RBUTTON) buttons |= Mouse_buttons::right;
+			g_win_app->enqueue_mouse_button_message(get_mouse_buttons(w_param));
+			return 0;
+		}
 
-			g_win_app->enqueu_mouse_button_message(buttons);
+		case WM_MOUSEMOVE:
+		{
+			if (!g_win_app->window().focused())
+				return DefWindowProc(hwnd, message, w_param, l_param);
+
+			uint2 p = get_mouse_position(l_param);
+
+			if (g_win_app->mouse().is_out()) {
+				g_win_app->enqueue_mouse_enter_message(get_mouse_buttons(w_param), p);
+			}
+			else {
+				g_win_app->enqueue_mouse_move_message(p);
+			}
+
+			TRACKMOUSEEVENT tme{ sizeof(TRACKMOUSEEVENT), TME_LEAVE, g_win_app->hwnd(), 0 };
+			TrackMouseEvent(&tme);
+			return 0;
+		}
+
+		case WM_MOUSELEAVE:
+		{
+			g_win_app->enqueue_mouse_leave_message();
 			return 0;
 		}
 
@@ -867,6 +902,11 @@ Win_window::~Win_window() noexcept
 
 	// window class
 	UnregisterClass(Win_window::wnd_class_name, _hinstance);
+}
+
+bool Win_window::focused() const noexcept
+{
+	return (_hwnd == GetFocus());
 }
 
 std::string Win_window::title() const  

@@ -3,6 +3,8 @@
 
 #include <ostream>
 #include <type_traits>
+#include "cg/math/math.h"
+
 
 namespace cg {
 namespace sys {
@@ -66,16 +68,26 @@ public:
 	Mouse(Mouse&&) noexcept = delete;
 
 
-	// Returns the state of all the mouse's buttons.
+	// The state of all the mouse's buttons.
 	const Mouse_buttons& buttons() const noexcept
 	{
 		return _buttons;
 	}
 
-	// Sets the state of all the mouse's buttons.
 	void set_buttons(const Mouse_buttons mb) noexcept
 	{
 		_buttons = mb;
+	}
+
+	// True if cursor left the client area of the window.
+	bool is_out() const noexcept
+	{
+		return _is_out;
+	}
+
+	void set_is_out(bool out) noexcept
+	{
+		_is_out = out;
 	}
 
 	// true if left mouse button has been pressed.
@@ -96,8 +108,22 @@ public:
 		return (_buttons & Mouse_buttons::right) == Mouse_buttons::right;
 	}
 
+	// Mouse position within the window's client area. 
+	// The value is relative to the bottom-left corner.
+	const cg::uint2& position() const noexcept
+	{
+		return _position;
+	}
+
+	void set_position(const cg::uint2& position) noexcept
+	{
+		_position = position;
+	}
+
 private:
+	cg::uint2 _position = cg::uint2::zero;
 	Mouse_buttons _buttons = Mouse_buttons::none;
+	bool _is_out = true;
 };
 
 

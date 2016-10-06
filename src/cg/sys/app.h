@@ -102,6 +102,9 @@ private:
 class Window_i {
 public:
 
+	// Indicates whether the window has input focus.
+	virtual bool focused() const noexcept = 0;
+
 	virtual void show() noexcept = 0;
 
 	// Returns the window's size in pixels.
@@ -151,12 +154,14 @@ public:
 };
 
 // Base interface for all possible system messages(events).
-// type filed is used to distinguish between message types.
 struct Sys_message final {
 
 	enum class Type {
 		none,
-		mouse_button
+		mouse_button,
+		mouse_enter,
+		mouse_leave,
+		mouse_move
 	};
 
 	// type of the system message.
@@ -164,6 +169,9 @@ struct Sys_message final {
 
 	// Indicates which buttons has been pressed. (type == Type::mouse_button).
 	Mouse_buttons mouse_buttons = Mouse_buttons::none;
+
+	// Mouse position within the window's client area. The value is relative to the upper-left corner.
+	cg::uint2 mouse_position = cg::uint2::zero;
 };
 
 class Application : public Application_context_i {
@@ -179,7 +187,13 @@ public:
 		return _mouse;
 	}
 
-	void enqueu_mouse_button_message(const Mouse_buttons mb) const;
+	void enqueue_mouse_button_message(const Mouse_buttons& mb);
+
+	void enqueue_mouse_enter_message(const Mouse_buttons& mb, const cg::uint2& p);
+
+	void enqueue_mouse_leave_message();
+
+	void enqueue_mouse_move_message(const cg::uint2& p);
 
 	void process_sys_messages() noexcept;
 
@@ -188,7 +202,7 @@ public:
 protected:
 	Clock _clock;
 	Mouse _mouse;
-	mutable std::vector<Sys_message> _sys_message_queue;
+	std::vector<Sys_message> _sys_message_queue;
 };
 
 class Render_context_i {

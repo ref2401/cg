@@ -1,5 +1,7 @@
 #include "cg/sys/app.h"
 
+#include <sstream>
+
 
 namespace cg {
 namespace sys {
@@ -62,12 +64,37 @@ Application::Application()
 	_sys_message_queue.reserve(64);
 }
 
-void Application::enqueu_mouse_button_message(const Mouse_buttons mb) const
+void Application::enqueue_mouse_button_message(const Mouse_buttons& mb)
 {
 	Sys_message msg;
 	msg.type = Sys_message::Type::mouse_button;
 	msg.mouse_buttons = mb;
 
+	_sys_message_queue.push_back(msg);
+}
+
+void Application::enqueue_mouse_enter_message(const Mouse_buttons& mb, const cg::uint2& p)
+{
+	Sys_message msg;
+	msg.type = Sys_message::Type::mouse_enter;
+	msg.mouse_buttons = mb;
+	msg.mouse_position = p;
+	_sys_message_queue.push_back(msg);
+}
+
+void Application::enqueue_mouse_move_message(const cg::uint2& p)
+{
+	Sys_message msg;
+	msg.type = Sys_message::Type::mouse_move;
+	msg.mouse_position = p;
+
+	_sys_message_queue.push_back(msg);
+}
+
+void Application::enqueue_mouse_leave_message()
+{
+	Sys_message msg;
+	msg.type = Sys_message::Type::mouse_leave;
 	_sys_message_queue.push_back(msg);
 }
 
@@ -84,37 +111,48 @@ void Application::process_sys_messages() noexcept
 				_mouse.set_buttons(msg.mouse_buttons);
 				break;
 			}
+
+			case Sys_message::Type::mouse_enter:
+			{
+				_mouse.set_is_out(false);
+				_mouse.set_buttons(msg.mouse_buttons);
+				_mouse.set_position(msg.mouse_position);
+				break;
+			}
+
+			case Sys_message::Type::mouse_leave:
+			{
+				_mouse.set_is_out(true);
+				break;
+			}
+
+			case Sys_message::Type::mouse_move:
+			{
+				_mouse.set_position(uint2(
+					msg.mouse_position.x,
+					window().size().height - msg.mouse_position.y - 1));
+				break;
+			}
 		}
-	} //for
+	} // for
 
-	std::string title = "[left: ";
-	if (_mouse.left_down()) {
-		title += "down] ";
-	}
-	else {
-		title += "up] ";
-	}
+	std::ostringstream title_builder;
+	if (_mouse.is_out()) title_builder << "out |";
+	else title_builder << " in |";
 
-	title += "[middle: ";
-	if (_mouse.middle_down()) {
-		title += "down] ";
-	}
-	else {
-		title += "up] ";
-	}
+	if (_mouse.left_down()) title_builder << " 1";
+	else title_builder << " 0";
+	if (_mouse.middle_down()) title_builder << "1";
+	else title_builder << "0";
+	if (_mouse.right_down()) title_builder << "1 |";
+	else title_builder << "0 |";
 
-	title += "[right: ";
-	if (_mouse.right_down()) {
-		title += "down]";
-	}
-	else {
-		title += "up]";
-	}
-
-	window().set_title(title);
+	title_builder << _mouse.position();
+	window().set_title(title_builder.str());
 
 	_sys_message_queue.clear();
 }
+
 
 } // namespace sys
 } // namespace cg
