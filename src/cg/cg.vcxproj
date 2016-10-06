@@ -139,8 +139,7 @@
     <ClCompile Include="opengl\shader.cpp" />
     <ClCompile Include="opengl\vertex_spec.cpp" />
     <ClCompile Include="sys\app.cpp" />
-    <ClCompile Include="sys\win32_app.cpp" />
-    <ClCompile Include="sys\win32_opengl.cpp" />
+    <ClCompile Include="sys\win_app.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\base.h" />
@@ -168,6 +167,7 @@
     <ClInclude Include="opengl\utility.h" />
     <ClInclude Include="opengl\vertex_spec.h" />
     <ClInclude Include="sys\app.h" />
+    <ClInclude Include="sys\win_app.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

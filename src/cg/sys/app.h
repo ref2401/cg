@@ -1,7 +1,6 @@
 #ifndef CG_SYS_APP_H_
 #define CG_SYS_APP_H_
 
-#include <cassert>
 #include <cstdint>
 #include <chrono>
 #include <memory>
@@ -12,31 +11,6 @@
 
 namespace cg {
 namespace sys {
-
-class IGame {
-public:
-
-	virtual ~IGame() noexcept = default;
-
-
-	virtual void on_window_resize() = 0;
-
-	virtual void render(float blend_state) = 0;
-
-	virtual void update(float dt) = 0;
-};
-
-class IWindow {
-public:
-
-	virtual void show() noexcept = 0;
-
-	// Returns the window's size in pixels.
-	virtual uint2 size() const noexcept = 0;
-
-protected:
-	~IWindow() noexcept = default;
-};
 
 struct Clock_report final {
 	using Dur_nano_t = std::chrono::duration<std::chrono::nanoseconds::rep, std::nano>;
@@ -110,7 +84,7 @@ public:
 	void restart() noexcept;
 
 private:
-	static constexpr auto loop_iteration_threshold_dur = 
+	static constexpr auto loop_iteration_threshold_dur =
 		std::chrono::duration_cast<Time_point_t::duration>(Clock::loop_iteration_threshold);
 
 	static constexpr auto update_delta_time_dur =
@@ -123,16 +97,57 @@ private:
 	uintmax_t _counter_updates;
 };
 
+class IGame {
+public:
 
-class IApplication {
+	virtual ~IGame() noexcept = default;
+
+
+	virtual void on_window_resize() = 0;
+
+	virtual void render(float blend_state) = 0;
+
+	virtual void update(float dt) = 0;
+};
+
+class IWindow {
+public:
+
+	virtual void show() noexcept = 0;
+
+	// Returns the window's size in pixels.
+	virtual uint2 size() const noexcept = 0;
+
+protected:
+	~IWindow() noexcept = default;
+};
+
+// Specifies constants that define which mouse button was pressed.
+enum class Mouse_buttons {
+	none = 0,
+	left = 1,
+	middle = 2,
+	right = 4
+};
+
+class IApplication_context {
+protected:
+
+	~IApplication_context() noexcept
+	{
+	}
+};
+
+class IApplication : public IApplication_context {
 public:
 
 	virtual ~IApplication() noexcept = default;
 
 
+
 	virtual Clock_report run(std::unique_ptr<IGame> game) = 0;
 
-	virtual IWindow* window() const noexcept = 0;
+	virtual IWindow& window() noexcept = 0;
 
 protected:
 	Clock _clock;
@@ -147,9 +162,8 @@ public:
 	virtual void swap_color_buffers() noexcept = 0;
 };
 
-std::unique_ptr<IApplication> make_win32_application(uint2 wnd_position, uint2 wnd_size);
 
-std::unique_ptr<IRender_context> make_win32_opengl_render_context(HWND hwnd);
+std::unique_ptr<IApplication> make_win32_application(uint2 wnd_position, uint2 wnd_size);
 
 } // namespace sys
 } // namespace cg

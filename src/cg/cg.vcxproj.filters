@@ -10,12 +10,6 @@
     <ClCompile Include="data\mesh.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="sys\win32_app.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
-    <ClCompile Include="sys\win32_opengl.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="opengl\shader.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
@@ -47,6 +41,9 @@
       <Filter>opengl</Filter>
     </ClCompile>
     <ClCompile Include="sys\app.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="sys\win_app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
@@ -145,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="opengl\framebuffer.h">
       <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\win_app.h">
+      <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 	auto app = make_win32_application(wnd_position, wnd_size);
 	
 	try {
-		auto game = std::make_unique<deferred_lighting::Deferred_lighting>(app->window()->size());
+		auto game = std::make_unique<deferred_lighting::Deferred_lighting>(app->window().size());
 		auto report = app->run(std::move(game));
 		OutputDebugString(get_report_message(report).c_str());
 	}

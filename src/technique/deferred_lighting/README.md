@@ -20,7 +20,7 @@ Deferred lighting is devided into three main passes.
 Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. Draw indirect buffer use tripple buffering technique to metigate synchronization with OpenGL command queue. Draw call index buffer is used for and gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size).
 
 ## Implementation notes and further improvements
-- single vertex array object. 
+- Single vertex array object. 
 - Frame_packet, 2-3 Frame objects.
 - Uniform arrays are used heavily, uniform block would have done better. Unifrom array limitations.
 - Point lights, spotlights instanced rendering.
