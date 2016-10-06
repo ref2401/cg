@@ -7,24 +7,24 @@
 
 namespace {
 
-extern "C" using extern_func_ptr_t = void(*);
+extern "C" using Extern_func_ptr_t = void(*);
 
-extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
+Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 {
 	assert(dll);
 	assert(func_name);
 
-	extern_func_ptr_t f = static_cast<extern_func_ptr_t>(GetProcAddress(dll, func_name));
+	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(GetProcAddress(dll, func_name));
 	cg::enforce(f, EXCEPTION_MSG(func_name));
 
 	return f;
 }
 
-extern_func_ptr_t load_opengl_func(const char* func_name)
+Extern_func_ptr_t load_opengl_func(const char* func_name)
 {
 	assert(func_name);
 
-	extern_func_ptr_t f = static_cast<extern_func_ptr_t>(wglGetProcAddress(func_name));
+	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(wglGetProcAddress(func_name));
 	cg::enforce(f, EXCEPTION_MSG(func_name));
 
 	return f;
@@ -873,7 +873,7 @@ bool Win_app::pump_sys_messages() const noexcept
 	return false;
 }
 
-Clock_report Win_app::run(std::unique_ptr<IGame> game)
+Clock_report Win_app::run(std::unique_ptr<Game_i> game)
 {
 	assert(!_is_running);
 	assert(game);
@@ -905,7 +905,7 @@ Clock_report Win_app::run(std::unique_ptr<IGame> game)
 
 // ----- funcs -----
 
-std::unique_ptr<IApplication> make_win32_application(uint2 wnd_position, uint2 wnd_size)
+std::unique_ptr<Application_i> make_win32_application(uint2 wnd_position, uint2 wnd_size)
 {
 	return std::make_unique<Win_app>(wnd_position, wnd_size);
 }

@@ -34,7 +34,7 @@ private:
 	int _version_minor = 0;
 };
 
-class Win_window final : public IWindow {
+class Win_window final : public Window_i {
 public:
 
 	static constexpr char* wnd_class_name = "cg_window_class";
@@ -60,7 +60,7 @@ private:
 	HDC _hdc = nullptr;
 };
 
-class Win_app final : public IApplication {
+class Win_app final : public Application_i {
 public:
 
 	Win_app(uint2 wnd_position, uint2 wnd_size);
@@ -72,9 +72,9 @@ public:
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages() const noexcept;
 
-	Clock_report run(std::unique_ptr<IGame> game) override;
+	Clock_report run(std::unique_ptr<Game_i> game) override;
 
-	IWindow& window() noexcept override
+	Window_i& window() noexcept override
 	{
 		return _window;
 	}

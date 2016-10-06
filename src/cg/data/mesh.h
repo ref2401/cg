@@ -283,71 +283,17 @@ inline bool operator!=(const Vertex& l, const Vertex& r) noexcept
 	return !(l == r);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
-{
-	out << "Vertex_attribs(";
-	
-	if (attribs == Vertex_attribs::none) {
-		out << "none";
-	}
-	else {
-		if (has_position(attribs)) out << "position";
-		if (has_normal(attribs)) out << " normal";
-		if (has_tex_coord(attribs)) out << " tex_coord";
-		if (has_tangent_h(attribs)) out << " tangent_h";
-	}
+std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs);
 
-	out << ")";
-	return out;
-}
+std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs);
 
-inline std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
-{
-	out << "Vertex_attribs(";
+std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt);
 
-	if (attribs == Vertex_attribs::none) {
-		out << "none";
-	}
-	else {
-		if (has_position(attribs)) out << "position";
-		if (has_normal(attribs)) out << " normal";
-		if (has_tex_coord(attribs)) out << " tex_coord";
-		if (has_tangent_h(attribs)) out << " tangent_h";
-	}
+std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt);
 
-	out << ")";
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
-inline std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt)
-{
-	out << fmt.attribs;
-	return out;
-}
-
-inline std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt)
-{
-	out << fmt.attribs;
-	return out;
-}
-
-inline std::ostream& operator<<(std::ostream& out, const Vertex& v)
-{
-	out << "Vertex(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
-	return out;
-}
-
-inline std::wostream& operator<<(std::wostream& out, const Vertex& v)
-{
-	out << "Vertex(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
-	return out;
-}
+std::wostream& operator<<(std::wostream& out, const Vertex& v);
 
 // Computes tangent and handedness of bitangent for a trinaglel that is specified by the 3 given vertices.
 // Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.

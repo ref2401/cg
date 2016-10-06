@@ -99,5 +99,71 @@ float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 	return float4(tangent, handedness);
 }
 
+std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
+{
+	out << "Vertex_attribs(";
+
+	if (attribs == Vertex_attribs::none) {
+		out << "none";
+	}
+	else {
+		if (has_position(attribs)) out << "position";
+		if (has_normal(attribs)) out << "normal ";
+		if (has_tex_coord(attribs)) out << "tex_coord ";
+		if (has_tangent_h(attribs)) out << "tangent_h";
+	}
+
+	out << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
+{
+	out << "Vertex_attribs(";
+
+	if (attribs == Vertex_attribs::none) {
+		out << "none";
+	}
+	else {
+		if (has_position(attribs)) out << "position";
+		if (has_normal(attribs)) out << "normal ";
+		if (has_tex_coord(attribs)) out << "tex_coord ";
+		if (has_tangent_h(attribs)) out << "tangent_h";
+	}
+
+	out << ")";
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt)
+{
+	out << fmt.attribs;
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt)
+{
+	out << fmt.attribs;
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Vertex& v)
+{
+	out << "Vertex(p: " << v.position
+		<< "; n: " << v.normal
+		<< "; tc: " << v.tex_coord
+		<< "; tan_h: " << v.tangent_h << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Vertex& v)
+{
+	out << "Vertex(p: " << v.position
+		<< "; n: " << v.normal
+		<< "; tc: " << v.tex_coord
+		<< "; tan_h: " << v.tangent_h << ")";
+	return out;
+}
+
 } // namesapce data
 } // namespace cg

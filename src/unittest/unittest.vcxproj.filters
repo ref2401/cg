@@ -58,6 +58,9 @@
     <ClCompile Include="opengl\texture_unittest.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
+    <ClCompile Include="sys\input_unittest.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -74,6 +77,9 @@
     </Filter>
     <Filter Include="opengl">
       <UniqueIdentifier>{8605e44c-d5cd-4adc-900e-b744c6554d44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{53127f8c-541e-445d-8b52-5c2c1fa2e908}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

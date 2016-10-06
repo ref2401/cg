@@ -25,7 +25,7 @@ public:
 	cg::opengl::Texture_2d tex_normal_map;
 };
 
-class Deferred_lighting final : public cg::sys::IGame {
+class Deferred_lighting final : public cg::sys::Game_i {
 public:
 
 	Deferred_lighting(cg::uint2 window_size);

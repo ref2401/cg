@@ -7,6 +7,7 @@
 #include <ratio>
 #include <windows.h>
 #include "cg/math/math.h"
+#include "cg/sys/input.h"
 
 
 namespace cg {
@@ -97,10 +98,32 @@ private:
 	uintmax_t _counter_updates;
 };
 
-class IGame {
+class Window_i {
 public:
 
-	virtual ~IGame() noexcept = default;
+	virtual void show() noexcept = 0;
+
+	// Returns the window's size in pixels.
+	virtual uint2 size() const noexcept = 0;
+
+protected:
+	~Window_i() noexcept = default;
+};
+
+class Application_context_i {
+public:
+
+	virtual Window_i& window() noexcept = 0;
+
+protected:
+
+	~Application_context_i() noexcept = default;
+};
+
+class Game_i {
+public:
+
+	virtual ~Game_i() noexcept = default;
 
 
 	virtual void on_window_resize() = 0;
@@ -110,44 +133,15 @@ public:
 	virtual void update(float dt) = 0;
 };
 
-class IWindow {
+// 
+class Application_i : public Application_context_i {
 public:
 
-	virtual void show() noexcept = 0;
-
-	// Returns the window's size in pixels.
-	virtual uint2 size() const noexcept = 0;
-
-protected:
-	~IWindow() noexcept = default;
-};
-
-// Specifies constants that define which mouse button was pressed.
-enum class Mouse_buttons {
-	none = 0,
-	left = 1,
-	middle = 2,
-	right = 4
-};
-
-class IApplication_context {
-protected:
-
-	~IApplication_context() noexcept
-	{
-	}
-};
-
-class IApplication : public IApplication_context {
-public:
-
-	virtual ~IApplication() noexcept = default;
+	virtual ~Application_i() noexcept = default;
 
 
 
-	virtual Clock_report run(std::unique_ptr<IGame> game) = 0;
-
-	virtual IWindow& window() noexcept = 0;
+	virtual Clock_report run(std::unique_ptr<Game_i> game) = 0;
 
 protected:
 	Clock _clock;
@@ -163,7 +157,7 @@ public:
 };
 
 
-std::unique_ptr<IApplication> make_win32_application(uint2 wnd_position, uint2 wnd_size);
+std::unique_ptr<Application_i> make_win32_application(uint2 wnd_position, uint2 wnd_size);
 
 } // namespace sys
 } // namespace cg

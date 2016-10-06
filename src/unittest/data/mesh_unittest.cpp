@@ -19,9 +19,9 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<cg::data::Interleaved_vertex_format>(const cg::data::Interleaved_vertex_format& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::data::Vertex>(const cg::data::Vertex& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::data::Vertex_attribs>(const cg::data::Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Interleaved_vertex_format>(const Interleaved_vertex_format& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Vertex>(const Vertex& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 

@@ -185,6 +185,7 @@
     <ClCompile Include="opengl\texture_unittest.cpp" />
     <ClCompile Include="opengl\utility_unittest_opengl.cpp" />
     <ClCompile Include="opengl\vertex_spec_unittest.cpp" />
+    <ClCompile Include="sys\input_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">
