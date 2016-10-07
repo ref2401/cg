@@ -31,7 +31,7 @@ Mouse_buttons get_mouse_buttons(WPARAM w_param) noexcept
 	return buttons;
 }
 
-uint2 get_mouse_position(LPARAM l_param) noexcept
+uint2 get_point(LPARAM l_param) noexcept
 {
 	return uint2(LOWORD(l_param), HIWORD(l_param));
 }
@@ -79,7 +79,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 			if (!g_win_app->window().focused())
 				return DefWindowProc(hwnd, message, w_param, l_param);
 
-			uint2 p = get_mouse_position(l_param);
+			uint2 p = get_point(l_param);
 
 			if (g_win_app->mouse().is_out()) {
 				g_win_app->enqueue_mouse_enter_message(get_mouse_buttons(w_param), p);
@@ -103,6 +103,12 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
+
+		case WM_SIZE:
+		{
+			g_win_app->enqueue_window_resize(get_point(l_param));
+			return 0;
+		}
 
 		default:
 			return DefWindowProc(hwnd, message, w_param, l_param);
@@ -966,7 +972,7 @@ bool Win_app::pump_sys_messages() const noexcept
 	return false;
 }
 
-Clock::Clock_report Win_app::run(std::unique_ptr<Game_i> game)
+Clock::Clock_report Win_app::run(std::unique_ptr<Game> game)
 {
 	assert(!_is_running);
 	assert(game);
@@ -985,7 +991,7 @@ Clock::Clock_report Win_app::run(std::unique_ptr<Game_i> game)
 		// simulation
 		while (_clock.has_update_time()) {
 			_clock.process_update_call();
-			process_sys_messages();
+			process_sys_messages(*game.get());
 			game->update(static_cast<float>(Clock::update_delta_time.count()));
 		}
 

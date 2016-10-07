@@ -140,17 +140,31 @@ protected:
 	~Application_context_i() noexcept = default;
 };
 
-class Game_i {
+class Sys_message_listener_i {
 public:
 
-	virtual ~Game_i() noexcept = default;
-
-
 	virtual void on_window_resize() = 0;
+
+protected:
+
+	~Sys_message_listener_i() noexcept = default;
+};
+
+class Game : public Sys_message_listener_i {
+public:
+
+	Game(Application_context_i& ctx) noexcept;
+
+	virtual ~Game() noexcept = default;
+
 
 	virtual void render(float blend_state) = 0;
 
 	virtual void update(float dt) = 0;
+
+protected:
+
+	Application_context_i& _ctx;
 };
 
 // Base interface for all possible system messages(events).
@@ -170,8 +184,9 @@ struct Sys_message final {
 	// Indicates which buttons has been pressed. (type == Type::mouse_button).
 	Mouse_buttons mouse_buttons = Mouse_buttons::none;
 
-	// Mouse position within the window's client area. The value is relative to the upper-left corner.
-	cg::uint2 mouse_position = cg::uint2::zero;
+	// type = Type::mouse_move.		Mouse position within the window's client area. 
+	//								The value is relative to the upper-left corner.
+	cg::uint2 point = cg::uint2::zero;
 };
 
 class Application : public Application_context_i {
@@ -195,13 +210,19 @@ public:
 
 	void enqueue_mouse_move_message(const cg::uint2& p);
 
-	void process_sys_messages() noexcept;
+	void enqueue_window_resize(const cg::uint2& size);
 
-	virtual Clock::Clock_report run(std::unique_ptr<Game_i> game) = 0;
+	void process_sys_messages(Sys_message_listener_i& listener) noexcept;
+
+	virtual Clock::Clock_report run(std::unique_ptr<Game> game) = 0;
 
 protected:
+
+	void clear_message_queue() noexcept;
+
 	Clock _clock;
 	Mouse _mouse;
+	bool _window_resize_message = false;
 	std::vector<Sys_message> _sys_message_queue;
 };
 

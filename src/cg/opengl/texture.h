@@ -170,20 +170,17 @@ enum class Texture_format : unsigned char {
 	depth_32f_stencil_8
 };
 
+// Texture_2d represent a texture object with mutables storage.
+// Format, mipmap level count, dimensions of the mipmap levels, 
+// texture parameters and contents can be modified.
 class Texture_2d final {
 public:
 
 	Texture_2d() noexcept = default;
 
-	// Creates a texture object with the specified format, size & mipmap level count.
-	// Initially all mipmap levels of the texture are not initialized. 
 	Texture_2d(Texture_format format, uint2 size, size_t mipmap_count = 1) noexcept;
 
-	// Creates a texture object using the specified image as data source.
-	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
-	Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept;
-
-	Texture_2d(const Texture_2d& tex) = delete;
+	Texture_2d(const Texture_2d&) = delete;
 
 	Texture_2d(Texture_2d&& tex) noexcept;
 
@@ -191,6 +188,67 @@ public:
 
 
 	Texture_2d& operator=(Texture_2d&& tex) noexcept;
+
+
+	// Texel format of this texture.
+	Texture_format format() const noexcept
+	{
+		return _format;
+	}
+
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+	// Reallocates a new mutable storage for thes texture object.
+	// Previous texture's contents will be lost.
+	void reallocate_storage(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+
+	// Size of the texture in pixels.
+	cg::uint2 size() const noexcept
+	{
+		return _size;
+	}
+
+	// Resizes the texture object. Preserves texture's format and mipmap count.
+	// Internally calls the reallocate_storage method. 
+	void set_size(const cg::uint2 size) noexcept;
+
+private:
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::texture_id;
+	Texture_format _format = Texture_format::none;
+	cg::uint2 _size = cg::uint2::zero;
+	size_t _mipmap_level_count = 0;
+};
+
+// Texture_2d_immut represent a texture object with immutable storage. (Immutable storage specifies 
+// the allocation of the memory, not the contents of that memory).
+// The format, mipmap level count and dimesions of all the mipmap levels are immutable. 
+// The contents of the texture and the parameters can still be modified.
+class Texture_2d_immut final {
+public:
+
+	Texture_2d_immut() noexcept = default;
+
+	// Creates a texture object with the specified format, size & mipmap level count.
+	// Initially all mipmap levels of the texture are not initialized. 
+	Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_count = 1) noexcept;
+
+	// Creates a texture object using the specified image as data source.
+	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
+	Texture_2d_immut(Texture_format format, const cg::data::Image_2d& image) noexcept;
+
+	Texture_2d_immut(const Texture_2d_immut&) = delete;
+
+	Texture_2d_immut(Texture_2d_immut&& tex) noexcept;
+
+	~Texture_2d_immut() noexcept;
+
+
+	Texture_2d_immut& operator=(Texture_2d_immut&& tex) noexcept;
 
 
 	// Texel format of this texture.
@@ -278,13 +336,25 @@ GLenum get_texture_mag_filter(Mag_filter filter) noexcept;
 // Converts the specified minification filter into OpenGL texture min filter value.
 GLenum get_texture_min_filter(Min_filter filter) noexcept;
 
-// Inferes an appropriate format value for the glTextureSubImage call based on the specified image format.
+// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
 
-// Inferes an appropriate type value for the glTextureSubImage call based on the specified image format.
+// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
+// based on the specified texture format.
+// Returns GL_NONE if fmt value eqauls to Texture_format::none.
+GLenum get_texture_sub_image_format(Texture_format fmt) noexcept;
+
+// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+
+// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified texture format.
+// Returns GL_NONE if fmt value eqauls to Texture_format::none.
+GLenum get_texture_sub_image_type(Texture_format fmt) noexcept;
 
 // Converts the specified wrap_mode into OpenGL wrap value.
 GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept;

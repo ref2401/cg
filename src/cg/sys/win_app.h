@@ -83,7 +83,7 @@ public:
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages() const noexcept;
 
-	Clock::Clock_report run(std::unique_ptr<Game_i> game) override;
+	Clock::Clock_report run(std::unique_ptr<Game> game) override;
 
 	Window_i& window() noexcept override
 	{

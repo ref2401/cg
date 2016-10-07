@@ -37,17 +37,18 @@ namespace deferred_lighting {
 
 // ----- Material -----
 
-Material::Material(float smoothness, Texture_2d tex_normal_map) noexcept :
+Material::Material(float smoothness, Texture_2d_immut tex_normal_map) noexcept :
 	smoothness(smoothness),
 	tex_normal_map(std::move(tex_normal_map))
 {}
 
 // ----- Deferred_lighting -----
 
-Deferred_lighting::Deferred_lighting(uint2 window_size) :
-	_projection_matrix(cg::perspective_matrix(cg::pi_3, window_size.aspect_ratio(), 1, 50)),
+Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
+	Game(ctx),
+	_projection_matrix(cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
 	_view_matrix(cg::view_matrix(float3(0, 0, 5), float3::zero)),
-	_renderer(make_render_config(window_size)),
+	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
 {
 	using cg::from_axis_angle_rotation;
@@ -59,10 +60,10 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 	// materials
 	auto normal_map_image = cg::file::load_image_tga("../data/normal_map.tga");
 	_material.smoothness = 3.f;
-	_material.tex_normal_map = Texture_2d(Texture_format::rgb_8, normal_map_image);
+	_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
 
 	auto default_normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
-	_tex_default_normal_map = Texture_2d(Texture_format::rgb_8, default_normal_map_image);
+	_tex_default_normal_map = Texture_2d_immut(Texture_format::rgb_8, default_normal_map_image);
 
 	// cube geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
@@ -96,6 +97,12 @@ Deferred_lighting::Deferred_lighting(uint2 window_size) :
 		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, cg::pi_8)),
 		9.f,
 		_tex_default_normal_map.id());
+}
+
+void Deferred_lighting::on_window_resize()
+{
+	_projection_matrix = cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50);
+	_renderer.resize_viewport(_ctx.window().size());
 }
 
 void Deferred_lighting::render(float blend_state) 

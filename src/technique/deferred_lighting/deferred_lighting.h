@@ -16,24 +16,24 @@ public:
 
 	Material() noexcept = default;
 
-	Material(float smoothness, cg::opengl::Texture_2d tex_normal_map) noexcept;
+	Material(float smoothness, cg::opengl::Texture_2d_immut tex_normal_map) noexcept;
 
 	~Material() noexcept = default;
 
 
 	float smoothness = 0.f;
-	cg::opengl::Texture_2d tex_normal_map;
+	cg::opengl::Texture_2d_immut tex_normal_map;
 };
 
-class Deferred_lighting final : public cg::sys::Game_i {
+class Deferred_lighting final : public cg::sys::Game {
 public:
 
-	Deferred_lighting(cg::uint2 window_size);
+	Deferred_lighting(cg::sys::Application_context_i& ctx);
 
 	~Deferred_lighting() noexcept override = default;
 
 
-	void on_window_resize() override {}
+	void on_window_resize() override;
 
 	void render(float blend_state) override;
 
@@ -44,7 +44,7 @@ private:
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	cg::opengl::Static_vertex_spec _vertex_spec0;
 	Material _material;
-	cg::opengl::Texture_2d _tex_default_normal_map;
+	cg::opengl::Texture_2d_immut _tex_default_normal_map;
 	// scene
 	std::vector<Renderable> _rednerable_objects;
 	cg::mat4 _projection_matrix;

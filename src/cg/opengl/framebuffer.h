@@ -28,8 +28,14 @@ public:
 	// Attach a texture as color attachment.
 	void attach_color_texture(GLenum color_attachment, const Texture_2d& texture, size_t mipmap_index = 0) noexcept;
 
+	// Attach a texture as color attachment.
+	void attach_color_texture(GLenum color_attachment, const Texture_2d_immut& texture, size_t mipmap_index = 0) noexcept;
+
 	// Attach a texture as depth attachment.
 	void attach_depth_texture(const Texture_2d& texture, size_t mipmap_index = 0) noexcept;
+
+	// Attach a texture as depth attachment.
+	void attach_depth_texture(const Texture_2d_immut& texture, size_t mipmap_index = 0) noexcept;
 
 	void detach_color_texture(GLenum color_attachment) noexcept;
 

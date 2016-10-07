@@ -33,12 +33,18 @@ namespace deferred_lighting {
 
 // ----- Gbuffer -----
 
-Gbuffer::Gbuffer(uint2 viewport_size,
+Gbuffer::Gbuffer(const uint2& viewport_size,
 	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout,
 	const Interleaved_mesh_data& rect_1x1_mesh_data) noexcept :
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
-	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge))
+	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),
+	_viewport_size(viewport_size),
+	_tex_depth_map(Texture_format::depth_32f, viewport_size),
+	_tex_normal_smoothness(Texture_format::rgba_32f, viewport_size),
+	_tex_lighting_ambient_term(Texture_format::rgb_32f, viewport_size),
+	_tex_lighting_diffuse_term(Texture_format::rgb_32f, viewport_size),
+	_tex_lighting_specular_term(Texture_format::rgb_32f, viewport_size)
 {
 	Static_vertex_spec_builder vs_builder(8, 8);
 	vs_builder.begin(rect_1x1_mesh_data.attribs(), kilobytes(1));
@@ -47,17 +53,16 @@ Gbuffer::Gbuffer(uint2 viewport_size,
 		_aux_geometry_rect_1x1_params = rect_1x1_cmd.get_base_vertex_params();
 	}
 	_aux_geometry_vertex_spec = vs_builder.end(_vertex_attrib_layout, true);
-	resize(viewport_size);
 }
 
-void Gbuffer::resize(uint2 viewport_size) noexcept
+void Gbuffer::resize(const uint2& viewport_size) noexcept
 {
 	_viewport_size = viewport_size;
-	_tex_depth_map = Texture_2d(Texture_format::depth_32f, viewport_size);
-	_tex_normal_smoothness = Texture_2d(Texture_format::rgba_32f, viewport_size);
-	_tex_lighting_ambient_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
-	_tex_lighting_diffuse_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
-	_tex_lighting_specular_term = Texture_2d(Texture_format::rgb_32f, viewport_size);
+	_tex_depth_map.set_size(_viewport_size);
+	_tex_normal_smoothness.set_size(_viewport_size);
+	_tex_lighting_ambient_term.set_size(_viewport_size);
+	_tex_lighting_diffuse_term.set_size(_viewport_size);
+	_tex_lighting_specular_term.set_size(_viewport_size);
 }
 
 // ----- Gbuffer_pass -----
@@ -225,15 +230,18 @@ void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 
 void Renderer::render(const Frame& frame) noexcept
 {
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	perform_gbuffer_pass(frame);
 	perform_lighting_pass(frame);
 }
 
-void Renderer::resize_viewport(uint2 size) noexcept
+void Renderer::resize_viewport(const uint2& size) noexcept
 {
 	assert(cg::greater_than(size, 0));
+	if (_gbuffer.viewport_size() == size) return;
 
-	glViewport(0, 0, size.width, size.height);
 	_gbuffer.resize(size);
 }
 

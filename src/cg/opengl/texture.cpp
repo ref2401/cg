@@ -92,31 +92,22 @@ Texture_2d_sub_image_params::Texture_2d_sub_image_params(size_t mipmap_index, cg
 
 // ----- Texture_2d -----
 
-Texture_2d::Texture_2d(Texture_format format, uint2 size, size_t mipmap_count) noexcept
+Texture_2d::Texture_2d(Texture_format format, uint2 size, size_t mipmap_level_count) noexcept
 {
-	assert(greater_than(size, 0));
-	assert(mipmap_count > 0);
-	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	glTextureStorage2D(_id, mipmap_count, get_texture_internal_format(format), size.width, size.height);
-}
-
-Texture_2d::Texture_2d(Texture_format format, const cg::data::Image_2d& image) noexcept :
-	_format(format)
-{
-	assert(format != Texture_format::none);
-	assert(image.format() != Image_format::none);
-
-	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
-	Texture_2d_sub_image_params sub_img(0, uint2::zero, image);
-	texture_2d_sub_image(_id, sub_img);
+	glGenTextures(1, &_id);
+	reallocate_storage(format, size, mipmap_level_count);
 }
 
 Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
-	_id(tex._id), _format(tex._format)
+	_id(tex._id),
+	_format(tex._format),
+	_size(tex._size),
+	_mipmap_level_count(tex._mipmap_level_count)
 {
-	tex._id = Invalid::texture_id;
-	tex._format = Texture_format::none;
+	_id = Invalid::texture_id;
+	_format = Texture_format::none;
+	_size = uint2::zero;
+	tex._mipmap_level_count = 0;
 }
 
 Texture_2d::~Texture_2d() noexcept
@@ -131,6 +122,100 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 	dispose();
 	_id = tex._id;
 	_format = tex._format;
+	_size = tex._size;
+	_mipmap_level_count = tex._mipmap_level_count;
+
+	tex._id = Invalid::texture_id;
+	tex._format = Texture_format::none;
+	tex._size = uint2::zero;
+	tex._mipmap_level_count = 0;
+
+	return *this;
+}
+
+void Texture_2d::dispose() noexcept
+{
+	if (_id == Invalid::texture_id) return;
+
+	glDeleteTextures(1, &_id);
+	_id = Invalid::texture_id;
+	_format = Texture_format::none;
+	_size = uint2::zero;
+}
+
+void Texture_2d::reallocate_storage(Texture_format format, uint2 size, size_t mipmap_level_count) noexcept
+{
+	assert(_id != Invalid::texture_id);
+	assert(greater_than(size, 0));
+	assert(mipmap_level_count > 0);
+
+	_format = format;
+	_size = size;
+	_mipmap_level_count = mipmap_level_count;
+	assert(_mipmap_level_count == 1); // > 1 not implemented
+
+	glBindTexture(GL_TEXTURE_2D, _id);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.f);
+	auto err = glGetError();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, get_texture_internal_format(_format),
+		_size.width, _size.height, 0,
+		get_texture_sub_image_format(_format),
+		get_texture_sub_image_type(_format),
+		nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, Invalid::texture_id);
+}
+
+void Texture_2d::set_size(const cg::uint2 size) noexcept
+{
+	reallocate_storage(_format, size, _mipmap_level_count);
+}
+
+// ----- Texture_2d_immut -----
+
+Texture_2d_immut::Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_count) noexcept :
+	_format(format)
+{
+	assert(greater_than(size, 0));
+	assert(mipmap_count > 0);
+
+	assert(mipmap_count == 1); // > 1 not implemented
+	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+	glTextureStorage2D(_id, mipmap_count, get_texture_internal_format(format), size.width, size.height);
+}
+
+Texture_2d_immut::Texture_2d_immut(Texture_format format, const cg::data::Image_2d& image) noexcept :
+	_format(format)
+{
+	assert(format != Texture_format::none);
+	assert(image.format() != Image_format::none);
+
+	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
+	Texture_2d_sub_image_params sub_img(0, uint2::zero, image);
+	texture_2d_sub_image(_id, sub_img);
+}
+
+Texture_2d_immut::Texture_2d_immut(Texture_2d_immut&& tex) noexcept :
+	_id(tex._id), _format(tex._format)
+{
+	tex._id = Invalid::texture_id;
+	tex._format = Texture_format::none;
+}
+
+Texture_2d_immut::~Texture_2d_immut() noexcept
+{
+	dispose();
+}
+
+Texture_2d_immut& Texture_2d_immut::operator=(Texture_2d_immut&& tex) noexcept
+{
+	if (this == &tex) return *this;
+
+	dispose();
+	_id = tex._id;
+	_format = tex._format;
 
 	tex._id = Invalid::texture_id;
 	tex._format = Texture_format::none;
@@ -138,7 +223,7 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 	return *this;
 }
 
-void Texture_2d::dispose() noexcept
+void Texture_2d_immut::dispose() noexcept
 {
 	if (_id == Invalid::texture_id) return;
 
@@ -547,6 +632,28 @@ GLenum get_texture_sub_image_format(Image_format fmt) noexcept
 	}
 }
 
+GLenum get_texture_sub_image_format(Texture_format fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Texture_format::none: return GL_NONE;
+
+		case Texture_format::red_8: return GL_RED;
+		case Texture_format::red_32f: return GL_RED;
+		case Texture_format::rg_8: return GL_RG;
+		case Texture_format::rg_32f: return GL_RG;
+		case Texture_format::rgb_8: return GL_RGB;
+		case Texture_format::rgb_32f: return GL_RGB;
+		case Texture_format::rgba_8: return GL_RGBA;
+		case Texture_format::rgba_32f: return GL_RGBA;
+		case Texture_format::depth_24: return GL_DEPTH_COMPONENT;
+		case Texture_format::depth_24_stencil_8: return GL_DEPTH_STENCIL;
+		case Texture_format::depth_32: return GL_DEPTH_COMPONENT;
+		case Texture_format::depth_32f: return GL_DEPTH_COMPONENT;
+		case Texture_format::depth_32f_stencil_8: return GL_DEPTH_STENCIL;
+	}
+}
+
 GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
 {
 	switch (fmt) {
@@ -558,6 +665,28 @@ GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
 		case Image_format::rgba_8: return GL_UNSIGNED_BYTE;
 		case Image_format::bgr_8: return GL_UNSIGNED_BYTE;
 		case Image_format::bgra_8: return GL_UNSIGNED_BYTE;
+	}
+}
+
+GLenum get_texture_sub_image_type(Texture_format fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Texture_format::none: return GL_NONE;
+
+		case Texture_format::red_8: return GL_UNSIGNED_BYTE;
+		case Texture_format::red_32f: return GL_FLOAT;
+		case Texture_format::rg_8: return GL_UNSIGNED_BYTE;
+		case Texture_format::rg_32f: return GL_FLOAT;
+		case Texture_format::rgb_8: return GL_UNSIGNED_BYTE;
+		case Texture_format::rgb_32f: return GL_FLOAT;
+		case Texture_format::rgba_8: return GL_UNSIGNED_BYTE;
+		case Texture_format::rgba_32f: return GL_FLOAT;
+		case Texture_format::depth_24: return GL_UNSIGNED_INT;
+		case Texture_format::depth_24_stencil_8: return GL_UNSIGNED_INT_24_8;
+		case Texture_format::depth_32: return GL_UNSIGNED_INT;
+		case Texture_format::depth_32f: return GL_FLOAT;
+		case Texture_format::depth_32f_stencil_8: return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 	}
 }
 

@@ -57,11 +57,24 @@ void Clock::restart() noexcept
 	_prev_loop_interation = _main_loop_begin = std::chrono::high_resolution_clock::now();
 }
 
+// ----- Game -----
+
+Game::Game(Application_context_i& ctx) noexcept :
+	_ctx(ctx)
+{}
+
 // ----- Application -----
 
 Application::Application()
 {
 	_sys_message_queue.reserve(64);
+}
+
+
+void Application::clear_message_queue() noexcept
+{
+	_sys_message_queue.clear();
+	_window_resize_message = false;
 }
 
 void Application::enqueue_mouse_button_message(const Mouse_buttons& mb)
@@ -78,7 +91,7 @@ void Application::enqueue_mouse_enter_message(const Mouse_buttons& mb, const cg:
 	Sys_message msg;
 	msg.type = Sys_message::Type::mouse_enter;
 	msg.mouse_buttons = mb;
-	msg.mouse_position = p;
+	msg.point = p;
 	_sys_message_queue.push_back(msg);
 }
 
@@ -86,7 +99,7 @@ void Application::enqueue_mouse_move_message(const cg::uint2& p)
 {
 	Sys_message msg;
 	msg.type = Sys_message::Type::mouse_move;
-	msg.mouse_position = p;
+	msg.point = p;
 
 	_sys_message_queue.push_back(msg);
 }
@@ -98,11 +111,20 @@ void Application::enqueue_mouse_leave_message()
 	_sys_message_queue.push_back(msg);
 }
 
-void Application::process_sys_messages() noexcept
+void Application::enqueue_window_resize(const cg::uint2& size)
+{
+	_window_resize_message = true;
+}
+
+void Application::process_sys_messages(Sys_message_listener_i& listener) noexcept
 {
 	if (_sys_message_queue.empty()) return;
 
 	assert(_sys_message_queue.size() < 64);
+
+
+	if (_window_resize_message)
+		listener.on_window_resize();
 
 	for (const auto& msg : _sys_message_queue) {
 		switch (msg.type) {
@@ -116,7 +138,7 @@ void Application::process_sys_messages() noexcept
 			{
 				_mouse.set_is_out(false);
 				_mouse.set_buttons(msg.mouse_buttons);
-				_mouse.set_position(msg.mouse_position);
+				_mouse.set_position(msg.point);
 				break;
 			}
 
@@ -129,8 +151,8 @@ void Application::process_sys_messages() noexcept
 			case Sys_message::Type::mouse_move:
 			{
 				_mouse.set_position(uint2(
-					msg.mouse_position.x,
-					window().size().height - msg.mouse_position.y - 1));
+					msg.point.x,
+					window().size().height - msg.point.y - 1));
 				break;
 			}
 		}
@@ -150,7 +172,7 @@ void Application::process_sys_messages() noexcept
 	title_builder << _mouse.position();
 	window().set_title(title_builder.str());
 
-	_sys_message_queue.clear();
+	clear_message_queue();
 }
 
 

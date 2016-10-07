@@ -17,7 +17,7 @@ namespace deferred_lighting {
 class Gbuffer final {
 public:
 
-	Gbuffer(cg::uint2 viewport_size, 
+	Gbuffer(const cg::uint2& viewport_size,
 		const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout,
 		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data) noexcept;
 
@@ -54,7 +54,7 @@ public:
 	}
 
 	// Resizes all the render target textures.
-	void resize(cg::uint2 viewport_size) noexcept;
+	void resize(const cg::uint2& viewport_size) noexcept;
 
 	// Contains depth information of the scene. Populated by the first pass (Gbuffer_pass).
 	cg::opengl::Texture_2d& tex_depth_map() noexcept
@@ -108,12 +108,12 @@ private:
 	cg::opengl::Sampler _nearest_sampler;
 	cg::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
 	cg::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
+	cg::uint2 _viewport_size;
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
 	cg::opengl::Texture_2d _tex_lighting_specular_term;
-	cg::uint2 _viewport_size;
 };
 
 class Gbuffer_pass final {
@@ -196,7 +196,7 @@ public:
 
 	void render(const Frame& frame) noexcept;
 
-	void resize_viewport(cg::uint2 size) noexcept;
+	void resize_viewport(const cg::uint2& size) noexcept;
 
 	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
