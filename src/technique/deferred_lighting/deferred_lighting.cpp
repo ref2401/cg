@@ -1,14 +1,13 @@
 #include "technique/deferred_lighting/deferred_lighting.h"
 
+#include <cmath>
+#include <sstream>
 #include <type_traits>
 #include "cg/base/base.h"
 #include "cg/file/file.h"
 
-using cg::float3;
-using cg::mat3;
-using cg::mat4;
-using cg::uint2;
 using cg::data::Vertex_attribs;
+using namespace cg;
 using namespace cg::opengl;
 
 
@@ -47,7 +46,8 @@ Material::Material(float smoothness, Texture_2d_immut tex_normal_map) noexcept :
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
 	_projection_matrix(cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
-	_view_matrix(cg::view_matrix(float3(0, 0, 5), float3::zero)),
+	_curr_viewpoint(float3(1, 0, 5), float3::zero),
+	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
 {
@@ -55,6 +55,8 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	using cg::megabytes;
 	using cg::tr_matrix;
 	using cg::translation_matrix;
+
+
 
 	// scene
 	// materials
@@ -99,27 +101,93 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 		_tex_default_normal_map.id());
 }
 
+void Deferred_lighting::begin_render(float blend_factor)
+{
+	assert(0.f <= blend_factor && blend_factor <= 1.f);
+
+	_frame.reset(_vertex_spec0);
+
+	_frame.set_projection_matrix(_projection_matrix);
+	auto viewpoint = lerp(_prev_viewpoint, _curr_viewpoint, blend_factor);
+	_frame.set_view_matrix(viewpoint.view_matrix());
+	//_frame.set_view_matrix(view_matrix);
+	_frame.set_directional_light(_dir_light);
+
+	for (const auto& rnd : _rednerable_objects) {
+		_frame.push_back_renderable(rnd);
+	}
+
+	_frame.begin_rendering();
+}
+
+void Deferred_lighting::end_render()
+{
+	_frame.end_rendering();
+	_prev_viewpoint = _curr_viewpoint;
+}
+
+void Deferred_lighting::on_mouse_move()
+{
+	float2 pos_ndc = _ctx.mouse().get_ndc_position(_ctx.window().size());
+	float2 offset_ndc = pos_ndc - _prev_mouse_pos_ndc;
+	_prev_mouse_pos_ndc = pos_ndc;
+
+
+	if (!_ctx.mouse().middle_down() || offset_ndc == float2::zero) return;
+
+	bool y_offset_satisfies = !approx_equal(offset_ndc.y, 0.f, 0.01f);
+	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, (y_offset_satisfies) ? 0.01f : 0.001f);
+
+	// mouse offset by x means rotation around OY (yaw)
+	if (x_offset_satisfies) {
+		_view_roll_angles.y += (offset_ndc.x > 0.f) ? -pi_64 : pi_64;
+	}
+
+	// mouse offset by x means rotation around OX (pitch)
+	if (y_offset_satisfies) {
+		_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
+	}
+}
+
 void Deferred_lighting::on_window_resize()
 {
 	_projection_matrix = cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50);
 	_renderer.resize_viewport(_ctx.window().size());
 }
 
-void Deferred_lighting::render(float blend_state) 
+void Deferred_lighting::render()
 {
-	_frame.reset(_vertex_spec0);
-
-	_frame.set_projection_matrix(_projection_matrix);
-	_frame.set_view_matrix(_view_matrix);
-	_frame.set_directional_light(_dir_light);
-
-	for (const auto& rnd : _rednerable_objects) {
-		_frame.push_back_renderable(rnd);
-	}
-	
-	_frame.begin_rendering();
 	_renderer.render(_frame);
-	_frame.end_rendering();
+}
+
+void Deferred_lighting::update(float dt)
+{
+	float3 forward = _curr_viewpoint.forward();
+	
+	if (_view_roll_angles != float2::zero) {
+
+		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+			quat q = from_axis_angle_rotation(_curr_viewpoint.up, _view_roll_angles.y);
+			
+			float3 new_forward = normalize(rotate(q, forward));
+			_curr_viewpoint.position = -new_forward * _curr_viewpoint.distance();
+			
+			forward = new_forward;
+		}
+
+		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
+			float3 ox = cross(forward, _curr_viewpoint.up);
+			ox.y = 0; // ox is always parallel the world's OX.
+			ox = normalize(ox);
+
+			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
+			float3 new_forward = normalize(rotate(q, forward));
+			_curr_viewpoint.up = normalize(cross(ox, new_forward));
+			_curr_viewpoint.position = -new_forward * _curr_viewpoint.distance();
+		}
+	}
+
+	_view_roll_angles = float2::zero;
 }
 
 } // namespace deferred_lighting

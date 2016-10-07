@@ -972,6 +972,26 @@ bool Win_app::pump_sys_messages() const noexcept
 	return false;
 }
 
+void Win_app::refresh_device_state() noexcept
+{
+	// mouse buttons
+	auto mb = Mouse_buttons::none;
+	if (HIWORD(GetKeyState(VK_LBUTTON)) == 1) mb |= Mouse_buttons::left;
+	if (HIWORD(GetKeyState(VK_MBUTTON)) == 1) mb |= Mouse_buttons::middle;
+	if (HIWORD(GetKeyState(VK_RBUTTON)) == 1) mb |= Mouse_buttons::right;
+
+	// mouse position & is_out
+	POINT cp;
+	GetCursorPos(&cp);
+	ScreenToClient(_window.hwnd(), &cp);
+	bool is_out = (cp.x < 0) || (static_cast<uint32_t>(cp.x) >= _window.size().width)
+		|| (cp.y < 0) || (static_cast<uint32_t>(cp.y) >= _window.size().height);
+	_mouse.set_is_out(is_out);
+
+	if (!is_out)
+		_mouse.set_position(uint2(cp.x, window().size().height - cp.y - 1));
+ }
+
 Clock::Clock_report Win_app::run(std::unique_ptr<Game> game)
 {
 	assert(!_is_running);
@@ -979,6 +999,8 @@ Clock::Clock_report Win_app::run(std::unique_ptr<Game> game)
 
 	_is_running = true;
 	_window.show();
+	refresh_device_state();
+	
 	_rnd_context.swap_color_buffers(); //  what for vsync
 	_clock.restart();
 
@@ -996,7 +1018,9 @@ Clock::Clock_report Win_app::run(std::unique_ptr<Game> game)
 		}
 
 		// rendering
-		game->render(1.f);
+		game->begin_render(_clock.get_interpolation_factor());
+		game->render();
+		game->end_render();
 		_rnd_context.swap_color_buffers();
 	}
 

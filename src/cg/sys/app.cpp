@@ -17,6 +17,11 @@ Clock::Clock_report::Clock_report(const Dur_nano_t& elapsed_time,
 
 // ----- Clock -----
 
+float Clock::get_interpolation_factor() const noexcept
+{
+	return float(_update_time_accum.count()) / Clock::update_delta_time_dur.count();
+}
+
 Clock::Clock_report Clock::get_report() const noexcept
 {
 	Time_point_t curr_time = std::chrono::high_resolution_clock::now();
@@ -131,6 +136,7 @@ void Application::process_sys_messages(Sys_message_listener_i& listener) noexcep
 			case Sys_message::Type::mouse_button:
 			{
 				_mouse.set_buttons(msg.mouse_buttons);
+				listener.on_mouse_click();
 				break;
 			}
 
@@ -153,24 +159,26 @@ void Application::process_sys_messages(Sys_message_listener_i& listener) noexcep
 				_mouse.set_position(uint2(
 					msg.point.x,
 					window().size().height - msg.point.y - 1));
+
+				listener.on_mouse_move();
 				break;
 			}
 		}
 	} // for
 
-	std::ostringstream title_builder;
-	if (_mouse.is_out()) title_builder << "out |";
-	else title_builder << " in |";
+	//std::ostringstream title_builder;
+	//if (_mouse.is_out()) title_builder << "out |";
+	//else title_builder << " in |";
 
-	if (_mouse.left_down()) title_builder << " 1";
-	else title_builder << " 0";
-	if (_mouse.middle_down()) title_builder << "1";
-	else title_builder << "0";
-	if (_mouse.right_down()) title_builder << "1 |";
-	else title_builder << "0 |";
+	//if (_mouse.left_down()) title_builder << " 1";
+	//else title_builder << " 0";
+	//if (_mouse.middle_down()) title_builder << "1";
+	//else title_builder << "0";
+	//if (_mouse.right_down()) title_builder << "1 |";
+	//else title_builder << "0 |";
 
-	title_builder << _mouse.position();
-	window().set_title(title_builder.str());
+	//title_builder << _mouse.position();
+	//window().set_title(title_builder.str());
 
 	clear_message_queue();
 }

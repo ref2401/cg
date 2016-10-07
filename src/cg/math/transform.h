@@ -35,22 +35,43 @@ constexpr float pi_2 = pi / 2.f;
 constexpr float pi_3 = pi / 3.f;
 constexpr float pi_4 = pi / 4.f;
 constexpr float pi_8 = pi / 8.f;
+constexpr float pi_16 = pi / 16.f;
+constexpr float pi_32 = pi / 32.f;
+constexpr float pi_64 = pi / 64.f;
+constexpr float pi_128 = pi / 128.f;
+
+// Represents camera position, and orientation is word.
+struct Viewpoint final {
+	Viewpoint() noexcept = default;
+
+	Viewpoint(float3 position, float3 target, float3 up = float3::unit_y) noexcept;
+
+
+	float3 forward() const noexcept
+	{
+		return normalize(target - position);
+	}
+
+	// Returns distance bitween position and target.
+	float distance() const noexcept
+	{
+		return cg::len(target - position);
+	}
+
+	// Calculates a matrix that cam be used to transform from world space to this view space.
+	mat4 view_matrix() const noexcept;
+
+	float3 position;
+	float3 target;
+	float3 up;
+};
+
 
 // Create a quaternion from the axis-angle respresentation.
 //	Params:
 //		axis = a unit vector indicates direction of a rotation axis.
 //		angle = (In radians) describes the magnitude of the rotation about the axis.
-inline quat from_axis_angle_rotation(const float3& axis, float angle) noexcept
-{
-	assert(is_normalized(axis));
-
-	if (approx_equal(angle, 0.f)) return quat::identity; // no angle, no rotation
-
-	float half_angle = angle * 0.5f;
-	float c = std::cos(half_angle);
-	float s = std::sin(half_angle);
-	return quat(axis.x * s, axis.y * s, axis.z * s, c);
-}
+quat from_axis_angle_rotation(const float3& axis, float angle) noexcept;
 
 // Construct a unit quaternion from the specified rotation matrix.
 // In the case of M is mat4 translation and perspective components are ignored.
@@ -106,64 +127,20 @@ quat from_rotation_matrix(const TMat& m) noexcept
 	return res;
 }
 
+// Linearly interpolates between two viewpoints.
+Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept;
+
 // Creates an OpenGL compatible orthographic projection matrix. 
 // right = -left, top = -bottom, near < far.
-inline mat4 orthographic_matrix(float width, float height, float near_z, float far_z) noexcept
-{
-	assert(width > 0);
-	assert(height > 0);
-	assert(near_z < far_z);
-
-	float far_minus_near = far_z - near_z;
-	float right = width / 2.f;
-	float top = height / 2.f;
-
-	return mat4(
-		1.f / right, 0, 0, 0,
-		0, 1.f / top, 0, 0,
-		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
-		0, 0, 0, 1
-	);
-}
+mat4 orthographic_matrix(float width, float height, float near_z, float far_z) noexcept;
 
 // Creates an OpenGL compatible orthographic projection matrix.
 // left < right, bottom < top, near < far.
-inline mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
-{
-	assert(left < right);
-	assert(bottom < top);
-	assert(near_z < far_z);
-
-	float doubled_near = 2.f * near_z;
-	float far_minus_near = far_z - near_z;
-	float right_minus_left = right - left;
-	float top_minus_bottom = top - bottom;
-
-	return mat4(
-		2.f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
-		0, 2.f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
-		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
-		0, 0, 0, 1
-	);
-}
+mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
 // Computes an OpenGL compatible projection matrix for general frustum.
 // left < right, bottom < top, 0 < near < far.
-inline mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
-{
-	float doubled_near = 2.f * near_z;
-	float far_minus_near = far_z - near_z;
-	float right_minus_left = right - left;
-	float top_minus_bottom = top - bottom;
-
-
-	return mat4(
-		doubled_near / right_minus_left, 0, (right + left) / right_minus_left, 0,
-		0, doubled_near / top_minus_bottom, (top + bottom) / top_minus_bottom, 0,
-		0, 0, -(far_z + near_z) / far_minus_near, -doubled_near * far_z / far_minus_near,
-		0, 0, -1, 0
-	);
-}
+mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
 // Computes an OpenGL compatible symmetric perspective projection matrix based on a field of view.
 // 0 < vert_Fov < cg::pi, 0 < near < far.
@@ -172,32 +149,7 @@ inline mat4 perspective_matrix(float left, float right, float bottom, float top,
 //		wh_ratio = The ratio of the width to the height of the near clipping plane.
 //		near = the distance between a viewer and the near clipping plane.
 //		far = the distance between a viewer and the far clipping plane.
-inline mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept
-{
-	assert(0 < vert_fov && vert_fov < pi);
-	assert(0 < near_z && near_z < far_z);
-
-	float fat_minus_near = far_z - near_z;
-	float rev_tangent = 1.f / std::tan(vert_fov * 0.5f);
-
-	/*
-	* TAN = tan(vert_fov / 2.0L)
-	* top = near * TAN
-	* right = top * wh_ratio = wh_ratio * near * TAN
-	*
-	* 2near / (right - (-rigth)) = 2near / 2right = near / right =
-	* near / (wh_ratio * near * TAN) = 1 / (wh_ratio * TAN)
-	*
-	* 2near / (top - (-top)) = 2near / 2top = neat / top =
-	* near / (near * TAN) = 1 / TAN */
-
-	return mat4(
-		(1.f / wh_ratio) * rev_tangent, 0, 0, 0,
-		0, rev_tangent, 0, 0,
-		0, 0, -(far_z + near_z) / fat_minus_near, -2.f * near_z * far_z / fat_minus_near,
-		0, 0, -1, 0
-	);
-}
+mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept;
 
 // Returns the position component of the specified matrix.
 inline float3 position(const mat4& m) noexcept
@@ -211,6 +163,13 @@ inline void set_position(mat4& m, const float3& p) noexcept
 	m.m03 = p.x;
 	m.m13 = p.y;
 	m.m23 = p.z;
+}
+
+inline float3 rotate(const quat& q, const float3& p) noexcept
+{
+	quat pq = quat(p.x, p.y, p.z, 1.0f);
+	quat res = q * pq * conjugate(q);
+	return float3(res.x, res.y, res.z);
 }
 
 // Constructs rotation matrix from (possibly non-unit) quaternion.
@@ -426,22 +385,7 @@ inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s) noexcept
 //		position = an origin, where eye(camera) is situated.
 //		target = a point of interest.
 //		up = the direction that is considered to be upward.
-inline mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept
-{
-	assert(position != target);
-	assert(is_normalized(up));
-
-	float3 forward = normalize(target - position);
-	float3 right = normalize(cross(forward, up));
-	float3 new_up = normalize(cross(right, forward));
-
-	mat4 r = mat4::identity;
-	r.m00 = right.x;	r.m01 = right.y;	r.m02 = right.z;	r.m03 = dot(right, -position);
-	r.m10 = new_up.x;	r.m11 = new_up.y;	r.m12 = new_up.z;	r.m13 = dot(new_up, -position);
-	r.m20 = -forward.x;	r.m21 = -forward.y;	r.m22 = -forward.z;	r.m23 = dot(forward, position);
-
-	return r;
-}
+mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept;
 
 } // namespace cg
 

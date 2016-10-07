@@ -21,7 +21,7 @@ template<typename Numeric,
 
 template<typename Numeric>
 struct Approx_equal_helper<Numeric, false, true> {
-	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs) noexcept
+	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs_diff) noexcept
 	{
 		return lhs == rhs;
 	}
@@ -29,13 +29,13 @@ struct Approx_equal_helper<Numeric, false, true> {
 
 template<typename Numeric>
 struct Approx_equal_helper<Numeric, true, false> {
-	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs) noexcept
+	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs_diff) noexcept
 	{
 		assert(std::isfinite(lhs));
 		assert(std::isfinite(rhs));
-		assert(std::isfinite(max_abs));
+		assert(std::isfinite(max_abs_diff));
 
-		return std::abs(lhs - rhs) <= max_abs;
+		return std::abs(lhs - rhs) <= max_abs_diff;
 	}
 };
 
@@ -45,10 +45,10 @@ struct Approx_equal_helper<Numeric, true, false> {
 // admitting a maximum absolute difference max_abs.
 // If Numeric is an integral value then max_abs doesn't matter.
 template<typename Numeric>
-inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs = 1e-5f) noexcept
+inline bool approx_equal(Numeric lhs, Numeric rhs, Numeric max_abs_diff = 1e-5f) noexcept
 {
 	cg::internal::Approx_equal_helper<Numeric> aeh;
-	return aeh(lhs, rhs, max_abs);
+	return aeh(lhs, rhs, max_abs_diff);
 }
 
 // Clamps v into the given bounds [lo, hi].

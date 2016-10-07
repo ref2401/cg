@@ -131,6 +131,7 @@
     <ClCompile Include="file\image_tga.cpp" />
     <ClCompile Include="file\mesh_wavefront.cpp" />
     <ClCompile Include="math\math.cpp" />
+    <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="opengl\buffer.cpp" />
     <ClCompile Include="opengl\framebuffer.cpp" />
     <ClCompile Include="opengl\texture.cpp" />

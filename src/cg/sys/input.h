@@ -69,6 +69,7 @@ public:
 
 
 	// The state of all the mouse's buttons.
+	// The value is undefined if is_out() returns true.
 	const Mouse_buttons& buttons() const noexcept
 	{
 		return _buttons;
@@ -78,6 +79,9 @@ public:
 	{
 		_buttons = mb;
 	}
+
+	// Calculates mouse's position as normalized device coordinates.
+	cg::float2 get_ndc_position(const cg::uint2& window_size) const noexcept;
 
 	// True if cursor left the client area of the window.
 	bool is_out() const noexcept
@@ -110,6 +114,7 @@ public:
 
 	// Mouse position within the window's client area. 
 	// The value is relative to the bottom-left corner.
+	// The value is undefined if is_out() returns true.
 	const cg::uint2& position() const noexcept
 	{
 		return _position;

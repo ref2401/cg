@@ -23,6 +23,8 @@ struct float3 {
 
 	explicit float3(float val) noexcept : x(val), y(val), z(val) {}
 
+	float3(const float2& v, float z) : x(v.x), y(v.y), z(z) {}
+
 	float3(float x, float y, float z) noexcept : x(x), y(y), z(z) {}
 
 

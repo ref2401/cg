@@ -68,6 +68,9 @@ public:
 	// 10 millisecons for 1 update - 100ups update rate.
 	static constexpr auto update_delta_time = std::chrono::milliseconds(10);
 
+	// Interpolation factor is a value between 0 & 1.
+	// It is used to interpolate between previous & current states during rendering.
+	float get_interpolation_factor() const noexcept;
 
 	// Returns the main loop execution report, times, counters' values.
 	Clock_report get_report() const noexcept;
@@ -143,6 +146,10 @@ protected:
 class Sys_message_listener_i {
 public:
 
+	virtual void on_mouse_click() = 0;
+
+	virtual void on_mouse_move() = 0;
+
 	virtual void on_window_resize() = 0;
 
 protected:
@@ -158,7 +165,11 @@ public:
 	virtual ~Game() noexcept = default;
 
 
-	virtual void render(float blend_state) = 0;
+	virtual void begin_render(float blend_factor) = 0;
+
+	virtual void end_render() = 0;
+
+	virtual void render() = 0;
 
 	virtual void update(float dt) = 0;
 

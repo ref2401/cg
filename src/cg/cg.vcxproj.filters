@@ -49,6 +49,9 @@
     <ClCompile Include="sys\input.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="math\transform.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

@@ -83,6 +83,9 @@ public:
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages() const noexcept;
 
+	// Refreshes state of mouse, keyboard etc.
+	void refresh_device_state() noexcept;
+
 	Clock::Clock_report run(std::unique_ptr<Game> game) override;
 
 	Window_i& window() noexcept override

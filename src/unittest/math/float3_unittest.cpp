@@ -34,19 +34,25 @@ public:
 		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24));
 		Assert::IsTrue((v1.width == 24) && (v1.height == 24) && (v1.depth == 24));
 
-		float3 v3(1, 2, 3);
-		Assert::IsTrue((v3.x == 1) && (v3.y == 2) && (v3.z == 3));
-		Assert::IsTrue((v3.r == 1) && (v3.g == 2) && (v3.b == 3));
-		Assert::IsTrue((v3.width == 1) && (v3.height == 2) && (v3.depth == 3));
+		cg::float2 vec2(3, 4);
+		float3 v3(vec2, 5);
+		Assert::IsTrue((v3.x == vec2.x) && (v3.y == vec2.y) && (v3.z == 5));
+		Assert::IsTrue((v3.r == vec2.x) && (v3.g == vec2.y) && (v3.b == 5));
+		Assert::IsTrue((v3.width == vec2.x) && (v3.height == vec2.y) && (v3.depth == 5));
+
+		float3 v4(1, 2, 3);
+		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3));
+		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3));
+		Assert::IsTrue((v4.width == 1) && (v4.height == 2) && (v4.depth == 3));
 
 		// copy ctor
-		float3 vc = v3;
-		Assert::IsTrue((vc.x == v3.x) && (vc.y == v3.y) && (vc.z == v3.z));
-		Assert::IsTrue((vc.r == v3.r) && (vc.g == v3.g) && (vc.b == v3.b));
-		Assert::IsTrue((vc.width == v3.width) && (vc.height == v3.height) && (vc.depth == v3.depth));
+		float3 vc = v4;
+		Assert::IsTrue((vc.x == v4.x) && (vc.y == v4.y) && (vc.z == v4.z));
+		Assert::IsTrue((vc.r == v4.r) && (vc.g == v4.g) && (vc.b == v4.b));
+		Assert::IsTrue((vc.width == v4.width) && (vc.height == v4.height) && (vc.depth == v4.depth));
 
 		// move ctor
-		float3 vm = std::move(v3);
+		float3 vm = std::move(v4);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z));
 		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b));
 		Assert::IsTrue((vm.width == vc.width) && (vm.height == vc.height) && (vm.depth == vc.depth));
