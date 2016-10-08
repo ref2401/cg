@@ -2,6 +2,7 @@
 #define CG_MATH_TRANSFORM_H_
 
 #include <cassert>
+#include <ostream>
 #include <type_traits>
 #include "cg/math/float3.h"
 #include "cg/math/float4.h"
@@ -40,13 +41,14 @@ constexpr float pi_32 = pi / 32.f;
 constexpr float pi_64 = pi / 64.f;
 constexpr float pi_128 = pi / 128.f;
 
-// Represents camera position, and orientation is word.
+// Represents camera position, and orientation in the word.
 struct Viewpoint final {
 	Viewpoint() noexcept = default;
 
 	Viewpoint(float3 position, float3 target, float3 up = float3::unit_y) noexcept;
 
 
+	// Direction in which this viewpoint(camera) points to.
 	float3 forward() const noexcept
 	{
 		return normalize(target - position);
@@ -59,13 +61,31 @@ struct Viewpoint final {
 	}
 
 	// Calculates a matrix that cam be used to transform from world space to this view space.
+	// Make sure that up is normalized before calling this method.
 	mat4 view_matrix() const noexcept;
+
 
 	float3 position;
 	float3 target;
 	float3 up;
 };
 
+
+inline bool operator==(const Viewpoint& l, const Viewpoint& r) noexcept
+{
+	return (l.position == r.position)
+		&& (l.target == r.target)
+		&& (l.up == r.up);
+}
+
+inline bool operator!=(const Viewpoint& l, const Viewpoint& r) noexcept
+{
+	return !(l == r);
+}
+
+std::ostream& operator<<(std::ostream& out, const Viewpoint& vp);
+
+std::wostream& operator<<(std::wostream& out, const Viewpoint& vp);
 
 // Create a quaternion from the axis-angle respresentation.
 //	Params:
@@ -165,8 +185,12 @@ inline void set_position(mat4& m, const float3& p) noexcept
 	m.m23 = p.z;
 }
 
+// Rotate position p by a quaternion q.
+// Usually rotation q is specified as a rotation around an arbitrary axis by some angle.
 inline float3 rotate(const quat& q, const float3& p) noexcept
 {
+	assert(is_normalized(q));
+
 	quat pq = quat(p.x, p.y, p.z, 1.0f);
 	quat res = q * pq * conjugate(q);
 	return float3(res.x, res.y, res.z);
@@ -386,6 +410,16 @@ inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s) noexcept
 //		target = a point of interest.
 //		up = the direction that is considered to be upward.
 mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept;
+
+// Linearly interpolates between two viewpoints and calculates a view matrix using the interpolation result.
+inline mat4 view_matrix(const Viewpoint& l, const Viewpoint& r, float lerp_factor) noexcept
+{
+	assert(0.0f <= lerp_factor && lerp_factor <= 1.0f);
+
+	auto vp = lerp(l, r, lerp_factor);
+	vp.up = normalize(vp.up);
+	return vp.view_matrix();
+}
 
 } // namespace cg
 

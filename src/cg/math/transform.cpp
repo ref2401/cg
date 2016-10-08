@@ -17,6 +17,18 @@ mat4 Viewpoint::view_matrix() const noexcept
 
 // ----- funcs -----
 
+std::ostream& operator<<(std::ostream& out, const Viewpoint& vp)
+{
+	out << "Viewpoint(" << vp.position << ", " << vp.target << ", " << vp.up << ')';
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Viewpoint& vp)
+{
+	out << "Viewpoint(" << vp.position << ", " << vp.target << ", " << vp.up << ')';
+	return out;
+}
+
 quat from_axis_angle_rotation(const float3& axis, float angle) noexcept
 {
 	assert(is_normalized(axis));

@@ -110,7 +110,6 @@ void Deferred_lighting::begin_render(float blend_factor)
 	_frame.set_projection_matrix(_projection_matrix);
 	auto viewpoint = lerp(_prev_viewpoint, _curr_viewpoint, blend_factor);
 	_frame.set_view_matrix(viewpoint.view_matrix());
-	//_frame.set_view_matrix(view_matrix);
 	_frame.set_directional_light(_dir_light);
 
 	for (const auto& rnd : _rednerable_objects) {

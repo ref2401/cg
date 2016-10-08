@@ -11,9 +11,10 @@ namespace sys {
 cg::float2 Mouse::get_ndc_position(const cg::uint2& window_size) const noexcept
 {
 	assert(!_is_out);
+	assert(greater_than(window_size, 0));
 
-	float x = 2.f * float(_position.x) / window_size.width - 1.f;
-	float y = 2.f * float(_position.y) / window_size.height - 1.f;
+	float x = 2.f * float(_position.x) / (window_size.width - 1) - 1.f;
+	float y = 2.f * float(_position.y) / (window_size.height - 1) - 1.f;
 
 	return float2(x, y);
 }

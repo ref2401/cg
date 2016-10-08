@@ -3,6 +3,7 @@
 #include "cg/math/math.h"
 #include "CppUnitTest.h"
 
+using cg::float2;
 using cg::uint2;
 using cg::sys::Mouse;
 using cg::sys::Mouse_buttons;
@@ -11,6 +12,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
+template<> inline std::wstring ToString<float2>(const float2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Mouse_buttons>(const Mouse_buttons& t) { RETURN_WIDE_STRING(t); }
 
@@ -67,6 +69,23 @@ public:
 		Assert::AreEqual(Mouse_buttons::none, mouse.buttons());
 		Assert::IsTrue(mouse.is_out());
 		Assert::AreEqual(uint2::zero, mouse.position());
+	}
+
+	TEST_METHOD(get_ndc_position)
+	{
+		Mouse mouse;
+		mouse.set_is_out(false);
+
+		uint2 wnd_size(61, 7);
+
+		mouse.set_position(uint2::zero);
+		Assert::AreEqual(float2(-1.0f), mouse.get_ndc_position(wnd_size));
+
+		mouse.set_position(uint2(30, 3));
+		Assert::AreEqual(float2::zero, mouse.get_ndc_position(wnd_size));
+
+		mouse.set_position(uint2(60, 6));
+		Assert::AreEqual(float2(1.0f, 1.0f), mouse.get_ndc_position(wnd_size));
 	}
 
 	TEST_METHOD(props_get_set)

@@ -65,6 +65,7 @@ vec3 calc_ambient_term(vec3 normal_vs)
 
 vec3 reconstruct_position_vs(ivec2 screen_uv)
 {
+	// NOTE(ref2401): Should I decrease u_viewport_size by uvec2(1) before dividing gl_FragCoord.xy by it?
 	vec2 tex_coord = (gl_FragCoord.xy / u_viewport_size) * 2.0 - 1.0;
 	float depth = texelFetch(u_tex_depth_map, screen_uv, 0).r * 2.0 - 1.0;
 	vec4 p = u_inv_projection_matrix * vec4(tex_coord, depth, 1.0);
