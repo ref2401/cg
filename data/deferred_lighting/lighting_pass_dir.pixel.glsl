@@ -47,10 +47,10 @@ void main()
 	vec3 diffuse_term = common_term * v_1_pi;
 
 	// specular term
-	vec3 dir_to_viewpoint_vs = normalize(-position_vs);
-	vec3 half_vector_vs = normalize(u_dlight.direction_to_light_vs + dir_to_viewpoint_vs);
+	vec3 direction_to_viewpoint_vs = normalize(-position_vs);
+	vec3 half_vector_vs = normalize(u_dlight.direction_to_light_vs + direction_to_viewpoint_vs);
 	float cosTh = max(0, dot(normal_vs, half_vector_vs));
-	vec3 specular_term = (smoothness + 8) * v_1_8pi * cosTh * common_term;
+	vec3 specular_term = (smoothness + 8) * v_1_8pi * pow(cosTh, smoothness) * common_term;
 	
 	rt_lighting_ambient_term = calc_ambient_term(normal_vs);
 	rt_lighting_diffuse_term = diffuse_term;
@@ -67,8 +67,8 @@ vec3 calc_ambient_term(vec3 normal_vs)
 vec3 reconstruct_position_vs(ivec2 screen_uv)
 {
 	// NOTE(ref2401): Should I decrease u_viewport_size by uvec2(1) before dividing gl_FragCoord.xy by it?
-	vec2 tex_coord = (gl_FragCoord.xy / u_viewport_size) * 2.0 - 1.0;
+	vec2 tex_coord = (gl_FragCoord.xy / u_viewport_size);
 	float depth = texelFetch(u_tex_depth_map, screen_uv, 0).r * 2.0 - 1.0;
-	vec4 p = u_inv_projection_matrix * vec4(tex_coord, depth, 1.0);
+	vec4 p = u_inv_projection_matrix * vec4(tex_coord * 2.0 - 1.0, depth, 1.0);
 	return p.xyz / p.w;
 }

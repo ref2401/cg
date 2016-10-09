@@ -7,14 +7,14 @@
 //
 // u_tex_lighting_{ambient/diffuer/specular}_term:	3 
 // u_arr_tex_diffuse_rgb:							14
-// u_arr_tex_specular_rgb:							14
+// u_arr_tex_specular_intensity:							14
 //										total :		31
 //										unused:		1
 // batch_size for the pixel shader = 14. draw_call_index is in [0, 14).
 
 
 layout(binding = 0) uniform sampler2D u_arr_tex_diffuse_rgb[14];
-layout(binding = 14) uniform sampler2D u_arr_tex_specular_rgb[14];
+layout(binding = 14) uniform sampler2D u_arr_tex_specular_intensity[14];
 layout(binding = 28) uniform sampler2D u_tex_lighting_ambient_term;
 layout(binding = 29) uniform sampler2D u_tex_lighting_deffure_term;
 layout(binding = 30) uniform sampler2D u_tex_lighting_specular_term;
@@ -29,6 +29,8 @@ in Pixel_data_i {
 layout(depth_unchanged) out float gl_FragDepth;
 layout(location = 0) out vec4 rt_material_ligting_result;
 
+float to_color_space(float red, float exponent);
+
 vec3 to_color_space(vec3 rgb, float exponent);
 
 void main()
@@ -39,11 +41,11 @@ void main()
 	vec3 specular_term = texelFetch(u_tex_lighting_specular_term, screen_uv, 0).rgb;
 
 	vec3 diffuse_rgb = to_color_space(texture(u_arr_tex_diffuse_rgb[ps_in.draw_call_index], ps_in.tex_coord).rgb, 2.2);
-	vec3 specular_rgb = to_color_space(texture(u_arr_tex_specular_rgb[ps_in.draw_call_index], ps_in.tex_coord).rgb, 2.2);
+	float specular_intensity = to_color_space(texture(u_arr_tex_specular_intensity[ps_in.draw_call_index], ps_in.tex_coord).r, 2.2);
 
 	vec3 ambient_contrib = ambient_term * diffuse_rgb;
 	vec3 diffuse_contrib = diffuse_rgb * diffuse_term;
-	vec3 specular_contrib = specular_rgb * specular_term;
+	vec3 specular_contrib = specular_intensity * specular_term;
 	vec3 lighting_result = to_color_space(ambient_contrib + diffuse_contrib + specular_contrib, 0.45);
 
 	rt_material_ligting_result = vec4(lighting_result, 1);
@@ -55,4 +57,9 @@ vec3 to_color_space(vec3 rgb, float exponent)
 	rgb.g = pow(rgb.g, exponent);
 	rgb.b = pow(rgb.b, exponent);
 	return rgb;
+}
+
+float to_color_space(float red, float exponent)
+{
+	return pow(red, exponent);
 }

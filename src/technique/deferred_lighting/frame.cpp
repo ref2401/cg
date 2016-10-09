@@ -48,11 +48,11 @@ Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix, const Materi
 	smoothness(material.smoothness),
 	tex_diffuse_rgb_id(material.tex_diffuse_rgb.id()),
 	tex_normal_map_id(material.tex_normal_map.id()),
-	tex_specular_rgb_id(material.tex_specular_rgb.id())
+	tex_specular_intensity_id(material.tex_specular_intensity.id())
 {
 	assert(tex_diffuse_rgb_id != Invalid::texture_id);
 	assert(tex_normal_map_id != Invalid::texture_id);
-	assert(tex_specular_rgb_id != Invalid::texture_id);
+	assert(tex_specular_intensity_id != Invalid::texture_id);
 }
 
 // ----- Material -----
@@ -60,11 +60,11 @@ Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix, const Materi
 Material::Material(float smoothness,
 	cg::opengl::Texture_2d_immut tex_diffuse_rgb,
 	cg::opengl::Texture_2d_immut tex_normal_map,
-	cg::opengl::Texture_2d_immut tex_specular_rgb) noexcept :
+	cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept :
 	smoothness(smoothness),
 	tex_diffuse_rgb(std::move(tex_diffuse_rgb)),
 	tex_normal_map(std::move(tex_normal_map)),
-	tex_specular_rgb(std::move(tex_specular_rgb))
+	tex_specular_intensity(std::move(tex_specular_intensity))
 {}
 
 // ----- Frame -----
@@ -80,7 +80,7 @@ Frame::Frame(size_t max_renderable_count) :
 	_uniform_array_smoothness.reserve(initial_capacity);
 	_uniform_array_tex_diffuse_rgb.reserve(initial_capacity);
 	_uniform_array_tex_normal_map.reserve(initial_capacity);
-	_uniform_array_tex_specular_rgb.reserve(initial_capacity);
+	_uniform_array_tex_specular_intensity.reserve(initial_capacity);
 }
 
 void Frame::begin_rendering() noexcept
@@ -90,7 +90,7 @@ void Frame::begin_rendering() noexcept
 	assert(_uniform_array_smoothness.size() == _renderable_count);
 	assert(_uniform_array_tex_diffuse_rgb.size() == _renderable_count);
 	assert(_uniform_array_tex_normal_map.size() == _renderable_count);
-	assert(_uniform_array_tex_specular_rgb.size() == _renderable_count);
+	assert(_uniform_array_tex_specular_intensity.size() == _renderable_count);
 }
 
 void Frame::end_rendering() noexcept
@@ -119,7 +119,7 @@ void Frame::push_back_renderable(const Renderable& rnd)
 	_uniform_array_smoothness.push_back(rnd.smoothness); // smoothness -> _uniform_array_smoothness
 	_uniform_array_tex_diffuse_rgb.push_back(rnd.tex_diffuse_rgb_id); // tex_diffuse_rgb_id -> _uniform_array_tex_diffuse_rgb
 	_uniform_array_tex_normal_map.push_back(rnd.tex_normal_map_id); // tex_normal_map_id -> _uniform_array_tex_normal_map
-	_uniform_array_tex_specular_rgb.push_back(rnd.tex_specular_rgb_id); // tex_specular_rgb_id -> _uniform_array_tex_specular_rgb
+	_uniform_array_tex_specular_intensity.push_back(rnd.tex_specular_intensity_id); // tex_specular_rgb_id -> _uniform_array_tex_specular_rgb
 
 	++_renderable_count;
 }
@@ -165,7 +165,7 @@ void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept
 	_uniform_array_smoothness.clear();
 	_uniform_array_tex_diffuse_rgb.clear();
 	_uniform_array_tex_normal_map.clear();
-	_uniform_array_tex_specular_rgb.clear();
+	_uniform_array_tex_specular_intensity.clear();
 }
 
 } // namespace deferred_lighting

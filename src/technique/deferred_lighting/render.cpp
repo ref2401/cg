@@ -109,8 +109,10 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
 	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
 
-	for (size_t curr_unit = 0; curr_unit < rnd_count; ++curr_unit)
+	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
+		glBindSampler(curr_unit, _gbuffer.bilinear_sampler().id());
 		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
+	}
 }
 
 // ----- Lighting_pass -----
@@ -146,14 +148,14 @@ void Lighting_pass::end() noexcept
 
 	//size_t hw = _gbuffer.viewport_size().width / 2;
 	//size_t hh = _gbuffer.viewport_size().height / 2;
-	
+	//
 	//// ambient_term -> upper-left
 	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	0, hh, hw - 1, _gbuffer.viewport_size().height,
 	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
+	//
 	//// diffuse_term -> upper-right
 	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT1);
 	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
@@ -167,7 +169,7 @@ void Lighting_pass::end() noexcept
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	0, 0, hw -1 , hh - 1,
 	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	
+	//
 	//_fbo.set_read_buffer(GL_NONE);
 }
 
@@ -228,21 +230,23 @@ void Material_lighting_pass::end() noexcept
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 		GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
 	_fbo.set_read_buffer(GL_NONE);
 }
 
 void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	const std::vector<float>& uniform_array_model_matrix,
 	const std::vector<GLuint>& uniform_array_tex_diffuse_rgb,
-	const std::vector<GLuint>& uniform_array_tex_specular_rgb) noexcept
+	const std::vector<GLuint>& uniform_array_tex_specular_intensity) noexcept
 {
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
 
-	for (size_t curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
+	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
 		// 14 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
+		glBindSampler(curr_unit, _gbuffer.bilinear_sampler().id());
 		glBindTextureUnit(curr_unit, uniform_array_tex_diffuse_rgb[rnd_offset + curr_unit]);
-		glBindTextureUnit(curr_unit + 14, uniform_array_tex_specular_rgb[rnd_offset + curr_unit]);
+
+		glBindSampler(curr_unit + 14, _gbuffer.bilinear_sampler().id());
+		glBindTextureUnit(curr_unit + 14, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
 	}
 }
 
@@ -264,9 +268,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 
 	// for each batch is the frame packet
 	auto r = frame.batch_count();
-	for (GLuint bi = 0; bi < frame.batch_count(); ++bi) {
-		glBindSampler(bi, _gbuffer.bilinear_sampler().id());
-
+	for (size_t bi = 0; bi < frame.batch_count(); ++bi) {
 		// rnd_offset: processed renderable object count.
 		// rnd_count: The number of renderable objects in the current batch #bi.
 		size_t rnd_offset = bi * frame.batch_size();
@@ -308,9 +310,7 @@ void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept
 
 	// for each batch is the frame packet
 	auto r = frame.batch_count();
-	for (GLuint bi = 0; bi < frame.batch_count(); ++bi) {
-		glBindSampler(bi, _gbuffer.bilinear_sampler().id());
-
+	for (size_t bi = 0; bi < frame.batch_count(); ++bi) {
 		// rnd_offset: processed renderable object count.
 		// rnd_count: The number of renderable objects in the current batch #bi.
 		size_t rnd_offset = bi * frame.batch_size();
@@ -320,7 +320,7 @@ void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept
 		_material_lighting_pass.set_uniform_arrays(rnd_offset, rnd_count,
 			frame.uniform_array_model_matrix(),
 			frame.uniform_array_tex_diffuse_rgb(),
-			frame.uniform_array_tex_specular_rgb());
+			frame.uniform_array_tex_specular_intensity());
 
 
 		// draw indirect

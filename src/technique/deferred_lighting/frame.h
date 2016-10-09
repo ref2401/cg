@@ -43,7 +43,7 @@ struct Material final {
 	Material(float smoothness,
 		cg::opengl::Texture_2d_immut tex_diffuse_rgb,
 		cg::opengl::Texture_2d_immut tex_normal_map,
-		cg::opengl::Texture_2d_immut tex_specular_rgb) noexcept;
+		cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
 
 	~Material() noexcept = default;
 
@@ -51,9 +51,8 @@ struct Material final {
 	float smoothness = 0.f;
 	cg::opengl::Texture_2d_immut tex_diffuse_rgb;
 	cg::opengl::Texture_2d_immut tex_normal_map;
-	cg::opengl::Texture_2d_immut tex_specular_rgb;
+	cg::opengl::Texture_2d_immut tex_specular_intensity;
 };
-
 
 struct Renderable final {
 
@@ -66,7 +65,7 @@ struct Renderable final {
 	float smoothness = 0.f;
 	GLuint tex_diffuse_rgb_id = cg::opengl::Invalid::texture_id;
 	GLuint tex_normal_map_id = cg::opengl::Invalid::texture_id;
-	GLuint tex_specular_rgb_id = cg::opengl::Invalid::texture_id;
+	GLuint tex_specular_intensity_id = cg::opengl::Invalid::texture_id;
 };
 
 
@@ -172,9 +171,9 @@ public:
 		return _uniform_array_tex_normal_map;
 	}
 
-	const std::vector<GLuint>& uniform_array_tex_specular_rgb() const noexcept
+	const std::vector<GLuint>& uniform_array_tex_specular_intensity() const noexcept
 	{
-		return _uniform_array_tex_specular_rgb;
+		return _uniform_array_tex_specular_intensity;
 	}
 
 private:
@@ -201,7 +200,7 @@ private:
 	std::vector<float> _uniform_array_smoothness;
 	std::vector<GLuint> _uniform_array_tex_diffuse_rgb;
 	std::vector<GLuint> _uniform_array_tex_normal_map;
-	std::vector<GLuint> _uniform_array_tex_specular_rgb;
+	std::vector<GLuint> _uniform_array_tex_specular_intensity;
 };
 
 } // namespace deferred_lighting

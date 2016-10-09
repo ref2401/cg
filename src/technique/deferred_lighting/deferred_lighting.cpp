@@ -53,25 +53,25 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 
 	// scene
 	{ // default material
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material_default_diffuse_rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/common_data/material_default_specular_rgb.tga");
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/common_data/material-default-specular-intensity.tga");
 
 		_material_default.smoothness = 10.0f;
 		_material_default.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
 		_material_default.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
-		_material_default.tex_specular_rgb = Texture_2d_immut(Texture_format::rgb_8, specular_image);
+		_material_default.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, specular_image);
 	}
 
-	{ // brick wall
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
+	{ // brick 
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
 		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular.tga");
+		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
 
-		_material_brick_wall.smoothness = 3.0f;
+		_material_brick_wall.smoothness = 8.0f;
 		_material_brick_wall.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
 		_material_brick_wall.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
-		_material_brick_wall.tex_specular_rgb = Texture_2d_immut(Texture_format::rgb_8, specular_image);
+		_material_brick_wall.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, specular_image);
 	}
 
 	// cube geometry
@@ -89,7 +89,7 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_dir_light.target = float3::zero;
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
-	_dir_light.ambient_intensity = 0.35f;
+	_dir_light.ambient_intensity = 0.25f;
 
 	_rednerable_objects.reserve(16);
 	_rednerable_objects.emplace_back(cube_cmd, 

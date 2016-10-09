@@ -203,7 +203,7 @@ public:
 	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 		const std::vector<float>& uniform_array_model_matrix,
 		const std::vector<GLuint>& uniform_array_tex_diffuse_rgb,
-		const std::vector<GLuint>& uniform_array_tex_specular_rgb) noexcept;
+		const std::vector<GLuint>& uniform_array_tex_specular_intensity) noexcept;
 
 private:
 	float _clear_value_color[4] = { 0, 0, 0, 0 };

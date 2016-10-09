@@ -75,7 +75,7 @@ Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(con
 	_u_tex_lighting_deffure_term_location(_prog.get_uniform_location("u_tex_lighting_deffure_term")),
 	_u_tex_lighting_specular_term_location(_prog.get_uniform_location("u_tex_lighting_specular_term")),
 	_u_arr_tex_diffuse_rgb_location(_prog.get_uniform_location("u_arr_tex_diffuse_rgb")),
-	_u_arr_tex_specular_rgb_location(_prog.get_uniform_location("u_arr_tex_specular_rgb"))
+	_u_arr_tex_specular_intensity_location(_prog.get_uniform_location("u_arr_tex_specular_intensity"))
 {}
 
 void Material_lighting_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
