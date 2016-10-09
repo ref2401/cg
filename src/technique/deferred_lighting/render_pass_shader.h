@@ -70,10 +70,37 @@ private:
 	cg::opengl::Shader_program _prog;
 	GLint _u_viewport_size_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_inv_projection_matrix_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_dir_to_light_vs_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_irradiance_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_ambient_irradiance_up_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_ambient_irradiance_down_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dlight_direction_to_light_vs_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dlight_irradiance_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dlight_ambient_irradiance_up_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dlight_ambient_irradiance_down_location = cg::opengl::Invalid::uniform_location;
+};
+
+class Material_lighting_pass_shader_program final {
+public:
+
+	Material_lighting_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+
+	Material_lighting_pass_shader_program(const Material_lighting_pass_shader_program&) = delete;
+
+	Material_lighting_pass_shader_program(Material_lighting_pass_shader_program&&) = delete;
+
+	~Material_lighting_pass_shader_program() noexcept = default;
+
+
+	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
+
+	void use(const cg::mat4& projection_view_matrix) noexcept;
+
+private:
+	cg::opengl::Shader_program _prog;
+	GLint _u_projection_view_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_tex_lighting_ambient_term_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_tex_lighting_deffure_term_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_tex_lighting_specular_term_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_arr_tex_diffuse_rgb_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_arr_tex_specular_rgb_location = cg::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

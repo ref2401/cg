@@ -45,10 +45,10 @@ Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
 	_prog("lighting-pass-dir-shader", dir_source_code),
 	_u_viewport_size_location(_prog.get_uniform_location("u_viewport_size")),
 	_u_inv_projection_matrix_location(_prog.get_uniform_location("u_inv_projection_matrix")),
-	_u_dir_light_dir_to_light_vs_location(_prog.get_uniform_location("u_dir_light.dir_to_light_vs")),
-	_u_dir_light_irradiance_location(_prog.get_uniform_location("u_dir_light.irradiance")),
-	_u_dir_light_ambient_irradiance_up_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_up")),
-	_u_dir_light_ambient_irradiance_down_location(_prog.get_uniform_location("u_dir_light.ambient_irradiance_down"))
+	_u_dlight_direction_to_light_vs_location(_prog.get_uniform_location("u_dlight.direction_to_light_vs")),
+	_u_dlight_irradiance_location(_prog.get_uniform_location("u_dlight.irradiance")),
+	_u_dlight_ambient_irradiance_up_location(_prog.get_uniform_location("u_dlight.ambient_irradiance_up")),
+	_u_dlight_ambient_irradiance_down_location(_prog.get_uniform_location("u_dlight.ambient_irradiance_down"))
 {}
 
 void Lighting_pass_dir_shader_program::use(const uint2& viewport_size, 
@@ -59,10 +59,34 @@ void Lighting_pass_dir_shader_program::use(const uint2& viewport_size,
 	glUseProgram(_prog.id());
 	set_uniform(_u_viewport_size_location, viewport_size);
 	set_uniform(_u_inv_projection_matrix_location, inverse(projection_matrix));
-	set_uniform(_u_dir_light_dir_to_light_vs_location, -dl_params.direction_vs);
-	set_uniform(_u_dir_light_irradiance_location, dl_params.irradiance);
-	set_uniform(_u_dir_light_ambient_irradiance_up_location, dl_params.ambient_irradiance_up);
-	set_uniform(_u_dir_light_ambient_irradiance_down_location, dl_params.ambient_irradiance_down);
+	set_uniform(_u_dlight_direction_to_light_vs_location, -dl_params.direction_vs);
+	set_uniform(_u_dlight_irradiance_location, dl_params.irradiance);
+	set_uniform(_u_dlight_ambient_irradiance_up_location, dl_params.ambient_irradiance_up);
+	set_uniform(_u_dlight_ambient_irradiance_down_location, dl_params.ambient_irradiance_down);
+}
+
+// ----- Material_lighting_pass -----
+
+Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(const Shader_program_source_code& source_code) :
+	_prog("material-pass_shader", source_code),
+	_u_projection_view_matrix_location(_prog.get_uniform_location("u_projection_view_matrix")),
+	_u_arr_model_matrix_location(_prog.get_uniform_location("u_arr_model_matrix")),
+	_u_tex_lighting_ambient_term_location(_prog.get_uniform_location("u_tex_lighting_ambient_term")),
+	_u_tex_lighting_deffure_term_location(_prog.get_uniform_location("u_tex_lighting_deffure_term")),
+	_u_tex_lighting_specular_term_location(_prog.get_uniform_location("u_tex_lighting_specular_term")),
+	_u_arr_tex_diffuse_rgb_location(_prog.get_uniform_location("u_arr_tex_diffuse_rgb")),
+	_u_arr_tex_specular_rgb_location(_prog.get_uniform_location("u_arr_tex_specular_rgb"))
+{}
+
+void Material_lighting_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
+{
+	set_uniform_array<mat4>(_u_arr_model_matrix_location, ptr, count);
+}
+
+void Material_lighting_pass_shader_program::use(const mat4& projection_view_matrix) noexcept
+{
+	glUseProgram(_prog.id());
+	set_uniform(_u_projection_view_matrix_location, projection_view_matrix);
 }
 
 } // namespace deferred_lighting

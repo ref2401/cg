@@ -11,20 +11,6 @@
 
 namespace deferred_lighting {
 
-class Material final {
-public:
-
-	Material() noexcept = default;
-
-	Material(float smoothness, cg::opengl::Texture_2d_immut tex_normal_map) noexcept;
-
-	~Material() noexcept = default;
-
-
-	float smoothness = 0.f;
-	cg::opengl::Texture_2d_immut tex_normal_map;
-};
-
 class Deferred_lighting final : public cg::sys::Game {
 public:
 
@@ -52,8 +38,8 @@ private:
 	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	cg::opengl::Static_vertex_spec _vertex_spec0;
-	Material _material;
-	cg::opengl::Texture_2d_immut _tex_default_normal_map;
+	Material _material_default;
+	Material _material_brick_wall;
 	// scene
 	std::vector<Renderable> _rednerable_objects;
 	cg::mat4 _projection_matrix;

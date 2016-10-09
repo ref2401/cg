@@ -83,6 +83,14 @@ public:
 		return _tex_lighting_specular_term;
 	}
 
+	// Material_lighting_pass's render target texture.
+	// xyz components contain fully lit material color.
+	// The computations are made in HDR.
+	cg::opengl::Texture_2d& tex_material_lighting_result() noexcept
+	{
+		return _tex_material_lighting_result;
+	}
+
 	// Gbuffer_pass's render target texture.
 	// xyz components contain normal in the view space.
 	// w component contains material.smoothness parameter.
@@ -114,6 +122,7 @@ private:
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
 	cg::opengl::Texture_2d _tex_lighting_specular_term;
+	cg::opengl::Texture_2d _tex_material_lighting_result;
 };
 
 class Gbuffer_pass final {
@@ -128,10 +137,10 @@ public:
 	~Gbuffer_pass() noexcept = default;
 
 
-	// Perform various preparations before rendering using this pass.
+	// Performs various preparations before rendering using this pass.
 	void begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
 
-	// Clear renderer states after rendring using this pass.
+	// Clears renderer states after rendring using this pass.
 	void end() noexcept;
 
 	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count, 
@@ -164,13 +173,43 @@ public:
 	void end() noexcept;
 
 	void perform_directional_light_pass(const cg::mat4& projection_matrix,
-		const cg::mat3& view_matrix, const Directional_light& dir_light) noexcept;
+		const cg::mat4& view_matrix, const Directional_light& dir_light) noexcept;
 
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
 	Gbuffer& _gbuffer;
 	cg::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
+};
+
+class Material_lighting_pass final {
+public:
+
+	Material_lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code);
+
+	Material_lighting_pass(const Material_lighting_pass&) = delete;
+
+	Material_lighting_pass(Material_lighting_pass&& pass) = delete;
+
+	~Material_lighting_pass() noexcept = default;
+
+
+	// Performs various preparations before rendering using this pass.
+	void begin(const cg::mat4& projection_view_matrix) noexcept;
+
+	// Clears renderer states after rendring using this pass.
+	void end() noexcept;
+
+	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
+		const std::vector<float>& uniform_array_model_matrix,
+		const std::vector<GLuint>& uniform_array_tex_diffuse_rgb,
+		const std::vector<GLuint>& uniform_array_tex_specular_rgb) noexcept;
+
+private:
+	float _clear_value_color[4] = { 0, 0, 0, 0 };
+	Gbuffer& _gbuffer;
+	cg::opengl::Framebuffer _fbo;
+	Material_lighting_pass_shader_program _prog;
 };
 
 struct Renderer_config final {
@@ -180,6 +219,7 @@ struct Renderer_config final {
 	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
+	cg::data::Shader_program_source_code material_pass_code;
 };
 
 class Renderer final {
@@ -209,9 +249,12 @@ private:
 
 	void perform_lighting_pass(const Frame& frame) noexcept;
 
+	void perform_material_lighting_pass(const Frame& frame) noexcept;
+
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
 	Lighting_pass _lighting_pass;
+	Material_lighting_pass _material_lighting_pass;
 };
 
 } // namespace deferred_lighting

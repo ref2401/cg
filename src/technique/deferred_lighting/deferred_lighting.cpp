@@ -25,6 +25,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
+	config.material_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/material_pass");
 
 	return config;
 }
@@ -33,13 +34,6 @@ Renderer_config make_render_config(uint2 viewport_size)
 
 
 namespace deferred_lighting {
-
-// ----- Material -----
-
-Material::Material(float smoothness, Texture_2d_immut tex_normal_map) noexcept :
-	smoothness(smoothness),
-	tex_normal_map(std::move(tex_normal_map))
-{}
 
 // ----- Deferred_lighting -----
 
@@ -57,15 +51,28 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	using cg::translation_matrix;
 
 
-
 	// scene
-	// materials
-	auto normal_map_image = cg::file::load_image_tga("../data/normal_map.tga");
-	_material.smoothness = 3.f;
-	_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
+	{ // default material
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material_default_diffuse_rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/common_data/material_default_specular_rgb.tga");
 
-	auto default_normal_map_image = cg::file::load_image_tga("../data/common_data/material_default_normal_map.tga");
-	_tex_default_normal_map = Texture_2d_immut(Texture_format::rgb_8, default_normal_map_image);
+		_material_default.smoothness = 10.0f;
+		_material_default.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
+		_material_default.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
+		_material_default.tex_specular_rgb = Texture_2d_immut(Texture_format::rgb_8, specular_image);
+	}
+
+	{ // brick wall
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular.tga");
+
+		_material_brick_wall.smoothness = 3.0f;
+		_material_brick_wall.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
+		_material_brick_wall.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
+		_material_brick_wall.tex_specular_rgb = Texture_2d_immut(Texture_format::rgb_8, specular_image);
+	}
 
 	// cube geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
@@ -87,18 +94,15 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_rednerable_objects.reserve(16);
 	_rednerable_objects.emplace_back(cube_cmd, 
 		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)),
-		_material.smoothness,
-		_material.tex_normal_map.id());
+		_material_brick_wall);
 	
 	_rednerable_objects.emplace_back(square_cmd, 
 		translation_matrix(float3(-2.f, 1, 1)),
-		_material.smoothness,
-		_material.tex_normal_map.id());
+		_material_brick_wall);
 
 	_rednerable_objects.emplace_back(square_cmd, 
 		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, cg::pi_8)),
-		9.f,
-		_tex_default_normal_map.id());
+		_material_default);
 }
 
 void Deferred_lighting::begin_render(float blend_factor)

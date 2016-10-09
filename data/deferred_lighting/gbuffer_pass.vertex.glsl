@@ -5,7 +5,11 @@
 // a mat3 consumes 12 components, a mat4 uniform consumes 16 components
 // see https://www.opengl.org/wiki/Uniform_(GLSL)#Implementation_limits
 //
-// 16 * 62 + 9 + 16 = 1017 < 1024
+// u_projection_view_matrix :	16
+// u_view_matrix:				12 
+// u_arr_model_matrix:			992 (16 * 62)
+//					total :		1020
+//					unused:		4					
 // batch_size for the vertex shader = 62; -> draw_call_index is in [0, 62).
 // batch_size for the pixel shader = 32 (see gbuffer_pass.pixel.glsl)
 
@@ -26,6 +30,7 @@ out Pixel_data_i {
 	vec2 tex_coord;
 	flat uint draw_call_index;
 } vs_out;
+
 
 void main()
 {

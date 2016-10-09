@@ -1,7 +1,8 @@
 #version 450 core
 
+
 struct Dir_light {
-	vec3 dir_to_light_vs;
+	vec3 direction_to_light_vs;
 	vec3 irradiance;
 	vec3 ambient_irradiance_up;
 	vec3 ambient_irradiance_down;
@@ -9,7 +10,7 @@ struct Dir_light {
 
 uniform uvec2 u_viewport_size;
 uniform mat4 u_inv_projection_matrix;
-uniform Dir_light u_dir_light;
+uniform Dir_light u_dlight;
 layout(binding = 0) uniform sampler2D u_tex_normal_smoothness;
 layout(binding = 1) uniform sampler2D u_tex_depth_map;
 
@@ -25,11 +26,11 @@ vec3 calc_ambient_term(vec3 normal_vs);
 
 vec3 reconstruct_position_vs(ivec2 screen_uv);
 
+
 void main()
 {
 	ivec2 screen_uv = ivec2(gl_FragCoord.xy);
 	
-
 	vec4 normal_smoothness = texelFetch(u_tex_normal_smoothness, screen_uv, 0);
 	if (all(equal(normal_smoothness.xyz, vec3(0)))) discard;
 
@@ -39,15 +40,15 @@ void main()
 	float smoothness = normal_smoothness.w;
 
 	// diffuse & specular terms 
-	float cosTi = max(0, dot(normal_vs, u_dir_light.dir_to_light_vs));
-	vec3 common_term = cosTi * u_dir_light.irradiance;
+	float cosTi = max(0, dot(normal_vs, u_dlight.direction_to_light_vs));
+	vec3 common_term = cosTi * u_dlight.irradiance;
 	
 	// diffuse term
 	vec3 diffuse_term = common_term * v_1_pi;
 
 	// specular term
 	vec3 dir_to_viewpoint_vs = normalize(-position_vs);
-	vec3 half_vector_vs = normalize(u_dir_light.dir_to_light_vs + dir_to_viewpoint_vs);
+	vec3 half_vector_vs = normalize(u_dlight.direction_to_light_vs + dir_to_viewpoint_vs);
 	float cosTh = max(0, dot(normal_vs, half_vector_vs));
 	vec3 specular_term = (smoothness + 8) * v_1_8pi * cosTh * common_term;
 	
@@ -60,7 +61,7 @@ vec3 calc_ambient_term(vec3 normal_vs)
 {
 	// Hemispheric ambient lighting
 	float blend_factor = dot(normal_vs, vec3(0, 1, 0)) * 0.5f + 0.5f;
-	return 0.7 * mix(u_dir_light.ambient_irradiance_down, u_dir_light.ambient_irradiance_up, blend_factor);
+	return 0.7 * mix(u_dlight.ambient_irradiance_down, u_dlight.ambient_irradiance_up, blend_factor);
 }
 
 vec3 reconstruct_position_vs(ivec2 screen_uv)

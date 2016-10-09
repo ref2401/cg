@@ -29,18 +29,19 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 
 ## roadmap
 - teapot model
+- scene floor, normal mapping applied. sort of a chess .
 
 - Material pass
 -  gamma correction sRGB formats?
 	- fix gamma, bring colors to the linear space pow(2.2)
 	- before retunring the color return it 0.45 gamma space
 
-- Lighting pass (poiint light, spotlight)
-	- depth_unchanged gl_FragDepth
-
 - Shadow pass (can I run it once: computing a shadow factor and apply in to lighting computations?)
+	- pack shadow factor & ambient occlusion factor in one texture.
 	- shadow mapping
 	- ambient occlusion
+
+- get_batch_size (check all the shaders and choose one)
 
 - post processing
 	- bloom (bockeh)

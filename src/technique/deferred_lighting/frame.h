@@ -37,17 +37,36 @@ struct Directional_light final {
 	float ambient_intensity = 1.f;
 };
 
+struct Material final {
+	Material() noexcept = default;
+
+	Material(float smoothness,
+		cg::opengl::Texture_2d_immut tex_diffuse_rgb,
+		cg::opengl::Texture_2d_immut tex_normal_map,
+		cg::opengl::Texture_2d_immut tex_specular_rgb) noexcept;
+
+	~Material() noexcept = default;
+
+
+	float smoothness = 0.f;
+	cg::opengl::Texture_2d_immut tex_diffuse_rgb;
+	cg::opengl::Texture_2d_immut tex_normal_map;
+	cg::opengl::Texture_2d_immut tex_specular_rgb;
+};
+
+
 struct Renderable final {
 
-	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix,
-		float smoothness, GLuint tex_normal_map_id) noexcept;
+	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material& material) noexcept;
 
 	// geometry
 	cg::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
 	// material
 	float smoothness = 0.f;
+	GLuint tex_diffuse_rgb_id = cg::opengl::Invalid::texture_id;
 	GLuint tex_normal_map_id = cg::opengl::Invalid::texture_id;
+	GLuint tex_specular_rgb_id = cg::opengl::Invalid::texture_id;
 };
 
 
@@ -143,9 +162,19 @@ public:
 		return _uniform_array_smoothness;
 	}
 
+	const std::vector<GLuint>& uniform_array_tex_diffuse_rgb() const noexcept
+	{
+		return _uniform_array_tex_diffuse_rgb;
+	}
+
 	const std::vector<GLuint>& uniform_array_tex_normal_map() const noexcept
 	{
 		return _uniform_array_tex_normal_map;
+	}
+
+	const std::vector<GLuint>& uniform_array_tex_specular_rgb() const noexcept
+	{
+		return _uniform_array_tex_specular_rgb;
 	}
 
 private:
@@ -170,7 +199,9 @@ private:
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
 	std::vector<float> _uniform_array_smoothness;
+	std::vector<GLuint> _uniform_array_tex_diffuse_rgb;
 	std::vector<GLuint> _uniform_array_tex_normal_map;
+	std::vector<GLuint> _uniform_array_tex_specular_rgb;
 };
 
 } // namespace deferred_lighting

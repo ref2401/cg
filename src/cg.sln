@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting", "deferr
 		..\data\deferred_lighting\gbuffer_pass.vertex.glsl = ..\data\deferred_lighting\gbuffer_pass.vertex.glsl
 		..\data\deferred_lighting\lighting_pass_dir.pixel.glsl = ..\data\deferred_lighting\lighting_pass_dir.pixel.glsl
 		..\data\deferred_lighting\lighting_pass_dir.vertex.glsl = ..\data\deferred_lighting\lighting_pass_dir.vertex.glsl
+		..\data\deferred_lighting\material_pass.pixel.glsl = ..\data\deferred_lighting\material_pass.pixel.glsl
+		..\data\deferred_lighting\material_pass.vertex.glsl = ..\data\deferred_lighting\material_pass.vertex.glsl
 	EndProjectSection
 EndProject
 Global

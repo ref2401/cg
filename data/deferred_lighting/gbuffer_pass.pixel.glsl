@@ -21,6 +21,7 @@ in Pixel_data_i {
 
 layout(location = 0) out vec4 rt_normal_smoothness;
 
+
 void main()
 {
 	vec3 normal_vs = normalize(ps_in.normal_vs);
