@@ -15,14 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{EB942D58-4
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "technique", "technique\technique.vcxproj", "{F39F9F4B-4584-4F17-8BB4-32CA1F3D12C3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting", "deferred_lighting", "{44D5E74A-E773-4AF8-ABF1-9B55CE0135B8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting_shaders", "deferred_lighting_shaders", "{44D5E74A-E773-4AF8-ABF1-9B55CE0135B8}"
 	ProjectSection(SolutionItems) = preProject
-		..\data\deferred_lighting\gbuffer_pass.pixel.glsl = ..\data\deferred_lighting\gbuffer_pass.pixel.glsl
-		..\data\deferred_lighting\gbuffer_pass.vertex.glsl = ..\data\deferred_lighting\gbuffer_pass.vertex.glsl
-		..\data\deferred_lighting\lighting_pass_dir.pixel.glsl = ..\data\deferred_lighting\lighting_pass_dir.pixel.glsl
-		..\data\deferred_lighting\lighting_pass_dir.vertex.glsl = ..\data\deferred_lighting\lighting_pass_dir.vertex.glsl
-		..\data\deferred_lighting\material_pass.pixel.glsl = ..\data\deferred_lighting\material_pass.pixel.glsl
-		..\data\deferred_lighting\material_pass.vertex.glsl = ..\data\deferred_lighting\material_pass.vertex.glsl
+		..\data\deferred_lighting_shaders\gbuffer_pass.pixel.glsl = ..\data\deferred_lighting_shaders\gbuffer_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\gbuffer_pass.vertex.glsl = ..\data\deferred_lighting_shaders\gbuffer_pass.vertex.glsl
+		..\data\deferred_lighting_shaders\lighting_pass_dir.pixel.glsl = ..\data\deferred_lighting_shaders\lighting_pass_dir.pixel.glsl
+		..\data\deferred_lighting_shaders\lighting_pass_dir.vertex.glsl = ..\data\deferred_lighting_shaders\lighting_pass_dir.vertex.glsl
+		..\data\deferred_lighting_shaders\material_pass.pixel.glsl = ..\data\deferred_lighting_shaders\material_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\material_pass.vertex.glsl = ..\data\deferred_lighting_shaders\material_pass.vertex.glsl
 	EndProjectSection
 EndProject
 Global

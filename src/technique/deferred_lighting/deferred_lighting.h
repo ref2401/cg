@@ -11,6 +11,79 @@
 
 namespace deferred_lighting {
 
+struct Material final {
+	Material() noexcept = default;
+
+	Material(float smoothness,
+		cg::opengl::Texture_2d_immut tex_diffuse_rgb,
+		cg::opengl::Texture_2d_immut tex_normal_map,
+		cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
+
+	~Material() noexcept = default;
+
+
+	float smoothness = 0.f;
+	cg::opengl::Texture_2d_immut tex_diffuse_rgb;
+	cg::opengl::Texture_2d_immut tex_normal_map;
+	cg::opengl::Texture_2d_immut tex_specular_intensity;
+};
+
+// Provides a predefined set of Material_instance objects.
+// Manages texture objects that define various materials.
+class Material_library final {
+public:
+
+	Material_library();
+
+	Material_library(const Material_library&) = delete;
+
+	Material_library(Material_library&&) noexcept = delete;
+
+	~Material_library() noexcept = default;
+
+
+	Material_instance brick_wall_material() const noexcept
+	{
+		return get_material_instance(_brick_wall_material);
+	}
+
+	Material_instance chess_board_material() const noexcept
+	{
+		return get_material_instance(_chess_board_material);
+	}
+
+	Material_instance default_material() const noexcept
+	{
+		return get_material_instance(_default_material);
+	}
+
+private:
+
+	// Constructs Material_instance object from the specified material objecj.
+	Material_instance get_material_instance(const Material& material) const noexcept
+	{
+		return Material_instance(material.smoothness,
+			material.tex_diffuse_rgb.id(),
+			material.tex_normal_map.id(),
+			material.tex_specular_intensity.id());
+	}
+
+	// Constructs Material_instance object from the specified material objecj.
+	// tex_specular_intensity is used instead of material.tex_specular_intensity.
+	Material_instance get_material_instance_specular_intensity(const Material& material,
+		const cg::opengl::Texture_2d_immut& tex_specular_intensity_override) const noexcept
+	{
+		return Material_instance(material.smoothness,
+			material.tex_diffuse_rgb.id(),
+			material.tex_normal_map.id(),
+			tex_specular_intensity_override.id());
+	}
+
+	Material _default_material;
+	Material _brick_wall_material;
+	Material _chess_board_material;
+};
+
 class Deferred_lighting final : public cg::sys::Game {
 public:
 
@@ -35,13 +108,10 @@ public:
 
 private:
 
-	void init_materials();
+	void init_geometry();
 
-	// scene data
-	cg::opengl::Static_vertex_spec_builder _vs_builder;
-	cg::opengl::Static_vertex_spec _vertex_spec0;
-	Material _material_default;
-	Material _material_brick_wall;
+	void init_renderables();
+
 	// scene
 	std::vector<Renderable> _rednerable_objects;
 	cg::mat4 _projection_matrix;
@@ -51,7 +121,12 @@ private:
 	// renderer stuff
 	Renderer _renderer;
 	Frame _frame;
-	//
+	// scene data
+	cg::opengl::Static_vertex_spec_builder _vs_builder;
+	cg::opengl::Static_vertex_spec _vertex_spec0;
+	cg::opengl::DE_cmd _cmd_rect_2x2_repeat;
+	Material_library _material_library;
+	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;
 	cg::float2 _prev_mouse_pos_ndc;
 };

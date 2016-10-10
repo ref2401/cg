@@ -26,7 +26,6 @@ vec3 calc_ambient_term(vec3 normal_vs);
 
 vec3 reconstruct_position_vs(ivec2 screen_uv);
 
-
 void main()
 {
 	ivec2 screen_uv = ivec2(gl_FragCoord.xy);
@@ -53,7 +52,7 @@ void main()
 	vec3 specular_term = (smoothness + 8) * v_1_8pi * pow(cosTh, smoothness) * common_term;
 	
 	rt_lighting_ambient_term = calc_ambient_term(normal_vs);
-	rt_lighting_diffuse_term = diffuse_term;
+	rt_lighting_diffuse_term = vec3(cosTi);
 	rt_lighting_specular_term = specular_term;
 }
 

@@ -37,35 +37,30 @@ struct Directional_light final {
 	float ambient_intensity = 1.f;
 };
 
-struct Material final {
-	Material() noexcept = default;
+struct Material_instance final {
+	Material_instance() noexcept = default;
 
-	Material(float smoothness,
-		cg::opengl::Texture_2d_immut tex_diffuse_rgb,
-		cg::opengl::Texture_2d_immut tex_normal_map,
-		cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
+	Material_instance(float smoothness,
+		GLuint tex_diffuse_rgb_id,
+		GLuint tex_normal_map_id,
+		GLuint tex_specular_intensity_id) noexcept;
 
-	~Material() noexcept = default;
+	~Material_instance() noexcept = default;
 
 
 	float smoothness = 0.f;
-	cg::opengl::Texture_2d_immut tex_diffuse_rgb;
-	cg::opengl::Texture_2d_immut tex_normal_map;
-	cg::opengl::Texture_2d_immut tex_specular_intensity;
+	GLuint tex_diffuse_rgb_id;
+	GLuint tex_normal_map_id;
+	GLuint tex_specular_intensity_id;
 };
 
 struct Renderable final {
 
-	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material& material) noexcept;
+	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
 
-	// geometry
 	cg::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
-	// material
-	float smoothness = 0.f;
-	GLuint tex_diffuse_rgb_id = cg::opengl::Invalid::texture_id;
-	GLuint tex_normal_map_id = cg::opengl::Invalid::texture_id;
-	GLuint tex_specular_intensity_id = cg::opengl::Invalid::texture_id;
+	Material_instance material;
 };
 
 

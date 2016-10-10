@@ -83,6 +83,7 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_sour
 void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_CLAMP);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -97,6 +98,7 @@ void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view
 void Gbuffer_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_CLAMP);
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 }
@@ -110,6 +112,7 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
+		glBindSampler(curr_unit, Invalid::sampler_id);
 		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
 	}
 }
@@ -198,6 +201,7 @@ void Material_lighting_pass::begin(const mat4& projection_view_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(false);
+	glEnable(GL_DEPTH_CLAMP);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -221,6 +225,7 @@ void Material_lighting_pass::end() noexcept
 {
 	glDepthMask(true);
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_CLAMP);
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
@@ -241,6 +246,8 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
 		// 14 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
+		glBindSampler(curr_unit, Invalid::sampler_id);
+		glBindSampler(curr_unit + 14, Invalid::sampler_id);
 		glBindTextureUnit(curr_unit, uniform_array_tex_diffuse_rgb[rnd_offset + curr_unit]);
 		glBindTextureUnit(curr_unit + 14, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
 	}
@@ -294,7 +301,6 @@ void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 		frame.view_matrix(), frame.directional_light());
 	
 	_lighting_pass.end();
-	glBindTextureUnit(0, _gbuffer.tex_lighting_ambient_term().id());
 }
 
 void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept

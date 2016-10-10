@@ -381,7 +381,7 @@ inline mat4 tr_matrix(const float3& p, const quat& q) noexcept
 	return m;
 }
 
-// Returns a matrix that is a concatentation of traslation by p and a look at rotation
+// Returns a matrix that is a concatentation of traslation by p and a look at rotation.
 inline mat4 tr_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept
 {
 	mat4 m = rotation_matrix<mat4>(position, target, up);
@@ -402,6 +402,14 @@ inline mat4 translation_matrix(const float3& p) noexcept
 inline mat4 trs_matrix(const float3& p, const quat& q, const float3& s) noexcept
 {
 	return tr_matrix(p, q) * scale_matrix<mat4>(s);
+}
+
+// Returns a matrix that is a concatentation of traslation by p and scale by s.
+inline mat4 ts_matrix(const float3& p, const float3& s) noexcept
+{
+	mat4 m = scale_matrix<mat4>(s);
+	set_position(m, p);
+	return m;
 }
 
 // Composes a matrix that cam be used to transform from world space to view space.

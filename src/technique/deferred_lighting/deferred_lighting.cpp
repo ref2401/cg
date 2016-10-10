@@ -23,9 +23,9 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
-	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/gbuffer_pass");
-	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting/lighting_pass_dir");
-	config.material_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting/material_pass");
+	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.material_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
 
 	return config;
 }
@@ -35,53 +35,87 @@ Renderer_config make_render_config(uint2 viewport_size)
 
 namespace deferred_lighting {
 
+// ----- Material -----
+
+Material::Material(float smoothness,
+	cg::opengl::Texture_2d_immut tex_diffuse_rgb,
+	cg::opengl::Texture_2d_immut tex_normal_map,
+	cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept :
+	smoothness(smoothness),
+	tex_diffuse_rgb(std::move(tex_diffuse_rgb)),
+	tex_normal_map(std::move(tex_normal_map)),
+	tex_specular_intensity(std::move(tex_specular_intensity))
+{
+	assert(this->smoothness >= 0.0f);
+	assert(this->tex_diffuse_rgb.id() != Invalid::texture_id);
+	assert(this->tex_normal_map.id() != Invalid::texture_id);
+	assert(this->tex_specular_intensity.id() != Invalid::texture_id);
+}
+
+// ----- Material_library -----
+
+Material_library::Material_library()
+{
+	Sampler_config nearest_clamp_to_edge(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge);
+	Sampler_config nearest_repeat(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::repeat);
+	Sampler_config bilinear_clamp_to_edge(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge);
+	Sampler_config bilinear_repeat(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::repeat);
+
+
+	auto material_default_normal_map = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
+	auto specular_intensity_0_18_image = cg::file::load_image_tga("../data/common_data/material-specular-intensity-0.18f.tga");
+	auto specular_intensity_1_00_image = cg::file::load_image_tga("../data/common_data/material-specular-intensity-1.00f.tga");
+
+	{ // default material
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+
+		_default_material.smoothness = 10.0f;
+		_default_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
+		_default_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, material_default_normal_map);
+		_default_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, nearest_clamp_to_edge, specular_intensity_1_00_image);
+	}
+
+	{ // brick wall
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
+
+		_brick_wall_material.smoothness = 8.0f;
+		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
+		_brick_wall_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
+		_brick_wall_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
+	}
+
+	{ // chess board
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/chess-board-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/chess-board-normal-map.tga");
+
+		_chess_board_material.smoothness = 1.0f;
+		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
+		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, normal_map_image);
+		_chess_board_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_repeat, specular_intensity_0_18_image);
+	}
+}
+
 // ----- Deferred_lighting -----
 
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
 	_projection_matrix(cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
-	_curr_viewpoint(float3(1, 0, 5), float3::zero),
+	_curr_viewpoint(float3(2, 3, 3), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
 {
-	using cg::from_axis_angle_rotation;
-	using cg::megabytes;
-	using cg::tr_matrix;
-	using cg::translation_matrix;
-
-	// scene
-	init_materials();
-
-	// cube geometry
-	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
-	auto cube_mesh_data = cg::file::load_mesh_wavefront("../data/cube.obj", vertex_attribs);
-	auto square_mesh_data = cg::file::load_mesh_wavefront("../data/square_03.obj", vertex_attribs);
-	_vs_builder.begin(vertex_attribs, megabytes(4));
-	DE_cmd cube_cmd = _vs_builder.push_back(cube_mesh_data);
-	DE_cmd square_cmd = _vs_builder.push_back(square_mesh_data);
-	// ... load other geometry ...
-	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());
-
-	// scene objects
-	_dir_light.position = float3(1000);
+	// scene lights
+	_dir_light.position = float3(1000, 1000, 1000);
 	_dir_light.target = float3::zero;
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
 	_dir_light.ambient_intensity = 0.25f;
 
-	_rednerable_objects.reserve(16);
-	_rednerable_objects.emplace_back(cube_cmd, 
-		trs_matrix(float3::zero, from_axis_angle_rotation(float3::unit_y, cg::pi_4), float3(2)),
-		_material_brick_wall);
-	
-	_rednerable_objects.emplace_back(square_cmd, 
-		translation_matrix(float3(-2.f, 1, 1)),
-		_material_brick_wall);
-
-	_rednerable_objects.emplace_back(square_cmd, 
-		tr_matrix(float3(2.f, -1, 1), from_axis_angle_rotation(float3::unit_y, cg::pi_8)),
-		_material_default);
+	init_geometry();
+	init_renderables();
 }
 
 void Deferred_lighting::begin_render(float blend_factor)
@@ -108,32 +142,33 @@ void Deferred_lighting::end_render()
 	_prev_viewpoint = _curr_viewpoint;
 }
 
-void Deferred_lighting::init_materials()
+void Deferred_lighting::init_geometry()
 {
-	Sampler_config nearest_clamp_to_edge(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge);
-	Sampler_config bilinear_clamp_to_edge(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge);
+	/*struct Load_info {
+		const char* filename;
+		DE_cmd* cmd;
+	};*/
 
-	{ // default material
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/common_data/material-default-specular-intensity.tga");
+	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
+	//std::vector<Load_info> 
+	
+	_vs_builder.begin(vertex_attribs, megabytes(4));
 
-		_material_default.smoothness = 10.0f;
-		_material_default.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
-		_material_default.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
-		_material_default.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, specular_image);
+	{
+		auto mesh_data = cg::file::load_mesh_wavefront("../data/rect_2x2_uv_repeat.obj", vertex_attribs);
+		_cmd_rect_2x2_repeat = _vs_builder.push_back(mesh_data);
 	}
 
-	{ // brick wall
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
+	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());
+}
 
-		_material_brick_wall.smoothness = 8.0f;
-		_material_brick_wall.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
-		_material_brick_wall.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, normal_map_image);
-		_material_brick_wall.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, specular_image);
-	}
+void Deferred_lighting::init_renderables()
+{
+	_rednerable_objects.reserve(16);
+
+	_rednerable_objects.emplace_back(_cmd_rect_2x2_repeat,
+		ts_matrix(float3::zero, float3(5)),
+		_material_library.chess_board_material());
 }
 
 void Deferred_lighting::on_mouse_move()

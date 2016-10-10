@@ -42,30 +42,28 @@ Directional_light::Directional_light(const float3& position, const float3& targe
 
 // ----- Renderable -----
 
-Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix, const Material& material) noexcept :
+Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix, const Material_instance& material) noexcept :
 	cmd(cmd),
 	model_matrix(model_matrix),
-	smoothness(material.smoothness),
-	tex_diffuse_rgb_id(material.tex_diffuse_rgb.id()),
-	tex_normal_map_id(material.tex_normal_map.id()),
-	tex_specular_intensity_id(material.tex_specular_intensity.id())
-{
-	assert(tex_diffuse_rgb_id != Invalid::texture_id);
-	assert(tex_normal_map_id != Invalid::texture_id);
-	assert(tex_specular_intensity_id != Invalid::texture_id);
-}
-
-// ----- Material -----
-
-Material::Material(float smoothness,
-	cg::opengl::Texture_2d_immut tex_diffuse_rgb,
-	cg::opengl::Texture_2d_immut tex_normal_map,
-	cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept :
-	smoothness(smoothness),
-	tex_diffuse_rgb(std::move(tex_diffuse_rgb)),
-	tex_normal_map(std::move(tex_normal_map)),
-	tex_specular_intensity(std::move(tex_specular_intensity))
+	material(material)
 {}
+
+// ----- Material_instance -----
+
+Material_instance::Material_instance(float smoothness,
+	GLuint tex_diffuse_rgb_id,
+	GLuint tex_normal_map_id,
+	GLuint tex_specular_intensity_id) noexcept :
+	smoothness(smoothness),
+	tex_diffuse_rgb_id(tex_diffuse_rgb_id),
+	tex_normal_map_id(tex_normal_map_id),
+	tex_specular_intensity_id(tex_specular_intensity_id)
+{
+	assert(this->smoothness >= 0.0f);
+	assert(this->tex_diffuse_rgb_id != Invalid::texture_id);
+	assert(this->tex_normal_map_id != Invalid::texture_id);
+	assert(this->tex_specular_intensity_id != Invalid::texture_id);
+}
 
 // ----- Frame -----
 
@@ -116,10 +114,14 @@ void Frame::push_back_renderable(const Renderable& rnd)
 		std::begin(model_matrix_arr), std::end(model_matrix_arr));
 
 	// material
-	_uniform_array_smoothness.push_back(rnd.smoothness); // smoothness -> _uniform_array_smoothness
-	_uniform_array_tex_diffuse_rgb.push_back(rnd.tex_diffuse_rgb_id); // tex_diffuse_rgb_id -> _uniform_array_tex_diffuse_rgb
-	_uniform_array_tex_normal_map.push_back(rnd.tex_normal_map_id); // tex_normal_map_id -> _uniform_array_tex_normal_map
-	_uniform_array_tex_specular_intensity.push_back(rnd.tex_specular_intensity_id); // tex_specular_rgb_id -> _uniform_array_tex_specular_rgb
+	// smoothness			->	_uniform_array_smoothness
+	// tex_diffuse_rgb_id	->	_uniform_array_tex_diffuse_rgb
+	// tex_normal_map_id	->	_uniform_array_tex_normal_map
+	// tex_specular_rgb_id	->	_uniform_array_tex_specular_rgb
+	_uniform_array_smoothness.push_back(rnd.material.smoothness); 
+	_uniform_array_tex_diffuse_rgb.push_back(rnd.material.tex_diffuse_rgb_id);
+	_uniform_array_tex_normal_map.push_back(rnd.material.tex_normal_map_id);
+	_uniform_array_tex_specular_intensity.push_back(rnd.material.tex_specular_intensity_id);
 
 	++_renderable_count;
 }
