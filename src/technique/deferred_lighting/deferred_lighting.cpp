@@ -3,6 +3,7 @@
 #include <cmath>
 #include <sstream>
 #include <type_traits>
+#include <utility>
 #include "cg/base/base.h"
 #include "cg/file/file.h"
 
@@ -144,19 +145,21 @@ void Deferred_lighting::end_render()
 
 void Deferred_lighting::init_geometry()
 {
-	/*struct Load_info {
-		const char* filename;
-		DE_cmd* cmd;
-	};*/
+	// pair.first - filename
+	// pair.second - cmd pointer.
+	using Load_info = std::pair<const char*, DE_cmd*>;
 
 	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
-	//std::vector<Load_info> 
-	
+	std::vector<Load_info> load_info_list = {
+		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat),
+		Load_info("../data/cube.obj", &_cmd_cube),
+	};
+
 	_vs_builder.begin(vertex_attribs, megabytes(4));
 
-	{
-		auto mesh_data = cg::file::load_mesh_wavefront("../data/rect_2x2_uv_repeat.obj", vertex_attribs);
-		_cmd_rect_2x2_repeat = _vs_builder.push_back(mesh_data);
+	for (auto& load_info : load_info_list) {
+		auto mesh_data = cg::file::load_mesh_wavefront(load_info.first, vertex_attribs);
+		*load_info.second = _vs_builder.push_back(mesh_data);
 	}
 
 	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());
@@ -169,6 +172,10 @@ void Deferred_lighting::init_renderables()
 	_rednerable_objects.emplace_back(_cmd_rect_2x2_repeat,
 		ts_matrix(float3::zero, float3(5)),
 		_material_library.chess_board_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(0, -1, 0)),
+		_material_library.brick_wall_material());
 }
 
 void Deferred_lighting::on_mouse_move()

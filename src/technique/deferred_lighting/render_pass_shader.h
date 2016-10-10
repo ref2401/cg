@@ -96,9 +96,6 @@ private:
 	cg::opengl::Shader_program _prog;
 	GLint _u_projection_view_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_tex_lighting_ambient_term_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_tex_lighting_deffure_term_location = cg::opengl::Invalid::uniform_location;
-	GLint _u_tex_lighting_specular_term_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_diffuse_rgb_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_specular_intensity_location = cg::opengl::Invalid::uniform_location;
 };

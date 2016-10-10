@@ -125,6 +125,7 @@ private:
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	cg::opengl::Static_vertex_spec _vertex_spec0;
 	cg::opengl::DE_cmd _cmd_rect_2x2_repeat;
+	cg::opengl::DE_cmd _cmd_cube;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;

@@ -7,7 +7,7 @@
 //
 // u_tex_lighting_{ambient/diffuer/specular}_term:	3 
 // u_arr_tex_diffuse_rgb:							14
-// u_arr_tex_specular_intensity:							14
+// u_arr_tex_specular_intensity:					14
 //										total :		31
 //										unused:		1
 // batch_size for the pixel shader = 14. draw_call_index is in [0, 14).
@@ -25,8 +25,7 @@ in Pixel_data_i {
 	flat uint draw_call_index;
 } ps_in;
 
-
-layout(depth_unchanged) out float gl_FragDepth;
+layout(depth_unchanged) out float gl_FragDepth; // force early depth test
 layout(location = 0) out vec4 rt_material_ligting_result;
 
 float to_color_space(float red, float exponent);
@@ -36,6 +35,7 @@ vec3 to_color_space(vec3 rgb, float exponent);
 void main()
 {
 	ivec2 screen_uv = ivec2(gl_FragCoord.xy);
+	
 	vec3 ambient_term = texelFetch(u_tex_lighting_ambient_term, screen_uv, 0).rgb;
 	vec3 diffuse_term = texelFetch(u_tex_lighting_deffure_term, screen_uv, 0).rgb;
 	vec3 specular_term = texelFetch(u_tex_lighting_specular_term, screen_uv, 0).rgb;
@@ -49,6 +49,12 @@ void main()
 	vec3 lighting_result = to_color_space(ambient_contrib + diffuse_contrib + specular_contrib, 0.45);
 
 	rt_material_ligting_result = vec4(lighting_result, 1);
+	/*if (rt_material_ligting_result.x > rt_material_ligting_result.y) {
+		rt_material_ligting_result = vec4(ps_in.depth_cs, depth_cs, gl_FragCoord.z, 1);
+	}
+	else {
+		rt_material_ligting_result = vec4(ps_in.depth_cs, depth_cs, gl_FragCoord.z, 1);
+	}*/
 }
 
 vec3 to_color_space(vec3 rgb, float exponent)

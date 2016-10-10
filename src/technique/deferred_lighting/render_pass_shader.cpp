@@ -71,9 +71,6 @@ Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(con
 	_prog("material-pass_shader", source_code),
 	_u_projection_view_matrix_location(_prog.get_uniform_location("u_projection_view_matrix")),
 	_u_arr_model_matrix_location(_prog.get_uniform_location("u_arr_model_matrix")),
-	_u_tex_lighting_ambient_term_location(_prog.get_uniform_location("u_tex_lighting_ambient_term")),
-	_u_tex_lighting_deffure_term_location(_prog.get_uniform_location("u_tex_lighting_deffure_term")),
-	_u_tex_lighting_specular_term_location(_prog.get_uniform_location("u_tex_lighting_specular_term")),
 	_u_arr_tex_diffuse_rgb_location(_prog.get_uniform_location("u_arr_tex_diffuse_rgb")),
 	_u_arr_tex_specular_intensity_location(_prog.get_uniform_location("u_arr_tex_specular_intensity"))
 {}

@@ -206,7 +206,7 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_specular_intensity) noexcept;
 
 private:
-	float _clear_value_color[4] = { 0, 0, 0, 0 };
+	cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
 	Gbuffer& _gbuffer;
 	cg::opengl::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
