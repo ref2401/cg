@@ -35,6 +35,8 @@ public:
 
 private:
 
+	void init_materials();
+
 	// scene data
 	cg::opengl::Static_vertex_spec_builder _vs_builder;
 	cg::opengl::Static_vertex_spec _vertex_spec0;

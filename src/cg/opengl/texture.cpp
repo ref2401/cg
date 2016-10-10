@@ -98,6 +98,17 @@ Texture_2d::Texture_2d(Texture_format format, uint2 size, size_t mipmap_level_co
 	reallocate_storage(format, size, mipmap_level_count);
 }
 
+Texture_2d::Texture_2d(Texture_format format, const Sampler_config& sampler_config,
+	uint2 size, size_t mipmap_level_count) noexcept :
+	Texture_2d(format, size, mipmap_level_count)
+{
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_config.min_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_config.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_config.wrap_u);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_config.wrap_v);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_config.wrap_w);
+}
+
 Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
 	_id(tex._id),
 	_format(tex._format),
@@ -174,15 +185,26 @@ void Texture_2d::set_size(const cg::uint2 size) noexcept
 
 // ----- Texture_2d_immut -----
 
-Texture_2d_immut::Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_count) noexcept :
+Texture_2d_immut::Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_level_count) noexcept :
 	_format(format)
 {
 	assert(greater_than(size, 0));
-	assert(mipmap_count > 0);
+	assert(mipmap_level_count > 0);
 
-	assert(mipmap_count == 1); // > 1 not implemented
+	assert(mipmap_level_count == 1); // > 1 not implemented
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	glTextureStorage2D(_id, mipmap_count, get_texture_internal_format(format), size.width, size.height);
+	glTextureStorage2D(_id, mipmap_level_count, get_texture_internal_format(format), size.width, size.height);
+}
+
+Texture_2d_immut::Texture_2d_immut(Texture_format format, const Sampler_config& sampler_config,
+	uint2 size, size_t mipmap_level_count) noexcept :
+	Texture_2d_immut(format, size, mipmap_level_count)
+{
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_config.min_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_config.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_config.wrap_u);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_config.wrap_v);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_config.wrap_w);
 }
 
 Texture_2d_immut::Texture_2d_immut(Texture_format format, const cg::data::Image_2d& image) noexcept :
@@ -195,6 +217,17 @@ Texture_2d_immut::Texture_2d_immut(Texture_format format, const cg::data::Image_
 	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
 	Texture_2d_sub_image_params sub_img(0, uint2::zero, image);
 	texture_2d_sub_image(_id, sub_img);
+}
+
+Texture_2d_immut::Texture_2d_immut(Texture_format format, const Sampler_config& sampler_config,
+	const cg::data::Image_2d& image) noexcept :
+	Texture_2d_immut(format, image)
+{
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_config.min_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_config.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_config.wrap_u);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_config.wrap_v);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_config.wrap_w);
 }
 
 Texture_2d_immut::Texture_2d_immut(Texture_2d_immut&& tex) noexcept :

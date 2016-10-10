@@ -178,7 +178,15 @@ public:
 
 	Texture_2d() noexcept = default;
 
-	Texture_2d(Texture_format format, uint2 size, size_t mipmap_count = 1) noexcept;
+	// Creates a texture object with the specified format, size & mipmap level count.
+	// Initially all mipmap levels of the texture are not initialized. 
+	Texture_2d(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+
+	// Creates a texture object with the specified format, size & mipmap level count.
+	// Sets an embedded sampler object params up in accordance with the specified sampler config.
+	// Initially all mipmap levels of the texture are not initialized. 
+	Texture_2d(Texture_format format, const Sampler_config& sampler_config,
+		uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	Texture_2d(const Texture_2d&) = delete;
 
@@ -235,11 +243,23 @@ public:
 
 	// Creates a texture object with the specified format, size & mipmap level count.
 	// Initially all mipmap levels of the texture are not initialized. 
-	Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_count = 1) noexcept;
+	Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+
+	// Creates a texture object with the specified format, size & mipmap level count.
+	// Sets an embedded sampler object params up in accordance with the specified sampler config.
+	// Initially all mipmap levels of the texture are not initialized. 
+	Texture_2d_immut(Texture_format format, const Sampler_config& sampler_config,
+		uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	// Creates a texture object using the specified image as data source.
 	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
 	Texture_2d_immut(Texture_format format, const cg::data::Image_2d& image) noexcept;
+
+	// Creates a texture object using the specified image as data source.
+	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
+	// Sets an embedded sampler object params up in accordance with the specified sampler config.
+	Texture_2d_immut(Texture_format format, const Sampler_config& sampler_config,
+		const cg::data::Image_2d& image) noexcept;
 
 	Texture_2d_immut(const Texture_2d_immut&) = delete;
 

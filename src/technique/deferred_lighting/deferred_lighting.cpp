@@ -50,29 +50,8 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	using cg::tr_matrix;
 	using cg::translation_matrix;
 
-
 	// scene
-	{ // default material
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/common_data/material-default-specular-intensity.tga");
-
-		_material_default.smoothness = 10.0f;
-		_material_default.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
-		_material_default.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
-		_material_default.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, specular_image);
-	}
-
-	{ // brick 
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
-
-		_material_brick_wall.smoothness = 8.0f;
-		_material_brick_wall.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, diffuse_rgb_image);
-		_material_brick_wall.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, normal_map_image);
-		_material_brick_wall.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, specular_image);
-	}
+	init_materials();
 
 	// cube geometry
 	auto vertex_attribs = Vertex_attribs::mesh_textured | Vertex_attribs::normal;
@@ -127,6 +106,34 @@ void Deferred_lighting::end_render()
 {
 	_frame.end_rendering();
 	_prev_viewpoint = _curr_viewpoint;
+}
+
+void Deferred_lighting::init_materials()
+{
+	Sampler_config nearest_clamp_to_edge(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge);
+	Sampler_config bilinear_clamp_to_edge(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge);
+
+	{ // default material
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/common_data/material-default-specular-intensity.tga");
+
+		_material_default.smoothness = 10.0f;
+		_material_default.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
+		_material_default.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
+		_material_default.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, specular_image);
+	}
+
+	{ // brick wall
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
+
+		_material_brick_wall.smoothness = 8.0f;
+		_material_brick_wall.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
+		_material_brick_wall.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, normal_map_image);
+		_material_brick_wall.tex_specular_intensity = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, specular_image);
+	}
 }
 
 void Deferred_lighting::on_mouse_move()

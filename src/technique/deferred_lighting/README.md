@@ -7,15 +7,16 @@ Deferred lighting is devided into three main passes.
 
 1. GBuffer_pass.
 
-	populates rgba32f texture. xyz: normal in the view space. w: material's smoothness property.
+	fills rgba32f texture. xyz: normal in the view space. w: material's smoothness property.
 
 2. Lighting_pass.
 
-	populates rgb32f ambient term, diffuse term, specular term textures.
+	fills rgb32f ambient term, diffuse term, specular term textures.
  
 3. Material_pass.
 
-	...
+	The final pass that combines lighting pass's & shadow pass's results with material properties of every object on the scene.
+	fills rgb32f material lighting texture.
 
 Deferred_lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. Draw indirect buffer use tripple buffering technique to metigate synchronization with OpenGL command queue. Draw call index buffer is used for and gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size).
 
@@ -29,7 +30,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 
 ## roadmap
 - teapot model
-- scene floor, normal mapping applied. sort of a chess .
+- scene floor, normal mapping applied. sort of a chess.
 
 - Material pass
 -  gamma correction sRGB formats?
@@ -51,7 +52,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 		- glEnable() with the GL_FRAMEBUFFER_SRGB
 
 - os messages(events)
-	- mouse
+	- mouse wheel
 	- keyboard
 	- on window resize
 	- fullscreen (F11), max/min window

@@ -19,3 +19,10 @@ Later I would like to do the same using DirectX 11
 5.1. shared vertices
 5.2. several models (objects) in a single .obj file
 
+# TODO
+1. Static_vertex_spec owns 2 Static_buffers
+2. Static_vertex_spec default ctor
+3. profile: memory, perf (VS profiler, anything else)
+4. try to move Win_app::run iplemtation into Application. You will need _mouse, _window, _rnd_ctx, pump_sys_messages
+5. Texture_2d, Texture_2d_immut take Sampler_config as ctor argument.
+

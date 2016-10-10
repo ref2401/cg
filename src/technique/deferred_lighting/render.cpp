@@ -110,7 +110,6 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
-		glBindSampler(curr_unit, _gbuffer.bilinear_sampler().id());
 		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
 	}
 }
@@ -242,10 +241,7 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
 		// 14 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
-		glBindSampler(curr_unit, _gbuffer.bilinear_sampler().id());
 		glBindTextureUnit(curr_unit, uniform_array_tex_diffuse_rgb[rnd_offset + curr_unit]);
-
-		glBindSampler(curr_unit + 14, _gbuffer.bilinear_sampler().id());
 		glBindTextureUnit(curr_unit + 14, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
 	}
 }
