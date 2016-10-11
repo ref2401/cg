@@ -7,9 +7,21 @@
 #include <type_traits>
 #include <utility>
 
+
 // Convenient macro to format more readable cg::enforce message.
 // Prepends string arguments with __FILE__ & __LINE__ macro which.
-#define EXCEPTION_MSG(...) __FILE__, '(', std::to_string(__LINE__), "): ", __VA_ARGS__
+// Dont forget to write semicolon at the end.
+// Example:
+// std::string msg = EXCEPTION_MSG("blah-blah")		<- compile time error
+// std::string msg = EXCEPTION_MSG("blah-blah");	<- ok.
+#define EXCEPTION_MSG(...) cg::concat(__FILE__, '(', std::to_string(__LINE__), "): ", __VA_ARGS__)
+
+// Enforces that the given expression is true.
+// If the expression evaluates to false then std::runtime_error is thrown.
+#define ENFORCE(expression, ...)								\
+	if (!(expression)) {										\
+		throw std::runtime_error(EXCEPTION_MSG(__VA_ARGS__));	\
+	}																										
 
 namespace cg {
 
@@ -67,24 +79,6 @@ inline std::string concat(const Args&... args)
 {
 	std::string dest;
 	return cg::internal::concat_impl(dest, args...);
-}
-
-// Enforces that the given value is true.
-//	Requires:
-//	-	Exception: must be derived from std::exception or its descendants. 
-//		The exception of type Exception is thrown if the value evaluates to false.
-//	Params:
-//	-	v:  value to test.
-//	-	msg: error message to put in the exception if it is thrown.
-template<typename Exception = std::runtime_error, typename T, typename... Strings>
-void enforce(const T& v, const Strings&... strs)
-{
-	static_assert(std::is_base_of<std::exception, Exception>::value, "Exception must be derived from std::exception.");
-
-	if (v) return;
-
-	std::string msg = concat(strs...);
-	throw Exception(msg);
 }
 
 // Constructs exception message string considering all the nested exceptions.

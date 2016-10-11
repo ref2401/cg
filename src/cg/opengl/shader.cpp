@@ -30,7 +30,7 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	if (!compiled()) {
 		const char* type_name = (_type == GL_VERTEX_SHADER) ? "Vertex" : "Pixel";
 		std::string log_msg = log();
-		std::string exc_msg = concat(EXCEPTION_MSG(type_name, " shader compilation error.\n", log_msg));
+		std::string exc_msg = EXCEPTION_MSG(type_name, " shader compilation error.\n", log_msg);
 		
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -109,7 +109,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 		glDetachShader(_id, pixel_shader.id());
 	}
 	catch (...) {
-		std::string exc_msg = concat(EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program."));
+		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
 		
 		dispose();
 		std::throw_with_nested(std::runtime_error(exc_msg));
@@ -117,7 +117,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 
 	if (!linked()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log));
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log);
 		
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -126,7 +126,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Shader_p
 	glValidateProgram(_id);
 	if (!valid()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log));
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log);
 
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -143,7 +143,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 
 	if (!linked()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.");
 
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -152,7 +152,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 	glValidateProgram(_id);
 	if (!valid()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.");
 
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -174,7 +174,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 		// once shaders have been linked into a program they are no longer needed.
 	}
 	catch (...) {
-		std::string exc_msg = concat(EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program."));
+		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
 
 		dispose();
 		std::throw_with_nested(std::runtime_error(exc_msg));
@@ -182,7 +182,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 
 	if (!linked()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program linkage failed. '", _name, "'."));
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.");
 
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -191,7 +191,7 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 	glValidateProgram(_id);
 	if (!valid()) {
 		std::string msg_log = log();
-		std::string exc_msg = concat(EXCEPTION_MSG("Program validation failed. '", _name, "'."));
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.");
 
 		dispose();
 		throw std::runtime_error(exc_msg);
@@ -238,8 +238,8 @@ GLint Shader_program::get_uniform_location(const char* uniform_name) const
 	assert(uniform_name);
 
 	GLint location = glGetUniformLocation(_id, uniform_name);
-	enforce(location != Invalid::uniform_location,
-		EXCEPTION_MSG("Shader program '", _name, "' does not have a uniform called '", uniform_name, "'."));
+	ENFORCE(location != Invalid::uniform_location,
+		"Shader program '", _name, "' does not have a uniform called '", uniform_name, "'.");
 
 	return location;
 }

@@ -29,7 +29,6 @@ std::string get_report_message(const Clock::Clock_report& report)
 
 } // namespace
 
-
 int main(int argc, char* argv[])
 {
 	uint2 wnd_position(90, 50);

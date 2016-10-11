@@ -28,4 +28,5 @@ Later I would like to do the same using DirectX 11
 3. profile: memory, perf (VS profiler, anything else)
 4. try to move Win_app::run iplemtation into Application. You will need _mouse, _window, _rnd_ctx, pump_sys_messages
 5. Sampler_config holds opengl value. Rename it to Sampler_params. Sampler_config should own {Min/Max}_filter, Wrap_mode values.
-
+6. Tangent space debugging. Draw tangent space for each vertex. Also draw the final normal exctracted from normal-map
+7. By_line_iterator unittest: start reading file with it0, move the iterator to it1 and finish reading the file.

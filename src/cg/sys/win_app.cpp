@@ -70,7 +70,7 @@ Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 	assert(func_name);
 
 	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(GetProcAddress(dll, func_name));
-	cg::enforce(f, EXCEPTION_MSG(func_name));
+	ENFORCE(f, "Failed to load func: ", func_name);
 
 	return f;
 }
@@ -80,7 +80,7 @@ Extern_func_ptr_t load_opengl_func(const char* func_name)
 	assert(func_name);
 
 	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(wglGetProcAddress(func_name));
-	cg::enforce(f, EXCEPTION_MSG(func_name));
+	ENFORCE(f, "Failed to load Opengl func: ", func_name);
 
 	return f;
 }
@@ -162,7 +162,7 @@ Opengl_render_context::Opengl_render_context(HWND hwnd) :
 
 	glGetIntegerv(GL_MAJOR_VERSION, &_version_major);
 	glGetIntegerv(GL_MINOR_VERSION, &_version_minor);
-	enforce(_version_major == 4 && _version_minor == 5, EXCEPTION_MSG("Opengl version must be 4.5 or greater."));
+	ENFORCE(_version_major == 4 && _version_minor == 5, "Opengl version must be 4.5 or greater.");
 	load_opengl_45();
 }
 
@@ -216,7 +216,7 @@ void Opengl_render_context::inti_context()
 	};
 
 	_hglrc = wglCreateContextAttribsARB(_hdc, nullptr, context_attribs);
-	enforce(_hglrc, EXCEPTION_MSG("wglCreateContextAttribsARB failed to create Opengl context."));
+	ENFORCE(_hglrc, "wglCreateContextAttribsARB failed to create Opengl context.");
 	wglMakeCurrent(_hdc, _hglrc);
 	wglDeleteContext(temp_hglrc);
 	wglCreateContextAttribsARB = nullptr;

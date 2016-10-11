@@ -156,21 +156,34 @@ void Deferred_lighting::end_render()
 
 void Deferred_lighting::init_geometry()
 {
-	// pair.first - filename
-	// pair.second - cmd pointer.
-	using Load_info = std::pair<const char*, DE_cmd*>;
+	struct Load_info {
+		Load_info(const char* filename, DE_cmd* cmd, 
+			size_t approx_vertex_count = 0, size_t approx_index_count = 0) noexcept :
+			filename(filename), cmd(cmd), 
+			approx_vertex_count(approx_vertex_count), 
+			approx_index_count(approx_index_count)
+		{}
+
+		const char* filename;
+		DE_cmd* cmd;
+		size_t approx_vertex_count;
+		size_t approx_index_count;
+	};
 
 	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
 	std::vector<Load_info> load_info_list = {
-		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat),
+		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
 		Load_info("../data/cube.obj", &_cmd_cube),
+		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};
 
 	_vs_builder.begin(vertex_attribs, megabytes(4));
 
 	for (auto& load_info : load_info_list) {
-		auto mesh_data = cg::file::load_mesh_wavefront(load_info.first, vertex_attribs);
-		*load_info.second = _vs_builder.push_back(mesh_data);
+		auto mesh_data = cg::file::load_mesh_wavefront(load_info.filename, 
+			vertex_attribs, load_info.approx_vertex_count, load_info.approx_index_count);
+		
+		*load_info.cmd = _vs_builder.push_back(mesh_data);
 	}
 
 	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());

@@ -6,7 +6,6 @@
 namespace {
 
 using cg::uint2;
-using cg::enforce;
 using cg::greater_than;
 using cg::data::Image_2d;
 using cg::data::Image_format;
@@ -92,17 +91,13 @@ Tga_header read_header(File& file)
 
 	// Color map type
 	// 0 if image file contains no color map, 1 if present.
-	enforce(header_buffer[1] == 0, 
-		EXCEPTION_MSG("Reading tga image error. Tga image mustn't have a color map.", file.filename()));
+	ENFORCE(header_buffer[1] == 0, "Reading tga image error. Tga image mustn't have a color map.", file.filename());
 
 	// Image type
 	auto type = parse_image_type(header_buffer[2]);
-	enforce(type != Tga_image_type::invalid,
-		EXCEPTION_MSG("Reading tga image error. Unknown tga image type.", file.filename()));
-	enforce(type != Tga_image_type::no_data 
-		|| type != Tga_image_type::color_map 
-		|| type != Tga_image_type::color_map_compressed,
-		EXCEPTION_MSG("Reading tga image error. Forbidden tga image type.", file.filename()));
+	ENFORCE(type != Tga_image_type::invalid, "Reading tga image error. Unknown tga image type.", file.filename());
+	ENFORCE(type != Tga_image_type::no_data && type != Tga_image_type::color_map && type != Tga_image_type::color_map_compressed,
+		"Reading tga image error. Forbidden tga image type.", file.filename());
 
 	header.compressed = (type == Tga_image_type::true_color_compressed 
 		|| type == Tga_image_type::grayscale_compressed);
@@ -110,40 +105,37 @@ Tga_header read_header(File& file)
 	// Image specification (x/y origin)
 	uint2 origin(bytes_to_uint16(header_buffer[9], header_buffer[8]), 
 		bytes_to_uint16(header_buffer[11], header_buffer[10]));
-	enforce(origin == uint2::zero, 
-		EXCEPTION_MSG("Reading tga image error. Unexpected origin coordinates. ", file.filename()));
+	ENFORCE(origin == uint2::zero, "Reading tga image error. Unexpected origin coordinates. ", file.filename());
 
 	// Image specification (width/height) 
 	header.size.width = bytes_to_uint16(header_buffer[13], header_buffer[12]);
 	header.size.height = bytes_to_uint16(header_buffer[15], header_buffer[14]);
-	enforce(greater_than(header.size, 0),
-		EXCEPTION_MSG("Reading tga image error. Image size must be greater than 0.", file.filename()));
+	ENFORCE(greater_than(header.size, 0), "Reading tga image error. Image size must be greater than 0.", file.filename());
 	
 	// Image specification (pixel depth)
 	unsigned char bits_per_pixel = header_buffer[16];
 
 	// Image specification (descriptor)
 	auto origin_corner = parse_origin_corner(header_buffer[17]);
-	enforce(origin_corner == Tga_origin_corner::bottom_left, 
-		EXCEPTION_MSG("Reading tga image error. Unexpected origin corner. ", file.filename()));
+	ENFORCE(origin_corner == Tga_origin_corner::bottom_left, 
+		"Reading tga image error. Unexpected origin corner. ", file.filename());
 
 	unsigned char alpha_bits = header_buffer[17] & 0xF;
-	enforce(alpha_bits == 0,
-		EXCEPTION_MSG("Reading tga image error. Alpha depth must equal to 0. ", file.filename()));
+	ENFORCE(alpha_bits == 0, "Reading tga image error. Alpha depth must equal to 0. ", file.filename());
 
 	// determine the image format
 	switch (type) {
 		case Tga_image_type::grayscale:
 		case Tga_image_type::grayscale_compressed:
-			enforce(bits_per_pixel == 8,
-				EXCEPTION_MSG("Reading tga image error. Only 8 bits pixel depth is supported for grayscale images", file.filename()));
+			ENFORCE(bits_per_pixel == 8,
+				"Reading tga image error. Only 8 bits pixel depth is supported for grayscale images", file.filename());
 			header.format = Image_format::red_8;
 			break;
 
 		case Tga_image_type::true_color:
 		case Tga_image_type::true_color_compressed:
-			enforce(bits_per_pixel == 24 || bits_per_pixel == 32,
-				EXCEPTION_MSG("Reading tga image error. Only 24 or 32 bits pixel depth is supported for true color images", file.filename()));
+			ENFORCE(bits_per_pixel == 24 || bits_per_pixel == 32,
+				"Reading tga image error. Only 24 or 32 bits pixel depth is supported for true color images", file.filename());
 			header.format = (bits_per_pixel == 24) ? Image_format::bgr_8 : Image_format::bgra_8;
 			break;
 	}

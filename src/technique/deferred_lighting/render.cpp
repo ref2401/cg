@@ -83,8 +83,6 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_sour
 void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
@@ -97,7 +95,6 @@ void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view
 void Gbuffer_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 }
 
@@ -201,7 +198,6 @@ void Material_lighting_pass::begin(const mat4& projection_view_matrix) noexcept
 	glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(false);
-	glEnable(GL_CULL_FACE);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
@@ -224,7 +220,6 @@ void Material_lighting_pass::end() noexcept
 	glDisable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glDepthMask(true);
-	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
 	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);

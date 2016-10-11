@@ -1,5 +1,9 @@
 #include "cg/data/mesh.h"
 
+#include <iterator>
+#include <type_traits>
+
+
 namespace cg {
 namespace data {
 
@@ -20,37 +24,47 @@ void Interleaved_mesh_data::push_back_index(uint32_t i)
 
 void Interleaved_mesh_data::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
 {
-	_indices.push_back(i0);
-	_indices.push_back(i1);
-	_indices.push_back(i2);
+	uint32_t index_buffer[3];
+	index_buffer[0] = i0;
+	index_buffer[1] = i1;
+	index_buffer[2] = i2;
+	_indices.insert(_indices.end(), index_buffer, index_buffer + std::extent<decltype(index_buffer)>::value);
 }
 
 void Interleaved_mesh_data::push_back_vertex(const Vertex& v)
 {
+	float data_buffer[12];
+	size_t offset = 0;
+
 	if (has_position(_format.attribs)) {
-		_data.push_back(v.position.x);
-		_data.push_back(v.position.y);
-		_data.push_back(v.position.z);
+		data_buffer[0] = v.position.x;
+		data_buffer[1] = v.position.y;
+		data_buffer[2] = v.position.z;
+		offset += 3;
 	}
 
 	if (has_normal(_format.attribs)) {
-		_data.push_back(v.normal.x);
-		_data.push_back(v.normal.y);
-		_data.push_back(v.normal.z);
+		data_buffer[offset]		= v.normal.x;
+		data_buffer[offset + 1] = v.normal.y;
+		data_buffer[offset + 2] = v.normal.z;
+		offset += 3;
 	}
 
 	if (has_tex_coord(_format.attribs)) {
-		_data.push_back(v.tex_coord.u);
-		_data.push_back(v.tex_coord.v);
+		data_buffer[offset]		= v.tex_coord.u;
+		data_buffer[offset + 1] = v.tex_coord.v;
+		offset += 2;
 	}
 
 	if (has_tangent_h(_format.attribs)) {
-		_data.push_back(v.tangent_h.x);
-		_data.push_back(v.tangent_h.y);
-		_data.push_back(v.tangent_h.z);
-		_data.push_back(v.tangent_h.w);
+		data_buffer[offset]		= v.tangent_h.x;
+		data_buffer[offset + 1] = v.tangent_h.y;
+		data_buffer[offset + 2] = v.tangent_h.z;
+		data_buffer[offset + 3] = v.tangent_h.w;
+		offset += 4;
 	}
 
+	_data.insert(_data.end(), data_buffer, data_buffer + offset);
 }
 
 void Interleaved_mesh_data::push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2)
@@ -64,8 +78,6 @@ void Interleaved_mesh_data::push_back_vertices(const Vertex& v0, const Vertex& v
 
 float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 {
-	assert(v0.normal == v1.normal && v1.normal == v2.normal);
-
 	float3 pos0 = v0.position;
 	float3 pos1 = v1.position;
 	float3 pos2 = v2.position;

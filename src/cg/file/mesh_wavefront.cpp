@@ -13,7 +13,6 @@ namespace {
 using cg::float2;
 using cg::float3;
 using cg::float4;
-using cg::enforce;
 using cg::data::Interleaved_mesh_data;
 using cg::data::Vertex;
 using cg::data::Vertex_attribs;
@@ -129,7 +128,7 @@ void parse_faces_p(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 
 		long long p0, p1, p2;
 		int count = sscanf(line.c_str(), "f %lld %lld %lld", &p0, &p1, &p2);
-		enforce(count == 3u, EXCEPTION_MSG("Invalid face format. Only position indices were expected."));
+		ENFORCE(count == 3u, "Invalid face format. Only position indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
 
 		std::array<Vertex, 3> vertices;
@@ -157,7 +156,7 @@ void parse_face_pn(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 
 		long long p0, p1, p2, n0, n1, n2;
 		int count = sscanf(line.c_str(), "f %lld//%lld %lld//%lld %lld//%lld", &p0, &n0, &p1, &n1, &p2, &n2);
-		enforce(count == 6u, EXCEPTION_MSG("Invalid face format. Position and normal indices were expected."));
+		ENFORCE(count == 6u, "Invalid face format. Position and normal indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
 		normalize_wf_indices(normal_count, n0, n1, n2);
 
@@ -191,7 +190,7 @@ void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_
 		long long p0, p1, p2, n0, n1, n2, tc0, tc1, tc2;
 		int count = sscanf(line.c_str(), "f %lld/%lld/%lld %lld/%lld/%lld %lld/%lld/%lld", 
 			&p0, &tc0, &n0, &p1, &tc1, &n1, &p2, &tc2, &n2);
-		enforce(count == 9u, EXCEPTION_MSG("Invalid face format. Position tex_coord and normal indices were expected."));
+		ENFORCE(count == 9u, "Invalid face format. Position tex_coord and normal indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
 		normalize_wf_indices(normal_count, n0, n1, n2);
 		normalize_wf_indices(tex_coord_count, tc0, tc1, tc2);
@@ -210,6 +209,15 @@ void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_
 		if (calc_tangent_h) {
 			float4 tangent_h = compute_tangent_h(vertices[0], vertices[1], vertices[2]);
 			vertices[0].tangent_h = vertices[1].tangent_h = vertices[2].tangent_h = tangent_h;
+			
+			//if (vertices[0].normal != vertices[1].normal || vertices[1].normal != vertices[2].normal)
+			//{
+			//	// TODO(ref2401): get rid of this ugly workaround if you remember it's here.
+			//	float4 tangent_h1 = compute_tangent_h(vertices[1], vertices[2], vertices[0]);
+			//	float4 tangent_h2= compute_tangent_h(vertices[2], vertices[0], vertices[1]);
+			//	vertices[1].tangent_h = tangent_h1;
+			//	vertices[2].tangent_h = tangent_h2;
+			//}
 		}
 
 		imd.push_back_vertices(vertices[0], vertices[1], vertices[2]);
@@ -233,7 +241,7 @@ void parse_face_ptc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_m
 
 		long long p0, p1, p2, tc0, tc1, tc2;
 		int count = sscanf(line.c_str(), "f %lld/%lld %lld/%lld %lld/%lld", &p0, &tc0, &p1, &tc1, &p2, &tc2);
-		enforce(count == 6u, EXCEPTION_MSG("Invalid face format. Position and tex_coord indices were expected."));
+		ENFORCE(count == 6u, "Invalid face format. Position and tex_coord indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
 		normalize_wf_indices(tex_coord_count, tc0, tc1, tc2);
 
@@ -255,7 +263,7 @@ float3 parse_normal(const std::string& line)
 {
 	float x, y, z;
 	int count = std::sscanf(line.c_str(), "vn %f %f %f", &x, &y, &z);
-	enforce(count == 3, EXCEPTION_MSG("Unexpected number of normal components."));
+	ENFORCE(count == 3, "Unexpected number of normal components.");
 
 	return float3(x, y, z);
 }
@@ -265,7 +273,7 @@ float3 parse_position(const std::string& line)
 {
 	float x, y, z;
 	int count = std::sscanf(line.c_str(), "v %f %f %f", &x, &y, &z);
-	enforce(count == 3, EXCEPTION_MSG("Unexpected number of position components."));
+	ENFORCE(count == 3, "Unexpected number of position components.");
 
 	return float3(x, y, z);
 }
@@ -275,7 +283,7 @@ float2 parse_tex_coord(const std::string& line)
 {
 	float x, y;
 	int count = std::sscanf(line.c_str(), "vt %f %f", &x, &y);
-	enforce(count == 2, EXCEPTION_MSG("Unexpected number of tex_coord components."));
+	ENFORCE(count == 2, "Unexpected number of tex_coord components.");
 
 	return float2(x, y);
 }
@@ -283,7 +291,8 @@ float2 parse_tex_coord(const std::string& line)
 #pragma warning(pop)
 
 // Loads, parses and constructs a mesh object using the specified file iterator.
-Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs)
+Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs,
+	size_t approx_vertex_count = 0, size_t approx_index_cont = 0)
 {
 	assert(attribs != Vertex_attribs::none);
 
@@ -321,14 +330,16 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 	}
 
 	// validate mesh data
-	enforce(mesh_data.positions.size() > 0u, EXCEPTION_MSG("Invalid mesh file. Expected position values."));
+	ENFORCE(mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
 	if (has_normal(attribs)) 
-		enforce(mesh_data.has_normals(), EXCEPTION_MSG("Invalid mesh file. Expected normal values."));
+		ENFORCE(mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
 	if (has_tex_coord(attribs))
-		enforce(mesh_data.has_tex_coords(), EXCEPTION_MSG("Invalid mesh file. Expected tex coord values."));
+		ENFORCE(mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
 
 	// pack data
-	cg::data::Interleaved_mesh_data imd(attribs, mesh_data.positions.size(), mesh_data.positions.size());
+	size_t init_vertex_count = (approx_vertex_count) ? approx_vertex_count : mesh_data.positions.size();
+	size_t init_index_cout = (approx_index_cont) ? approx_index_cont : mesh_data.positions.size();
+	cg::data::Interleaved_mesh_data imd(attribs, init_vertex_count, init_index_cout);
 
 	auto n = mesh_data.has_normals();
 	auto tc = mesh_data.has_tex_coords();
@@ -353,16 +364,18 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 namespace cg {
 namespace file {
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, cg::data::Vertex_attribs attribs)
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, 
+	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);
-	return ::load_mesh_wavefront(std::move(it), attribs);
+	return ::load_mesh_wavefront(std::move(it), attribs, approx_vertex_count, approx_index_cont);
 }
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const char* filename, cg::data::Vertex_attribs attribs)
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const char* filename, 
+	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);
-	return ::load_mesh_wavefront(std::move(it), attribs);
+	return ::load_mesh_wavefront(std::move(it), attribs, approx_vertex_count, approx_index_cont);
 }
 
 } // namespace file

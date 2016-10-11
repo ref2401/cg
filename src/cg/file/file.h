@@ -47,7 +47,7 @@ public:
 	// Also returns true if this->handle() equals to nullptr.
 	bool eof() const
 	{
-		enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
+		assert(_handle);
 		return (std::feof(_handle) != 0);
 	}
 
@@ -216,9 +216,11 @@ cg::data::Image_2d load_image_tga(const std::string& filename);
 
 cg::data::Image_2d load_image_tga(const char* filename);
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, cg::data::Vertex_attribs attribs);
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, 
+	cg::data::Vertex_attribs attribs, size_t approx_vertex_count = 0, size_t approx_index_cont = 0);
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const char * filename, cg::data::Vertex_attribs attribs);
+cg::data::Interleaved_mesh_data load_mesh_wavefront(const char * filename, 
+	cg::data::Vertex_attribs attribs, size_t approx_vertex_count = 0, size_t approx_index_cont = 0);
 
 // Returns the content of the specified text file.
 std::string load_text(const std::string& filename);

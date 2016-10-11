@@ -9,7 +9,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace unittest {
 
 TEST_CLASS(cg_base_Base) {
-
+	
 	TEST_METHOD(concat)
 	{
 		using cg::concat;
@@ -46,15 +46,10 @@ TEST_CLASS(cg_base_Base) {
 
 	}
 
-	TEST_METHOD(enforce)
+	TEST_METHOD(ENFORCE_macro)
 	{
-		using cg::enforce;
-
-		enforce(true, "it doesn't throw.");
-		
-		Assert::ExpectException<std::runtime_error>([] { enforce(false, "error"); });
-		Assert::ExpectException<std::runtime_error>([] { enforce<std::runtime_error>(false, "error"); });
-		Assert::ExpectException<std::range_error>([] { enforce<std::range_error>(false, "error"); });
+		ENFORCE(true, "it doesn't throw.");
+		Assert::ExpectException<std::runtime_error>([] { ENFORCE(false, "error"); });
 	}
 
 	TEST_METHOD(get_exception_message)

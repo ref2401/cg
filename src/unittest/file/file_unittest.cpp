@@ -98,18 +98,6 @@ TEST_CLASS(cg_file_File) {
 			Assert::IsFalse(res);
 			Assert::IsTrue(f.eof());
 		}
-
-		{ // attempt to read from moved File object
-			File f0(Filenames::ascii_single_line);
-			Assert::IsFalse(f0.eof());
-
-			File f = std::move(f0);
-			Assert::ExpectException<std::runtime_error>([&]
-			{
-				char ch;
-				f0.read_byte(&ch);
-			});
-		}
 	}
 
 	TEST_METHOD(read_bytes_and_eof)
@@ -135,18 +123,6 @@ TEST_CLASS(cg_file_File) {
 			Assert::AreEqual(6u, count);
 			Assert::IsTrue(f.eof());
 			Assert::AreEqual("abc123", reinterpret_cast<char*>(buffer_id));
-		}
-
-		{ // attempt to read from moved File object
-			File f0(Filenames::ascii_single_line);
-			Assert::IsFalse(f0.eof());
-
-			File f = std::move(f0);
-			Assert::ExpectException<std::runtime_error>([&]
-			{ 
-				char ch;
-				f0.read_bytes(&ch, 1);  
-			});
 		}
 	}
 
@@ -209,9 +185,6 @@ public:
 
 	TEST_METHOD(iterate_no_line_feeds)
 	{
-		By_line_iterator it0;
-		Assert::ExpectException<std::runtime_error>([&] { ++it0; });
-
 		// empty file iterator
 		By_line_iterator it_empty(Filenames::empty_file, false);
 		Assert::IsTrue((*it_empty).empty()); // empty file has no content
@@ -236,9 +209,6 @@ public:
 
 	TEST_METHOD(iterate_with_line_feeds)
 	{
-		By_line_iterator it0;
-		Assert::ExpectException<std::runtime_error>([&] { ++it0; });
-
 		{ // empty file iterator
 			std::string expected_line = "\n";
 			By_line_iterator it_empty(Filenames::empty_file, true);

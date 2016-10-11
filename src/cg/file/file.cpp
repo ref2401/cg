@@ -66,7 +66,7 @@ void File::open(const char* filename)
 	assert(filename);
 
 	_handle = std::fopen(filename, "rb");
-	enforce(_handle, EXCEPTION_MSG("Failed to open file:", filename));
+	ENFORCE(_handle, "Failed to open file: ", filename);
 	_filename = filename;
 }
 #pragma warning(pop)
@@ -74,7 +74,7 @@ void File::open(const char* filename)
 bool File::read_byte(void* buff) const
 {
 	assert(buff);
-	enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
+	assert(_handle);
 
 	int res = std::fgetc(_handle);
 	if (res == EOF) return false;
@@ -87,18 +87,18 @@ size_t File::read_bytes(void* buff, size_t byte_count) const
 {
 	assert(buff);
 	assert(byte_count);
-	enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
+	assert(_handle);
 
 	return fread(buff, sizeof(unsigned char), byte_count, _handle);
 }
 
 void File::seek(long offset, File_seek_origin origin) const
 {
-	enforce(_handle, EXCEPTION_MSG("Invalid operation. File is not open."));
+	assert(_handle);
 	int res = std::fseek(_handle, offset,
 		(origin == File_seek_origin::current_position) ? SEEK_CUR : SEEK_SET);
 
-	enforce(res == 0, EXCEPTION_MSG("File seek error: ", _filename));
+	ENFORCE(res == 0, "File seek error: ", _filename);
 }
 
 // ----- By_line_iteator -----
@@ -106,10 +106,8 @@ void File::seek(long offset, File_seek_origin origin) const
 const By_line_iterator By_line_iterator::end {};
 
 By_line_iterator::By_line_iterator(const std::string& filename, bool keep_line_feed) 
-	: _file(filename), _keep_line_feed(keep_line_feed)
-{
-	read_next_line();
-}
+	: By_line_iterator(filename.c_str(), keep_line_feed)
+{}
 
 By_line_iterator::By_line_iterator(const char* filename, bool keep_line_feed) 
 	: _file(filename), _keep_line_feed(keep_line_feed)
