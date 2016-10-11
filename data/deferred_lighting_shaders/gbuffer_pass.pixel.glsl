@@ -26,7 +26,7 @@ void main()
 {
 	vec3 normal_vs = normalize(ps_in.normal_vs);
 	vec3 tangent_vs = normalize(ps_in.tangent_vs);
-	tangent_vs = normalize(tangent_vs - normal_vs * dot(normal_vs, tangent_vs));
+	tangent_vs = normalize(tangent_vs - normal_vs * dot(normal_vs, tangent_vs)); // Gram-Schmidt orthogonalize.
 	vec3 bitangent_vs = normalize(ps_in.bitanget_vs);
 	mat3 view_space_matrix = mat3(tangent_vs, bitangent_vs, normal_vs);
 

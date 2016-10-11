@@ -57,6 +57,11 @@ public:
 		return get_material_instance(_default_material);
 	}
 
+	Material_instance wooden_box_material() const noexcept
+	{
+		return get_material_instance(_wooden_box_material);
+	}
+
 private:
 
 	// Constructs Material_instance object from the specified material objecj.
@@ -82,6 +87,7 @@ private:
 	Material _default_material;
 	Material _brick_wall_material;
 	Material _chess_board_material;
+	Material _wooden_box_material;
 };
 
 class Deferred_lighting final : public cg::sys::Game {

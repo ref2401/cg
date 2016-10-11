@@ -96,6 +96,17 @@ Material_library::Material_library()
 		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, normal_map_image);
 		_chess_board_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_repeat, specular_intensity_0_18_image);
 	}
+
+	{ // wooden box
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/wooden-box-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/wooden-box-normal-map.tga");
+		auto specular_image = cg::file::load_image_tga("../data/wooden-box-specular-intensity.tga");
+
+		_wooden_box_material.smoothness = 5.0f;
+		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
+		_wooden_box_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
+		_wooden_box_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
+	}
 }
 
 // ----- Deferred_lighting -----
@@ -103,7 +114,7 @@ Material_library::Material_library()
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
 	_projection_matrix(cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
-	_curr_viewpoint(float3(2, 3, 3), float3::zero),
+	_curr_viewpoint(float3(2, 3, 5), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
@@ -169,13 +180,40 @@ void Deferred_lighting::init_renderables()
 {
 	_rednerable_objects.reserve(16);
 
+	// chess board
 	_rednerable_objects.emplace_back(_cmd_rect_2x2_repeat,
 		ts_matrix(float3::zero, float3(5)),
 		_material_library.chess_board_material());
 
+	// brick cubes
 	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(0, -1, 0)),
+		translation_matrix(float3(-1, 0.5f, -1)),
 		_material_library.brick_wall_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-1, 1.5f, -1)),
+		_material_library.brick_wall_material());
+
+	// wooden cubes
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-1, 2.5f, -1)),
+		_material_library.wooden_box_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-2, 0.5f, -1)),
+		_material_library.wooden_box_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-2, 0.5f, 0)),
+		_material_library.wooden_box_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(0, 0.5f, -1)),
+		_material_library.wooden_box_material());
+
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(1, 0.5f, -1)),
+		_material_library.wooden_box_material());
 }
 
 void Deferred_lighting::on_mouse_move()

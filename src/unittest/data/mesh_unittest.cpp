@@ -512,7 +512,7 @@ public:
 		Vertex rt0 = Vertex(float3(1, 1, 0), normal_positive, float2::unit_xy); // right-top
 
 		float4 tan_right = compute_tangent_h(lb0, rb0, rt0);
-		Assert::AreEqual(float4(float3::unit_x, 1.f), tan_right);
+		Assert::AreEqual(float4(float3::unit_x, 1.0f), tan_right);
 
 		// left-handed basis
 		float3 normal_negative = -float3::unit_z;
@@ -521,7 +521,7 @@ public:
 		Vertex rt1 = Vertex(float3(1, 1, 0), normal_negative, float2::unit_xy); // right-top
 
 		float4 tan_left = compute_tangent_h(lb1, rb1, rt1);
-		Assert::AreEqual(float4(float3::unit_x, -1.f), tan_left);
+		Assert::AreEqual(float4(float3::unit_x, -1.0f), tan_left);
 	}
 };
 

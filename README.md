@@ -16,13 +16,16 @@ Later I would like to do the same using DirectX 11
 3. anisotropic brdf
 4. point sprites
 5. wavefront loading
+5.1. compute_tangent_h. different normals. if normal0 = normal1 then tangetn_h0 = tangent_h1
 5.1. shared vertices
 5.2. several models (objects) in a single .obj file
+5.3. crytek sponza 
+5.4. light house
 
 # TODO
 1. Static_vertex_spec owns 2 Static_buffers
 2. Static_vertex_spec default ctor
 3. profile: memory, perf (VS profiler, anything else)
 4. try to move Win_app::run iplemtation into Application. You will need _mouse, _window, _rnd_ctx, pump_sys_messages
-5. Texture_2d, Texture_2d_immut take Sampler_config as ctor argument.
+5. Sampler_config holds opengl value. Rename it to Sampler_params. Sampler_config should own {Min/Max}_filter, Wrap_mode values.
 

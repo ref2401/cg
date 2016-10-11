@@ -26,6 +26,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 - Uniform arrays are used heavily, uniform block would have done better. Unifrom array limitations.
 - Point lights, spotlights instanced rendering.
 - Batch_size deduction.
+- light house model note
 
 
 ## roadmap
@@ -54,9 +55,6 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 - os messages(events)
 	- mouse wheel
 	- keyboard
-	- on window resize
 	- fullscreen (F11), max/min window
-	- camera controls
 
 - compute shaders: indirect buffer, draw call index buffer, uniform buffer object, ...
-- crytek sponza 
