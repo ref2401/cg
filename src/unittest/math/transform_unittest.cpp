@@ -414,6 +414,17 @@ TEST_CLASS(cg_math_transform_Funcs) {
 		Assert::AreEqual(mT * mR * mS, trs_matrix(p, q, s));
 	}
 
+	TEST_METHOD(ts_matrix)
+	{
+		using cg::scale_matrix;
+		using cg::translation_matrix;
+		using cg::ts_matrix;
+
+		float3 pos(1, 2, 3);
+		float3 scale(4, 5, 6);
+		Assert::AreEqual(translation_matrix(pos) * scale_matrix<mat4>(scale), ts_matrix(pos, scale));
+	}
+
 	TEST_METHOD(view_matrix_Viewpoints)
 	{
 		using cg::lerp;

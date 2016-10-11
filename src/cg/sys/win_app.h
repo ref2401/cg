@@ -6,7 +6,6 @@
 #include "cg/sys/app.h"
 #include <windows.h>
 
-
 namespace cg {
 namespace sys {
 
@@ -20,6 +19,8 @@ public:
 	void swap_color_buffers() noexcept override;
 
 private:
+
+	void inti_context();
 
 	void load_opengl_11() const;
 

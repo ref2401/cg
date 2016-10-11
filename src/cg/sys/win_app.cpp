@@ -5,13 +5,41 @@
 #include <type_traits>
 #include "cg/base/base.h"
 
+// All the definition was copied from the WGL_ARB_create_context, WGL_ARB_create_context_profile extension.
+// For more details see https://www.opengl.org/registry/specs/ARB/wgl_create_context.txt
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
+#define WGL_CONTEXT_LAYER_PLANE_ARB 0x2093
+
+// glcorearb.h: GL_CONTEXT_PROFILE_MASK(0x9126) == WGL_CONTEXT_PROFILE_MASK_ARB.
+// #define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
+
+// glcorearb.h: GL_CONTEXT_FLAGS(0x821E) != WGL_CONTEXT_FLAGS_ARB.
+#define WGL_CONTEXT_FLAGS_ARB 0x2094
+
+//  glcorearb.h: #define GL_CONTEXT_FLAG_DEBUG_BIT (0x00000002) != WGL_CONTEXT_DEBUG_BIT_ARB.
+#define WGL_CONTEXT_DEBUG_BIT_ARB 0x0001
+
+// glcorearb.h: GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT (0x00000001) != WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+
+// glcorearb.h: GL_CONTEXT_CORE_PROFILE_BIT (0x00000001) == WGL_CONTEXT_CORE_PROFILE_BIT_ARB
+// #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+
+// glcorearb.h: GL_CONTEXT_COMPATIBILITY_PROFILE_BIT (0x00000002) == WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+// #define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+
+typedef HGLRC(APIENTRYP PFNWGLCREATECONTEXTATTRIBSARB)(HDC hDC, HGLRC hshareContext, const int *attribList);
 
 namespace {
 
 using cg::uint2;
 using cg::sys::Mouse_buttons;
 
-extern "C" using Extern_func_ptr_t = void(*);
+extern "C" {
+	using Extern_func_ptr_t = void(*);
+}
 
 // Yay! A global. The Win_app ctor sets its value. The Win_app dtor resets it to nullptr.
 // Only window_proc is supposed to use the global. 
@@ -123,32 +151,12 @@ namespace sys {
 
 // ----- Opengl_render_context -----
 
-Opengl_render_context::Opengl_render_context(HWND hwnd)
-	: _hwnd(hwnd)
+Opengl_render_context::Opengl_render_context(HWND hwnd) :
+	_hwnd(hwnd)
 {
 	assert(_hwnd);
+	inti_context();
 
-	_hdc = GetDC(_hwnd);
-	assert(_hdc);
-
-	PIXELFORMATDESCRIPTOR pixel_fmt_desc = {};
-	pixel_fmt_desc.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	pixel_fmt_desc.nVersion = 1;
-	pixel_fmt_desc.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pixel_fmt_desc.iPixelType = PFD_TYPE_RGBA;
-	pixel_fmt_desc.cColorBits = 32;
-	pixel_fmt_desc.cDepthBits = 32;
-	pixel_fmt_desc.iLayerType = PFD_MAIN_PLANE;
-
-	int pixel_format = ChoosePixelFormat(_hdc, &pixel_fmt_desc);
-	assert(pixel_format > 0);
-	SetPixelFormat(_hdc, pixel_format, &pixel_fmt_desc);
-
-	_hglrc = wglCreateContext(_hdc);
-	assert(_hglrc);
-	wglMakeCurrent(_hdc, _hglrc);
-
-	// load opengl funcs
 	_opengl_dll = LoadLibrary("opengl32.dll");
 	load_opengl_11();
 
@@ -175,6 +183,43 @@ Opengl_render_context::~Opengl_render_context() noexcept
 		ReleaseDC(_hwnd, _hdc);
 		_hdc = nullptr;
 	}
+}
+
+void Opengl_render_context::inti_context()
+{
+	_hdc = GetDC(_hwnd);
+	assert(_hdc);
+
+	PIXELFORMATDESCRIPTOR pixel_fmt_desc = {};
+	pixel_fmt_desc.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	pixel_fmt_desc.nVersion = 1;
+	pixel_fmt_desc.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pixel_fmt_desc.iPixelType = PFD_TYPE_RGBA;
+	pixel_fmt_desc.cColorBits = 32;
+	pixel_fmt_desc.cDepthBits = 32;
+	pixel_fmt_desc.iLayerType = PFD_MAIN_PLANE;
+
+	int pixel_format = ChoosePixelFormat(_hdc, &pixel_fmt_desc);
+	assert(pixel_format > 0);
+	SetPixelFormat(_hdc, pixel_format, &pixel_fmt_desc);
+
+	HGLRC temp_hglrc = wglCreateContext(_hdc);
+	assert(temp_hglrc);
+	wglMakeCurrent(_hdc, temp_hglrc);
+	PFNWGLCREATECONTEXTATTRIBSARB wglCreateContextAttribsARB = static_cast<PFNWGLCREATECONTEXTATTRIBSARB>(load_opengl_func("wglCreateContextAttribsARB"));
+	
+	const int context_attribs[] = {
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 5,
+		GL_CONTEXT_PROFILE_MASK, GL_CONTEXT_CORE_PROFILE_BIT,
+		0
+	};
+
+	_hglrc = wglCreateContextAttribsARB(_hdc, nullptr, context_attribs);
+	enforce(_hglrc, EXCEPTION_MSG("wglCreateContextAttribsARB failed to create Opengl context."));
+	wglMakeCurrent(_hdc, _hglrc);
+	wglDeleteContext(temp_hglrc);
+	wglCreateContextAttribsARB = nullptr;
 }
 
 void Opengl_render_context::load_opengl_11() const
