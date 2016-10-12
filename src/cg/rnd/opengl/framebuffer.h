@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_FRAMEBUFFER_H_
-#define CG_OPENGL_FRAMEBUFFER_H_
+#ifndef CG_RND_OPENGL_FRAMEBUFFER_H_
+#define CG_RND_OPENGL_FRAMEBUFFER_H_
 
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
@@ -133,4 +133,4 @@ private:
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_OPENGL_FRAMEBUFFER_H_
+#endif // CG_RND_OPENGL_FRAMEBUFFER_H_

@@ -33,8 +33,9 @@ int main(int argc, char* argv[])
 {
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);
-	auto app = make_win_application(wnd_position, wnd_size);
+
 	try {
+		auto app = make_win_application(wnd_position, wnd_size);
 		auto game = std::make_unique<deferred_lighting::Deferred_lighting>(*app.get());
 		auto report = app->run(std::move(game));
 		OutputDebugString(get_report_message(report).c_str());

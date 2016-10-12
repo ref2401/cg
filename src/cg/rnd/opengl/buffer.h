@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_BUFFER_H_
-#define CG_OPENGL_BUFFER_H_
+#ifndef CG_RND_OPENGL_BUFFER_H_
+#define CG_RND_OPENGL_BUFFER_H_
 
 #include <cassert>
 #include <cstring>
@@ -210,4 +210,4 @@ size_t Partitioned_buffer<Buffer_type>::write(size_t rel_offset, const T* ptr, s
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_OPENGL_BUFFER_H_
+#endif // CG_RND_OPENGL_BUFFER_H_

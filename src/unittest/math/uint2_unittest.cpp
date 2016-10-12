@@ -13,7 +13,10 @@ public:
 
 	TEST_METHOD(static_members)
 	{
-		Assert::AreEqual(uint2(0), uint2::zero);
+		Assert::AreEqual(uint2(0, 0), uint2::zero);
+		Assert::AreEqual(uint2(1, 0), uint2::unit_x);
+		Assert::AreEqual(uint2(0, 1), uint2::unit_y);
+		Assert::AreEqual(uint2(1, 1), uint2::unit_xy);
 	}
 
 	TEST_METHOD(ctors)

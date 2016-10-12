@@ -9,6 +9,7 @@
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
 #include "cg/rnd/opengl/opengl.h"
+#include "cg/rnd/utility/gaussian_filter.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 
@@ -20,7 +21,7 @@ public:
 
 	Gbuffer(const cg::uint2& viewport_size,
 		const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
-		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data) noexcept;
+		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data);
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
 
@@ -55,6 +56,13 @@ public:
 		return _bilinear_sampler;
 	}
 
+	// Gaussian filter shader that is used by render passes to filter their intermediate results.
+	// Usually the shader is used in conjuction with tex_aux_render_target.
+	cg::rnd::utility::Gaussian_filter_shader_program& gaussian_filter_shader_program() noexcept
+	{
+		return _gaussian_filter_shader_program;
+	}
+
 	// Default nearest sampler (clamp_to_edge).
 	const cg::rnd::opengl::Sampler& nearest_sampler() const noexcept
 	{
@@ -63,6 +71,14 @@ public:
 
 	// Resizes all the render target textures.
 	void resize(const cg::uint2& viewport_size) noexcept;
+
+	// Auxiliary texture that can be used by any render pass.
+	// The texture is not supposed to transfer rendering results from pass to pass.
+	// At the begining of every pass assume that texture's contents is undefined.
+	cg::rnd::opengl::Texture_2d& tex_aux_render_target() noexcept
+	{
+		return _tex_aux_render_target;
+	}
 
 	// Contains depth information of the scene. Populated by the first pass (Gbuffer_pass).
 	cg::rnd::opengl::Texture_2d& tex_depth_map() noexcept
@@ -130,10 +146,12 @@ private:
 	const cg::rnd::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	cg::rnd::opengl::Sampler _bilinear_sampler;
 	cg::rnd::opengl::Sampler _nearest_sampler;
+	cg::rnd::utility::Gaussian_filter_shader_program _gaussian_filter_shader_program;
 	cg::rnd::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
 	cg::rnd::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
 	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
+	cg::rnd::opengl::Texture_2d _tex_aux_render_target;
 	cg::rnd::opengl::Texture_2d _tex_depth_map;
 	cg::rnd::opengl::Texture_2d _tex_normal_smoothness;
 	cg::rnd::opengl::Texture_2d _tex_shadow_map;
@@ -251,6 +269,9 @@ public:
 		const std::vector<float>& uniform_array_model_matrix) noexcept;
 
 private:
+	// Filters Gbuffer.tex_shadow_map
+	void filter_shadow_map() noexcept;
+
 	const float _clear_value_shadow_map[4] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), 0, 0 };
 	const float _clear_value_depth = 1.0f;
 	Gbuffer& _gbuffer;

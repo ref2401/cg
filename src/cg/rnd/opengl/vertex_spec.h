@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_VERTEX_SPEC_H_
-#define CG_OPENGL_VERTEX_SPEC_H_
+#ifndef CG_RND_OPENGL_VERTEX_SPEC_H_
+#define CG_RND_OPENGL_VERTEX_SPEC_H_
 
 #include <cassert>
 #include <iostream>

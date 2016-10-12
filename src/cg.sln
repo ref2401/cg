@@ -29,6 +29,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting_shaders",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E19C7866-BFA4-4FEE-BD78-A07DE857805B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility_shaders", "utility_shaders", "{AF112729-F54C-42ED-B255-96AD38F61B9F}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\utility_shaders\gaussian_filter.vertex.glsl = ..\data\utility_shaders\gaussian_filter.vertex.glsl
+		..\data\utility_shaders\gaussian_filter_r5.pixel.glsl = ..\data\utility_shaders\gaussian_filter_r5.pixel.glsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -67,5 +73,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{44D5E74A-E773-4AF8-ABF1-9B55CE0135B8} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
+		{AF112729-F54C-42ED-B255-96AD38F61B9F} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 	EndGlobalSection
 EndGlobal

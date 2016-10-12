@@ -163,19 +163,19 @@ void By_line_iterator::read_next_line()
 
 bool exists(const std::string& filename)
 {
+	if (filename.empty()) return false;
+
 	assert(filename.size() < MAX_PATH); // :'(
 	return (GetFileAttributes(filename.c_str()) != INVALID_FILE_ATTRIBUTES);
 }
 
 bool exists(const char* filename)
 {
-	assert(std::strlen(filename)< MAX_PATH); // :'(
-	return (GetFileAttributes(filename) != INVALID_FILE_ATTRIBUTES);
-}
+	size_t len = std::strlen(filename);
+	if (len == 0) return false;
 
-cg::data::Shader_program_source_code load_glsl_program_source(const std::string& filename)
-{
-	return load_glsl_program_source(filename.c_str());
+	assert(len < MAX_PATH); // :'(
+	return (GetFileAttributes(filename) != INVALID_FILE_ATTRIBUTES);
 }
 
 cg::data::Shader_program_source_code load_glsl_program_source(const char* filename)
@@ -199,6 +199,19 @@ cg::data::Shader_program_source_code load_glsl_program_source(const char* filena
 	fn.append(".pixel.glsl");
 	if (exists(fn))
 		src.pixel_source = load_text(fn);
+
+	return src;
+}
+
+cg::data::Shader_program_source_code load_glsl_program_source(const char* vertex_filename, const char* pixel_filename)
+{
+	cg::data::Shader_program_source_code src;
+	
+	if (exists(vertex_filename))
+		src.vertex_source = load_text(vertex_filename);
+
+	if (exists(pixel_filename))
+		src.pixel_source = load_text(pixel_filename);
 
 	return src;
 }

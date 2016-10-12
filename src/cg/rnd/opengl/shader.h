@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_SHADER_H_
-#define CG_OPENGL_SHADER_H_
+#ifndef CG_RND_OPENGL_SHADER_H_
+#define CG_RND_OPENGL_SHADER_H_
 
 #include <vector>
 #include "cg/data/shader.h"
@@ -23,9 +23,9 @@ public:
 
 	Shader(GLenum type, const std::string& source_code);
 
-	Shader(const Shader& shader_id) = delete;
+	Shader(const Shader&) = delete;
 
-	Shader(Shader&& shader_id) = delete;
+	Shader(Shader&&) = delete;
 
 	~Shader() noexcept;
 
@@ -57,17 +57,22 @@ private:
 class Shader_program final {
 public:
 
+	Shader_program() noexcept = default;
+
 	Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src);
 
 	Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader);
 
 	Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code);
 
-	Shader_program(const Shader_program& prog) = delete;
+	Shader_program(const Shader_program&) = delete;
 
-	Shader_program(Shader_program&& prog) = delete;
+	Shader_program(Shader_program&& prog) noexcept;
 
 	~Shader_program() noexcept;
+
+
+	Shader_program& operator=(Shader_program&& prog) noexcept;
 
 
 	// Returns a location value of the specified uniform.
@@ -154,4 +159,4 @@ void set_uniform_array(GLint location, const TPtr* ptr, size_t count) noexcept;
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_OPENGL_SHADER_H_
+#endif // CG_RND_OPENGL_SHADER_H_

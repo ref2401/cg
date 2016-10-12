@@ -37,6 +37,9 @@ const quat quat::identity(0, 0, 0, 1);
 const quat quat::zero(0, 0, 0, 0);
 
 const uint2 uint2::zero(0);
+const uint2 uint2::unit_x(1, 0);
+const uint2 uint2::unit_y(0, 1);
+const uint2 uint2::unit_xy(1);
 
 
 // ----- mat3 ----

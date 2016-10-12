@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_UTILITY_H_
-#define CG_OPENGL_UTILITY_H_
+#ifndef CG_RND_OPENGL_UTILITY_H_
+#define CG_RND_OPENGL_UTILITY_H_
 
 #include <cstring>
 #include <type_traits>
@@ -84,5 +84,5 @@ void wait_for(GLsync sync_obj) noexcept;
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_OPENGL_UTILITY_H_
+#endif // CG_RND_OPENGL_UTILITY_H_
 

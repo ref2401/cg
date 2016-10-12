@@ -199,9 +199,30 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 	}
 }
 
+Shader_program::Shader_program(Shader_program&& prog) noexcept :
+	_id(prog._id),
+	_name(std::move(prog._name))
+{
+	prog._id = Invalid::shader_program_id;
+}
+
 Shader_program::~Shader_program() noexcept
 {
 	dispose();
+}
+
+Shader_program& Shader_program::operator=(Shader_program&& prog) noexcept
+{
+	if (this == &prog) return *this;
+
+	dispose();
+
+	_id = prog._id;
+	_name = std::move(prog._name);
+
+	prog._id = Invalid::shader_program_id;
+
+	return *this;
 }
 
 void Shader_program::dispose() noexcept
@@ -210,8 +231,6 @@ void Shader_program::dispose() noexcept
 
 	glDeleteProgram(_id);
 	_id = Invalid::shader_program_id;
-	// NOTE(ref2401): Do not clear the _name field.
-	// It might be used to compose exception messages after the object has been disposed;
 }
 
 GLint Shader_program::get_property(GLenum prop) const noexcept
@@ -236,6 +255,7 @@ GLint Shader_program::get_uniform_location(const std::string& uniform_name) cons
 
 GLint Shader_program::get_uniform_location(const char* uniform_name) const
 {
+	assert(_id != Invalid::shader_program_id);
 	assert(uniform_name);
 
 	GLint location = glGetUniformLocation(_id, uniform_name);
@@ -247,6 +267,7 @@ GLint Shader_program::get_uniform_location(const char* uniform_name) const
 
 bool Shader_program::linked() const noexcept
 {
+	assert(_id != Invalid::shader_program_id);
 	return get_property(GL_LINK_STATUS) != 0;
 }
 
@@ -268,6 +289,7 @@ std::string Shader_program::log() const noexcept
 
 bool Shader_program::valid() const noexcept
 {
+	assert(_id != Invalid::shader_program_id);
 	return get_property(GL_VALIDATE_STATUS) != 0;
 }
 

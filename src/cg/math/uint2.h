@@ -11,6 +11,9 @@ namespace cg {
 
 struct uint2 {
 	static const uint2 zero;
+	static const uint2 unit_x;
+	static const uint2 unit_y;
+	static const uint2 unit_xy;
 
 
 	uint2() noexcept : x(0), y(0) {}

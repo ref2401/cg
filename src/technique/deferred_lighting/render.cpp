@@ -17,12 +17,14 @@ namespace deferred_lighting {
 
 Gbuffer::Gbuffer(const uint2& viewport_size,
 	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
-	const Interleaved_mesh_data& rect_1x1_mesh_data) noexcept :
+	const Interleaved_mesh_data& rect_1x1_mesh_data) :
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),
+	_gaussian_filter_shader_program(cg::rnd::utility::Gaussian_filter_kernel_size::radius_5),
 	_viewport_size(viewport_size),
 	_aux_depth_renderbuffer(Texture_format::depth_32f, viewport_size),
+	_tex_aux_render_target(Texture_format::rg_32f, viewport_size),
 	_tex_depth_map(Texture_format::depth_32f, viewport_size),
 	_tex_normal_smoothness(Texture_format::rgba_32f, viewport_size),
 	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
@@ -45,6 +47,7 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 	_viewport_size = viewport_size;
 
 	_aux_depth_renderbuffer.set_size(_viewport_size);
+	_tex_aux_render_target.set_size(_viewport_size);
 	_tex_depth_map.set_size(_viewport_size);
 	_tex_normal_smoothness.set_size(_viewport_size);
 	_tex_shadow_map.set_size(_viewport_size);
@@ -243,7 +246,7 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_progra
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
 	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
 }
@@ -263,6 +266,8 @@ void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
 void Shadow_map_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
+	filter_shadow_map();
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
 	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
@@ -273,12 +278,32 @@ void Shadow_map_pass::end() noexcept
 	//_fbo.set_read_buffer(GL_NONE);
 }
 
+void Shadow_map_pass::filter_shadow_map() noexcept
+{
+	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
+
+	// horz filter pass (render to _gbuffer.tex_aux_render_target())
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_aux_render_target());
+
+	glBindSampler(0, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(0, _gbuffer.tex_shadow_map().id());
+	
+	_gbuffer.gaussian_filter_shader_program().use_for_horizontal_pass();
+	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
+
+	// vert filter pass (render to _gbuffer.tex_shadow_map())
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	glBindTextureUnit(0, _gbuffer.tex_aux_render_target().id());
+
+	_gbuffer.gaussian_filter_shader_program().use_for_vertical_pass();
+	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
+}
+
 void Shadow_map_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	const std::vector<float>& uniform_array_model_matrix) noexcept
 {
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
 }
-
 
 // ----- Renderer -----
 

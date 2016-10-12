@@ -200,7 +200,7 @@ bool exists(const char* filename);
 //		The constructed filenames are:
 //		- ../data/shader/blinn_phong.vertex.glsl
 //		- ../data/shader/blinn_phong.pixel.glsl
-cg::data::Shader_program_source_code load_glsl_program_source(const std::string& filename);
+cg::data::Shader_program_source_code load_glsl_program_source(const char* filename);
 
 // Loads all found shader source code files.
 // Each file name is constructed as filename + .<shader_type> + .glsl
@@ -210,7 +210,20 @@ cg::data::Shader_program_source_code load_glsl_program_source(const std::string&
 //		The constructed filenames are:
 //		- ../data/shader/blinn_phong.vertex.glsl
 //		- ../data/shader/blinn_phong.pixel.glsl
-cg::data::Shader_program_source_code load_glsl_program_source(const char* filename);
+inline cg::data::Shader_program_source_code load_glsl_program_source(const std::string& filename)
+{
+	return load_glsl_program_source(filename.c_str());
+}
+
+// Loads the specified shader source code files.
+cg::data::Shader_program_source_code load_glsl_program_source(const char* vertex_filename, const char* pixel_filename);
+
+// Loads the specified shader source code files.
+inline cg::data::Shader_program_source_code load_glsl_program_source(const std::string& vertex_filename,
+	const std::string& pixel_filename)
+{
+	return load_glsl_program_source(vertex_filename.c_str(), pixel_filename.c_str());
+}
 
 cg::data::Image_2d load_image_tga(const std::string& filename);
 

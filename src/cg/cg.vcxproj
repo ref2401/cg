@@ -139,6 +139,7 @@
     <ClCompile Include="rnd\opengl\texture.cpp" />
     <ClCompile Include="rnd\opengl\utility.cpp" />
     <ClCompile Include="rnd\opengl\vertex_spec.cpp" />
+    <ClCompile Include="rnd\utility\gaussian_filter.cpp" />
     <ClCompile Include="sys\app.cpp" />
     <ClCompile Include="sys\input.cpp" />
     <ClCompile Include="sys\win_app.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="rnd\opengl\texture.h" />
     <ClInclude Include="rnd\opengl\utility.h" />
     <ClInclude Include="rnd\opengl\vertex_spec.h" />
+    <ClInclude Include="rnd\utility\gaussian_filter.h" />
     <ClInclude Include="sys\app.h" />
     <ClInclude Include="sys\input.h" />
     <ClInclude Include="sys\win_app.h" />

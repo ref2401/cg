@@ -7,6 +7,7 @@
 #include "cg/base/base.h"
 #include "cg/file/file.h"
 
+
 using cg::data::Vertex_attribs;
 using namespace cg;
 using namespace cg::rnd::opengl;
@@ -134,13 +135,14 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
 {
+
 	// scene lights
 	_dir_light.position = float3(-1000, 1000, -1000);
 	_dir_light.target = float3::zero;
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
 	_dir_light.ambient_intensity = 0.25f;
-	_dir_light.projection_matrix = orthographic_matrix(50, 50, 0, 2 * len(_dir_light.position - _dir_light.target));
+	_dir_light.projection_matrix = orthographic_matrix(50, 50, len(_dir_light.position - _dir_light.target) - 50, len(_dir_light.position - _dir_light.target) + 50);
 
 	init_geometry();
 	init_renderables();

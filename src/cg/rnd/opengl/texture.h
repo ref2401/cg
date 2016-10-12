@@ -1,5 +1,5 @@
-#ifndef CG_OPENGL_TEXTURE_H_
-#define CG_OPENGL_TEXTURE_H_
+#ifndef CG_RND_OPENGL_TEXTURE_H_
+#define CG_RND_OPENGL_TEXTURE_H_
 
 #include <cassert>
 #include <ostream>
@@ -394,4 +394,4 @@ inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image_p
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_OPENGL_TEXTURE_H_
+#endif // CG_RND_OPENGL_TEXTURE_H_

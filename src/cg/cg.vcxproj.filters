@@ -52,6 +52,9 @@
     <ClCompile Include="rnd\opengl\vertex_spec.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\utility\gaussian_filter.cpp">
+      <Filter>rnd\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -74,6 +77,9 @@
     </Filter>
     <Filter Include="rnd\opengl">
       <UniqueIdentifier>{66ef643f-fc86-46b4-899e-17fbcb9b800f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rnd\utility">
+      <UniqueIdentifier>{ad025c4b-55ed-4ce4-aa29-c56f0b379506}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="rnd\opengl\vertex_spec.h">
       <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\utility\gaussian_filter.h">
+      <Filter>rnd\utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
