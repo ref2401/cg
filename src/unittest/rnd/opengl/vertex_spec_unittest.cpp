@@ -1,11 +1,11 @@
-#include "cg/opengl/vertex_spec.h"
+#include "cg/rnd/opengl/vertex_spec.h"
 
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/utility.h"
 #include "CppUnitTest.h"
 
-using cg::opengl::DE_cmd;
-using cg::opengl::DE_base_vertex_params;
-using cg::opengl::DE_indirect_params;
+using cg::rnd::opengl::DE_cmd;
+using cg::rnd::opengl::DE_base_vertex_params;
+using cg::rnd::opengl::DE_indirect_params;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -20,13 +20,13 @@ template<> inline std::wstring ToString<DE_indirect_params>(const DE_indirect_pa
 
 namespace unittest {
 
-TEST_CLASS(cg_opengl_vertex_spec_DE_cmd) {
+TEST_CLASS(cg_rnd_opengl_vertex_spec_DE_cmd) {
 public:
 
 	TEST_METHOD(ctors)
 	{
 		DE_cmd cmd0;
-		Assert::AreEqual<GLuint>(cg::opengl::Invalid::vao_id, cmd0.vao_id());
+		Assert::AreEqual<GLuint>(cg::rnd::opengl::Invalid::vao_id, cmd0.vao_id());
 		Assert::AreEqual<size_t>(0, cmd0.index_count());
 		Assert::AreEqual<size_t>(0, cmd0.offset_indices());
 		Assert::AreEqual<size_t>(0, cmd0.base_vertex());
@@ -92,7 +92,7 @@ public:
 
 };
 
-TEST_CLASS(cg_opengl_vertex_spec_DE_base_vertex_params) {
+TEST_CLASS(cg_rnd_opengl_vertex_spec_DE_base_vertex_params) {
 public:
 
 	TEST_METHOD(ctors)
@@ -138,7 +138,7 @@ public:
 
 };
 
-TEST_CLASS(gl_opengl_vertex_spec_DE_indirect_params) {
+TEST_CLASS(gl_rnd_opengl_vertex_spec_DE_indirect_params) {
 public:
 
 	TEST_METHOD(ctors)

@@ -8,7 +8,7 @@
 #include "cg/math/math.h"
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
-#include "cg/opengl/opengl.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 
@@ -19,7 +19,7 @@ class Gbuffer final {
 public:
 
 	Gbuffer(const cg::uint2& viewport_size,
-		const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout,
+		const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
 		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data) noexcept;
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
@@ -31,13 +31,13 @@ public:
 
 	// Auxiliary depth32f buffer that can be used in an rendering pass.
 	// The renderbuffer is used in shadow_map_pass for depth test.
-	cg::opengl::Renderbuffer& aux_depth_renderbuffer() noexcept
+	cg::rnd::opengl::Renderbuffer& aux_depth_renderbuffer() noexcept
 	{
 		return _aux_depth_renderbuffer;
 	}
 
 	// Rect 1x1 (a square) is usually used to perform a full screen pass.
-	const cg::opengl::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
+	const cg::rnd::opengl::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
 	{
 		return _aux_geometry_rect_1x1_params;
 	}
@@ -50,13 +50,13 @@ public:
 	}
 	
 	// Default bilinear sampler (clamp_to_edge).
-	const cg::opengl::Sampler& bilinear_sampler() const noexcept
+	const cg::rnd::opengl::Sampler& bilinear_sampler() const noexcept
 	{
 		return _bilinear_sampler;
 	}
 
 	// Default nearest sampler (clamp_to_edge).
-	const cg::opengl::Sampler& nearest_sampler() const noexcept
+	const cg::rnd::opengl::Sampler& nearest_sampler() const noexcept
 	{
 		return _nearest_sampler;
 	}
@@ -65,28 +65,28 @@ public:
 	void resize(const cg::uint2& viewport_size) noexcept;
 
 	// Contains depth information of the scene. Populated by the first pass (Gbuffer_pass).
-	cg::opengl::Texture_2d& tex_depth_map() noexcept
+	cg::rnd::opengl::Texture_2d& tex_depth_map() noexcept
 	{
 		return _tex_depth_map;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain ambient radiance.
-	cg::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
 	{
 		return _tex_lighting_ambient_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain diffuse radiance.
-	cg::opengl::Texture_2d& tex_lighting_diffuse_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_diffuse_term() noexcept
 	{
 		return _tex_lighting_diffuse_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain specular radiance.
-	cg::opengl::Texture_2d& tex_lighting_specular_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_specular_term() noexcept
 	{
 		return _tex_lighting_specular_term;
 	}
@@ -94,7 +94,7 @@ public:
 	// Material_lighting_pass's render target texture.
 	// xyz components contain fully lit material color.
 	// The computations are made in HDR.
-	cg::opengl::Texture_2d& tex_material_lighting_result() noexcept
+	cg::rnd::opengl::Texture_2d& tex_material_lighting_result() noexcept
 	{
 		return _tex_material_lighting_result;
 	}
@@ -102,7 +102,7 @@ public:
 	// Gbuffer_pass's render target texture.
 	// xyz components contain normal in the view space.
 	// w component contains material.smoothness parameter.
-	cg::opengl::Texture_2d& tex_normal_smoothness() noexcept
+	cg::rnd::opengl::Texture_2d& tex_normal_smoothness() noexcept
 	{
 		return _tex_normal_smoothness;
 	}
@@ -110,12 +110,12 @@ public:
 	// Shadow_map_pass's render target texture.
 	// xy components contain linear depth and squared depth values in the directional light's space.
 	// xy components are always positive in spite of depth values are negative in the light's space.
-	cg::opengl::Texture_2d& tex_shadow_map() noexcept
+	cg::rnd::opengl::Texture_2d& tex_shadow_map() noexcept
 	{
 		return _tex_shadow_map;
 	}
 
-	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _vertex_attrib_layout;
 	}
@@ -127,20 +127,20 @@ public:
 	}
 
 private:
-	const cg::opengl::Vertex_attrib_layout _vertex_attrib_layout;
-	cg::opengl::Sampler _bilinear_sampler;
-	cg::opengl::Sampler _nearest_sampler;
-	cg::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
-	cg::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
+	const cg::rnd::opengl::Vertex_attrib_layout _vertex_attrib_layout;
+	cg::rnd::opengl::Sampler _bilinear_sampler;
+	cg::rnd::opengl::Sampler _nearest_sampler;
+	cg::rnd::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
+	cg::rnd::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
-	cg::opengl::Renderbuffer _aux_depth_renderbuffer;
-	cg::opengl::Texture_2d _tex_depth_map;
-	cg::opengl::Texture_2d _tex_normal_smoothness;
-	cg::opengl::Texture_2d _tex_shadow_map;
-	cg::opengl::Texture_2d _tex_lighting_ambient_term;
-	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
-	cg::opengl::Texture_2d _tex_lighting_specular_term;
-	cg::opengl::Texture_2d _tex_material_lighting_result;
+	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
+	cg::rnd::opengl::Texture_2d _tex_depth_map;
+	cg::rnd::opengl::Texture_2d _tex_normal_smoothness;
+	cg::rnd::opengl::Texture_2d _tex_shadow_map;
+	cg::rnd::opengl::Texture_2d _tex_lighting_ambient_term;
+	cg::rnd::opengl::Texture_2d _tex_lighting_diffuse_term;
+	cg::rnd::opengl::Texture_2d _tex_lighting_specular_term;
+	cg::rnd::opengl::Texture_2d _tex_material_lighting_result;
 };
 
 class Gbuffer_pass final {
@@ -169,7 +169,7 @@ public:
 private:
 	const float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
 	const float _clear_value_depth_map = 1.0f;
-	cg::opengl::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Gbuffer_pass_shader_program _prog;
 	Gbuffer& _gbuffer;
 };
@@ -196,7 +196,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
 	Gbuffer& _gbuffer;
-	cg::opengl::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
 };
 
@@ -226,7 +226,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
 	Gbuffer& _gbuffer;
-	cg::opengl::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
 };
 
@@ -254,13 +254,13 @@ private:
 	const float _clear_value_shadow_map[4] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), 0, 0 };
 	const float _clear_value_depth = 1.0f;
 	Gbuffer& _gbuffer;
-	cg::opengl::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
 };
 
 struct Renderer_config final {
 
-	cg::opengl::Vertex_attrib_layout vertex_attrib_layout;
+	cg::rnd::opengl::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
@@ -285,7 +285,7 @@ public:
 
 	void resize_viewport(const cg::uint2& size) noexcept;
 
-	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _gbuffer.vertex_attrib_layout();
 	}

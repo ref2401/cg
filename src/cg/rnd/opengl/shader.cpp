@@ -1,17 +1,18 @@
-#include "cg/opengl/shader.h"
+#include "cg/rnd/opengl/shader.h"
 
 #include <cassert>
 #include <exception>
 #include <string>
 #include "cg/base/base.h"
 #include "cg/data/shader.h"
-#include "cg/opengl/opengl_def.h"
+#include "cg/rnd/opengl/opengl_def.h"
 
 using namespace cg;
 using cg::data::Vertex_attribs;
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // ----- Shader -----
@@ -384,4 +385,5 @@ void set_uniform_array<mat4, mat4>(GLint location, const mat4* ptr, size_t count
 }
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg

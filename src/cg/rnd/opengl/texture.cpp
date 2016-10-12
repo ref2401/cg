@@ -1,4 +1,4 @@
-#include "cg/opengl/texture.h"
+#include "cg/rnd/opengl/texture.h"
 
 
 using cg::greater_than;
@@ -7,6 +7,7 @@ using cg::data::Image_format;
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // ----- Sampler_config -----
@@ -738,4 +739,5 @@ GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept
 }
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg

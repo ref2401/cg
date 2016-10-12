@@ -4,8 +4,8 @@ using cg::mat3;
 using cg::mat4;
 using cg::uint2;
 using cg::data::Shader_program_source_code;
-using cg::opengl::set_uniform;
-using cg::opengl::set_uniform_array;
+using cg::rnd::opengl::set_uniform;
+using cg::rnd::opengl::set_uniform_array;
 
 
 namespace deferred_lighting {

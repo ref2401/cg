@@ -1,16 +1,16 @@
-#include "cg/opengl/shader.h"
+#include "cg/rnd/opengl/shader.h"
 
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/utility.h"
 #include "CppUnitTest.h"
 
-using cg::opengl::Invalid;
-using cg::opengl::Vertex_attrib_layout;
+using cg::rnd::opengl::Invalid;
+using cg::rnd::opengl::Vertex_attrib_layout;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {
 
-TEST_CLASS(cg_opengl_shader_Vertex_attrib_layout) {
+TEST_CLASS(cg_rnd_opengl_shader_Vertex_attrib_layout) {
 public:
 
 	TEST_METHOD(ctors)

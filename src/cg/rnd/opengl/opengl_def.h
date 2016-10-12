@@ -1,7 +1,7 @@
 #ifndef CG_OPENGL_OPENGL_DEF_H_
 #define CG_OPENGL_OPENGL_DEF_H_
 
-#include "cg/opengl/glcorearb.h"
+#include "cg/rnd/opengl/glcorearb.h"
 
 extern "C" {
 	extern PFNGLCULLFACEPROC glCullFace;

@@ -3,10 +3,11 @@
 
 #include <cstring>
 #include <type_traits>
-#include "cg/opengl/opengl_def.h"
+#include "cg/rnd/opengl/opengl_def.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 class Invalid final {
@@ -80,6 +81,7 @@ constexpr bool is_valid_texture_sub_image_type(const GLenum& v) noexcept
 void wait_for(GLsync sync_obj) noexcept;
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_UTILITY_H_

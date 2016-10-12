@@ -1,4 +1,4 @@
-#include "cg/opengl/framebuffer.h"
+#include "cg/rnd/opengl/framebuffer.h"
 
 #include <cassert>
 #include <exception>
@@ -9,7 +9,7 @@ namespace {
 
 void validate_framebuffer(GLuint id, GLenum target)
 {
-	assert(id != cg::opengl::Invalid::framebuffer_id);
+	assert(id != cg::rnd::opengl::Invalid::framebuffer_id);
 	assert(target == GL_FRAMEBUFFER
 		|| target == GL_READ_FRAMEBUFFER
 		|| target == GL_DRAW_FRAMEBUFFER);
@@ -33,6 +33,7 @@ void validate_framebuffer(GLuint id, GLenum target)
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // ----- Renderbuffer -----
@@ -236,4 +237,5 @@ void Framebuffer::validate() const
 
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg

@@ -1,9 +1,10 @@
-#include "cg/opengl/buffer.h"
+#include "cg/rnd/opengl/buffer.h"
 
 #include <cassert>
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // ----- Persistent_buffer -----
@@ -61,4 +62,5 @@ void Static_buffer::dispose() noexcept
 }
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg

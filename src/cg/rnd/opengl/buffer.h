@@ -4,11 +4,12 @@
 #include <cassert>
 #include <cstring>
 #include <type_traits>
-#include "cg/opengl/opengl_def.h"
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/utility.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // Persistent_buffer represents opengl buffer object that is mapped once during the constructuon
@@ -206,6 +207,7 @@ size_t Partitioned_buffer<Buffer_type>::write(size_t rel_offset, const T* ptr, s
 }
 
 } // namespace opengl 
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_BUFFER_H_

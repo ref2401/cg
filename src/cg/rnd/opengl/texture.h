@@ -5,11 +5,12 @@
 #include <ostream>
 #include "cg/data/image.h"
 #include "cg/math/math.h"
-#include "cg/opengl/opengl_def.h"
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/utility.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // Mag_filter describes the process of fragment color calculation from a stretched texture.
@@ -390,6 +391,7 @@ inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image_p
 }
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_TEXTURE_H_

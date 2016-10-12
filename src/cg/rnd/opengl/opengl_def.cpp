@@ -1,4 +1,4 @@
-#include "cg/opengl/opengl_def.h"
+#include "cg/rnd/opengl/opengl_def.h"
 
 
 PFNGLCULLFACEPROC glCullFace;

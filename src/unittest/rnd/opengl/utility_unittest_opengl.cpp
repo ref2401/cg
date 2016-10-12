@@ -1,4 +1,4 @@
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/utility.h"
 
 #include "CppUnitTest.h"
 
@@ -7,12 +7,12 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace unittest {
 
-TEST_CLASS(cg_opengl_utility_Funcs) {
+TEST_CLASS(cg_rnd_opengl_utility_Funcs) {
 public:
 
 	TEST_METHOD(is_valid_color_attachment)
 	{
-		using cg::opengl::is_valid_color_attachment;
+		using cg::rnd::opengl::is_valid_color_attachment;
 
 		Assert::IsTrue(is_valid_color_attachment(GL_NONE));
 		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT0));
@@ -31,7 +31,7 @@ public:
 
 	TEST_METHOD(is_valid_texture_sub_image_format)
 	{
-		using cg::opengl::is_valid_texture_sub_image_format;
+		using cg::rnd::opengl::is_valid_texture_sub_image_format;
 
 		Assert::IsTrue(is_valid_texture_sub_image_format(GL_RED));
 		Assert::IsTrue(is_valid_texture_sub_image_format(GL_RG));
@@ -50,7 +50,7 @@ public:
 
 	TEST_METHOD(is_valid_texture_sub_image_type)
 	{
-		using cg::opengl::is_valid_texture_sub_image_type;
+		using cg::rnd::opengl::is_valid_texture_sub_image_type;
 
 		Assert::IsTrue(is_valid_texture_sub_image_type(GL_UNSIGNED_BYTE));
 		Assert::IsTrue(is_valid_texture_sub_image_type(GL_BYTE));

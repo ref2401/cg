@@ -2,12 +2,13 @@
 #define CG_OPENGL_FRAMEBUFFER_H_
 
 #include "cg/math/math.h"
-#include "cg/opengl/opengl_def.h"
-#include "cg/opengl/texture.h"
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/texture.h"
+#include "cg/rnd/opengl/utility.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 class Renderbuffer final {
@@ -129,6 +130,7 @@ private:
 };
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_FRAMEBUFFER_H_

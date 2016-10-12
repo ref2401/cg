@@ -2,7 +2,7 @@
 #define CG_SYS_WIN_APP_H_
 
 #include "cg/math/math.h"
-#include "cg/opengl/opengl_def.h"
+#include "cg/rnd/opengl/opengl_def.h"
 #include "cg/sys/app.h"
 #include <windows.h>
 

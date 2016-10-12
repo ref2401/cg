@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "cg/math/math.h"
-#include "cg/opengl/opengl.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render.h"
@@ -15,17 +15,17 @@ struct Material final {
 	Material() noexcept = default;
 
 	Material(float smoothness,
-		cg::opengl::Texture_2d_immut tex_diffuse_rgb,
-		cg::opengl::Texture_2d_immut tex_normal_map,
-		cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
+		cg::rnd::opengl::Texture_2d_immut tex_diffuse_rgb,
+		cg::rnd::opengl::Texture_2d_immut tex_normal_map,
+		cg::rnd::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
 
 	~Material() noexcept = default;
 
 
 	float smoothness = 0.f;
-	cg::opengl::Texture_2d_immut tex_diffuse_rgb;
-	cg::opengl::Texture_2d_immut tex_normal_map;
-	cg::opengl::Texture_2d_immut tex_specular_intensity;
+	cg::rnd::opengl::Texture_2d_immut tex_diffuse_rgb;
+	cg::rnd::opengl::Texture_2d_immut tex_normal_map;
+	cg::rnd::opengl::Texture_2d_immut tex_specular_intensity;
 };
 
 // Provides a predefined set of Material_instance objects.
@@ -76,7 +76,7 @@ private:
 	// Constructs Material_instance object from the specified material objecj.
 	// tex_specular_intensity is used instead of material.tex_specular_intensity.
 	Material_instance get_material_instance_specular_intensity(const Material& material,
-		const cg::opengl::Texture_2d_immut& tex_specular_intensity_override) const noexcept
+		const cg::rnd::opengl::Texture_2d_immut& tex_specular_intensity_override) const noexcept
 	{
 		return Material_instance(material.smoothness,
 			material.tex_diffuse_rgb.id(),
@@ -128,11 +128,11 @@ private:
 	Renderer _renderer;
 	Frame _frame;
 	// scene data
-	cg::opengl::Static_vertex_spec_builder _vs_builder;
-	cg::opengl::Static_vertex_spec _vertex_spec0;
-	cg::opengl::DE_cmd _cmd_cube;
-	cg::opengl::DE_cmd _cmd_rect_2x2_repeat;
-	cg::opengl::DE_cmd _cmd_teapot_base;
+	cg::rnd::opengl::Static_vertex_spec_builder _vs_builder;
+	cg::rnd::opengl::Static_vertex_spec _vertex_spec0;
+	cg::rnd::opengl::DE_cmd _cmd_cube;
+	cg::rnd::opengl::DE_cmd _cmd_rect_2x2_repeat;
+	cg::rnd::opengl::DE_cmd _cmd_teapot_base;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;

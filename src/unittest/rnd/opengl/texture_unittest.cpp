@@ -1,4 +1,4 @@
-#include "cg/opengl/texture.h"
+#include "cg/rnd/opengl/texture.h"
 
 #include "cg/data/image.h"
 #include "cg/math/math.h"
@@ -7,12 +7,12 @@
 using cg::uint2;
 using cg::data::Image_2d;
 using cg::data::Image_format;
-using cg::opengl::Mag_filter;
-using cg::opengl::Min_filter;
-using cg::opengl::Sampler_config;
-using cg::opengl::Texture_2d_sub_image_params;
-using cg::opengl::Texture_format;
-using cg::opengl::Wrap_mode;
+using cg::rnd::opengl::Mag_filter;
+using cg::rnd::opengl::Min_filter;
+using cg::rnd::opengl::Sampler_config;
+using cg::rnd::opengl::Texture_2d_sub_image_params;
+using cg::rnd::opengl::Texture_format;
+using cg::rnd::opengl::Wrap_mode;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -32,7 +32,7 @@ template<> inline std::wstring ToString<Wrap_mode>(const Wrap_mode& t) { RETURN_
 
 namespace unittest {
 
-TEST_CLASS(cg_opengl_texture_Sampler_config) {
+TEST_CLASS(cg_rnd_opengl_texture_Sampler_config) {
 public:
 
 	TEST_METHOD(ctors)
@@ -81,7 +81,7 @@ public:
 	}
 };
 
-TEST_CLASS(cg_opengl_texture_Texture_2d_sub_image_params) {
+TEST_CLASS(cg_rnd_opengl_texture_Texture_2d_sub_image_params) {
 public:
 
 	TEST_METHOD(ctors)
@@ -122,12 +122,12 @@ public:
 	}
 };
 
-TEST_CLASS(cg_opengl_texture_Funcs) {
+TEST_CLASS(cg_rnd_opengl_texture_Funcs) {
 public:
 
 	TEST_METHOD(get_texture_format)
 	{
-		using cg::opengl::get_texture_format;
+		using cg::rnd::opengl::get_texture_format;
 
 		Assert::AreEqual(Texture_format::none, get_texture_format(Image_format::none));
 		Assert::AreEqual(Texture_format::red_8, get_texture_format(Image_format::red_8));
@@ -139,7 +139,7 @@ public:
 
 	TEST_METHOD(get_texture_internal_format)
 	{
-		using cg::opengl::get_texture_internal_format;
+		using cg::rnd::opengl::get_texture_internal_format;
 
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_internal_format(Texture_format::none));
 		Assert::AreEqual<GLenum>(GL_R8, get_texture_internal_format(Texture_format::red_8));
@@ -159,7 +159,7 @@ public:
 
 	TEST_METHOD(get_texture_mag_filter)
 	{
-		using cg::opengl::get_texture_mag_filter;
+		using cg::rnd::opengl::get_texture_mag_filter;
 
 		Assert::AreEqual<GLenum>(GL_NEAREST, get_texture_mag_filter(Mag_filter::nearest));
 		Assert::AreEqual<GLenum>(GL_LINEAR, get_texture_mag_filter(Mag_filter::bilinear));
@@ -167,7 +167,7 @@ public:
 
 	TEST_METHOD(get_texture_min_filter)
 	{
-		using cg::opengl::get_texture_min_filter;
+		using cg::rnd::opengl::get_texture_min_filter;
 
 		Assert::AreEqual<GLenum>(GL_NEAREST, get_texture_min_filter(Min_filter::nearest));
 		Assert::AreEqual<GLenum>(GL_LINEAR, get_texture_min_filter(Min_filter::bilinear));
@@ -179,7 +179,7 @@ public:
 
 	TEST_METHOD(get_texture_sub_image_format)
 	{
-		using cg::opengl::get_texture_sub_image_format;
+		using cg::rnd::opengl::get_texture_sub_image_format;
 
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(Image_format::none));
 		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(Image_format::red_8));
@@ -206,7 +206,7 @@ public:
 
 	TEST_METHOD(get_texture_sub_image_type)
 	{
-		using cg::opengl::get_texture_sub_image_type;
+		using cg::rnd::opengl::get_texture_sub_image_type;
 
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(Image_format::none));
 		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::red_8));
@@ -233,7 +233,7 @@ public:
 
 	TEST_METHOD(get_texture_wrap)
 	{
-		using cg::opengl::get_texture_wrap;
+		using cg::rnd::opengl::get_texture_wrap;
 
 		Assert::AreEqual<GLenum>(GL_REPEAT, get_texture_wrap(Wrap_mode::repeat));
 		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER , get_texture_wrap(Wrap_mode::clamp_to_border));

@@ -5,11 +5,12 @@
 #include "cg/data/shader.h"
 #include "cg/data/mesh.h"
 #include "cg/math/math.h"
-#include "cg/opengl/opengl_def.h"
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/utility.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 class Shader final {
@@ -150,6 +151,7 @@ template<typename T, typename TPtr>
 void set_uniform_array(GLint location, const TPtr* ptr, size_t count) noexcept;
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_SHADER_H_

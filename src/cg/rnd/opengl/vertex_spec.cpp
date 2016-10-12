@@ -1,4 +1,4 @@
-#include "cg/opengl/vertex_spec.h"
+#include "cg/rnd/opengl/vertex_spec.h"
 
 #include "cg/base/base.h"
 
@@ -13,6 +13,7 @@ using cg::data::is_superset_of;
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // ----- Static_vertex_spec
@@ -174,4 +175,5 @@ DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_da
 }
 
 } // namepsace opengl
+} // namespace rnd
 } // namespace cg

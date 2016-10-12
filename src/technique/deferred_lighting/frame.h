@@ -3,7 +3,7 @@
 
 #include <array>
 #include "cg/math/math.h"
-#include "cg/opengl/opengl.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 
 
@@ -60,9 +60,9 @@ struct Material_instance final {
 
 struct Renderable final {
 
-	Renderable(const cg::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
+	Renderable(const cg::rnd::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
 
-	cg::opengl::DE_cmd cmd;
+	cg::rnd::opengl::DE_cmd cmd;
 	cg::mat4 model_matrix;
 	Material_instance material;
 };
@@ -107,7 +107,7 @@ public:
 
 	void push_back_renderable(const Renderable& rnd);
 
-	void reset(const cg::opengl::Static_vertex_spec& vertex_spec) noexcept;	
+	void reset(const cg::rnd::opengl::Static_vertex_spec& vertex_spec) noexcept;	
 
 
 	// frame packet stuff:
@@ -166,12 +166,12 @@ private:
 	// indirect rendering gears
 	const size_t _batch_size;
 	std::array<GLsync, 3> _sync_objects;
-	cg::opengl::Partitioned_buffer<cg::opengl::Persistent_buffer> _draw_indirect_buffer;
-	cg::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
+	cg::rnd::opengl::Partitioned_buffer<cg::rnd::opengl::Persistent_buffer> _draw_indirect_buffer;
+	cg::rnd::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
 	size_t _offset_draw_indirect = 0;
 
 	// future Frame_packet stuff:
-	GLuint _vao_id = cg::opengl::Invalid::vao_id;
+	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
 	std::vector<float> _uniform_array_smoothness;

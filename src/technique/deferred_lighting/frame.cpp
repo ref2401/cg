@@ -5,7 +5,7 @@
 #include <numeric>
 
 using namespace cg;
-using namespace cg::opengl;
+using namespace cg::rnd::opengl;
 
 
 namespace {

@@ -6,13 +6,14 @@
 #include <memory>
 #include <vector>
 #include "cg/data/mesh.h"
-#include "cg/opengl/buffer.h"
-#include "cg/opengl/shader.h"
-#include "cg/opengl/opengl_def.h"
-#include "cg/opengl/utility.h"
+#include "cg/rnd/opengl/buffer.h"
+#include "cg/rnd/opengl/shader.h"
+#include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/utility.h"
 
 
 namespace cg {
+namespace rnd {
 namespace opengl {
 
 // Specifies params to call the glDrawElementsBaseVertex func.
@@ -361,6 +362,7 @@ inline void draw_elements_base_vertex(const DE_cmd& cmd) noexcept
 }
 
 } // namespace opengl
+} // namespace rnd
 } // namespace cg
 
 #endif // CG_OPENGL_VERTEX_SPEC_H_

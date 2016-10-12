@@ -10,21 +10,6 @@
     <ClCompile Include="data\mesh.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="opengl\shader.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\opengl_def.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\vertex_spec.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\utility.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\buffer.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
     <ClCompile Include="file\mesh_wavefront.cpp">
       <Filter>file</Filter>
     </ClCompile>
@@ -33,12 +18,6 @@
     </ClCompile>
     <ClCompile Include="data\image.cpp">
       <Filter>data</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\texture.cpp">
-      <Filter>opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl\framebuffer.cpp">
-      <Filter>opengl</Filter>
     </ClCompile>
     <ClCompile Include="sys\app.cpp">
       <Filter>sys</Filter>
@@ -51,6 +30,27 @@
     </ClCompile>
     <ClCompile Include="math\transform.cpp">
       <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\buffer.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\framebuffer.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\opengl_def.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\shader.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\texture.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\utility.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\vertex_spec.cpp">
+      <Filter>rnd\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,8 +69,11 @@
     <Filter Include="sys">
       <UniqueIdentifier>{015ab915-01f0-44ac-9236-202f6e7e53f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="opengl">
+    <Filter Include="rnd">
       <UniqueIdentifier>{7b214224-e4a9-4b7f-a05d-9bbab53c65be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rnd\opengl">
+      <UniqueIdentifier>{66ef643f-fc86-46b4-899e-17fbcb9b800f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,47 +116,47 @@
     <ClInclude Include="sys\app.h">
       <Filter>sys</Filter>
     </ClInclude>
-    <ClInclude Include="opengl\glcorearb.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
     <ClInclude Include="math\utility.h">
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="data\shader.h">
       <Filter>data</Filter>
     </ClInclude>
-    <ClInclude Include="opengl\shader.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\opengl_def.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\opengl.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\vertex_spec.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\utility.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\buffer.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
     <ClInclude Include="data\image.h">
       <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\texture.h">
-      <Filter>opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl\framebuffer.h">
-      <Filter>opengl</Filter>
     </ClInclude>
     <ClInclude Include="sys\win_app.h">
       <Filter>sys</Filter>
     </ClInclude>
     <ClInclude Include="sys\input.h">
       <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\buffer.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\framebuffer.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\glcorearb.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl_def.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\shader.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\texture.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\utility.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\vertex_spec.h">
+      <Filter>rnd\opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

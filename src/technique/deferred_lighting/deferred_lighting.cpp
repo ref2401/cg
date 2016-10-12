@@ -9,7 +9,7 @@
 
 using cg::data::Vertex_attribs;
 using namespace cg;
-using namespace cg::opengl;
+using namespace cg::rnd::opengl;
 
 
 namespace {
@@ -55,9 +55,9 @@ namespace deferred_lighting {
 // ----- Material -----
 
 Material::Material(float smoothness,
-	cg::opengl::Texture_2d_immut tex_diffuse_rgb,
-	cg::opengl::Texture_2d_immut tex_normal_map,
-	cg::opengl::Texture_2d_immut tex_specular_intensity) noexcept :
+	cg::rnd::opengl::Texture_2d_immut tex_diffuse_rgb,
+	cg::rnd::opengl::Texture_2d_immut tex_normal_map,
+	cg::rnd::opengl::Texture_2d_immut tex_specular_intensity) noexcept :
 	smoothness(smoothness),
 	tex_diffuse_rgb(std::move(tex_diffuse_rgb)),
 	tex_normal_map(std::move(tex_normal_map)),
