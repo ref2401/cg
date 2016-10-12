@@ -19,6 +19,9 @@ struct Directional_light final {
 		const cg::float3& rgb, float intensity, float ambient_intensity) noexcept;
 	
 
+	// Projection matrix of the light that is used in shadow mapping.
+	cg::mat4 projection_matrix;
+
 	// Position of the light. 
 	// The value is required in shadow mapping computations.
 	cg::float3 position = cg::float3::unit_z;

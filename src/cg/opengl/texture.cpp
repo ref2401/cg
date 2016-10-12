@@ -167,7 +167,6 @@ void Texture_2d::reallocate_storage(Texture_format format, uint2 size, size_t mi
 
 	glBindTexture(GL_TEXTURE_2D, _id);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.f);
-	auto err = glGetError();
 
 	glTexImage2D(GL_TEXTURE_2D, 0, get_texture_internal_format(_format),
 		_size.width, _size.height, 0,

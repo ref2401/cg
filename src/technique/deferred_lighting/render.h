@@ -2,6 +2,7 @@
 #define TECHNIQUE_DEFERRED_LIGHTING_RENDER_H_
 
 #include <array>
+#include <limits>
 #include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
@@ -27,6 +28,13 @@ public:
 
 	~Gbuffer() noexcept = default;
 
+
+	// Auxiliary depth32f buffer that can be used in an rendering pass.
+	// The renderbuffer is used in shadow_map_pass for depth test.
+	cg::opengl::Renderbuffer& aux_depth_renderbuffer() noexcept
+	{
+		return _aux_depth_renderbuffer;
+	}
 
 	// Rect 1x1 (a square) is usually used to perform a full screen pass.
 	const cg::opengl::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
@@ -100,7 +108,8 @@ public:
 	}
 
 	// Shadow_map_pass's render target texture.
-	// xy components contain depth and squared depth values in the directional light's space.
+	// xy components contain linear depth and squared depth values in the directional light's space.
+	// xy components are always positive in spite of depth values are negative in the light's space.
 	cg::opengl::Texture_2d& tex_shadow_map() noexcept
 	{
 		return _tex_shadow_map;
@@ -124,6 +133,7 @@ private:
 	cg::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
 	cg::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
+	cg::opengl::Renderbuffer _aux_depth_renderbuffer;
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
 	cg::opengl::Texture_2d _tex_shadow_map;
@@ -157,8 +167,8 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept;
 
 private:
-	float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
-	float _clear_value_depth_map = 1.f;
+	const float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
+	const float _clear_value_depth_map = 1.0f;
 	cg::opengl::Framebuffer _fbo;
 	Gbuffer_pass_shader_program _prog;
 	Gbuffer& _gbuffer;
@@ -214,7 +224,7 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_specular_intensity) noexcept;
 
 private:
-	cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
+	const cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
 	Gbuffer& _gbuffer;
 	cg::opengl::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
@@ -231,7 +241,18 @@ public:
 
 	~Shadow_map_pass() noexcept = default;
 
+
+	// Performs various preparations before rendering using this pass.
+	void begin(const Directional_light& dir_light) noexcept;
+
+	void end() noexcept;
+
+	void set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
+		const std::vector<float>& uniform_array_model_matrix) noexcept;
+
 private:
+	const float _clear_value_shadow_map[4] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), 0, 0 };
+	const float _clear_value_depth = 1.0f;
 	Gbuffer& _gbuffer;
 	cg::opengl::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
@@ -272,6 +293,8 @@ public:
 private:
 
 	void perform_gbuffer_pass(const Frame& frame) noexcept;
+
+	void perform_shadow_map_pass(const Frame& frame) noexcept;
 
 	void perform_lighting_pass(const Frame& frame) noexcept;
 

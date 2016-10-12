@@ -30,5 +30,5 @@ void main()
 	vec4 pos = u_view_matrix * (model_matrix * vec4(vert_position, 1));
 
 	gl_Position = u_projection_matrix * pos;
-	vs_out.depth_vs = pos.z;
+	vs_out.depth_vs = -pos.z;
 }

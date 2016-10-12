@@ -7,6 +7,7 @@ in Pixel_data_i {
 	float depth_vs; // direction light's space.
 } ps_in;
 
+// rt_shadow_map.rg components are always positive in spite of depth values are negative in the light's space.
 layout(location = 0) out vec2 rt_shadow_map;
 
 void main()

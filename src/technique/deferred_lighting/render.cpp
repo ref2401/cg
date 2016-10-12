@@ -40,6 +40,7 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),
 	_viewport_size(viewport_size),
+	_aux_depth_renderbuffer(Texture_format::depth_32f, viewport_size),
 	_tex_depth_map(Texture_format::depth_32f, viewport_size),
 	_tex_normal_smoothness(Texture_format::rgba_32f, viewport_size),
 	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
@@ -60,6 +61,8 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 void Gbuffer::resize(const uint2& viewport_size) noexcept
 {
 	_viewport_size = viewport_size;
+
+	_aux_depth_renderbuffer.set_size(_viewport_size);
 	_tex_depth_map.set_size(_viewport_size);
 	_tex_normal_smoothness.set_size(_viewport_size);
 	_tex_shadow_map.set_size(_viewport_size);
@@ -224,12 +227,12 @@ void Material_lighting_pass::end() noexcept
 		glDepthMask(true);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	_fbo.set_read_buffer(GL_NONE);
+	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	//_fbo.set_read_buffer(GL_NONE);
 }
 
 void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -254,8 +257,47 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_progra
 	_gbuffer(gbuffer),
 	_prog(source_code)
 {
-	//_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.set_read_buffer(GL_NONE);
+	_fbo.validate();
 }
+
+void Shadow_map_pass::begin(const Directional_light& dir_light) noexcept
+{
+	glEnable(GL_DEPTH_TEST);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
+	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glClearBufferfv(GL_COLOR, 0, _clear_value_shadow_map);
+	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth);
+
+	// directional light matrices.
+	mat4 projection_matrix = dir_light.projection_matrix;
+	mat4 view_matrix = cg::view_matrix(dir_light.position, dir_light.target, float3::unit_y);
+	_prog.use(projection_matrix, view_matrix);
+}
+
+void Shadow_map_pass::end() noexcept
+{
+	glDisable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	_fbo.set_read_buffer(GL_NONE);
+}
+
+void Shadow_map_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
+	const std::vector<float>& uniform_array_model_matrix) noexcept
+{
+	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
+}
+
 
 // ----- Renderer -----
 
@@ -296,6 +338,35 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 	}
 
 	_gbuffer_pass.end();
+}
+
+void Renderer::perform_shadow_map_pass(const Frame& frame) noexcept
+{
+	_shadow_map_pass.begin(frame.directional_light());
+
+	// for each frame packet
+	glBindVertexArray(frame.vao_id());
+
+	// for each batch is the frame packet
+	auto r = frame.batch_count();
+	for (size_t bi = 0; bi < frame.batch_count(); ++bi) {
+		// rnd_offset: processed renderable object count.
+		// rnd_count: The number of renderable objects in the current batch #bi.
+		size_t rnd_offset = bi * frame.batch_size();
+		size_t rnd_count = std::min(frame.batch_size(), frame.renderable_count() - rnd_offset);
+
+		// uniform arrays
+		_shadow_map_pass.set_uniform_arrays(rnd_offset, rnd_count,
+			frame.uniform_array_model_matrix());
+
+
+		// draw indirect
+		unsigned char* draw_indirect_ptr = nullptr;
+		draw_indirect_ptr += rnd_offset * sizeof(DE_indirect_params);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, rnd_count, 0);
+	}
+
+	_shadow_map_pass.end();
 }
 
 void Renderer::perform_lighting_pass(const Frame& frame) noexcept
@@ -345,6 +416,7 @@ void Renderer::render(const Frame& frame) noexcept
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	perform_gbuffer_pass(frame);
+	perform_shadow_map_pass(frame);
 	perform_lighting_pass(frame);
 	perform_material_lighting_pass(frame);
 }

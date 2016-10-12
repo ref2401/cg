@@ -114,7 +114,7 @@ Material_library::Material_library()
 
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
-	_projection_matrix(cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
+	_projection_matrix(perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
 	_curr_viewpoint(float3(2, 3, 5), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
@@ -126,6 +126,7 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
 	_dir_light.ambient_intensity = 0.25f;
+	_dir_light.projection_matrix = orthographic_matrix(50, 50, 0, 2 * len(_dir_light.position - _dir_light.target));
 
 	init_geometry();
 	init_renderables();
