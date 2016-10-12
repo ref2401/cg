@@ -4,6 +4,7 @@
 #include <array>
 #include "cg/math/math.h"
 #include "cg/opengl/opengl.h"
+#include "technique/deferred_lighting/render_pass_shader.h"
 
 
 namespace deferred_lighting {
@@ -97,45 +98,17 @@ public:
 
 	void end_rendering() noexcept;
 
-	const Directional_light& directional_light() const noexcept
-	{
-		return _dir_light;
-	}
 
-	void set_directional_light(const Directional_light& dir_light) noexcept
-	{
-		_dir_light = dir_light;
-	}
-
-	const cg::mat4& projection_matrix() const noexcept
-	{
-		return _projection_matrix;
-	}
-
-	void set_projection_matrix(const cg::mat4& mat) noexcept
-	{
-		_projection_matrix = mat;
-	}
-
-	// Returns result of projection_matrix() * view_matrix()
+	// Returns result of projection_matrix * view_matrix
 	cg::mat4 projection_view_matrix() const noexcept
 	{
-		return _projection_matrix * _view_matrix;
+		return projection_matrix * view_matrix;
 	}
 
 	void push_back_renderable(const Renderable& rnd);
 
 	void reset(const cg::opengl::Static_vertex_spec& vertex_spec) noexcept;	
 
-	const cg::mat4& view_matrix() const noexcept
-	{
-		return _view_matrix;
-	}
-
-	void set_view_matrix(const cg::mat4& mat) noexcept
-	{
-		_view_matrix = mat;
-	}
 
 	// frame packet stuff:
 
@@ -174,15 +147,21 @@ public:
 		return _uniform_array_tex_specular_intensity;
 	}
 
+
+	Directional_light_params directional_light;
+
+	// Viewpoint(camera) projection matrix
+	cg::mat4 projection_matrix = cg::mat4::identity;
+
+	// Viewpoint(camera) view matrix.
+	cg::mat4 view_matrix = cg::mat4::identity;
+
 private:
 	// The method adds additional bindings to the specified vao object hence makeing it sutable for rendering.
 	// Side effect: before method returns it resets vertex array binding to zero.
 	void prepare_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept;
 
 	const size_t _max_renderable_count;
-	cg::mat4 _projection_matrix = cg::mat4::identity;
-	cg::mat4 _view_matrix = cg::mat4::identity;
-	Directional_light _dir_light;
 	
 	// indirect rendering gears
 	const size_t _batch_size;

@@ -14,7 +14,22 @@ using namespace cg::opengl;
 
 namespace {
 
+using deferred_lighting::Directional_light;
+using deferred_lighting::Directional_light_params;
 using deferred_lighting::Renderer_config;
+
+
+Directional_light_params get_directional_light_params(const mat4& view_matrix, const Directional_light& dir_light) noexcept
+{
+	Directional_light_params p;
+	p.projection_matrix = dir_light.projection_matrix;
+	p.view_matrix = cg::view_matrix(dir_light.position, dir_light.target, float3::unit_y);
+	p.direction_vs = normalize(mul(static_cast<mat3>(view_matrix), (dir_light.target - dir_light.position)));
+	p.irradiance = dir_light.rgb * dir_light.intensity;
+	p.ambient_irradiance_up = dir_light.rgb * dir_light.ambient_intensity;
+	p.ambient_irradiance_down = 0.7f * p.ambient_irradiance_up;
+	return p;
+}
 
 Renderer_config make_render_config(uint2 viewport_size)
 {
@@ -90,11 +105,10 @@ Material_library::Material_library()
 
 	{ // chess board
 		auto diffuse_rgb_image = cg::file::load_image_tga("../data/chess-board-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/chess-board-normal-map.tga");
 
 		_chess_board_material.smoothness = 1.0f;
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
-		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, normal_map_image);
+		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, material_default_normal_map);
 		_chess_board_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_repeat, specular_intensity_0_18_image);
 	}
 
@@ -115,13 +129,13 @@ Material_library::Material_library()
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
 	_projection_matrix(perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
-	_curr_viewpoint(float3(2, 3, 5), float3::zero),
+	_curr_viewpoint(float3(2, 2, 4), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
 {
 	// scene lights
-	_dir_light.position = float3(1000, 1000, 1000);
+	_dir_light.position = float3(-1000, 1000, -1000);
 	_dir_light.target = float3::zero;
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
@@ -138,10 +152,9 @@ void Deferred_lighting::begin_render(float blend_factor)
 
 	_frame.reset(_vertex_spec0);
 
-	_frame.set_projection_matrix(_projection_matrix);
-	auto viewpoint = lerp(_prev_viewpoint, _curr_viewpoint, blend_factor);
-	_frame.set_view_matrix(viewpoint.view_matrix());
-	_frame.set_directional_light(_dir_light);
+	_frame.projection_matrix = _projection_matrix;
+	_frame.view_matrix = view_matrix(_prev_viewpoint, _curr_viewpoint, blend_factor);
+	_frame.directional_light = get_directional_light_params(_frame.view_matrix, _dir_light);
 
 	for (const auto& rnd : _rednerable_objects) {
 		_frame.push_back_renderable(rnd);
@@ -248,10 +261,10 @@ void Deferred_lighting::on_mouse_move()
 		_view_roll_angles.y += (offset_ndc.x > 0.f) ? -pi_64 : pi_64;
 	}
 
-	// mouse offset by x means rotation around OX (pitch)
-	if (y_offset_satisfies) {
-		_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
-	}
+	//// mouse offset by x means rotation around OX (pitch)
+	//if (y_offset_satisfies) {
+	//	_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
+	//}
 }
 
 void Deferred_lighting::on_window_resize()

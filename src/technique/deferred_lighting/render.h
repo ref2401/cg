@@ -191,7 +191,7 @@ public:
 	void end() noexcept;
 
 	void perform_directional_light_pass(const cg::mat4& projection_matrix,
-		const cg::mat4& view_matrix, const Directional_light& dir_light) noexcept;
+		const Directional_light_params& dir_light) noexcept;
 
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
@@ -213,7 +213,7 @@ public:
 
 
 	// Performs various preparations before rendering using this pass.
-	void begin(const cg::mat4& projection_view_matrix) noexcept;
+	void begin(const cg::mat4& projection_view_matrix, const Directional_light_params& dir_light) noexcept;
 
 	// Clears renderer states after rendring using this pass.
 	void end() noexcept;
@@ -243,7 +243,7 @@ public:
 
 
 	// Performs various preparations before rendering using this pass.
-	void begin(const Directional_light& dir_light) noexcept;
+	void begin(const Directional_light_params& dir_light) noexcept;
 
 	void end() noexcept;
 

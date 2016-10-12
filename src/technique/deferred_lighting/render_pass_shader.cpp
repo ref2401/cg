@@ -68,8 +68,10 @@ void Lighting_pass_dir_shader_program::use(const uint2& viewport_size,
 // ----- Material_lighting_pass -----
 
 Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(const Shader_program_source_code& source_code) :
-	_prog("material-pass_shader", source_code),
+	_prog("material-pass-shader", source_code),
 	_u_projection_view_matrix_location(_prog.get_uniform_location("u_projection_view_matrix")),
+	_u_dir_light_projection_matrix_location(_prog.get_uniform_location("u_dir_light_projection_matrix")),
+	_u_dir_light_view_matrix_location(_prog.get_uniform_location("u_dir_light_view_matrix")),
 	_u_arr_model_matrix_location(_prog.get_uniform_location("u_arr_model_matrix")),
 	_u_arr_tex_diffuse_rgb_location(_prog.get_uniform_location("u_arr_tex_diffuse_rgb")),
 	_u_arr_tex_specular_intensity_location(_prog.get_uniform_location("u_arr_tex_specular_intensity"))
@@ -80,10 +82,13 @@ void Material_lighting_pass_shader_program::set_uniform_array_model_matrix(const
 	set_uniform_array<mat4>(_u_arr_model_matrix_location, ptr, count);
 }
 
-void Material_lighting_pass_shader_program::use(const mat4& projection_view_matrix) noexcept
+void Material_lighting_pass_shader_program::use(const mat4& projection_view_matrix, 
+	const Directional_light_params& dir_light) noexcept
 {
 	glUseProgram(_prog.id());
 	set_uniform(_u_projection_view_matrix_location, projection_view_matrix);
+	set_uniform(_u_dir_light_projection_matrix_location, dir_light.projection_matrix);
+	set_uniform(_u_dir_light_view_matrix_location, dir_light.view_matrix);
 }
 
 // ----- Shadow_map_pass_shader_program -----
@@ -100,11 +105,11 @@ void Shadow_map_pass_shader_program::set_uniform_array_model_matrix(const float*
 	set_uniform_array<mat4>(_u_arr_model_matrix_location, ptr, count);
 }
 
-void Shadow_map_pass_shader_program::use(const mat4& projection_matrix, const mat4& view_matrix) noexcept
+void Shadow_map_pass_shader_program::use(const Directional_light_params& dir_light) noexcept
 {
 	glUseProgram(_prog.id());
-	set_uniform(_u_projection_matrix_location, projection_matrix);
-	set_uniform(_u_view_matrix_location, view_matrix);
+	set_uniform(_u_projection_matrix_location, dir_light.projection_matrix);
+	set_uniform(_u_view_matrix_location, dir_light.view_matrix);
 }
 
 } // namespace deferred_lighting

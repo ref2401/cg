@@ -155,8 +155,8 @@ void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept
 	glDeleteSync(sync_obj);
 	_sync_objects[_draw_indirect_buffer.current_partition_index()] = nullptr;
 
-	_projection_matrix = mat4::identity;
-	_view_matrix = mat4::identity;
+	projection_matrix = mat4::identity;
+	view_matrix = mat4::identity;
 
 	// prepare frame_packet
 	prepare_vao(vertex_spec.vao_id(), vertex_spec.vertex_buffer_binding_index() + 1);

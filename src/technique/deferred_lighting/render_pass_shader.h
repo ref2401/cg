@@ -8,6 +8,13 @@
 namespace deferred_lighting {
 
 struct Directional_light_params final {
+
+	// Projection matrix is used in shadow mapping.
+	cg::mat4 projection_matrix;
+
+	// View matrix is used in shadow mapping.
+	cg::mat4 view_matrix;
+
 	// The direction in which the light travels. 
 	// The value is normalized and in the view space.
 	cg::float3 direction_vs;
@@ -90,11 +97,13 @@ public:
 
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
-	void use(const cg::mat4& projection_view_matrix) noexcept;
+	void use(const cg::mat4& projection_view_matrix, const Directional_light_params& dir_light) noexcept;
 
 private:
 	cg::opengl::Shader_program _prog;
 	GLint _u_projection_view_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_projection_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_dir_light_view_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_diffuse_rgb_location = cg::opengl::Invalid::uniform_location;
 	GLint _u_arr_tex_specular_intensity_location = cg::opengl::Invalid::uniform_location;
@@ -112,7 +121,7 @@ public:
 	~Shadow_map_pass_shader_program() noexcept = default;
 
 
-	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+	void use(const Directional_light_params& dir_light) noexcept;
 
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 

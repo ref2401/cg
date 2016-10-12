@@ -11,24 +11,6 @@ using cg::data::Interleaved_mesh_data;
 using cg::data::Shader_program_source_code;
 
 
-namespace {
-
-using deferred_lighting::Directional_light;
-using deferred_lighting::Directional_light_params;
-
-Directional_light_params get_directional_light_params(const mat3& view_matrix, const Directional_light& dir_light) noexcept
-{
-	Directional_light_params p;
-	p.direction_vs = normalize(mul(view_matrix, (dir_light.target - dir_light.position)));
-	p.irradiance = dir_light.rgb * dir_light.intensity;
-	p.ambient_irradiance_up = dir_light.rgb * dir_light.ambient_intensity;
-	p.ambient_irradiance_down = 0.7f * p.ambient_irradiance_up;
-	return p;
-}
-
-} // namespace
-
-
 namespace deferred_lighting {
 
 // ----- Gbuffer -----
@@ -176,10 +158,9 @@ void Lighting_pass::end() noexcept
 }
 
 void Lighting_pass::perform_directional_light_pass(const cg::mat4& projection_matrix, 
-	const mat4& view_matrix, const Directional_light& dir_light) noexcept
+	const Directional_light_params& dir_light) noexcept
 {
-	auto dir_light_params = get_directional_light_params(static_cast<mat3>(view_matrix), dir_light);
-	_dir_prog.use(_gbuffer.viewport_size(), projection_matrix, dir_light_params);
+	_dir_prog.use(_gbuffer.viewport_size(), projection_matrix, dir_light);
 	
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
@@ -198,7 +179,7 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 	_fbo.validate();
 }
 
-void Material_lighting_pass::begin(const mat4& projection_view_matrix) noexcept
+void Material_lighting_pass::begin(const mat4& projection_view_matrix, const Directional_light_params& dir_light) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
@@ -208,7 +189,7 @@ void Material_lighting_pass::begin(const mat4& projection_view_matrix) noexcept
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
 	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
 
-	_prog.use(projection_view_matrix);
+	_prog.use(projection_view_matrix, dir_light);
 	// ambient term
 	glBindSampler(28, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(28, _gbuffer.tex_lighting_ambient_term().id());
@@ -218,6 +199,9 @@ void Material_lighting_pass::begin(const mat4& projection_view_matrix) noexcept
 	// specular term
 	glBindSampler(30, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(30, _gbuffer.tex_lighting_specular_term().id());
+	// shadow map
+	glBindSampler(31, _gbuffer.bilinear_sampler().id());
+	glBindTextureUnit(31, _gbuffer.tex_shadow_map().id());
 }
 
 void Material_lighting_pass::end() noexcept
@@ -227,12 +211,12 @@ void Material_lighting_pass::end() noexcept
 		glDepthMask(true);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	//_fbo.set_read_buffer(GL_NONE);
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	_fbo.set_read_buffer(GL_NONE);
 }
 
 void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -264,7 +248,7 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_progra
 	_fbo.validate();
 }
 
-void Shadow_map_pass::begin(const Directional_light& dir_light) noexcept
+void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -273,10 +257,7 @@ void Shadow_map_pass::begin(const Directional_light& dir_light) noexcept
 	glClearBufferfv(GL_COLOR, 0, _clear_value_shadow_map);
 	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth);
 
-	// directional light matrices.
-	mat4 projection_matrix = dir_light.projection_matrix;
-	mat4 view_matrix = cg::view_matrix(dir_light.position, dir_light.target, float3::unit_y);
-	_prog.use(projection_matrix, view_matrix);
+	_prog.use(dir_light);
 }
 
 void Shadow_map_pass::end() noexcept
@@ -284,12 +265,12 @@ void Shadow_map_pass::end() noexcept
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	_fbo.set_read_buffer(GL_NONE);
+	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	//_fbo.set_read_buffer(GL_NONE);
 }
 
 void Shadow_map_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -311,7 +292,7 @@ Renderer::Renderer(const Renderer_config& config) :
 
 void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 {
-	_gbuffer_pass.begin(frame.projection_matrix(), frame.view_matrix());
+	_gbuffer_pass.begin(frame.projection_matrix, frame.view_matrix);
 
 	// for each frame packet
 	glBindVertexArray(frame.vao_id());
@@ -342,7 +323,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 
 void Renderer::perform_shadow_map_pass(const Frame& frame) noexcept
 {
-	_shadow_map_pass.begin(frame.directional_light());
+	_shadow_map_pass.begin(frame.directional_light);
 
 	// for each frame packet
 	glBindVertexArray(frame.vao_id());
@@ -372,16 +353,13 @@ void Renderer::perform_shadow_map_pass(const Frame& frame) noexcept
 void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 {
 	_lighting_pass.begin();
-
-	_lighting_pass.perform_directional_light_pass(frame.projection_matrix(),
-		frame.view_matrix(), frame.directional_light());
-	
+	_lighting_pass.perform_directional_light_pass(frame.projection_matrix, frame.directional_light);
 	_lighting_pass.end();
 }
 
 void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept
 {
-	_material_lighting_pass.begin(frame.projection_view_matrix());
+	_material_lighting_pass.begin(frame.projection_view_matrix(), frame.directional_light);
 
 	// for each frame packet
 	glBindVertexArray(frame.vao_id());
