@@ -31,7 +31,6 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 
 ## roadmap
 - teapot model
-- scene floor, normal mapping applied. sort of a chess.
 
 - Material pass
 -  gamma correction sRGB formats?
@@ -46,15 +45,5 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 - get_batch_size (check all the shaders and choose one)
 
 - post processing
-	- bloom (bockeh)
-	- good rays
-	- screen space reflection
 	- tonemapping, wtite to sRGB texture
 		- glEnable() with the GL_FRAMEBUFFER_SRGB
-
-- os messages(events)
-	- mouse wheel
-	- keyboard
-	- fullscreen (F11), max/min window
-
-- compute shaders: indirect buffer, draw call index buffer, uniform buffer object, ...

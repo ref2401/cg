@@ -21,6 +21,8 @@ Later I would like to do the same using DirectX 11
 5.2. several models (objects) in a single .obj file
 5.3. crytek sponza 
 5.4. light house
+6. light scattering (GPU Pro 5)
+7. Screen space reflection
 
 # TODO
 1. Static_vertex_spec owns 2 Static_buffers
@@ -30,3 +32,8 @@ Later I would like to do the same using DirectX 11
 5. Sampler_config holds opengl value. Rename it to Sampler_params. Sampler_config should own {Min/Max}_filter, Wrap_mode values.
 6. Tangent space debugging. Draw tangent space for each vertex. Also draw the final normal exctracted from normal-map
 7. By_line_iterator unittest: start reading file with it0, move the iterator to it1 and finish reading the file.
+8. os messages(events)
+	- fix mouse camera rotation. It's too sloppy.
+	- mouse wheel
+	- keyboard
+	- fullscreen (F11), max/min window

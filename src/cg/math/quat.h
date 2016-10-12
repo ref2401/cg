@@ -24,132 +24,74 @@ struct quat {
 	static const quat zero;
 
 
-	quat() noexcept;
+	quat() noexcept : x(0), y(0), z(0), a(0) {}
 
-	quat(float x, float y, float z, float a) noexcept;
+	quat(float x, float y, float z, float a) noexcept : x(x), y(y), z(z), a(a) {}
 
-	quat(const float3& v, float a) noexcept;
+	quat(const float3& v, float a) noexcept : x(v.x), y(v.y), z(v.z), a(a) {}
 
 
 	// Adds the specified quaternion q to this quaternion.
-	quat& operator+=(const quat& q);
+	quat& operator+=(const quat& q) noexcept
+	{
+		x += q.x;
+		y += q.y;
+		z += q.z;
+		a += q.a;
+		return *this;
+	}
 
 	// Subtracts the specified quaternion q from this quaternion.
-	quat& operator-=(const quat& q);
+	quat& operator-=(const quat& q) noexcept
+	{
+		x -= q.x;
+		y -= q.y;
+		z -= q.z;
+		a -= q.a;
+		return *this;
+	}
 
 	// Multiplies each component of this quaternion by val.
-	quat& operator*=(float val);
+	quat& operator*=(float val) noexcept
+	{
+		x *= val;
+		y *= val;
+		z *= val;
+		a *= val;
+		return *this;
+	}
 
 	// Calculates the Hamilton product of this and the specified quaterions.
 	// Stores the result in this quaternion.
-	quat& operator*=(const quat& q);
+	quat& operator*=(const quat& q) noexcept
+	{
+		float xp = (a * q.x) + (x * q.a) + (y * q.z) - (z * q.y);
+		float yp = (a * q.y) + (y * q.a) + (z * q.x) - (x * q.z);
+		float zp = (a * q.z) + (z * q.a) + (x * q.y) - (y * q.x);
+		float ap = (a * q.a) - (x * q.x) - (y * q.y) - (z * q.z);
+
+		x = xp;
+		y = yp;
+		z = zp;
+		a = ap;
+		return *this;
+	}
 
 	// Devides each component of this quaternion by val.
-	quat& operator/=(float val);
+	quat& operator/=(float val) noexcept
+	{
+		assert(!approx_equal(val, 0.f));
+
+		x /= val;
+		y /= val;
+		z /= val;
+		a /= val;
+		return *this;
+	}
 
 
 	float x, y, z, a;
 };
-
-// Multiplies each component of q by val.
-quat operator*(const quat& q, float val);
-
-// Multiplies each component of q by val.
-quat operator*(float val, const quat& q);
-
-// Calculates the Hamilton product of lsh and rhs quaternions.
-quat operator*(const quat& lhs, const quat& rhs);
-
-// Devides each component of q by val.
-quat operator/(const quat& q, float val);
-
-// Devides val by each component of q.
-quat operator/(float val, const quat& q);
-
-std::ostream& operator<<(std::ostream& out, const quat& q);
-
-std::wostream& operator<<(std::wostream& out, const quat& q);
-
-// Gets the conjugation result of the given quaternion.
-quat conjugate(const quat& q);
-
-// Computes the inverse(reciprocal) of the given quaternion. q* / (|q|^2)
-quat inverse(const quat& q);
-
-// Checks whether the specified quaternion is normalized.
-bool is_normalized(const quat& q);
-
-// Calculates the squared length of q.
-float len_squared(const quat& q);
-
-// Calculates the length of q.
-float len(const quat& q);
-
-// Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
-quat normalize(const quat& q);
-
-// Performs spherical-interpolation between unit quaternions (geometrical slerp).
-quat slerp(const quat& q, const quat& r, float factor);
-
-
-inline quat::quat() noexcept : x(0), y(0), z(0), a(0) {}
-
-inline quat::quat(float x, float y, float z, float a) noexcept : x(x), y(y), z(z), a(a) {}
-
-inline quat::quat(const float3& v, float a) noexcept : x(v.x), y(v.y), z(v.z), a(a) {}
-
-
-inline quat& quat::operator+=(const quat& q)
-{
-	x += q.x;
-	y += q.y;
-	z += q.z;
-	a += q.a;
-	return *this;
-}
-
-inline quat& quat::operator-=(const quat& q)
-{
-	x -= q.x;
-	y -= q.y;
-	z -= q.z;
-	a -= q.a;
-	return *this;
-}
-
-inline quat& quat::operator*=(float val)
-{
-	x *= val;
-	y *= val;
-	z *= val;
-	a *= val;
-	return *this;
-}
-
-inline quat& quat::operator*=(const quat& q)
-{
-	float xp = (a * q.x) + (x * q.a) + (y * q.z) - (z * q.y);
-	float yp = (a * q.y) + (y * q.a) + (z * q.x) - (x * q.z);
-	float zp = (a * q.z) + (z * q.a) + (x * q.y) - (y * q.x);
-	float ap = (a * q.a) - (x * q.x) - (y * q.y) - (z * q.z);
-
-	x = xp;
-	y = yp;
-	z = zp;
-	a = ap;
-	return *this;
-}
-
-inline quat& quat::operator/=(float val)
-{
-	assert(!approx_equal(val, 0.f));
-
-	x /= val;
-	y /= val;
-	z /= val;
-	a /= val;
-	return *this;
-}
 
 
 inline bool operator==(const quat& lhs, const quat& rhs)
@@ -180,17 +122,20 @@ inline quat operator-(const quat& q)
 	return quat(-q.x, -q.y, -q.z, -q.a);
 }
 
-inline quat operator*(const quat& q, float val)
+// Multiplies each component of q by val.
+inline quat operator*(const quat& q, float val) noexcept
 {
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
-inline quat operator*(float val, const quat& q)
+// Multiplies each component of q by val.
+inline quat operator*(float val, const quat& q) noexcept
 {
 	return quat(q.x * val, q.y * val, q.z * val, q.a * val);
 }
 
-inline quat operator*(const quat& lhs, const quat& rhs)
+// Calculates the Hamilton product of lsh and rhs quaternions.
+inline quat operator*(const quat& lhs, const quat& rhs) noexcept
 {
 	return quat(
 		(lhs.a * rhs.x) + (lhs.x * rhs.a) + (lhs.y * rhs.z) - (lhs.z * rhs.y),
@@ -200,37 +145,50 @@ inline quat operator*(const quat& lhs, const quat& rhs)
 	);
 }
 
-inline quat operator/(const quat& q, float val)
+// Devides each component of q by val.
+inline quat operator/(const quat& q, float val) noexcept
 {
 	assert(!approx_equal(val, 0.f));
 
 	return quat(q.x / val, q.y / val, q.z / val, q.a / val);
 }
 
-inline quat operator/(float val, const quat& q)
+// Devides val by each component of q.
+inline quat operator/(float val, const quat& q) noexcept
 {
 	return quat(val / q.x, val / q.y, val / q.z, val / q.a);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const quat& q)
-{
-	out << "quat(" << q.x << ", " << q.y << ", " << q.z << ", " << q.a << ")";
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const quat& q);
 
-inline std::wostream& operator<<(std::wostream& out, const quat& q)
-{
-	out << "quat(" << q.x << ", " << q.y << ", " << q.z << ", " << q.a << ")";
-	return out;
-}
+std::wostream& operator<<(std::wostream& out, const quat& q);
 
-
-inline quat conjugate(const quat& q) 
+// Gets the conjugation result of the given quaternion.
+inline quat conjugate(const quat& q) noexcept
 {
 	return quat(-q.x, -q.y, -q.z, q.a);
 }
 
-inline quat inverse(const quat& q)
+// Calculates the squared length of q.
+inline float len_squared(const quat& q) noexcept
+{
+	return (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.a * q.a);
+}
+
+// Calculates the length of q.
+inline float len(const quat& q) noexcept
+{
+	return std::sqrt(len_squared(q));
+}
+
+// Checks whether the specified quaternion is normalized.
+inline bool is_normalized(const quat& q) noexcept
+{
+	return approx_equal(len_squared(q), 1.0f);
+}
+
+// Computes the inverse(reciprocal) of the given quaternion. q* / (|q|^2)
+inline quat inverse(const quat& q) noexcept
 {
 	float l2 = len_squared(q);
 	assert(!approx_equal(l2, 0.f)); // A quaternion with len = 0 isn't invertible.
@@ -239,22 +197,8 @@ inline quat inverse(const quat& q)
 	return conjugate(q) * scalar;
 }
 
-inline bool is_normalized(const quat& q)
-{
-	return approx_equal(len_squared(q), 1.f);
-}
-
-inline float len_squared(const quat& q)
-{
-	return (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.a * q.a);
-}
-
-inline float len(const quat& q)
-{
-	return std::sqrt(len_squared(q));
-}
-
-inline quat normalize(const quat& q)
+// Returns a new quaternion which is normalized(unit length) copy of the given quaternion.
+inline quat normalize(const quat& q) noexcept
 {
 	float l2 = len_squared(q);
 
@@ -263,6 +207,16 @@ inline quat normalize(const quat& q)
 	float factor = 1.f / sqrt(l2);
 	return q * factor;
 }
+
+// Performs spherical-interpolation between unit quaternions (geometrical slerp).
+quat slerp(const quat& q, const quat& r, float factor);
+
+
+
+
+
+
+
 
 } // namespace cg
 

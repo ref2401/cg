@@ -28,19 +28,6 @@ struct float3 {
 	float3(float x, float y, float z) noexcept : x(x), y(y), z(z) {}
 
 
-	// Returns the first two components of this vector.
-	float2 xy() const noexcept
-	{
-		return float2(x, y);
-	}
-
-	// Returns the first two components of this vector.
-	float2 uv() const noexcept
-	{
-		return float2(x, y);
-	}
-
-
 	// Adds val to every component of the vector.
 	float3& operator+=(float val) noexcept
 	{
@@ -95,6 +82,19 @@ struct float3 {
 		y /= val;
 		z /= val;
 		return *this;
+	}
+
+
+	// Returns the first two components of this vector.
+	float2 xy() const noexcept
+	{
+		return float2(x, y);
+	}
+
+	// Returns the first two components of this vector.
+	float2 uv() const noexcept
+	{
+		return float2(x, y);
 	}
 
 
@@ -187,18 +187,9 @@ inline float3 operator/(float val, const float3& v) noexcept
 	return float3(val / v.x, val / v.y, val / v.z);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const float3& v) noexcept
-{
-	out << "float3(" << v.x << ", " << v.y << ", " << v.z << ")";
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const float3& v) noexcept;
 
-inline std::wostream& operator<<(std::wostream& out, const float3& v) noexcept
-{
-	out << "float3(" << v.x << ", " << v.y << ", " << v.z << ")";
-	return out;
-}
-
+std::wostream& operator<<(std::wostream& out, const float3& v) noexcept;
 
 // Constrains vector v to lie between two further vectors.
 // The function processes each component of the vector separately.

@@ -156,24 +156,16 @@ inline float2 operator/(const float2& v, float val) noexcept
 
 	return float2(v.x / val, v.y / val);
 }
-
+ 
 // Devides val by each component of v.
 inline float2 operator/(float val, const float2& v) noexcept
 {
 	return float2(val / v.x, val / v.y);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const float2& v)
-{
-	out << "float2(" << v.x << ", " << v.y << ")";
-	return out;
-}
+std::ostream& operator<<(std::ostream& out, const float2& v);
 
-inline std::wostream& operator<<(std::wostream& out, const float2& v)
-{
-	out << "float2(" << v.x << ", " << v.y << ")";
-	return out;
-}
+std::wostream& operator<<(std::wostream& out, const float2& v);
 
 // Constrains vector v to lie between two further vectors.
 // The function processes each component of the vector separately.
