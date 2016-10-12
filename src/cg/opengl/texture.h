@@ -209,7 +209,7 @@ public:
 		return _id;
 	}
 
-	// Reallocates a new mutable storage for thes texture object.
+	// Reallocates a new mutable storage for this texture object.
 	// Previous texture's contents will be lost.
 	void reallocate_storage(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
 

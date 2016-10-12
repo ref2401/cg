@@ -25,6 +25,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
+	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
 	config.material_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
 
@@ -172,7 +173,7 @@ void Deferred_lighting::init_geometry()
 
 	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
 	std::vector<Load_info> load_info_list = {
-		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
+		//Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
 		Load_info("../data/cube.obj", &_cmd_cube),
 		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};

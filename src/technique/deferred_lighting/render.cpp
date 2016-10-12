@@ -42,6 +42,7 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_viewport_size(viewport_size),
 	_tex_depth_map(Texture_format::depth_32f, viewport_size),
 	_tex_normal_smoothness(Texture_format::rgba_32f, viewport_size),
+	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
 	_tex_lighting_ambient_term(Texture_format::rgb_32f, viewport_size),
 	_tex_lighting_diffuse_term(Texture_format::rgb_32f, viewport_size),
 	_tex_lighting_specular_term(Texture_format::rgb_32f, viewport_size),
@@ -61,6 +62,7 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 	_viewport_size = viewport_size;
 	_tex_depth_map.set_size(_viewport_size);
 	_tex_normal_smoothness.set_size(_viewport_size);
+	_tex_shadow_map.set_size(_viewport_size);
 	_tex_lighting_ambient_term.set_size(_viewport_size);
 	_tex_lighting_diffuse_term.set_size(_viewport_size);
 	_tex_lighting_specular_term.set_size(_viewport_size);
@@ -246,11 +248,21 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 	}
 }
 
+// ----- Shadow_map_pass -----
+
+Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code) :
+	_gbuffer(gbuffer),
+	_prog(source_code)
+{
+	//_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+}
+
 // ----- Renderer -----
 
 Renderer::Renderer(const Renderer_config& config) :
 	_gbuffer(config.viewport_size, config.vertex_attrib_layout, config.rect_1x1_mesh_data),
 	_gbuffer_pass(_gbuffer, config.gbuffer_pass_code),
+	_shadow_map_pass(_gbuffer, config.shadow_map_pass_code),
 	_lighting_pass(_gbuffer, config.lighting_pass_dir_code),
 	_material_lighting_pass(_gbuffer, config.material_pass_code)
 {}

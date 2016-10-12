@@ -180,6 +180,7 @@ void Texture_2d::reallocate_storage(Texture_format format, uint2 size, size_t mi
 
 void Texture_2d::set_size(const cg::uint2 size) noexcept
 {
+	if (size == _size) return;
 	reallocate_storage(_format, size, _mipmap_level_count);
 }
 

@@ -9,11 +9,16 @@ Deferred lighting is devided into three main passes.
 
 	fills rgba32f texture. xyz: normal in the view space. w: material's smoothness property.
 
-2. Lighting_pass.
+2. Shadow_map_pass.
+
+	Variance Shadow Mapping
+	fills rg32f components of the shadow map texture with depth and squared depth. Depth values are in the directionnal light's space.
+
+3. Lighting_pass.
 
 	fills rgb32f ambient term, diffuse term, specular term textures.
  
-3. Material_pass.
+4. Material_pass.
 
 	The final pass that combines lighting pass's & shadow pass's results with material properties of every object on the scene.
 	fills rgb32f material lighting texture.
@@ -27,6 +32,8 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 - Point lights, spotlights instanced rendering.
 - Batch_size deduction.
 - light house model note
+- Encode/decode normal
+	- Material alpha mask (opaque, transparent)
 
 
 ## roadmap

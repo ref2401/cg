@@ -100,6 +100,29 @@ private:
 	GLint _u_arr_tex_specular_intensity_location = cg::opengl::Invalid::uniform_location;
 };
 
+class Shadow_map_pass_shader_program final {
+public:
+
+	Shadow_map_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+
+	Shadow_map_pass_shader_program(const Shadow_map_pass_shader_program&) = delete;
+
+	Shadow_map_pass_shader_program(Shadow_map_pass_shader_program&&) = delete;
+
+	~Shadow_map_pass_shader_program() noexcept = default;
+
+
+	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+
+	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
+
+private:
+	cg::opengl::Shader_program _prog;
+	GLint _u_projection_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_view_matrix_location = cg::opengl::Invalid::uniform_location;
+	GLint _u_arr_model_matrix_location = cg::opengl::Invalid::uniform_location;
+};
+
 } // namespace deferred_lighting
 
 #endif // TECHNIQUE_DEFERRED_LIGHTING_RENDER_PASS_SHADER_H_

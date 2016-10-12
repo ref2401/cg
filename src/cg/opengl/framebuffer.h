@@ -10,6 +10,55 @@
 namespace cg {
 namespace opengl {
 
+class Renderbuffer final {
+public:
+
+	Renderbuffer() noexcept = default;
+
+	Renderbuffer(Texture_format format, const uint2& size) noexcept;
+
+	Renderbuffer(const Renderbuffer&) = delete;
+
+	Renderbuffer(Renderbuffer&& rnd_buff) noexcept;
+
+	~Renderbuffer() noexcept;
+
+
+	Renderbuffer& operator=(Renderbuffer&& rnd_buff) noexcept;
+
+
+	// Texel format of the renderbuffer.
+	Texture_format format() const noexcept
+	{
+		return _format;
+	}
+
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+	// Reallocates a new storage for the renderbuffer object.
+	void reallocate_storate(Texture_format format, const uint2& size) noexcept;
+
+	//  Size of the renderbuffer in pixels.
+	uint2 size() const noexcept
+	{
+		return _size;
+	}
+
+	// Sets the new size of the renderbuffer. 
+	// Internally calls the reallocate_storage method. 
+	void set_size(const uint2& size) noexcept;
+
+private:
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::renderbuffer_id;
+	Texture_format _format = Texture_format::none;
+	uint2 _size = uint2::zero;
+};
+
 // Framebuffer object supports 8 simultaneous color attachments.
 class Framebuffer final {
 public:
@@ -25,20 +74,28 @@ public:
 
 	Framebuffer& operator=(Framebuffer&& fb) noexcept;
 
-	// Attach a texture as color attachment.
+	// Attaches a texture as color attachment.
 	void attach_color_texture(GLenum color_attachment, const Texture_2d& texture, size_t mipmap_index = 0) noexcept;
 
-	// Attach a texture as color attachment.
+	// Attaches a texture as color attachment.
 	void attach_color_texture(GLenum color_attachment, const Texture_2d_immut& texture, size_t mipmap_index = 0) noexcept;
 
-	// Attach a texture as depth attachment.
+	// Attaches a render buffer as depth atatchment.
+	void attach_depth_renderbuffer(const Renderbuffer& rnd_buff) noexcept;
+
+	// Attaches a texture as depth attachment.
 	void attach_depth_texture(const Texture_2d& texture, size_t mipmap_index = 0) noexcept;
 
-	// Attach a texture as depth attachment.
+	// Attaches a texture as depth attachment.
 	void attach_depth_texture(const Texture_2d_immut& texture, size_t mipmap_index = 0) noexcept;
 
+	// Clears color texture attachment point.
 	void detach_color_texture(GLenum color_attachment) noexcept;
 
+	// Clears depth renderbuffer attachment point.
+	void detach_depth_renderbuffer() noexcept;
+
+	// Clears depth texture attachment point.
 	void detach_depth_texture() noexcept;
 
 	GLuint id() const noexcept

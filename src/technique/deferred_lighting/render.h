@@ -99,6 +99,13 @@ public:
 		return _tex_normal_smoothness;
 	}
 
+	// Shadow_map_pass's render target texture.
+	// xy components contain depth and squared depth values in the directional light's space.
+	cg::opengl::Texture_2d& tex_shadow_map() noexcept
+	{
+		return _tex_shadow_map;
+	}
+
 	const cg::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _vertex_attrib_layout;
@@ -119,6 +126,7 @@ private:
 	cg::uint2 _viewport_size;
 	cg::opengl::Texture_2d _tex_depth_map;
 	cg::opengl::Texture_2d _tex_normal_smoothness;
+	cg::opengl::Texture_2d _tex_shadow_map;
 	cg::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::opengl::Texture_2d _tex_lighting_diffuse_term;
 	cg::opengl::Texture_2d _tex_lighting_specular_term;
@@ -212,12 +220,30 @@ private:
 	Material_lighting_pass_shader_program _prog;
 };
 
+class Shadow_map_pass final {
+public:
+
+	Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code);
+
+	Shadow_map_pass(const Shadow_map_pass&) = delete;
+
+	Shadow_map_pass(Shadow_map_pass&&) = delete;
+
+	~Shadow_map_pass() noexcept = default;
+
+private:
+	Gbuffer& _gbuffer;
+	cg::opengl::Framebuffer _fbo;
+	Shadow_map_pass_shader_program _prog;
+};
+
 struct Renderer_config final {
 
 	cg::opengl::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
+	cg::data::Shader_program_source_code shadow_map_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
 	cg::data::Shader_program_source_code material_pass_code;
 };
@@ -253,6 +279,7 @@ private:
 
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
+	Shadow_map_pass _shadow_map_pass;
 	Lighting_pass _lighting_pass;
 	Material_lighting_pass _material_lighting_pass;
 };

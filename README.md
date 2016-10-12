@@ -33,7 +33,7 @@ Later I would like to do the same using DirectX 11
 6. Tangent space debugging. Draw tangent space for each vertex. Also draw the final normal exctracted from normal-map
 7. By_line_iterator unittest: start reading file with it0, move the iterator to it1 and finish reading the file.
 8. os messages(events)
-	- fix mouse camera rotation. It's too sloppy.
+	- Fix mouse camera rotation. It's too sloppy.
 	- mouse wheel
 	- keyboard
 	- fullscreen (F11), max/min window
