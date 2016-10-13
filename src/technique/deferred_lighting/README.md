@@ -11,7 +11,8 @@ Deferred lighting is devided into three main passes.
 
 2. Shadow_map_pass.
 
-	Variance Shadow Mapping
+	Variance Shadow Mapping.
+	Gaussian filter.
 	fills rg32f components of the shadow map texture with depth and squared depth. Depth values are in the directionnal light's space.
 	Red & green components are always positive in spite of depth values are negative in the light's space.
 
@@ -52,7 +53,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 
 - get_batch_size (check all the shaders and choose one)
 
-- camera coration. Horz mouse offset always rotates around float3::unit_y; 
+- camera rotation. Horz mouse offset always rotates around float3::unit_y; 
 
 - post processing
 	- tonemapping, wtite to sRGB texture

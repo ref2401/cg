@@ -59,12 +59,14 @@ void main()
 	vec3 lighting_result = ambient_contrib + shadow_factor * (diffuse_contrib + specular_contrib);
 	rt_material_ligting_result = vec4(to_color_space(lighting_result, 0.45), 1);
 	
-	/*if (rt_material_ligting_result.x > rt_material_ligting_result.y) {
-		rt_material_ligting_result = vec4(compute_shadow_factor(ps_in.position_dls), 0, 0, 1);
-	}
-	else {
-		rt_material_ligting_result = vec4(compute_shadow_factor(ps_in.position_dls), 0, 0, 1);
-	}*/
+	//if (rt_material_ligting_result.x > rt_material_ligting_result.y) {
+	//	vec3 v = vec3(shadow_factor, shadow_factor, shadow_factor);
+	//	rt_material_ligting_result = vec4(v, 1);
+	//}
+	//else {
+	//	vec3 v = vec3(shadow_factor, shadow_factor, shadow_factor);
+	//	rt_material_ligting_result = vec4(v, 1);
+	//}
 }
 
 float compute_shadow_factor(vec3 position_dls)
@@ -79,15 +81,15 @@ float compute_shadow_factor(vec3 position_dls)
 	float m2 = moments.y;
 	float depth_dls = -position_dls.z;
 	
+	if (depth_dls < m1)
+		return 1.0;
+
 	float diff = depth_dls - m1;
-	if (diff > 0) {
-		// chebushev upper bound
-		float variance = max(m2 - m1 * m1, 0.00002);
-		return variance / (variance + pow(diff, 2));
-	}
-	else {
-		return 1;
-	}
+	float variance = max(0.05, m2 - m1 * m1);
+	float p_max = variance / (variance + diff * diff);
+
+	// light bleeding reduction
+	return smoothstep(0.15, 1.0, p_max);
 }
 
 vec3 to_color_space(vec3 rgb, float exponent)

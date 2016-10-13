@@ -37,3 +37,6 @@ Later I would like to do the same using DirectX 11
 	- mouse wheel
 	- keyboard
 	- fullscreen (F11), max/min window
+9. cg/rnd/utility/filter.h
+	- Compute kernel and pass it to Filter_shader_program. There shoudl be only one shader that takes kernel as uniform array.
+	- Gaussian kernel. Sharp/mid/soft peak

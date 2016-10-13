@@ -21,7 +21,6 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),
-	_gaussian_filter_shader_program(cg::rnd::utility::Gaussian_filter_kernel_size::radius_5),
 	_viewport_size(viewport_size),
 	_aux_depth_renderbuffer(Texture_format::depth_32f, viewport_size),
 	_tex_aux_render_target(Texture_format::rg_32f, viewport_size),
@@ -242,7 +241,8 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 
 Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code) :
 	_gbuffer(gbuffer),
-	_prog(source_code)
+	_prog(source_code),
+	_filter_shader_program(cg::rnd::utility::Filter_type::gaussian, cg::rnd::utility::Filter_kernel_radius::radius_03)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
 	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
@@ -288,14 +288,14 @@ void Shadow_map_pass::filter_shadow_map() noexcept
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(0, _gbuffer.tex_shadow_map().id());
 	
-	_gbuffer.gaussian_filter_shader_program().use_for_horizontal_pass();
+	_filter_shader_program.use_for_horizontal_pass();
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 
 	// vert filter pass (render to _gbuffer.tex_shadow_map())
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
 	glBindTextureUnit(0, _gbuffer.tex_aux_render_target().id());
 
-	_gbuffer.gaussian_filter_shader_program().use_for_vertical_pass();
+	_filter_shader_program.use_for_vertical_pass();
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 }
 

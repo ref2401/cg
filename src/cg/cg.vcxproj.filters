@@ -52,7 +52,7 @@
     <ClCompile Include="rnd\opengl\vertex_spec.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="rnd\utility\gaussian_filter.cpp">
+    <ClCompile Include="rnd\utility\filter_shader.cpp">
       <Filter>rnd\utility</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,7 +164,7 @@
     <ClInclude Include="rnd\opengl\vertex_spec.h">
       <Filter>rnd\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="rnd\utility\gaussian_filter.h">
+    <ClInclude Include="rnd\utility\filter_shader.h">
       <Filter>rnd\utility</Filter>
     </ClInclude>
   </ItemGroup>

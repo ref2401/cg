@@ -9,7 +9,7 @@
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
 #include "cg/rnd/opengl/opengl.h"
-#include "cg/rnd/utility/gaussian_filter.h"
+#include "cg/rnd/utility/filter_shader.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 
@@ -54,13 +54,6 @@ public:
 	const cg::rnd::opengl::Sampler& bilinear_sampler() const noexcept
 	{
 		return _bilinear_sampler;
-	}
-
-	// Gaussian filter shader that is used by render passes to filter their intermediate results.
-	// Usually the shader is used in conjuction with tex_aux_render_target.
-	cg::rnd::utility::Gaussian_filter_shader_program& gaussian_filter_shader_program() noexcept
-	{
-		return _gaussian_filter_shader_program;
 	}
 
 	// Default nearest sampler (clamp_to_edge).
@@ -146,7 +139,6 @@ private:
 	const cg::rnd::opengl::Vertex_attrib_layout _vertex_attrib_layout;
 	cg::rnd::opengl::Sampler _bilinear_sampler;
 	cg::rnd::opengl::Sampler _nearest_sampler;
-	cg::rnd::utility::Gaussian_filter_shader_program _gaussian_filter_shader_program;
 	cg::rnd::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
 	cg::rnd::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
@@ -277,6 +269,7 @@ private:
 	Gbuffer& _gbuffer;
 	cg::rnd::opengl::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
+	cg::rnd::utility::Filter_shader_program _filter_shader_program;
 };
 
 struct Renderer_config final {

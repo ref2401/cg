@@ -142,7 +142,10 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_dir_light.rgb = float3::unit_xyz;
 	_dir_light.intensity = 1.f;
 	_dir_light.ambient_intensity = 0.25f;
-	_dir_light.projection_matrix = orthographic_matrix(50, 50, len(_dir_light.position - _dir_light.target) - 50, len(_dir_light.position - _dir_light.target) + 50);
+	float width = 30.0f;
+	float height = width / _ctx.window().size().aspect_ratio<float>();
+	float distance_to_light = len(_dir_light.position - _dir_light.target);
+	_dir_light.projection_matrix = orthographic_matrix(width, height, -1, 1.5f * distance_to_light);
 
 	init_geometry();
 	init_renderables();
