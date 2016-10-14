@@ -13,12 +13,16 @@ Deferred lighting is devided into three main passes.
 
 	Variance Shadow Mapping.
 	Gaussian filter.
-	fills rg32f components of the shadow map texture with depth and squared depth. Depth values are in the directionnal light's space.
+	fills rg32f components of the shadow occlusion map texture with depth and squared depth. Depth values are in the directionnal light's space.
 	Red & green components are always positive in spite of depth values are negative in the light's space.
 
-3. Lighting_pass.
+	It's important that Shadow_map_pass is performed before Light_pass. The reason...
+
+3. Lighting_pass. 
 
 	fills rgb32f ambient term, diffuse term, specular term textures.
+
+3.1. Ambient_occlusion_pass.
  
 4. Material_pass.
 
@@ -31,6 +35,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 - Single vertex array object. 
 - Frame_packet, 2-3 Frame objects.
 - Uniform arrays are used heavily, uniform block would have done better. Unifrom array limitations.
+- Gbuffer render targets as 2D texture array.
 - Point lights, spotlights instanced rendering.
 - Batch_size deduction.
 - light house model note
@@ -52,6 +57,7 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 	- ambient occlusion
 
 - get_batch_size (check all the shaders and choose one)
+- Format uniform in all the shaders.
 
 - camera rotation. Horz mouse offset always rotates around float3::unit_y; 
 

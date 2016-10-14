@@ -24,9 +24,8 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_viewport_size(viewport_size),
 	_aux_depth_renderbuffer(Texture_format::depth_32f, viewport_size),
 	_tex_aux_render_target(Texture_format::rg_32f, viewport_size),
-	_tex_depth_map(Texture_format::depth_32f, viewport_size),
-	_tex_normal_smoothness(Texture_format::rgba_32f, viewport_size),
-	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
+	_tex_nds(Texture_format::rgba_32f, viewport_size),
+	_tex_shadow_occlusion_map(Texture_format::rgb_32f, viewport_size),
 	_tex_lighting_ambient_term(Texture_format::rgb_32f, viewport_size),
 	_tex_lighting_diffuse_term(Texture_format::rgb_32f, viewport_size),
 	_tex_lighting_specular_term(Texture_format::rgb_32f, viewport_size),
@@ -47,9 +46,8 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 
 	_aux_depth_renderbuffer.set_size(_viewport_size);
 	_tex_aux_render_target.set_size(_viewport_size);
-	_tex_depth_map.set_size(_viewport_size);
-	_tex_normal_smoothness.set_size(_viewport_size);
-	_tex_shadow_map.set_size(_viewport_size);
+	_tex_nds.set_size(_viewport_size);
+	_tex_shadow_occlusion_map.set_size(_viewport_size);
 	_tex_lighting_ambient_term.set_size(_viewport_size);
 	_tex_lighting_diffuse_term.set_size(_viewport_size);
 	_tex_lighting_specular_term.set_size(_viewport_size);
@@ -62,8 +60,8 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_sour
 	_prog(source_code),
 	_gbuffer(gbuffer)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_normal_smoothness());
-	_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_nds());
+	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
@@ -85,6 +83,14 @@ void Gbuffer_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+
+	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	//
+	//_fbo.set_read_buffer(GL_NONE);
 }
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -110,7 +116,9 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Shader_program_so
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT2, _gbuffer.tex_lighting_specular_term());
-	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2);
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT3, _gbuffer.tex_shadow_occlusion_map());
+	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, 
+		GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
 }
@@ -119,13 +127,11 @@ void Lighting_pass::begin() noexcept
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-	glClearColor(_clear_value_color.r, _clear_value_color.g, _clear_value_color.b, _clear_value_color.a);
+	glClearColor(_clear_value_color.x, _clear_value_color.y, _clear_value_color.z, _clear_value_color.y);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(0, _gbuffer.tex_normal_smoothness().id());
-	glBindSampler(1, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(1, _gbuffer.tex_depth_map().id());
+	glBindTextureUnit(0, _gbuffer.tex_nds().id());
 }
 
 void Lighting_pass::end() noexcept
@@ -160,9 +166,10 @@ void Lighting_pass::end() noexcept
 }
 
 void Lighting_pass::perform_directional_light_pass(const cg::mat4& projection_matrix, 
-	const Directional_light_params& dir_light) noexcept
+	const std::array<float3, 4>& far_plane_coords, const Directional_light_params& dir_light) noexcept
 {
 	_dir_prog.use(_gbuffer.viewport_size(), projection_matrix, dir_light);
+	_dir_prog.set_uniform_array_far_plane_coords(far_plane_coords);
 	
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
@@ -175,42 +182,38 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 	_prog(source_code)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_material_lighting_result());
-	_fbo.attach_depth_texture(_gbuffer.tex_depth_map());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
 }
 
-void Material_lighting_pass::begin(const mat4& projection_view_matrix, const Directional_light_params& dir_light) noexcept
+void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& view_matrix,
+	const Directional_light_params& dir_light) noexcept
 {
-	glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		glDepthMask(false);
-
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
 	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
 
-	_prog.use(projection_view_matrix, dir_light);
+	_prog.use(projection_matrix, view_matrix, dir_light);
 	// ambient term
-	glBindSampler(28, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(28, _gbuffer.tex_lighting_ambient_term().id());
+	glBindSampler(26, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(26, _gbuffer.tex_lighting_ambient_term().id());
 	// diffuse term
-	glBindSampler(29, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(29, _gbuffer.tex_lighting_diffuse_term().id());
+	glBindSampler(27, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(27, _gbuffer.tex_lighting_diffuse_term().id());
 	// specular term
-	glBindSampler(30, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(30, _gbuffer.tex_lighting_specular_term().id());
+	glBindSampler(28, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(28, _gbuffer.tex_lighting_specular_term().id());
+	// nds (normal, depth, smoothness)
+	glBindSampler(29, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(29, _gbuffer.tex_nds().id());
 	// shadow map
-	glBindSampler(31, _gbuffer.bilinear_sampler().id());
-	glBindTextureUnit(31, _gbuffer.tex_shadow_map().id());
+	glBindSampler(30, _gbuffer.bilinear_sampler().id());
+	glBindTextureUnit(30, _gbuffer.tex_shadow_occlusion_map().id());
 }
 
 void Material_lighting_pass::end() noexcept
 {
-	glDisable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glDepthMask(true);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
 	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
@@ -229,11 +232,11 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
-		// 14 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
+		// 13 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
 		glBindSampler(curr_unit, Invalid::sampler_id);
-		glBindSampler(curr_unit + 14, Invalid::sampler_id);
+		glBindSampler(curr_unit + 13, Invalid::sampler_id);
 		glBindTextureUnit(curr_unit, uniform_array_tex_diffuse_rgb[rnd_offset + curr_unit]);
-		glBindTextureUnit(curr_unit + 14, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
+		glBindTextureUnit(curr_unit + 13, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
 	}
 }
 
@@ -244,9 +247,10 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_progra
 	_prog(source_code),
 	_filter_shader_program(cg::rnd::utility::Filter_type::gaussian, cg::rnd::utility::Filter_kernel_radius::radius_03)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_occlusion_map());
+	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
 	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
-	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1);
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
 }
@@ -254,10 +258,11 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Shader_progra
 void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
+	glColorMask(true, true, false, false);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-	glClearBufferfv(GL_COLOR, 0, _clear_value_shadow_map);
+	glClearBufferfv(GL_COLOR, 0, _clear_value_shadow_occlusion);
 	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth);
 
 	_prog.use(dir_light);
@@ -266,6 +271,8 @@ void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
 void Shadow_map_pass::end() noexcept
 {
 	glDisable(GL_DEPTH_TEST);
+	glColorMask(true, true, true, true);
+
 	filter_shadow_map();
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
@@ -283,16 +290,16 @@ void Shadow_map_pass::filter_shadow_map() noexcept
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 
 	// horz filter pass (render to _gbuffer.tex_aux_render_target())
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_aux_render_target());
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT1);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
-	glBindTextureUnit(0, _gbuffer.tex_shadow_map().id());
+	glBindTextureUnit(0, _gbuffer.tex_shadow_occlusion_map().id());
 	
 	_filter_shader_program.use_for_horizontal_pass();
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 
 	// vert filter pass (render to _gbuffer.tex_shadow_map())
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	glBindTextureUnit(0, _gbuffer.tex_aux_render_target().id());
 
 	_filter_shader_program.use_for_vertical_pass();
@@ -378,13 +385,14 @@ void Renderer::perform_shadow_map_pass(const Frame& frame) noexcept
 void Renderer::perform_lighting_pass(const Frame& frame) noexcept
 {
 	_lighting_pass.begin();
-	_lighting_pass.perform_directional_light_pass(frame.projection_matrix, frame.directional_light);
+	_lighting_pass.perform_directional_light_pass(frame.projection_matrix,
+		frame.far_plane_coords, frame.directional_light);
 	_lighting_pass.end();
 }
 
 void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept
 {
-	_material_lighting_pass.begin(frame.projection_view_matrix(), frame.directional_light);
+	_material_lighting_pass.begin(frame.projection_matrix, frame.view_matrix, frame.directional_light);
 
 	// for each frame packet
 	glBindVertexArray(frame.vao_id());
@@ -419,8 +427,8 @@ void Renderer::render(const Frame& frame) noexcept
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	perform_gbuffer_pass(frame);
-	perform_shadow_map_pass(frame);
 	perform_lighting_pass(frame);
+	perform_shadow_map_pass(frame);
 	perform_material_lighting_pass(frame);
 }
 

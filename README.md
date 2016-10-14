@@ -40,3 +40,7 @@ Later I would like to do the same using DirectX 11
 9. cg/rnd/utility/filter.h
 	- Compute kernel and pass it to Filter_shader_program. There shoudl be only one shader that takes kernel as uniform array.
 	- Gaussian kernel. Sharp/mid/soft peak
+10. math
+10.1. Plane <n, d>
+10.2. Rect_3d
+10.3. Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()

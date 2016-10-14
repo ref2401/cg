@@ -5,31 +5,32 @@
 // GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 16
 // that leaves us 32 texture units for the pixel shader.
 //
+// u_arr_tex_diffuse_rgb:							13
+// u_arr_tex_specular_intensity:					13
 // u_tex_lighting_{ambient/diffuer/specular}_term:	3
+// u_tex_nds:										1
 // u_tex_shadow_map:								1
-// u_arr_tex_diffuse_rgb:							14
-// u_arr_tex_specular_intensity:					14
-//										total :		32
-//										unused:		0
-// batch_size for the pixel shader = 14. draw_call_index is in [0, 14).
+//										total :		31
+//										unused:		1
+// batch_size for the pixel shader = 13. draw_call_index is in [0, 13).
 
 						uniform	mat4		u_dir_light_projection_matrix;
-layout(binding = 0)		uniform sampler2D	u_arr_tex_diffuse_rgb[14];
-layout(binding = 14)	uniform sampler2D	u_arr_tex_specular_intensity[14];
-layout(binding = 28)	uniform sampler2D	u_tex_lighting_ambient_term;
-layout(binding = 29)	uniform sampler2D	u_tex_lighting_deffure_term;
-layout(binding = 30)	uniform sampler2D	u_tex_lighting_specular_term;
-layout(binding = 31)	uniform sampler2D	u_tex_shadow_map;
+layout(binding = 0)		uniform sampler2D	u_arr_tex_diffuse_rgb[13];
+layout(binding = 13)	uniform sampler2D	u_arr_tex_specular_intensity[13];
+layout(binding = 26)	uniform sampler2D	u_tex_lighting_ambient_term;
+layout(binding = 27)	uniform sampler2D	u_tex_lighting_deffure_term;
+layout(binding = 28)	uniform sampler2D	u_tex_lighting_specular_term;
+layout(binding = 29)	uniform sampler2D	u_tex_nds;
+layout(binding = 30)	uniform sampler2D	u_tex_shadow_map;
 
 
 in Pixel_data_i {
 	vec3 position_dls; // position in the direction light's space.
+	float depth_vs;
 	vec2 tex_coord;
 	flat uint draw_call_index;
 } ps_in;
 
-
-layout(depth_unchanged) out float gl_FragDepth; // force early depth test
 layout(location = 0) out vec4 rt_material_ligting_result;
 
 
@@ -43,6 +44,10 @@ vec3 to_color_space(vec3 rgb, float exponent);
 void main()
 {
 	ivec2 screen_uv = ivec2(gl_FragCoord.xy);
+
+	// depth test
+	float depth_vs = texelFetch(u_tex_nds, screen_uv, 0).z;
+	if (abs(ps_in.depth_vs - depth_vs) > 0.001) discard;
 	
 	vec3 ambient_term = texelFetch(u_tex_lighting_ambient_term, screen_uv, 0).rgb;
 	vec3 diffuse_term = texelFetch(u_tex_lighting_deffure_term, screen_uv, 0).rgb;
@@ -60,12 +65,10 @@ void main()
 	rt_material_ligting_result = vec4(to_color_space(lighting_result, 0.45), 1);
 	
 	//if (rt_material_ligting_result.x > rt_material_ligting_result.y) {
-	//	vec3 v = vec3(shadow_factor, shadow_factor, shadow_factor);
-	//	rt_material_ligting_result = vec4(v, 1);
+	//	rt_material_ligting_result = vec4(ps_in.depth_vs - depth_vs, ps_in.depth_vs, depth_vs, 1);
 	//}
 	//else {
-	//	vec3 v = vec3(shadow_factor, shadow_factor, shadow_factor);
-	//	rt_material_ligting_result = vec4(v, 1);
+	//	rt_material_ligting_result = vec4(ps_in.depth_vs - depth_vs, ps_in.depth_vs, depth_vs, 1);
 	//}
 }
 

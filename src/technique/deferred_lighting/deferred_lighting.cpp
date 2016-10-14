@@ -39,7 +39,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::position);
+	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::mesh_textured);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
 	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
@@ -129,7 +129,6 @@ Material_library::Material_library()
 
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
-	_projection_matrix(perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50)),
 	_curr_viewpoint(float3(2, 2, 4), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
@@ -147,6 +146,8 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	float distance_to_light = len(_dir_light.position - _dir_light.target);
 	_dir_light.projection_matrix = orthographic_matrix(width, height, -1, 1.5f * distance_to_light);
 
+	update_viewpoint_projection();
+
 	init_geometry();
 	init_renderables();
 }
@@ -157,6 +158,7 @@ void Deferred_lighting::begin_render(float blend_factor)
 
 	_frame.reset(_vertex_spec0);
 
+	_frame.far_plane_coords = _far_plane_coords;
 	_frame.projection_matrix = _projection_matrix;
 	_frame.view_matrix = view_matrix(_prev_viewpoint, _curr_viewpoint, blend_factor);
 	_frame.directional_light = get_directional_light_params(_frame.view_matrix, _dir_light);
@@ -274,7 +276,7 @@ void Deferred_lighting::on_mouse_move()
 
 void Deferred_lighting::on_window_resize()
 {
-	_projection_matrix = cg::perspective_matrix(cg::pi_3, _ctx.window().size().aspect_ratio(), 1, 50);
+	update_viewpoint_projection();
 	_renderer.resize_viewport(_ctx.window().size());
 }
 
@@ -311,6 +313,22 @@ void Deferred_lighting::update(float dt)
 	}
 
 	_view_roll_angles = float2::zero;
+}
+
+void Deferred_lighting::update_viewpoint_projection()
+{
+	float near_z = 1;
+	float far_z = 50;
+	float vert_fov = cg::pi_3;
+	float wh_ratio = _ctx.window().size().aspect_ratio();
+	_projection_matrix = cg::perspective_matrix(vert_fov, wh_ratio, near_z, far_z);
+
+	float far_y = far_z * std::tan(vert_fov * 0.5f);
+	float far_x = far_y * wh_ratio;
+	_far_plane_coords[0] = float3(-far_x, -far_y, -far_z); // left-bottom
+	_far_plane_coords[1] = float3( far_x, -far_y, -far_z); // right-bottom
+	_far_plane_coords[2] = float3( far_x,  far_y, -far_z); // right-top
+	_far_plane_coords[3] = float3(-far_x,  far_y, -far_z); // left-top
 }
 
 } // namespace deferred_lighting

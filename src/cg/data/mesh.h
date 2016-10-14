@@ -99,8 +99,6 @@ struct Interleaved_vertex_format final {
 	// How many components are there before normal data starts.
 	size_t component_offset_normal() const noexcept
 	{
-		if (!has_normal(attribs)) return 0;
-
 		size_t prior_cmpt_count = has_position(attribs)
 			? (Interleaved_vertex_format::component_count_position)
 			: 0u;
@@ -116,8 +114,6 @@ struct Interleaved_vertex_format final {
 	// How many components are there before tangent_h data starts.
 	size_t component_offset_tangent_h() const noexcept
 	{
-		if (!has_tangent_h(attribs)) return 0;
-
 		size_t prior_cmpt_count = has_tex_coord(attribs)
 			? (Interleaved_vertex_format::component_count_tex_coord)
 			: 0u;
@@ -127,8 +123,6 @@ struct Interleaved_vertex_format final {
 	// How many components are there before tex_coord data starts.
 	size_t component_offset_tex_coord() const noexcept
 	{
-		if (!has_tex_coord(attribs)) return 0;
-
 		size_t prior_cmpt_count = has_normal(attribs)
 			? (Interleaved_vertex_format::component_count_normal)
 			: 0u;

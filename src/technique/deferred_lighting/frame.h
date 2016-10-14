@@ -150,6 +150,11 @@ public:
 
 	Directional_light_params directional_light;
 
+	// Viewpoint(camera) far plane coordinaces.
+	// left-bottom, right-bottom, right-top, left-top.
+	// All the coordinates are in the view space.
+	std::array<cg::float3, 4> far_plane_coords;
+
 	// Viewpoint(camera) projection matrix
 	cg::mat4 projection_matrix = cg::mat4::identity;
 

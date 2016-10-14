@@ -1,6 +1,7 @@
 #ifndef TECHNIQUE_DEFERRED_LIGHTING_RENDER_PASS_SHADER_H_
 #define TECHNIQUE_DEFERRED_LIGHTING_RENDER_PASS_SHADER_H_
 
+#include <array>
 #include "cg/data/shader.h"
 #include "cg/rnd/opengl/opengl.h"
 
@@ -51,7 +52,7 @@ public:
 
 private:
 	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_projection_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_arr_smoothness_location = cg::rnd::opengl::Invalid::uniform_location;
@@ -70,13 +71,16 @@ public:
 	~Lighting_pass_dir_shader_program() noexcept = default;
 
 
+	void set_uniform_array_far_plane_coords(const std::array<cg::float3, 4>& far_plane_coords) noexcept;
+
 	void use(const cg::uint2& viewport_size, const cg::mat4& projection_matrix,
-		const Directional_light_params& dl_params) noexcept;
+		 const Directional_light_params& dl_params) noexcept;
 
 private:
 	cg::rnd::opengl::Shader_program _prog;
 	GLint _u_viewport_size_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_inv_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_arr_far_pane_coords_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dlight_direction_to_light_vs_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dlight_irradiance_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dlight_ambient_irradiance_up_location = cg::rnd::opengl::Invalid::uniform_location;
@@ -97,11 +101,13 @@ public:
 
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
-	void use(const cg::mat4& projection_view_matrix, const Directional_light_params& dir_light) noexcept;
+	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix,
+		const Directional_light_params& dir_light) noexcept;
 
 private:
 	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_projection_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dir_light_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dir_light_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;

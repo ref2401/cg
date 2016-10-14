@@ -1,6 +1,7 @@
 #ifndef TECHNIQUE_DEFERRED_LIGHTING_DEFERRED_LIGHTING_H_
 #define TECHNIQUE_DEFERRED_LIGHTING_DEFERRED_LIGHTING_H_
 
+#include <array>
 #include <vector>
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl.h"
@@ -118,12 +119,16 @@ private:
 
 	void init_renderables();
 
+	void update_viewpoint_projection();
+
 	// scene
+	Directional_light _dir_light;
 	std::vector<Renderable> _rednerable_objects;
+	// scene viewpoint (camera)
 	cg::mat4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
-	Directional_light _dir_light;
+	std::array<cg::float3, 4> _far_plane_coords; // left-bottom, right-bottom, right-top, left-top
 	// renderer stuff
 	Renderer _renderer;
 	Frame _frame;

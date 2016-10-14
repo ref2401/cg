@@ -369,6 +369,15 @@ void set_uniform_array<float, float>(GLint location, const float* ptr, size_t co
 }
 
 template<>
+void set_uniform_array<float3, float>(GLint location, const float* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniform3fv(location, count, ptr);
+}
+
+template<>
 void set_uniform_array<mat3, mat3>(GLint location, const mat3* ptr, size_t count) noexcept
 {
 	assert(location != Invalid::uniform_location);

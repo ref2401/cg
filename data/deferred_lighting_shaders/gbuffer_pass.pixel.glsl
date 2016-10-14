@@ -16,11 +16,14 @@ in Pixel_data_i {
 	vec3 tangent_vs;
 	vec3 bitanget_vs;
 	vec2 tex_coord;
+	float depth_vs;
 	flat uint draw_call_index;
 } ps_in;
 
-layout(location = 0) out vec4 rt_normal_smoothness;
+layout(location = 0) out vec4 rt_nds; // normal, depth, smoothness
 
+
+vec2 encode_normal_vs(vec3 normal_vs);
 
 void main()
 {
@@ -34,5 +37,13 @@ void main()
 	normal_ts = 2.0 * normal_ts - 1.0;
 	vec3 actual_normal_vs = normalize(view_space_matrix * normal_ts);
 
-	rt_normal_smoothness = vec4(actual_normal_vs, u_arr_smoothness[ps_in.draw_call_index].x);
+	rt_nds = vec4(
+		encode_normal_vs(actual_normal_vs),
+		ps_in.depth_vs,
+		u_arr_smoothness[ps_in.draw_call_index].x);
+}
+
+vec2 encode_normal_vs(vec3 normal_vs)
+{
+	return vec2(normal_vs.xy * 0.5 + 0.5);
 }
