@@ -45,6 +45,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
 	config.ssao_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/ssao_pass");
 	config.material_lighting_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
+	config.tone_mapping_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/tone_mapping_pass");
 
 	return config;
 }
@@ -112,6 +113,16 @@ Material_library::Material_library()
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
 		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, material_default_normal_map);
 		_chess_board_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_repeat, specular_intensity_0_18_image);
+	}
+
+	{ // teapot material
+		auto diffuse_rgb_image = cg::file::load_image_tga("../data/teapot-diffuse-rgb.tga");
+		auto normal_map_image = cg::file::load_image_tga("../data/teapot-normal-map.tga");
+
+		_teapot_material.smoothness = 10.0f;
+		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
+		_teapot_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, normal_map_image);
+		_teapot_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, nearest_clamp_to_edge, specular_intensity_1_00_image);
 	}
 
 	{ // wooden box
@@ -195,7 +206,8 @@ void Deferred_lighting::init_geometry()
 
 	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
 	std::vector<Load_info> load_info_list = {
-		//Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
+		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
+		Load_info("../data/teapot_top.obj", &_cmd_teapot_top, 10656, 10656),
 		Load_info("../data/cube.obj", &_cmd_cube),
 		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};
@@ -221,35 +233,44 @@ void Deferred_lighting::init_renderables()
 		ts_matrix(float3::zero, float3(5)),
 		_material_library.chess_board_material());
 
-	// brick cubes
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(-1, 0.5f, -1)),
-		_material_library.brick_wall_material());
+	// teapot
+	_rednerable_objects.emplace_back(_cmd_teapot_top,
+		ts_matrix(float3::zero, float3(0.03f)),
+		_material_library.teapot_material());
 
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(-1, 1.5f, -1)),
-		_material_library.brick_wall_material());
+	_rednerable_objects.emplace_back(_cmd_teapot_base,
+		ts_matrix(float3::zero, float3(0.03f)),
+		_material_library.teapot_material());
 
-	// wooden cubes
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(-1, 2.5f, -1)),
-		_material_library.wooden_box_material());
+	//// brick cubes
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(-1, 0.5f, -1)),
+	//	_material_library.brick_wall_material());
 
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(-2, 0.5f, -1)),
-		_material_library.wooden_box_material());
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(-1, 1.5f, -1)),
+	//	_material_library.brick_wall_material());
 
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(-2, 0.5f, 0)),
-		_material_library.wooden_box_material());
+	//// wooden cubes
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(-1, 2.5f, -1)),
+	//	_material_library.wooden_box_material());
 
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(0, 0.5f, -1)),
-		_material_library.wooden_box_material());
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(-2, 0.5f, -1)),
+	//	_material_library.wooden_box_material());
 
-	_rednerable_objects.emplace_back(_cmd_cube,
-		translation_matrix(float3(1, 0.5f, -1)),
-		_material_library.wooden_box_material());
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(-2, 0.5f, 0)),
+	//	_material_library.wooden_box_material());
+
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(0, 0.5f, -1)),
+	//	_material_library.wooden_box_material());
+
+	//_rednerable_objects.emplace_back(_cmd_cube,
+	//	translation_matrix(float3(1, 0.5f, -1)),
+	//	_material_library.wooden_box_material());
 }
 
 void Deferred_lighting::on_mouse_move()
@@ -269,10 +290,10 @@ void Deferred_lighting::on_mouse_move()
 		_view_roll_angles.y += (offset_ndc.x > 0.f) ? -pi_64 : pi_64;
 	}
 
-	//// mouse offset by x means rotation around OX (pitch)
-	//if (y_offset_satisfies) {
-	//	_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
-	//}
+	// mouse offset by x means rotation around OX (pitch)
+	if (y_offset_satisfies) {
+		_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
+	}
 }
 
 void Deferred_lighting::on_window_resize()

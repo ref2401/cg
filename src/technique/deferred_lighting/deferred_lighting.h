@@ -58,6 +58,11 @@ public:
 		return get_material_instance(_default_material);
 	}
 
+	Material_instance teapot_material() const noexcept
+	{
+		return  get_material_instance(_teapot_material);
+	}
+
 	Material_instance wooden_box_material() const noexcept
 	{
 		return get_material_instance(_wooden_box_material);
@@ -88,6 +93,7 @@ private:
 	Material _default_material;
 	Material _brick_wall_material;
 	Material _chess_board_material;
+	Material _teapot_material;
 	Material _wooden_box_material;
 };
 
@@ -138,6 +144,7 @@ private:
 	cg::rnd::opengl::DE_cmd _cmd_cube;
 	cg::rnd::opengl::DE_cmd _cmd_rect_2x2_repeat;
 	cg::rnd::opengl::DE_cmd _cmd_teapot_base;
+	cg::rnd::opengl::DE_cmd _cmd_teapot_top;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;

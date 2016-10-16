@@ -144,4 +144,15 @@ void Ssao_pass_shader_program::use(const std::vector<float3>& sample_rays_and_no
 		reinterpret_cast<const float*>(sample_rays_and_normals.data() + sample_ray_count), random_normal_count);
 }
 
+// ----- Tone_mapping_pass_shader_program -----
+
+Tone_mapping_pass_shader_program::Tone_mapping_pass_shader_program(const cg::data::Shader_program_source_code& source_code) :
+	_prog("tone-mapping-pass-shader", source_code)
+{}
+
+void Tone_mapping_pass_shader_program::use() noexcept
+{
+	glUseProgram(_prog.id());
+}
+
 } // namespace deferred_lighting

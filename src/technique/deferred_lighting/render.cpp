@@ -336,6 +336,27 @@ void Ssao_pass::filter_ssao_map() noexcept
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 }
 
+// ----- Tone_mapping_pass -----
+
+Tone_mapping_pass::Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code) :
+	_gbuffer(gbuffer),
+	_prog(source_code)
+{}
+
+void Tone_mapping_pass::perform() noexcept
+{
+	// renders directly into the back buffer.
+	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
+
+	glBindSampler(0, _gbuffer.nearest_sampler().id());
+	glBindTextureUnit(0, _gbuffer.tex_material_lighting_result().id());
+	_prog.use();
+
+	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
+	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
+}
+
 // ----- Renderer -----
 
 Renderer::Renderer(const Renderer_config& config) :
@@ -344,7 +365,8 @@ Renderer::Renderer(const Renderer_config& config) :
 	_lighting_pass(_gbuffer, config.lighting_pass_dir_code),
 	_shadow_map_pass(_gbuffer, config.shadow_map_pass_code),
 	_ssao_pass(_gbuffer, config.ssao_pass_code),
-	_material_lighting_pass(_gbuffer, config.material_lighting_pass_code)
+	_material_lighting_pass(_gbuffer, config.material_lighting_pass_code),
+	_tone_mapping_pass(_gbuffer, config.tone_mapping_pass_code)
 {}
 
 void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
@@ -451,6 +473,7 @@ void Renderer::render(const Frame& frame) noexcept
 	perform_shadow_map_pass(frame);
 	_ssao_pass.perform();
 	perform_material_lighting_pass(frame);
+	//_tone_mapping_pass.perform();
 }
 
 void Renderer::resize_viewport(const uint2& size) noexcept

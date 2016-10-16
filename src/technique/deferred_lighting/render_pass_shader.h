@@ -156,6 +156,24 @@ private:
 	GLint _u_arr_random_normal_location = cg::rnd::opengl::Invalid::uniform_location;
 };
 
+class Tone_mapping_pass_shader_program final {
+public:
+
+	Tone_mapping_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+
+	Tone_mapping_pass_shader_program(const Tone_mapping_pass_shader_program&) = delete;
+
+	Tone_mapping_pass_shader_program(Tone_mapping_pass_shader_program&&) = delete;
+
+	~Tone_mapping_pass_shader_program() noexcept = default;
+
+
+	void use() noexcept;
+
+private:
+	cg::rnd::opengl::Shader_program _prog;
+};
+
 } // namespace deferred_lighting
 
 #endif // TECHNIQUE_DEFERRED_LIGHTING_RENDER_PASS_SHADER_H_

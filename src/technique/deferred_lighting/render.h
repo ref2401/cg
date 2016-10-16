@@ -156,7 +156,7 @@ private:
 	cg::rnd::opengl::Texture_2d _tex_nds;
 	cg::rnd::opengl::Texture_2d _tex_shadow_map;
 	cg::rnd::opengl::Texture_2d _tex_ssao_map;
-	cg::rnd::opengl::Texture_2d _tex_ssao_map_aux; // is used to filter ssao map
+	cg::rnd::opengl::Texture_2d _tex_ssao_map_aux; //  the texture is used to filter ssao map
 };
 
 class Gbuffer_pass final {
@@ -311,6 +311,27 @@ private:
 	cg::rnd::utility::Filter_shader_program _filter_shader_program;
 };
 
+class Tone_mapping_pass final {
+public:
+
+	Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code);
+
+	Tone_mapping_pass(const Tone_mapping_pass&) = delete;
+
+	Tone_mapping_pass(Tone_mapping_pass&&) = delete;
+
+	~Tone_mapping_pass() noexcept = default;
+
+
+	void perform() noexcept;
+
+private:
+	const cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
+
+	Gbuffer& _gbuffer;
+	Tone_mapping_pass_shader_program _prog;
+};
+
 struct Renderer_config final {
 
 	cg::rnd::opengl::Vertex_attrib_layout vertex_attrib_layout;
@@ -318,9 +339,10 @@ struct Renderer_config final {
 	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
+	cg::data::Shader_program_source_code material_lighting_pass_code;
 	cg::data::Shader_program_source_code shadow_map_pass_code;
 	cg::data::Shader_program_source_code ssao_pass_code;
-	cg::data::Shader_program_source_code material_lighting_pass_code;
+	cg::data::Shader_program_source_code tone_mapping_pass_code;
 };
 
 class Renderer final {
@@ -360,6 +382,7 @@ private:
 	Shadow_map_pass _shadow_map_pass;
 	Ssao_pass _ssao_pass;
 	Material_lighting_pass _material_lighting_pass;
+	Tone_mapping_pass _tone_mapping_pass;
 };
 
 } // namespace deferred_lighting
