@@ -317,6 +317,13 @@ Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
 // ----- funcs -----
 
 template<>
+void set_uniform<float>(GLint location, const float& val) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform1f(location, val);
+}
+
+template<>
 void set_uniform<uint2>(GLint location, const uint2& v) noexcept
 {
 	assert(location != Invalid::uniform_location);

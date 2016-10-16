@@ -47,6 +47,18 @@ public:
 		Assert::AreEqual(1, clamp(1, -1, 1));
 		Assert::AreEqual(1, clamp(24, -1, 1));
 	}
+
+	TEST_METHOD(lerp)
+	{
+		using cg::lerp;
+
+		Assert::AreEqual(0.0f, lerp(0.0f, 1.0f, 0.0f));
+		Assert::AreEqual(0.6f, lerp(0.0f, 1.0f, 0.6f));
+		Assert::AreEqual(1.0f, lerp(0.0f, 1.0f, 1.0f));
+
+		Assert::AreEqual(24.0f, lerp(24.0f, 24.0f, 0.4f));
+		Assert::AreEqual(24.0f, lerp(24.0f, 24.0f, 0.7f));
+	}
 };
 
 } // unittest

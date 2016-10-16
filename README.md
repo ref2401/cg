@@ -23,6 +23,7 @@ Later I would like to do the same using DirectX 11
 5.4. light house
 6. light scattering (GPU Pro 5)
 7. Screen space reflection
+8. Horizon-Base Ambient Occlusion +
 
 # TODO
 1. Static_vertex_spec owns 2 Static_buffers
@@ -44,3 +45,4 @@ Later I would like to do the same using DirectX 11
 10.1. Plane <n, d>
 10.2. Rect_3d
 10.3. Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
+10.4. move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.

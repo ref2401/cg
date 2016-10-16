@@ -14,7 +14,7 @@ size_t get_batch_size() noexcept
 {
 	// max_texture_unit_count
 	// const size_t _batch_size = 62; // see gbuffer_pass.vertex.glsl
-	return 2;
+	return 4;
 }
 
 Static_buffer make_draw_index_buffer(size_t draw_call_count)

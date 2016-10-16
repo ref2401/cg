@@ -84,6 +84,8 @@ public:
 	// How many batches are in the frame.
 	size_t batch_count() const noexcept
 	{
+		if (_renderable_count == 0) return 0;
+
 		size_t partial_batch = (_renderable_count % _batch_size > 0) ? 1 : 0;
 		return _renderable_count / _batch_size + partial_batch;
 	}

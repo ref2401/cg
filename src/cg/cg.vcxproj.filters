@@ -55,6 +55,9 @@
     <ClCompile Include="rnd\utility\filter_shader.cpp">
       <Filter>rnd\utility</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\utility\utility_rnd.cpp">
+      <Filter>rnd\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -165,6 +168,9 @@
       <Filter>rnd\opengl</Filter>
     </ClInclude>
     <ClInclude Include="rnd\utility\filter_shader.h">
+      <Filter>rnd\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\utility\utility.h">
       <Filter>rnd\utility</Filter>
     </ClInclude>
   </ItemGroup>

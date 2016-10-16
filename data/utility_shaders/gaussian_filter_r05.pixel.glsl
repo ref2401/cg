@@ -1,6 +1,7 @@
 #version 450 core
 
 // 0.000006	0.000883 0.029507 0.235589 0.468029 0.235589 0.029507 0.000883 0.000006
+// 0.028532 0.067234 0.124009 0.179044 0.20236 0.179044 0.124009 0.067234 0.028532
 
 
 layout(binding = 0) uniform sampler2D	u_tex_source;
@@ -18,15 +19,15 @@ void main() {
 	const ivec2 offset_mul_04 = 4 * offset;
 
 	vec4 accum = vec4(0);
-	accum += texelFetch(u_tex_source, uv - offset_mul_04, 0)	* 0.000006;
-	accum += texelFetch(u_tex_source, uv - offset_mul_03, 0)	* 0.000883;
-	accum += texelFetch(u_tex_source, uv - offset_mul_02, 0)	* 0.029507;
-	accum += texelFetch(u_tex_source, uv - offset, 0)			* 0.235589;
-	accum += texelFetch(u_tex_source, uv, 0)					* 0.468029;
-	accum += texelFetch(u_tex_source, uv + offset, 0)			* 0.235589;
-	accum += texelFetch(u_tex_source, uv + offset_mul_02, 0)	* 0.029507;
-	accum += texelFetch(u_tex_source, uv + offset_mul_03, 0)	* 0.000883;
-	accum += texelFetch(u_tex_source, uv + offset_mul_04, 0)	* 0.000006;
+	accum += texelFetch(u_tex_source, uv - offset_mul_04, 0)	* 0.028532;
+	accum += texelFetch(u_tex_source, uv - offset_mul_03, 0)	* 0.067234;
+	accum += texelFetch(u_tex_source, uv - offset_mul_02, 0)	* 0.124009;
+	accum += texelFetch(u_tex_source, uv - offset, 0)			* 0.179044;
+	accum += texelFetch(u_tex_source, uv, 0)					* 0.20236;
+	accum += texelFetch(u_tex_source, uv + offset, 0)			* 0.179044;
+	accum += texelFetch(u_tex_source, uv + offset_mul_02, 0)	* 0.124009;
+	accum += texelFetch(u_tex_source, uv + offset_mul_03, 0)	* 0.067234;
+	accum += texelFetch(u_tex_source, uv + offset_mul_04, 0)	* 0.028532;
 
 	rt_filter_result = accum;
 }

@@ -294,6 +294,19 @@ public:
 		Assert::AreEqual(th.component_offset_normal(), 0u);
 		Assert::AreEqual(th.component_offset_tex_coord(), 0u);
 		Assert::AreEqual(th.component_offset_tangent_h(), 0u);
+
+		Interleaved_vertex_format p_tc(Vertex_attribs::mesh_textured);
+		Assert::AreEqual(p_tc.component_offset_position(), 0u);
+		Assert::AreEqual(p_tc.component_offset_normal(), Interleaved_vertex_format::component_count_position);
+		Assert::AreEqual(p_tc.component_offset_tex_coord(), Interleaved_vertex_format::component_count_position);
+		Assert::AreEqual(p_tc.component_offset_tangent_h(), Interleaved_vertex_format::component_count_position
+			+ Interleaved_vertex_format::component_count_tex_coord);
+
+		Interleaved_vertex_format n_th(Vertex_attribs::normal | Vertex_attribs::tangent_h);
+		Assert::AreEqual(n_th.component_offset_position(), 0u);
+		Assert::AreEqual(n_th.component_offset_normal(), 0u);
+		Assert::AreEqual(n_th.component_offset_tex_coord(), Interleaved_vertex_format::component_count_normal);
+		Assert::AreEqual(n_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_normal);
 	}
 
 	TEST_METHOD(equal_operator)

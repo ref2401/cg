@@ -214,11 +214,11 @@ inline bool is_normalized(const float2& v) noexcept
 
 // Linearly interpolates between two values.
 // Params:
-//		lhs = The start of the range in which to interpolate.
-//		rhs = The end of the range in which to interpolate.
-//		factor = The value to use to interpolate between lhs & rhs.
-//		factor has to lie within the range [0 .. 1].
-inline float2 lerp(const float2& lhs, const float2 rhs, float factor) noexcept
+// -	lhs:	The start of the range in which to interpolate.
+// -	rhs:	The end of the range in which to interpolate.
+// -	factor:	The value to use to interpolate between lhs & rhs.
+//				Factor has to lie within the range [0 .. 1].
+inline float2 lerp(const float2& lhs, const float2& rhs, float factor) noexcept
 {
 	assert(0.f <= factor && factor <= 1.f);
 	return lhs + factor * (rhs - lhs);

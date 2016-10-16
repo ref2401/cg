@@ -73,13 +73,10 @@ public:
 
 	void set_uniform_array_far_plane_coords(const std::array<cg::float3, 4>& far_plane_coords) noexcept;
 
-	void use(const cg::uint2& viewport_size, const cg::mat4& projection_matrix,
-		 const Directional_light_params& dl_params) noexcept;
+	void use(const Directional_light_params& dl_params) noexcept;
 
 private:
 	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_viewport_size_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_inv_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_arr_far_pane_coords_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dlight_direction_to_light_vs_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_dlight_irradiance_location = cg::rnd::opengl::Invalid::uniform_location;
@@ -136,6 +133,27 @@ private:
 	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+};
+
+class Ssao_pass_shader_program final {
+public:
+
+	Ssao_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+
+	Ssao_pass_shader_program(const Ssao_pass_shader_program&) = delete;
+
+	Ssao_pass_shader_program(Ssao_pass_shader_program&&) = delete;
+
+	~Ssao_pass_shader_program() noexcept = default;
+
+
+	void use(const std::vector<cg::float3>& sample_rays_and_normals,
+		size_t sample_ray_count, size_t random_normal_count) noexcept;
+
+private:
+	cg::rnd::opengl::Shader_program _prog;
+	GLint _u_arr_sample_ray_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_arr_random_normal_location = cg::rnd::opengl::Invalid::uniform_location;
 };
 
 } // namespace deferred_lighting

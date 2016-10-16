@@ -114,9 +114,19 @@ public:
 	// xy components contain linear depth and squared depth values in the directional light's space.
 	// xy components are always positive in spite of depth values are negative in the light's space.
 	// z component contains ambient occlusion factor.
-	cg::rnd::opengl::Texture_2d& tex_shadow_occlusion_map() noexcept
+	cg::rnd::opengl::Texture_2d& tex_shadow_map() noexcept
 	{
-		return _tex_shadow_occlusion_map;
+		return _tex_shadow_map;
+	}
+
+	cg::rnd::opengl::Texture_2d& tex_ssao_map() noexcept
+	{
+		return _tex_ssao_map;
+	}
+
+	cg::rnd::opengl::Texture_2d& tex_ssao_map_aux() noexcept
+	{
+		return _tex_ssao_map_aux;
 	}
 
 	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
@@ -139,12 +149,14 @@ private:
 	cg::uint2 _viewport_size;
 	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
 	cg::rnd::opengl::Texture_2d _tex_aux_render_target;
-	cg::rnd::opengl::Texture_2d _tex_nds;
-	cg::rnd::opengl::Texture_2d _tex_shadow_occlusion_map;
 	cg::rnd::opengl::Texture_2d _tex_lighting_ambient_term;
 	cg::rnd::opengl::Texture_2d _tex_lighting_diffuse_term;
 	cg::rnd::opengl::Texture_2d _tex_lighting_specular_term;
 	cg::rnd::opengl::Texture_2d _tex_material_lighting_result;
+	cg::rnd::opengl::Texture_2d _tex_nds;
+	cg::rnd::opengl::Texture_2d _tex_shadow_map;
+	cg::rnd::opengl::Texture_2d _tex_ssao_map;
+	cg::rnd::opengl::Texture_2d _tex_ssao_map_aux; // is used to filter ssao map
 };
 
 class Gbuffer_pass final {
@@ -171,7 +183,7 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept;
 
 private:
-	const float _clear_value_normal_smoothness[4] = { 0, 0, 0, 0 };
+	const float _clear_value_nds[4] = { 0, 0, std::numeric_limits<float>::lowest(), 0 };
 	const float _clear_value_depth_map = 1.0f;
 	cg::rnd::opengl::Framebuffer _fbo;
 	Gbuffer_pass_shader_program _prog;
@@ -194,8 +206,8 @@ public:
 
 	void end() noexcept;
 
-	void perform_directional_light_pass(const cg::mat4& projection_matrix,
-		const std::array<cg::float3, 4>& far_plane_coords, const Directional_light_params& dir_light) noexcept;
+	void perform_directional_light_pass(const std::array<cg::float3, 4>& far_plane_coords, 
+		const Directional_light_params& dir_light) noexcept;
 
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
@@ -258,6 +270,7 @@ public:
 private:
 	// Filters Gbuffer.tex_shadow_map
 	void filter_shadow_map() noexcept;
+
 	const float _clear_value_shadow_occlusion[4] = {
 		std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), 0, 0
 	};
@@ -268,15 +281,46 @@ private:
 	cg::rnd::utility::Filter_shader_program _filter_shader_program;
 };
 
+// Ssao pass uses 8 sample rays (sample kernel size = 8) and 8 random normals that are used
+// to randomly rotate each sample ray.
+class Ssao_pass final {
+public:
+
+	Ssao_pass(Gbuffer& gbuffer, const cg::data::Shader_program_source_code& source_code);
+
+	Ssao_pass(const Ssao_pass&) = delete;
+
+	Ssao_pass(Ssao_pass&&) = delete;
+
+	~Ssao_pass() noexcept = default;
+
+
+	void perform() noexcept;
+
+private:
+	void filter_ssao_map() noexcept;
+
+	const size_t sample_ray_count = 16;
+	const size_t random_normal_count = 8;
+	const cg::float4 _clear_value_ssao_map = cg::float4::zero;
+	Gbuffer& _gbuffer;
+	cg::rnd::opengl::Framebuffer _fbo;
+	Ssao_pass_shader_program _prog;
+	// [0.. 7] sample rays, [8 .. 15] random normals
+	const std::vector<cg::float3> _sample_rays;
+	cg::rnd::utility::Filter_shader_program _filter_shader_program;
+};
+
 struct Renderer_config final {
 
 	cg::rnd::opengl::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
-	cg::data::Shader_program_source_code shadow_map_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
-	cg::data::Shader_program_source_code material_pass_code;
+	cg::data::Shader_program_source_code shadow_map_pass_code;
+	cg::data::Shader_program_source_code ssao_pass_code;
+	cg::data::Shader_program_source_code material_lighting_pass_code;
 };
 
 class Renderer final {
@@ -304,16 +348,17 @@ private:
 
 	void perform_gbuffer_pass(const Frame& frame) noexcept;
 
-	void perform_shadow_map_pass(const Frame& frame) noexcept;
-
 	void perform_lighting_pass(const Frame& frame) noexcept;
 
 	void perform_material_lighting_pass(const Frame& frame) noexcept;
 
+	void perform_shadow_map_pass(const Frame& frame) noexcept;
+
 	Gbuffer _gbuffer;
 	Gbuffer_pass _gbuffer_pass;
-	Shadow_map_pass _shadow_map_pass;
 	Lighting_pass _lighting_pass;
+	Shadow_map_pass _shadow_map_pass;
+	Ssao_pass _ssao_pass;
 	Material_lighting_pass _material_lighting_pass;
 };
 

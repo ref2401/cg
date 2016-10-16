@@ -41,9 +41,10 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::mesh_textured);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
-	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
-	config.material_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
+	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
+	config.ssao_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/ssao_pass");
+	config.material_lighting_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
 
 	return config;
 }
@@ -98,7 +99,7 @@ Material_library::Material_library()
 		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
 		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
 
-		_brick_wall_material.smoothness = 8.0f;
+		_brick_wall_material.smoothness = 5.0f;
 		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
 		_brick_wall_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
 		_brick_wall_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
@@ -118,7 +119,7 @@ Material_library::Material_library()
 		auto normal_map_image = cg::file::load_image_tga("../data/wooden-box-normal-map.tga");
 		auto specular_image = cg::file::load_image_tga("../data/wooden-box-specular-intensity.tga");
 
-		_wooden_box_material.smoothness = 5.0f;
+		_wooden_box_material.smoothness = 4.0f;
 		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
 		_wooden_box_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
 		_wooden_box_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
@@ -139,8 +140,8 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_dir_light.position = float3(-1000, 1000, -1000);
 	_dir_light.target = float3::zero;
 	_dir_light.rgb = float3::unit_xyz;
-	_dir_light.intensity = 1.f;
-	_dir_light.ambient_intensity = 0.25f;
+	_dir_light.intensity = 2.0f;
+	_dir_light.ambient_intensity = 0.35f;
 	float width = 30.0f;
 	float height = width / _ctx.window().size().aspect_ratio<float>();
 	float distance_to_light = len(_dir_light.position - _dir_light.target);
@@ -317,7 +318,7 @@ void Deferred_lighting::update(float dt)
 
 void Deferred_lighting::update_viewpoint_projection()
 {
-	float near_z = 1;
+	float near_z = 0.1f;
 	float far_z = 50;
 	float vert_fov = cg::pi_3;
 	float wh_ratio = _ctx.window().size().aspect_ratio();
