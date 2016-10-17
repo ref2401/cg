@@ -14,17 +14,17 @@
 //										total :		32
 //										unused:		0
 // batch_size for the pixel shader = 13. draw_call_index is in [0, 13).
+const uint batch_size = 13;
 
-						uniform	mat4		u_dir_light_projection_matrix;
-layout(binding = 0)		uniform sampler2D	u_arr_tex_diffuse_rgb[13];
-layout(binding = 13)	uniform sampler2D	u_arr_tex_specular_intensity[13];
+layout(binding = 0)		uniform sampler2D	u_arr_tex_diffuse_rgb[batch_size];
+layout(binding = 13)	uniform sampler2D	u_arr_tex_specular_intensity[batch_size];
 layout(binding = 26)	uniform sampler2D	u_tex_lighting_ambient_term;
 layout(binding = 27)	uniform sampler2D	u_tex_lighting_deffure_term;
 layout(binding = 28)	uniform sampler2D	u_tex_lighting_specular_term;
 layout(binding = 29)	uniform sampler2D	u_tex_nds;
 layout(binding = 30)	uniform sampler2D	u_tex_shadow_map;
 layout(binding = 31)	uniform sampler2D	u_tex_ssao_map;
-
+						uniform	mat4		u_dir_light_projection_matrix;
 
 in Pixel_data_i {
 	vec3 position_dls; // position in the direction light's space.
@@ -52,20 +52,24 @@ void main()
 	// depth test
 	float depth_vs = texelFetch(u_tex_nds, screen_uv, 0).z;
 	if (abs(ps_in.depth_vs - depth_vs) > 0.001) discard;
+
+	// material properties
+	vec3 diffuse_rgb = change_color_space(texture(u_arr_tex_diffuse_rgb[ps_in.draw_call_index], ps_in.tex_coord).rgb, 2.2);
+	float specular_intensity = change_color_space(texture(u_arr_tex_specular_intensity[ps_in.draw_call_index], ps_in.tex_coord).r, 2.2);
 	
+	// precalculated light terms & shadow factors
 	vec3 ambient_term = texelFetch(u_tex_lighting_ambient_term, screen_uv, 0).rgb;
 	vec3 diffuse_term = texelFetch(u_tex_lighting_deffure_term, screen_uv, 0).rgb;
 	vec3 specular_term = texelFetch(u_tex_lighting_specular_term, screen_uv, 0).rgb;
+	float shadow_factor = compute_shadow_factor(ps_in.position_dls);
 	float ambient_occlusion_factor = texture(u_tex_ssao_map, ssao_map_tex_coord, 0).r;
 
-	vec3 diffuse_rgb = change_color_space(texture(u_arr_tex_diffuse_rgb[ps_in.draw_call_index], ps_in.tex_coord).rgb, 2.2);
-	float specular_intensity = change_color_space(texture(u_arr_tex_specular_intensity[ps_in.draw_call_index], ps_in.tex_coord).r, 2.2);
-
+	// combine material props with light terms
 	vec3 ambient_contrib = diffuse_rgb *  mix(vec3(0), ambient_term, pow(ambient_occlusion_factor, 1.9));
 	vec3 diffuse_contrib = diffuse_rgb * diffuse_term;
 	vec3 specular_contrib = specular_intensity * specular_term;
-	float shadow_factor = compute_shadow_factor(ps_in.position_dls);
 	
+	// filnal result (shadow factors are used here)
 	vec3 lighting_result = ambient_contrib + shadow_factor * (diffuse_contrib + specular_contrib);
 	rt_material_ligting_result = vec4(change_color_space(lighting_result, 0.45), 1);
 }

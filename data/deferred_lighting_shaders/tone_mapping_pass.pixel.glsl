@@ -25,5 +25,6 @@ void main()
 
 vec3 aces_tone_mapping(vec3 x)
 {
+	// https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
 	return clamp((x * (a * x + b)) / (x *(c * x + d) + e), 0.0, 1.0);
 }

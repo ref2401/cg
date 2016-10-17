@@ -10,8 +10,8 @@ struct Dir_light {
 	vec3 ambient_irradiance_down;
 };
 
-layout(binding = 0)	uniform	sampler2D					u_tex_nds;
-					uniform	Dir_light					u_dlight;
+layout(binding = 0)	uniform	sampler2D	u_tex_nds;
+					uniform	Dir_light	u_dlight;
 
 in Pixel_data_i {
 	vec3 view_ray_vs;

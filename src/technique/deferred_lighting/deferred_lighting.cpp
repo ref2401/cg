@@ -141,7 +141,7 @@ Material_library::Material_library()
 
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
-	_curr_viewpoint(float3(2, 2, 4), float3::zero),
+	_curr_viewpoint(float3(2, 4, 4), float3::zero),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)
@@ -235,42 +235,29 @@ void Deferred_lighting::init_renderables()
 
 	// teapot
 	_rednerable_objects.emplace_back(_cmd_teapot_top,
-		ts_matrix(float3::zero, float3(0.03f)),
+		ts_matrix(float3(0, 0.965f, 0), float3(0.03f)),
 		_material_library.teapot_material());
 
 	_rednerable_objects.emplace_back(_cmd_teapot_base,
-		ts_matrix(float3::zero, float3(0.03f)),
+		ts_matrix(float3(0, 0.965f, 0), float3(0.03f)),
 		_material_library.teapot_material());
 
-	//// brick cubes
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(-1, 0.5f, -1)),
-	//	_material_library.brick_wall_material());
+	// cubes
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-0.45f, 0.5f, -0.5)),
+		_material_library.brick_wall_material());
 
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(-1, 1.5f, -1)),
-	//	_material_library.brick_wall_material());
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(0.55f, 0.5f, -0.5)),
+		_material_library.wooden_box_material());
 
-	//// wooden cubes
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(-1, 2.5f, -1)),
-	//	_material_library.wooden_box_material());
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(-0.45f, 0.5f, 0.5)),
+		_material_library.wooden_box_material());
 
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(-2, 0.5f, -1)),
-	//	_material_library.wooden_box_material());
-
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(-2, 0.5f, 0)),
-	//	_material_library.wooden_box_material());
-
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(0, 0.5f, -1)),
-	//	_material_library.wooden_box_material());
-
-	//_rednerable_objects.emplace_back(_cmd_cube,
-	//	translation_matrix(float3(1, 0.5f, -1)),
-	//	_material_library.wooden_box_material());
+	_rednerable_objects.emplace_back(_cmd_cube,
+		translation_matrix(float3(0.55f, 0.5f, 0.5)),
+		_material_library.brick_wall_material());
 }
 
 void Deferred_lighting::on_mouse_move()

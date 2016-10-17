@@ -10,13 +10,6 @@ using namespace cg::rnd::opengl;
 
 namespace {
 
-size_t get_batch_size() noexcept
-{
-	// max_texture_unit_count
-	// const size_t _batch_size = 62; // see gbuffer_pass.vertex.glsl
-	return 4;
-}
-
 Static_buffer make_draw_index_buffer(size_t draw_call_count)
 {
 	std::vector<GLuint> draw_indices(draw_call_count);
@@ -69,7 +62,6 @@ Material_instance::Material_instance(float smoothness,
 
 Frame::Frame(size_t max_renderable_count) :
 	_max_renderable_count(max_renderable_count),
-	_batch_size(get_batch_size()),
 	_draw_indirect_buffer(3, max_renderable_count * sizeof(DE_indirect_params)),
 	_draw_index_buffer(make_draw_index_buffer(_batch_size))
 {

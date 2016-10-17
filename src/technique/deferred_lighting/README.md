@@ -1,4 +1,6 @@
 # deferred lighting renderer
+camera rotation...
+scene description
 
 ## screenshots
 

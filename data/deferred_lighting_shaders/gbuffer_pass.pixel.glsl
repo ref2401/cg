@@ -6,10 +6,10 @@
 // that leaves us 32 texture units for the pixel shader.
 //
 // batch_size for the pixel shader = 32. draw_call_index is in [0, 32).
+const uint batch_size = 32;
 
-
-uniform float u_arr_smoothness[32];
-layout(binding = 0) uniform sampler2D u_arr_tex_normal_map[32];
+layout(binding = 0)	uniform sampler2D	u_arr_tex_normal_map[batch_size];
+					uniform float		u_arr_smoothness[batch_size];
 
 in Pixel_data_i {
 	vec3 normal_vs;

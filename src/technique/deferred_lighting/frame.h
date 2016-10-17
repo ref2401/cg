@@ -171,7 +171,8 @@ private:
 	const size_t _max_renderable_count;
 	
 	// indirect rendering gears
-	const size_t _batch_size;
+	// batch_size equals to 13 because the 'material_pass.pixel.glsl' shader imposes the most severe restriction.
+	const size_t _batch_size = 13;
 	std::array<GLsync, 3> _sync_objects;
 	cg::rnd::opengl::Partitioned_buffer<cg::rnd::opengl::Persistent_buffer> _draw_indirect_buffer;
 	cg::rnd::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
