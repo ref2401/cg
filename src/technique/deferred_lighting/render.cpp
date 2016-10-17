@@ -190,11 +190,11 @@ void Material_lighting_pass::end() noexcept
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
 	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	_fbo.set_read_buffer(GL_NONE);
+	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	//_fbo.set_read_buffer(GL_NONE);
 }
 
 void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -473,7 +473,7 @@ void Renderer::render(const Frame& frame) noexcept
 	perform_shadow_map_pass(frame);
 	_ssao_pass.perform();
 	perform_material_lighting_pass(frame);
-	//_tone_mapping_pass.perform();
+	_tone_mapping_pass.perform();
 }
 
 void Renderer::resize_viewport(const uint2& size) noexcept

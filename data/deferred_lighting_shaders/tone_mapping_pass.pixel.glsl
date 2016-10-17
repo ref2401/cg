@@ -18,6 +18,7 @@ void main()
 {
 	ivec2 screen_uv = ivec2(gl_FragCoord.xy);
 	vec3 hdr = texelFetch(u_tex_material_lighting_result, screen_uv, 0).rgb;
+	if (all(lessThan(hdr, vec3(0.0)))) discard;
 
 	rt_ldr_result = aces_tone_mapping(hdr);
 }

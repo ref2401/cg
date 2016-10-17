@@ -48,11 +48,8 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 
 
 ## roadmap
-- teapot model
-
-- get_batch_size (check all the shaders and choose one)
-
 - Format uniform in all the shaders.
+- get_batch_size (check all the shaders and choose one)
 
 - camera rotation. Horz mouse offset always rotates around float3::unit_y; 
 
@@ -60,4 +57,4 @@ Deferred_lighting renderer uses persistent mapped buffer technique for multi-ind
 	- tonemapping, wtite to sRGB texture
 	- glEnable() with the GL_FRAMEBUFFER_SRGB
 
-- restore 60 fps frame rate.
+- restore 60 fps frame rate. (ssas_pass)

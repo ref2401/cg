@@ -46,3 +46,4 @@ Later I would like to do the same using DirectX 11
 10.2. Rect_3d
 10.3. Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
 10.4. move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.
+10.5. float{2/3/4} to float[2/3/4]
