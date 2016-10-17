@@ -2,10 +2,9 @@
 camera rotation...
 scene description
 
-## screenshots
-
 ## renderer outline
 Deferred lighting is divided into three main and three optional passes. You can read more about the deferred lighting approach [here](http://www.realtimerendering.com/blog/deferred-lighting-approaches/).
+
 Deferred lighting renderer uses persistent mapped buffer technique for multi-indirect rendering. Draw indirect buffer uses triple buffering technique to mitigate synchronization with OpenGL command queue. Draw call index buffer is used for gl_DrawID simulation. It is a static buffer object that contains ordered sequence of integers [0, batch_size). The bach_size value is limited by shader's input limitations such as the max number of uniform component and max combined texture units. The final bach_size value equals to 13. To investigate the reason check comments in shader all the files from [data/deferred_lighting_shaders/](../../../data/deferred_lighting_shaders/)
 
 1. GBuffer_pass (_main pass_).
@@ -39,3 +38,5 @@ Deferred lighting renderer uses persistent mapped buffer technique for multi-ind
 - Uniform arrays are used heavily, uniform block would have done better. Uniform array limitations.
 - Gbuffer render targets as 2D texture array.
 - Batch_size deduction for each pass separately.
+
+## screenshots
