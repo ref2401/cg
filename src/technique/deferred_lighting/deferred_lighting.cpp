@@ -283,7 +283,7 @@ void Deferred_lighting::on_mouse_move()
 	if (!_ctx.mouse().middle_down() || offset_ndc == float2::zero) return;
 
 	bool y_offset_satisfies = !approx_equal(offset_ndc.y, 0.f, 0.01f);
-	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, (y_offset_satisfies) ? 0.01f : 0.001f);
+	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, ((y_offset_satisfies) ? 0.01f : 0.001f));
 
 	// mouse offset by x means rotation around OY (yaw)
 	if (x_offset_satisfies) {
@@ -308,30 +308,28 @@ void Deferred_lighting::render()
 }
 
 void Deferred_lighting::update(float dt)
-{
-	float3 forward = _curr_viewpoint.forward();
-	
+{	
 	if (_view_roll_angles != float2::zero) {
+		float dist = _curr_viewpoint.distance();
+		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+		ox.y = 0.0f; // ox is always parallel the world's OX.
+		ox = normalize(ox);
 
-		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-			quat q = from_axis_angle_rotation(_curr_viewpoint.up, _view_roll_angles.y);
-			
-			float3 new_forward = normalize(rotate(q, forward));
-			_curr_viewpoint.position = -new_forward * _curr_viewpoint.distance();
-			
-			forward = new_forward;
+		if (!approx_equal(_view_roll_angles.y, 0.0f)) {	
+			quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+
+			ox = rotate(q, ox);
+			ox.y = 0.0f;
+			ox = normalize(ox);
 		}
 
 		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
-			float3 ox = cross(forward, _curr_viewpoint.up);
-			ox.y = 0; // ox is always parallel the world's OX.
-			ox = normalize(ox);
-
 			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
-			float3 new_forward = normalize(rotate(q, forward));
-			_curr_viewpoint.up = normalize(cross(ox, new_forward));
-			_curr_viewpoint.position = -new_forward * _curr_viewpoint.distance();
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
 		}
+
+		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
 	}
 
 	_view_roll_angles = float2::zero;
