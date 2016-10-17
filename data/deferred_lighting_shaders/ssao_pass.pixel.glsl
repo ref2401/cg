@@ -1,7 +1,7 @@
 #version 450 core
 
 
-const uint sample_count = 16;
+const uint sample_count = 8;
 const uint random_normal_count = 8;
 const float sample_depth_limit = 1.5;
 

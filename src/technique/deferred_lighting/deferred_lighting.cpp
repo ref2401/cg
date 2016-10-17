@@ -228,11 +228,6 @@ void Deferred_lighting::init_renderables()
 {
 	_rednerable_objects.reserve(16);
 
-	// chess board
-	_rednerable_objects.emplace_back(_cmd_rect_2x2_repeat,
-		ts_matrix(float3::zero, float3(5)),
-		_material_library.chess_board_material());
-
 	// teapot
 	_rednerable_objects.emplace_back(_cmd_teapot_top,
 		ts_matrix(float3(0, 0.965f, 0), float3(0.03f)),
@@ -258,6 +253,11 @@ void Deferred_lighting::init_renderables()
 	_rednerable_objects.emplace_back(_cmd_cube,
 		translation_matrix(float3(0.55f, 0.5f, 0.5)),
 		_material_library.brick_wall_material());
+
+	// chess board
+	_rednerable_objects.emplace_back(_cmd_rect_2x2_repeat,
+		ts_matrix(float3::zero, float3(5)),
+		_material_library.chess_board_material());
 }
 
 void Deferred_lighting::on_mouse_move()

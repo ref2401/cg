@@ -300,7 +300,7 @@ public:
 private:
 	void filter_ssao_map() noexcept;
 
-	const size_t sample_ray_count = 16;
+	const size_t sample_ray_count = 8;
 	const size_t random_normal_count = 8;
 	const cg::float4 _clear_value_ssao_map = cg::float4::zero;
 	Gbuffer& _gbuffer;

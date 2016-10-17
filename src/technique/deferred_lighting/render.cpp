@@ -11,6 +11,19 @@ using namespace cg::rnd::opengl;
 using cg::data::Interleaved_mesh_data;
 using cg::data::Shader_program_source_code;
 
+namespace {
+
+uint2 get_scaled_viewport_size(const uint2& viewport_size, float scale) noexcept
+{
+	assert(scale > 0.0f);
+
+	float width = viewport_size.width * scale;
+	float height = viewport_size.height * scale;
+	return uint2(uint32_t(width), uint32_t(height));
+}
+
+} // namespace
+
 
 namespace deferred_lighting {
 
@@ -31,8 +44,8 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_tex_material_lighting_result(Texture_format::rgb_32f, viewport_size),
 	_tex_nds(Texture_format::rgba_32f, viewport_size),
 	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
-	_tex_ssao_map(Texture_format::red_32f, viewport_size),
-	_tex_ssao_map_aux(Texture_format::red_32f, viewport_size)
+	_tex_ssao_map(Texture_format::red_32f, get_scaled_viewport_size(viewport_size, 0.5f)),
+	_tex_ssao_map_aux(Texture_format::red_32f, get_scaled_viewport_size(viewport_size, 0.5f))
 {
 	Static_vertex_spec_builder vs_builder(8, 8);
 	vs_builder.begin(rect_1x1_mesh_data.attribs(), kilobytes(1));
@@ -46,7 +59,7 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 void Gbuffer::resize(const uint2& viewport_size) noexcept
 {
 	_viewport_size = viewport_size;
-	//uint2 half_size = _viewport_size;
+	uint2 scaled_size = get_scaled_viewport_size(viewport_size, 0.5f);
 
 	_aux_depth_renderbuffer.set_size(_viewport_size);
 	_tex_aux_render_target.set_size(_viewport_size);
@@ -56,8 +69,8 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 	_tex_material_lighting_result.set_size(_viewport_size);
 	_tex_nds.set_size(_viewport_size);
 	_tex_shadow_map.set_size(_viewport_size);
-	_tex_ssao_map.set_size(_viewport_size);
-	_tex_ssao_map_aux.set_size(_viewport_size);
+	_tex_ssao_map.set_size(scaled_size);
+	_tex_ssao_map_aux.set_size(scaled_size);
 }
 
 // ----- Gbuffer_pass -----
@@ -75,6 +88,8 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Shader_program_sour
 
 void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
 {
+	glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
@@ -87,6 +102,7 @@ void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view
 
 void Gbuffer_pass::end() noexcept
 {
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 }
@@ -160,9 +176,12 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& view_matrix,
 	const Directional_light_params& dir_light) noexcept
 {
+	glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
 	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
+
 
 	_prog.use(projection_matrix, view_matrix, dir_light);
 	// ambient term
@@ -187,9 +206,10 @@ void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& vi
 
 void Material_lighting_pass::end() noexcept
 {
+	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
@@ -313,6 +333,13 @@ void Ssao_pass::perform() noexcept
 	
 	// end
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+
+	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//	0, 0, _gbuffer.tex_ssao_map().size().width, _gbuffer.tex_ssao_map().size().height,
+	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	//_fbo.set_read_buffer(GL_NONE);
 }
 
 void Ssao_pass::filter_ssao_map() noexcept
