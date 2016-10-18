@@ -47,3 +47,9 @@ Later I would like to do the same using DirectX 11
 10.3. Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
 10.4. move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.
 10.5. float{2/3/4} to float[2/3/4]
+11. Data_bundle_loader. feed it with filenames and call load. Data_bundle_loader will use several threads to load all the data in parallel.
+	Returns future with Data_bundle.
+	For each requested data element the bundle has the element or an exception.
+	Each thread pulls the next filename when it's done with its current job.
+12. Deferred_lighting_renderer viewpoint rotation is broken if viewpoint's target is not float3::zero. 
+	Possible fix. Oy rotation axis must take target's position into account.

@@ -141,7 +141,8 @@ Material_library::Material_library()
 
 Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	Game(ctx),
-	_curr_viewpoint(float3(2, 4, 4), float3::zero),
+	//_curr_viewpoint(float3(4, 4, -3.5), float3(0, 1, 0)),
+	_curr_viewpoint(float3(2, 5, 4), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	_renderer(make_render_config(_ctx.window().size())),
 	_frame(16)

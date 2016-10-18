@@ -1,6 +1,5 @@
 # Deferred lighting renderer
-camera rotation...
-scene description
+You can rotate camera holding the middle mouse button down. The rotation is similar to Blender.
 
 ## Renderer outline
 Deferred lighting is divided into three main and three optional passes. You can read more about the deferred lighting approach [here](http://www.realtimerendering.com/blog/deferred-lighting-approaches/).
@@ -17,13 +16,13 @@ Deferred lighting renderer uses persistent mapped buffer technique for multi-ind
 
 2. Lighting_pass _(main pass)_.
 
-	The pass fills 3 rgb32f textures that hold ambient,  diffuse & specular lighting terms. The textures are called ```tex_lighting_ambient_term```, ```tex_lighting_diffuse_term``` & ```tex_lighting_specular_term```.
+	The pass fills 3 rgb32f textures that hold ambient,  diffuse & specular lighting terms. The textures are called ```tex_lighting_ambient_term```, ```tex_lighting_diffuse_term``` & ```tex_lighting_specular_term``` respectively.
 	
 3. Ambient_occlusion_pass _(optional pass)_.
 
 	The pass fills red32f texture called ```tex_ssao_map```. The pass consumes ```tex_nds``` and computes ambient occlusion term for each texel. The ao computation shader implements an algorithm that is similar to the normal oriented hemisphere ssao algorithm. The main difference is that the shader does not bother to calculate orientation matrix for each sample kernel ray and project it into the clip space to get the appropriate texture coordinates. Instead the shader checks dot product of a sample kernel ray and the processed texel's normal and if the dot product is negative then the ray's direction will be reversed. This helps to place that ray and the texel's normal in the same hemisphere. Also each sample kernel ray is reflected about a random normal. This introduces noise in the computation results. After the ao has been calculated the ```tex_ssao_map``` texture is blured by Gaussian filter. While the approach is clearly far from accurate, statistically it work out.
  
-4. Shadow_map_pass _(optional pass)_.
+4. Shadow_pass _(optional pass)_.
 	
 	The pass fills rg32f texture called ```tex_shadow_map```. **rg** of the texture components contain depth & squared depth. The squared depth value is required by the variance shadow mapping algorithm. Depth values are in the directional light's space. Also **rg** components are always positive in spite of depth values are negative in the light's space. After the shadow map shader ends the ```tex_shadow_map``` by Gaussian filter.
  
@@ -36,10 +35,44 @@ Deferred lighting renderer uses persistent mapped buffer technique for multi-ind
 	The pass consumes the ```tex_material_lighting_result``` texture and fills the back buffer of the default framebuffer.
 
 ## Possible improvements
-- Single vertex array object. 
-- Frame_packet, 2-3 Frame objects.
-- Uniform arrays are used heavily, uniform block would have done better. Uniform array limitations.
-- Gbuffer render targets as 2D texture array.
-- Batch_size deduction for each pass separately.
+
+- Uniform array are used heavily in the code. Due to uniform array limitation a decent suggestion is to use uniform block.
+- Gbuffer textures like: ```tex_nds```, ```tex_lighting_{ambient/diffuse/specular}_term```, ```tex_ssao_map``` & ```tex_material_lighting_result``` should be organized in one 2d texture array.
+- Batch_size might be deduced for each pass separately.
 
 ## Screenshots
+
+### The final image.
+
+![The final image](../../../screenshots/deferred_lighting_renderer/0_final_ldr.png)
+
+### Gbuffer_pass ```tex_nds``` texture.
+
+![gbuffer_pass](../../../screenshots/deferred_lighting_renderer/1_gbuffer_pass.png)
+
+### Lighting_pass
+
+```tex_lighting_ambient_term```
+![lighting_pass_ambient_term](../../../screenshots/deferred_lighting_renderer/2_1_lighting_pass_ambient_term.png)
+
+```tex_lighting_diffuse_term```
+![tex_lighting_diffuse_term](../../../screenshots/deferred_lighting_renderer/2_2_lighting_pass_diffuse_term.png)
+
+```tex_lighting_specular_term```
+![tex_lighting_specular_term](../../../screenshots/deferred_lighting_renderer/2_3_lighting_pass_specular_term.png)
+
+### Shadow_map_pass
+
+There is no screenshot because the texture looks as a window filled with yellow color. This is because the shadow map texture
+contains ```std::numeric_limits<float>::max()``` texels where there is no objects on the scene.
+
+### Ssao_pass
+
+The size of ```tex_ssao_map``` is reduced twice to gain some performance advantage.
+![tex_ssao_map](../../../screenshots/deferred_lighting_renderer/4_ssao_pass.png)
+
+### Material_lighting_pass
+
+There is no background fill, texture values are in the linear color space & hdr values are just clamped to the range [0, 1].
+
+![tex_material_lighting_result](../../../screenshots/deferred_lighting_renderer/5_material_lighting_pass.png)
