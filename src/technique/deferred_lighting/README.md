@@ -52,13 +52,16 @@ Deferred lighting renderer uses persistent mapped buffer technique for multi-ind
 
 ### Lighting_pass
 
-```tex_lighting_ambient_term```
+```tex_lighting_ambient_term``` texture.
+
 ![lighting_pass_ambient_term](../../../screenshots/deferred_lighting_renderer/2_1_lighting_pass_ambient_term.png)
 
-```tex_lighting_diffuse_term```
+```tex_lighting_diffuse_term``` texture.
+
 ![tex_lighting_diffuse_term](../../../screenshots/deferred_lighting_renderer/2_2_lighting_pass_diffuse_term.png)
 
-```tex_lighting_specular_term```
+```tex_lighting_specular_term``` texture.
+
 ![tex_lighting_specular_term](../../../screenshots/deferred_lighting_renderer/2_3_lighting_pass_specular_term.png)
 
 ### Shadow_map_pass
@@ -69,6 +72,7 @@ contains ```std::numeric_limits<float>::max()``` texels where there is no object
 ### Ssao_pass
 
 The size of ```tex_ssao_map``` is reduced twice to gain some performance advantage.
+
 ![tex_ssao_map](../../../screenshots/deferred_lighting_renderer/4_ssao_pass.png)
 
 ### Material_lighting_pass
