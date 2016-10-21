@@ -2,28 +2,33 @@
 Implementation of various CG algorithms/techniques using OpenGL 4.5.
 Later I would like to do the same using DirectX 11
 
+## Build
+Visual Studio Community 2015 is used. The solution is tested only under x86 (Win32) platform.
+
 # Techniques
 1. [deferred lighting renderer](/src/technique/deferred_lighting/)
 
 # Wanna implement
-1. Fibers base engine (simulation, visibility check & renderer params submition
-2. lighting
-2.1 physically based lighting
+1. Fibers base engine (simulation, visibility check & renderer params submition.
+2. lighting.
+	- physically based lighting
 	Walter GGX https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
 	https://readyatdawn.sharefile.com/share?#/view/s9dc3fcc9c7b4a118
-2.2. image-based lighting
-2.3. spherical harmonics
+	- image-based lighting
+	- spherical harmonics
 3. anisotropic brdf
 4. point sprites
 5. wavefront loading
-5.1. compute_tangent_h. different normals. if normal0 = normal1 then tangetn_h0 = tangent_h1
-5.1. shared vertices
-5.2. several models (objects) in a single .obj file
-5.3. crytek sponza 
-5.4. light house
+	- compute_tangent_h. different normals. if normal0 = normal1 then tangetn_h0 = tangent_h1
+	- shared vertices
+	- several models (objects) in a single .obj file
+	- crytek sponza 
+-	 light house
 6. light scattering (GPU Pro 5)
 7. Screen space reflection
-8. Horizon-Base Ambient Occlusion +
+8. SSAO 
+	- Horizon-Base Ambient Occlusion +
+	- triangle sample kernel in textur space. orient it in the same hemisphere with a texel's normal.
 
 # TODO
 1. Static_vertex_spec owns 2 Static_buffers
@@ -42,11 +47,11 @@ Later I would like to do the same using DirectX 11
 	- Compute kernel and pass it to Filter_shader_program. There shoudl be only one shader that takes kernel as uniform array.
 	- Gaussian kernel. Sharp/mid/soft peak
 10. math
-10.1. Plane <n, d>
-10.2. Rect_3d
-10.3. Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
-10.4. move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.
-10.5. float{2/3/4} to float[2/3/4]
+	- Plane <n, d>
+	- Rect_3d
+	- Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
+	- move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.
+	- float{2/3/4} to float[2/3/4]
 11. Data_bundle_loader. feed it with filenames and call load. Data_bundle_loader will use several threads to load all the data in parallel.
 	Returns future with Data_bundle.
 	For each requested data element the bundle has the element or an exception.
