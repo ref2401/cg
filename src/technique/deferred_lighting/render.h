@@ -348,7 +348,7 @@ struct Renderer_config final {
 class Renderer final {
 public:
 
-	Renderer(const Renderer_config& config);
+	explicit Renderer(const Renderer_config& config);
 
 	Renderer(const Renderer&) = delete;
 

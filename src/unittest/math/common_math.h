@@ -20,17 +20,4 @@ template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
-namespace unittest {
-
-class Filenames final {
-public:
-
-	static const std::string ascii_multiline;
-	static const std::string ascii_single_line;
-	static const std::string empty_file;
-	static const std::string wavefront_triangle_p;
-};
-
-} // namespace unittest
-
 #endif // UNITTEST_MATH_COMMON_MATH_H_

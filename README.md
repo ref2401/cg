@@ -50,8 +50,7 @@ Visual Studio Community 2015 is used. The solution is tested only under x86 (Win
 	- Plane <n, d>
 	- Rect_3d
 	- Frustum owns planes. view_space_{near/far/left/right}_plane(), view_space_{near/far/left/right}_rect_3d()
-	- move float{2/3/4}, uint2 into one header vector.h. You can implement used-define conversions there.
-	- float{2/3/4} to float[2/3/4]
+	- float{2/3/4} to float[2/3/4] array
 11. Data_bundle_loader. feed it with filenames and call load. Data_bundle_loader will use several threads to load all the data in parallel.
 	Returns future with Data_bundle.
 	For each requested data element the bundle has the element or an exception.

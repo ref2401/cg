@@ -1,27 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="math\float3_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\float4_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\quat_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\float2_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\uint2_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\mat4_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\mat3_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="math\transform_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -60,6 +39,12 @@
     </ClCompile>
     <ClCompile Include="rnd\opengl\vertex_spec_unittest.cpp">
       <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="math\vector_unittest.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\matrix_unittest.cpp">
+      <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

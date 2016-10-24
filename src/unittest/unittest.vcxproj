@@ -172,15 +172,10 @@
     <ClCompile Include="data\shader_unittest_data.cpp" />
     <ClCompile Include="file\common_file.cpp" />
     <ClCompile Include="file\file_unittest.cpp" />
-    <ClCompile Include="math\float2_unittest.cpp" />
-    <ClCompile Include="math\float4_unittest.cpp" />
-    <ClCompile Include="math\mat3_unittest.cpp" />
-    <ClCompile Include="math\mat4_unittest.cpp" />
-    <ClCompile Include="math\quat_unittest.cpp" />
+    <ClCompile Include="math\matrix_unittest.cpp" />
     <ClCompile Include="math\transform_unittest.cpp" />
-    <ClCompile Include="math\uint2_unittest.cpp" />
     <ClCompile Include="math\utility_unittest_math.cpp" />
-    <ClCompile Include="math\float3_unittest.cpp" />
+    <ClCompile Include="math\vector_unittest.cpp" />
     <ClCompile Include="rnd\opengl\shader_unittest_opengl.cpp" />
     <ClCompile Include="rnd\opengl\texture_unittest.cpp" />
     <ClCompile Include="rnd\opengl\utility_unittest_opengl.cpp" />

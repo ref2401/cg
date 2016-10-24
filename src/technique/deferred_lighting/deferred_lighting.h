@@ -100,7 +100,7 @@ private:
 class Deferred_lighting final : public cg::sys::Game {
 public:
 
-	Deferred_lighting(cg::sys::Application_context_i& ctx);
+	explicit Deferred_lighting(cg::sys::Application_context_i& ctx);
 
 	~Deferred_lighting() noexcept override = default;
 
