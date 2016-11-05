@@ -78,6 +78,7 @@ Wf_mesh_data::Wf_mesh_data()
 	normals.reserve(100);
 	tex_coords.reserve(100);
 }
+
 // ----- funcs -----
 
 // Wavefront spec: If an index is positive then it refers to the offset in that vertex list, starting at 1.
@@ -344,7 +345,7 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 	auto n = mesh_data.has_normals();
 	auto tc = mesh_data.has_tex_coords();
 	if (mesh_data.has_normals() && mesh_data.has_tex_coords()) {
-		parse_face_pntc(it, mesh_data, imd, has_tangent_h(attribs));
+		parse_face_pntc(it, mesh_data, imd, has_tangent_space(attribs));
 	}
 	else if (mesh_data.has_normals()) {
 		parse_face_pn(it, mesh_data, imd);

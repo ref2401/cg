@@ -69,7 +69,7 @@ void main()
 	vec3 diffuse_contrib = diffuse_rgb * diffuse_term;
 	vec3 specular_contrib = specular_intensity * specular_term;
 	
-	// filnal result (shadow factors are used here)
+	// final result (shadow factors are used here)
 	vec3 lighting_result = ambient_contrib + shadow_factor * (diffuse_contrib + specular_contrib);
 	rt_material_ligting_result = vec4(change_color_space(lighting_result, 0.45), 1);
 }

@@ -144,7 +144,7 @@ public:
 				v2.tex_coord.u, v2.tex_coord.v, v2.tangent_h.x, v2.tangent_h.y, v2.tangent_h.z, v2.tangent_h.w,
 			};
 
-			Interleaved_mesh_data md(Vertex_attribs::mesh_tangent_h);
+			Interleaved_mesh_data md(Vertex_attribs::mesh_tangent_space);
 			md.push_back_vertex(v0);
 			md.push_back_vertex(v1);
 			md.push_back_vertex(v2);
@@ -183,13 +183,13 @@ public:
 		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_textured);
 		Assert::AreEqual(fmt1.component_count() * sizeof(float), fmt1.byte_count());
 
-		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_h);
+		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_space);
 		Assert::AreEqual(fmt2.component_count() * sizeof(float), fmt2.byte_count());
 	}
 
 	TEST_METHOD(byte_offset)
 	{
-		Interleaved_vertex_format fmt(Vertex_attribs::mesh_tangent_h);
+		Interleaved_vertex_format fmt(Vertex_attribs::mesh_tangent_space);
 		
 		Assert::AreEqual(fmt.byte_offset_position(), 0u);
 		
@@ -214,8 +214,8 @@ public:
 		Interleaved_vertex_format fmt1(Vertex_attribs::normal);
 		Assert::AreEqual(Vertex_attribs::normal, fmt1.attribs);
 
-		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_h);
-		Assert::AreEqual(Vertex_attribs::mesh_tangent_h, fmt2.attribs);
+		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_space);
+		Assert::AreEqual(Vertex_attribs::mesh_tangent_space, fmt2.attribs);
 	}
 
 	TEST_METHOD(component_count)
@@ -255,7 +255,7 @@ public:
 			+ Interleaved_vertex_format::component_count_normal
 			+ Interleaved_vertex_format::component_count_tex_coord
 			+ Interleaved_vertex_format::component_count_tangent_h;
-		Assert::AreEqual(expected_pntcth, Interleaved_vertex_format(Vertex_attribs::mesh_tangent_h).component_count());
+		Assert::AreEqual(expected_pntcth, Interleaved_vertex_format(Vertex_attribs::mesh_tangent_space).component_count());
 
 		// tex_coord & tangent_h
 		auto attribs_tcth = Vertex_attribs::tex_coord | Vertex_attribs::tangent_h;
@@ -266,7 +266,7 @@ public:
 
 	TEST_METHOD(component_offset_all)
 	{
-		Interleaved_vertex_format p_n_tc_th(Vertex_attribs::mesh_tangent_h);
+		Interleaved_vertex_format p_n_tc_th(Vertex_attribs::mesh_tangent_space);
 		Assert::AreEqual(p_n_tc_th.component_offset_position(),	0u);
 		Assert::AreEqual(p_n_tc_th.component_offset_normal(), Interleaved_vertex_format::component_count_position);
 		Assert::AreEqual(p_n_tc_th.component_offset_tex_coord(), 
@@ -448,7 +448,7 @@ TEST_CLASS(cg_data_mesh_Vertex_attribs) {
 
 		Assert::IsTrue(has_position(Vertex_attribs::mesh_position));
 		Assert::IsTrue(has_position(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_position(Vertex_attribs::mesh_tangent_h));
+		Assert::IsTrue(has_position(Vertex_attribs::mesh_tangent_space));
 
 		// tex_coord
 		Assert::IsFalse(has_tex_coord(Vertex_attribs::position));
@@ -458,7 +458,7 @@ TEST_CLASS(cg_data_mesh_Vertex_attribs) {
 
 		Assert::IsFalse(has_tex_coord(Vertex_attribs::mesh_position));
 		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_tangent_h));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_tangent_space));
 
 		// normal
 		Assert::IsFalse(has_normal(Vertex_attribs::position));
@@ -468,17 +468,17 @@ TEST_CLASS(cg_data_mesh_Vertex_attribs) {
 
 		Assert::IsFalse(has_normal(Vertex_attribs::mesh_position));
 		Assert::IsFalse(has_normal(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_normal(Vertex_attribs::mesh_tangent_h));
+		Assert::IsTrue(has_normal(Vertex_attribs::mesh_tangent_space));
 
 		// tangent_h
-		Assert::IsFalse(has_tangent_h(Vertex_attribs::position));
-		Assert::IsFalse(has_tangent_h(Vertex_attribs::tex_coord));
-		Assert::IsFalse(has_tangent_h(Vertex_attribs::normal));
-		Assert::IsTrue(has_tangent_h(Vertex_attribs::tangent_h));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::position));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::tex_coord));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::normal));
+		Assert::IsTrue(has_tangent_space(Vertex_attribs::tangent_h));
 
-		Assert::IsFalse(has_tangent_h(Vertex_attribs::mesh_position));
-		Assert::IsFalse(has_tangent_h(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_tangent_h(Vertex_attribs::mesh_tangent_h));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_position));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_textured));
+		Assert::IsTrue(has_tangent_space(Vertex_attribs::mesh_tangent_space));
 	}
 
 	TEST_METHOD(is_superset_of)
@@ -491,7 +491,7 @@ TEST_CLASS(cg_data_mesh_Vertex_attribs) {
 		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::tangent_h));
 		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_position));
 		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_textured));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_tangent_h));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_tangent_space));
 
 		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::position));
 		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tex_coord));
@@ -499,15 +499,15 @@ TEST_CLASS(cg_data_mesh_Vertex_attribs) {
 		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tangent_h));
 		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_position));
 		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_textured));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_tangent_h));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_tangent_space));
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::tex_coord));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::normal));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::tangent_h));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::mesh_position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::mesh_textured));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_h, Vertex_attribs::mesh_tangent_h));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tex_coord));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::normal));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tangent_h));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_textured));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_tangent_space));
 	}
 };
 

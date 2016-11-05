@@ -22,12 +22,12 @@ enum class Vertex_attribs : unsigned char {
 
 	mesh_position = position,
 	mesh_textured = position | tex_coord,
-	mesh_tangent_h = position | tex_coord | normal | tangent_h
+	mesh_tangent_space = position | tex_coord | normal | tangent_h
 };
 
 constexpr bool has_normal(Vertex_attribs attribs); // see defs & comments below
 constexpr bool has_position(Vertex_attribs attribs);
-constexpr bool has_tangent_h(Vertex_attribs attribs);
+constexpr bool has_tangent_space(Vertex_attribs attribs);
 constexpr bool has_tex_coord(Vertex_attribs attribs);
 
 // Describes the order and offset (byte & component) of every vertex attribute.
@@ -47,6 +47,7 @@ struct Interleaved_vertex_format final {
 	static constexpr size_t component_count_position = 3;
 	static constexpr size_t component_count_tangent_h = 4;
 	static constexpr size_t component_count_tex_coord = 2;
+
 
 	Interleaved_vertex_format() noexcept = default;
 
@@ -91,7 +92,7 @@ struct Interleaved_vertex_format final {
 		if (has_position(attribs)) counter += component_count_position;
 		if (has_normal(attribs)) counter += component_count_normal;
 		if (has_tex_coord(attribs)) counter += component_count_tex_coord;
-		if (has_tangent_h(attribs)) counter += component_count_tangent_h;
+		if (has_tangent_space(attribs)) counter += component_count_tangent_h;
 
 		return counter;
 	}
@@ -307,7 +308,7 @@ constexpr bool has_position(Vertex_attribs attribs)
 }
 
 // Checks whether attribs contains Vertex_attribs::tangent_h.
-constexpr bool has_tangent_h(Vertex_attribs attribs)
+constexpr bool has_tangent_space(Vertex_attribs attribs)
 {
 	return (attribs & Vertex_attribs::tangent_h) == Vertex_attribs::tangent_h;
 }

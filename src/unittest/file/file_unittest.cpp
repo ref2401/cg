@@ -459,7 +459,7 @@ public:
 				-2,	 1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1,  -2, -1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 1,  2, 1, 0, 0, 0, 1, 0, 1, 0, -1, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_rect_negative_indices_pntc, Vertex_attribs::mesh_tangent_h);
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_negative_indices_pntc, Vertex_attribs::mesh_tangent_space);
 
 			Assert::IsTrue(std::equal(
 				md.data().cbegin(), md.data().cend(),
@@ -554,7 +554,7 @@ public:
 				-2,	 1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1,  -2, -1, 0, 0, 0, 1, 1, 0, 0, -1, 0, 1,  2, 1, 0, 0, 0, 1, 0, 1, 0, -1, 0, 1
 			};
 
-			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_pntc, Vertex_attribs::mesh_tangent_h);
+			auto md = load_mesh_wavefront(Filenames::wavefront_rect_positive_indices_pntc, Vertex_attribs::mesh_tangent_space);
 
 			Assert::IsTrue(std::equal(
 				md.data().cbegin(), md.data().cend(),

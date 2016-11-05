@@ -7,7 +7,7 @@ using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex_attribs;
 using cg::data::has_normal;
 using cg::data::has_position;
-using cg::data::has_tangent_h;
+using cg::data::has_tangent_space;
 using cg::data::has_tex_coord;
 using cg::data::is_superset_of;
 
@@ -141,7 +141,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 	}
 
 	// tangent_h
-	if (has_tangent_h(_format.attribs)) {
+	if (has_tangent_space(_format.attribs)) {
 		assert(attrib_layout.tangent_h_location != Invalid::vertex_attrib_location);
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tangent_h_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.tangent_h_location, vb_binding_index);

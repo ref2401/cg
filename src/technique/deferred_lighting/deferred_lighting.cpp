@@ -205,7 +205,7 @@ void Deferred_lighting::init_geometry()
 		size_t approx_index_count;
 	};
 
-	auto vertex_attribs = Vertex_attribs::mesh_tangent_h;
+	auto vertex_attribs = Vertex_attribs::mesh_tangent_space;
 	std::vector<Load_info> load_info_list = {
 		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
 		Load_info("../data/teapot_top.obj", &_cmd_teapot_top, 10656, 10656),

@@ -56,7 +56,7 @@ void Interleaved_mesh_data::push_back_vertex(const Vertex& v)
 		offset += 2;
 	}
 
-	if (has_tangent_h(_format.attribs)) {
+	if (has_tangent_space(_format.attribs)) {
 		data_buffer[offset]		= v.tangent_h.x;
 		data_buffer[offset + 1] = v.tangent_h.y;
 		data_buffer[offset + 2] = v.tangent_h.z;
@@ -105,10 +105,10 @@ float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
 
 	// Gram-Schmidt orthogonalize.
 	// project tangent vector onto normal.
-	float3 t_prj_n = normal * dot(t, normal);
+	/*float3 t_prj_n = normal * dot(t, normal);
 	float3 tangent = normalize(t - t_prj_n);
-
-	return float4(tangent, handedness);
+	return float4(tangent, handedness);*/
+	return float4(t, handedness);
 }
 
 std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
@@ -122,7 +122,7 @@ std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
 		if (has_position(attribs)) out << "position";
 		if (has_normal(attribs)) out << "normal ";
 		if (has_tex_coord(attribs)) out << "tex_coord ";
-		if (has_tangent_h(attribs)) out << "tangent_h";
+		if (has_tangent_space(attribs)) out << "tangent_h";
 	}
 
 	out << ")";
@@ -140,7 +140,7 @@ std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
 		if (has_position(attribs)) out << "position";
 		if (has_normal(attribs)) out << "normal ";
 		if (has_tex_coord(attribs)) out << "tex_coord ";
-		if (has_tangent_h(attribs)) out << "tangent_h";
+		if (has_tangent_space(attribs)) out << "tangent_h";
 	}
 
 	out << ")";
