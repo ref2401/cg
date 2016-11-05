@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <ostream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
@@ -290,10 +291,23 @@ std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
 std::wostream& operator<<(std::wostream& out, const Vertex& v);
 
-// Computes tangent and handedness of bitangent for a trinaglel that is specified by the 3 given vertices.
+// Computes tangent and handedness of bitangent for a triangle that is specified by the 3 given vertices.
 // Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.
 // Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
 float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2);
+
+// Computes tangent and bitangent vectors for a triangle that is specified by 3 position, tex_coord attribures.
+// Returned vectors are not normalized.
+std::pair<cg::float3, cg::float3> compute_tangent_bitangent(
+	const cg::float3& pos0, const cg::float2& tc0,
+	const cg::float3& pos1, const cg::float2& tc1, 
+	const cg::float3& pos2, const cg::float2& tc2) noexcept;
+
+// Computes orthogonalized tangent and bitangent's handedness.
+// All vectors have to be normalized.
+// Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
+cg::float4 compute_tangent_handedness(const cg::float3& tangent,
+	const cg::float3& bitangent, const cg::float3& normal) noexcept;
 
 // Checks whether attribs contains Vertex_attribs::normal.
 constexpr bool has_normal(Vertex_attribs attribs)
