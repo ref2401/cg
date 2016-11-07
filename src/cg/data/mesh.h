@@ -135,26 +135,26 @@ struct Interleaved_vertex_format final {
 	Vertex_attribs attribs = Vertex_attribs::none;
 };
 
-struct Vertex {
-	Vertex() noexcept = default;
+struct Vertex_old {
+	Vertex_old() noexcept = default;
 
-	explicit Vertex(float3 position) noexcept
-		: Vertex(position, float3::zero, float2::zero, float4::zero)
+	explicit Vertex_old(float3 position) noexcept
+		: Vertex_old(position, float3::zero, float2::zero, float4::zero)
 	{}
 
-	Vertex(float3 position, float3 normal) noexcept
-		: Vertex(position, normal, float2::zero, float4::zero)
+	Vertex_old(float3 position, float3 normal) noexcept
+		: Vertex_old(position, normal, float2::zero, float4::zero)
 	{}
 
-	Vertex(float3 position, float2 tex_coord) noexcept
-		: Vertex(position, float3::zero, tex_coord, float4::zero)
+	Vertex_old(float3 position, float2 tex_coord) noexcept
+		: Vertex_old(position, float3::zero, tex_coord, float4::zero)
 	{}
 
-	Vertex(float3 position, float3 normal, float2 tex_coord) noexcept
-		: Vertex(position, normal, tex_coord, float4::zero)
+	Vertex_old(float3 position, float3 normal, float2 tex_coord) noexcept
+		: Vertex_old(position, normal, tex_coord, float4::zero)
 	{}
 
-	Vertex(float3 position, float3 normal, float2 tex_coord, float4 tangent_h) noexcept
+	Vertex_old(float3 position, float3 normal, float2 tex_coord, float4 tangent_h) noexcept
 		: position(position), normal(normal), tex_coord(tex_coord), tangent_h(tangent_h)
 	{}
 
@@ -163,6 +163,38 @@ struct Vertex {
 	float3 normal = float3::zero;
 	float2 tex_coord = float2::zero;
 	float4 tangent_h = float4::zero;
+};
+
+struct Vertex final {
+	Vertex() noexcept = default;
+
+	explicit Vertex(float3 position) noexcept : 
+		position(position) 
+	{}
+
+	Vertex(float3 position, float3 normal) noexcept : 
+		position(position), normal(normal)
+	{}
+
+	Vertex(float3 position, float2 tex_coord) noexcept :
+		position(position), tex_coord(tex_coord)
+	{}
+
+	Vertex(float3 position, float3 normal, float2 tex_coord) noexcept :
+		position(position), normal(normal), tex_coord(tex_coord)
+	{}
+
+	Vertex(float3 position, float3 normal, float2 tex_coord, float3 tangent, float3 bitangent) noexcept :
+		position(position), normal(normal), tex_coord(tex_coord), 
+		tangent(tangent), bitangent(bitangent)
+	{}
+
+
+	float3 position = float3::zero;
+	float3 normal = float3::zero;
+	float2 tex_coord = float2::zero;
+	float3 tangent = float3::zero;
+	float3 bitangent = float3::zero;
 };
 
 // Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
@@ -215,9 +247,9 @@ public:
 
 	// Packs all the v vertex attribus that are specified in format.
 	// Preserves the relative order of the attributes: positon, normal, tex_coord, tangent_h.
-	void push_back_vertex(const Vertex& v);
+	void push_back_vertex(const Vertex_old& v);
 
-	void push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2);
+	void push_back_vertices(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2);
 
 	// How many vertices are in this mesh data.
 	size_t vertex_count() const noexcept
@@ -266,12 +298,26 @@ inline bool operator!=(const Interleaved_vertex_format& l, const Interleaved_ver
 	return (l.attribs == r.attribs);
 }
 
-inline bool operator==(const Vertex& l, const Vertex& r) noexcept
+inline bool operator==(const Vertex_old& l, const Vertex_old& r) noexcept
 {
 	return (l.position == r.position)
 		&& (l.normal == r.normal)
 		&& (l.tex_coord == r.tex_coord)
 		&& (l.tangent_h == r.tangent_h);
+}
+
+inline bool operator!=(const Vertex_old& l, const Vertex_old& r) noexcept
+{
+	return !(l == r);
+}
+
+inline bool operator==(const Vertex& l, const Vertex& r) noexcept
+{
+	return (l.position == r.position)
+		&& (l.normal == r.normal)
+		&& (l.tex_coord == r.tex_coord)
+		&& (l.tangent == r.tangent)
+		&& (l.bitangent == r.bitangent);
 }
 
 inline bool operator!=(const Vertex& l, const Vertex& r) noexcept
@@ -287,6 +333,10 @@ std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt
 
 std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt);
 
+std::ostream& operator<<(std::ostream& out, const Vertex_old& v);
+
+std::wostream& operator<<(std::wostream& out, const Vertex_old& v);
+
 std::ostream& operator<<(std::ostream& out, const Vertex& v);
 
 std::wostream& operator<<(std::wostream& out, const Vertex& v);
@@ -294,7 +344,7 @@ std::wostream& operator<<(std::wostream& out, const Vertex& v);
 // Computes tangent and handedness of bitangent for a triangle that is specified by the 3 given vertices.
 // Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.
 // Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
-float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2);
+float4 compute_tangent_h(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2);
 
 // Computes tangent and bitangent vectors for a triangle that is specified by 3 position, tex_coord attribures.
 // Returned vectors are not normalized.

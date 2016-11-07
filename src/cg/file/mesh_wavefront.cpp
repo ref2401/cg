@@ -14,7 +14,7 @@ using cg::float2;
 using cg::float3;
 using cg::float4;
 using cg::data::Interleaved_mesh_data;
-using cg::data::Vertex;
+using cg::data::Vertex_old;
 using cg::data::Vertex_attribs;
 using cg::data::compute_tangent_h;
 using cg::file::By_line_iterator;
@@ -132,7 +132,7 @@ void parse_faces_p(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 		ENFORCE(count == 3u, "Invalid face format. Only position indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
 
-		std::array<Vertex, 3> vertices;
+		std::array<Vertex_old, 3> vertices;
 		vertices[0].position = mesh_data.positions[static_cast<size_t>(p0)];
 		vertices[1].position = mesh_data.positions[static_cast<size_t>(p1)];
 		vertices[2].position = mesh_data.positions[static_cast<size_t>(p2)];
@@ -161,7 +161,7 @@ void parse_face_pn(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 		normalize_wf_indices(position_count, p0, p1, p2);
 		normalize_wf_indices(normal_count, n0, n1, n2);
 
-		std::array<Vertex, 3> vertices;
+		std::array<Vertex_old, 3> vertices;
 		vertices[0].position = mesh_data.positions[static_cast<size_t>(p0)];
 		vertices[1].position = mesh_data.positions[static_cast<size_t>(p1)];
 		vertices[2].position = mesh_data.positions[static_cast<size_t>(p2)];
@@ -196,7 +196,7 @@ void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_
 		normalize_wf_indices(normal_count, n0, n1, n2);
 		normalize_wf_indices(tex_coord_count, tc0, tc1, tc2);
 
-		std::array<Vertex, 3> vertices;
+		std::array<Vertex_old, 3> vertices;
 		vertices[0].position = mesh_data.positions[static_cast<size_t>(p0)];
 		vertices[1].position = mesh_data.positions[static_cast<size_t>(p1)];
 		vertices[2].position = mesh_data.positions[static_cast<size_t>(p2)];
@@ -246,7 +246,7 @@ void parse_face_ptc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_m
 		normalize_wf_indices(position_count, p0, p1, p2);
 		normalize_wf_indices(tex_coord_count, tc0, tc1, tc2);
 
-		std::array<Vertex, 3> vertices;
+		std::array<Vertex_old, 3> vertices;
 		vertices[0].position = mesh_data.positions[static_cast<size_t>(p0)];
 		vertices[1].position = mesh_data.positions[static_cast<size_t>(p1)];
 		vertices[2].position = mesh_data.positions[static_cast<size_t>(p2)];

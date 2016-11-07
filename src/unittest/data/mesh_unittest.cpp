@@ -13,6 +13,7 @@ using cg::approx_equal;
 using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_vertex_format;
 using cg::data::Vertex;
+using cg::data::Vertex_old;
 using cg::data::Vertex_attribs;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -21,6 +22,7 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
 template<> inline std::wstring ToString<Interleaved_vertex_format>(const Interleaved_vertex_format& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Vertex>(const Vertex& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Vertex_old>(const Vertex_old& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
@@ -74,9 +76,9 @@ public:
 
 	TEST_METHOD(push_back_vertices)
 	{
-		Vertex v0(float3(1, 2, 3), float3(6, 7, 8), float2(4, 5),  float4(9, 10, 11, 12));
-		Vertex v1(float3(101, 102, 103), float3(106, 107, 108), float2(104, 105), float4(109, 110, 111, 112));
-		Vertex v2(float3(201, 202, 203), float3(206, 207, 208), float2(204, 205), float4(209, 210, 211, 212));
+		Vertex_old v0(float3(1, 2, 3), float3(6, 7, 8), float2(4, 5),  float4(9, 10, 11, 12));
+		Vertex_old v1(float3(101, 102, 103), float3(106, 107, 108), float2(104, 105), float4(109, 110, 111, 112));
+		Vertex_old v2(float3(201, 202, 203), float3(206, 207, 208), float2(204, 205), float4(209, 210, 211, 212));
 
 		{ // position attrib
 			float expected_data[9] = { 
@@ -161,13 +163,13 @@ public:
 		Interleaved_mesh_data md(Vertex_attribs::position);
 		Assert::AreEqual<size_t>(0, md.vertex_count());
 
-		md.push_back_vertex(Vertex());
+		md.push_back_vertex(Vertex_old());
 		Assert::AreEqual<size_t>(1, md.vertex_count());
 		
-		md.push_back_vertex(Vertex());
+		md.push_back_vertex(Vertex_old());
 		Assert::AreEqual<size_t>(2, md.vertex_count());
 
-		md.push_back_vertices(Vertex(), Vertex(), Vertex());
+		md.push_back_vertices(Vertex_old(), Vertex_old(), Vertex_old());
 		Assert::AreEqual<size_t>(5, md.vertex_count());
 	}
 };
@@ -328,68 +330,77 @@ public:
 		Assert::AreEqual(float3::zero, v0.position);
 		Assert::AreEqual(float3::zero, v0.normal);
 		Assert::AreEqual(float2::zero, v0.tex_coord);
-		Assert::AreEqual(float4::zero, v0.tangent_h);
+		Assert::AreEqual(float3::zero, v0.tangent);
+		Assert::AreEqual(float3::zero, v0.bitangent);
 
 		// position
 		Vertex v1(float3(1));
 		Assert::AreEqual(float3(1), v1.position);
 		Assert::AreEqual(float3::zero, v1.normal);
 		Assert::AreEqual(float2::zero, v1.tex_coord);
-		Assert::AreEqual(float4::zero, v1.tangent_h);
+		Assert::AreEqual(float3::zero, v1.tangent);
+		Assert::AreEqual(float3::zero, v1.bitangent);
 
 		// position & normal
 		Vertex v2_0(float3(1), float3(2));
 		Assert::AreEqual(float3(1), v2_0.position);
 		Assert::AreEqual(float3(2), v2_0.normal);
 		Assert::AreEqual(float2::zero, v2_0.tex_coord);
-		Assert::AreEqual(float4::zero, v2_0.tangent_h);
+		Assert::AreEqual(float3::zero, v2_0.tangent);
+		Assert::AreEqual(float3::zero, v2_0.bitangent);
 
 		// position & tex_coord
 		Vertex v2_1(float3(1), float2(3));
 		Assert::AreEqual(float3(1), v2_1.position);
 		Assert::AreEqual(float3::zero, v2_1.normal);
 		Assert::AreEqual(float2(3), v2_1.tex_coord);
-		Assert::AreEqual(float4::zero, v2_1.tangent_h);
+		Assert::AreEqual(float3::zero, v2_1.tangent);
+		Assert::AreEqual(float3::zero, v2_1.bitangent);
 
 		// position, normal & tex_coord
 		Vertex v3(float3(1), float3(2), float2(3));
 		Assert::AreEqual(float3(1), v3.position);
 		Assert::AreEqual(float3(2), v3.normal);
 		Assert::AreEqual(float2(3), v3.tex_coord);
-		Assert::AreEqual(float4::zero, v3.tangent_h);
+		Assert::AreEqual(float3::zero, v3.tangent);
+		Assert::AreEqual(float3::zero, v3.bitangent);
 
 		// position, normal, tex_coord & tangent_h
-		Vertex v4(float3(1), float3(2), float2(3), float4(4));
+		Vertex v4(float3(1), float3(2), float2(3), float3(4), float3(5));
 		Assert::AreEqual(float3(1), v4.position);
 		Assert::AreEqual(float3(2), v4.normal);
 		Assert::AreEqual(float2(3), v4.tex_coord);
-		Assert::AreEqual(float4(4), v4.tangent_h);
+		Assert::AreEqual(float3(4), v4.tangent);
+		Assert::AreEqual(float3(5), v4.bitangent);
 
 		// copy ctor
 		Vertex v4_c = v4;
 		Assert::AreEqual(v4.position, v4_c.position);
 		Assert::AreEqual(v4.normal, v4_c.normal);
 		Assert::AreEqual(v4.tex_coord, v4_c.tex_coord);
-		Assert::AreEqual(v4.tangent_h, v4_c.tangent_h);
+		Assert::AreEqual(v4.tangent, v4_c.tangent);
+		Assert::AreEqual(v4.bitangent, v4_c.bitangent);
 
 		// move ctor
 		Vertex v4_m = std::move(v4);
 		Assert::AreEqual(v4.position, v4_m.position);
 		Assert::AreEqual(v4.normal, v4_m.normal);
 		Assert::AreEqual(v4.tex_coord, v4_m.tex_coord);
-		Assert::AreEqual(v4.tangent_h, v4_m.tangent_h);
+		Assert::AreEqual(v4.tangent, v4_m.tangent);
+		Assert::AreEqual(v4.bitangent, v4_m.bitangent);
 	}
 
 	TEST_METHOD(operator_equal)
 	{
-		Vertex v(float3(1), float3(2), float2(3), float4(4));
+		Vertex v(float3(1), float3(2), float2(3), float3(4), float3(5));
 
-		Assert::AreNotEqual(v, Vertex(float3(10), float3(2), float2(3), float4(4)));
-		Assert::AreNotEqual(v, Vertex(float3(1), float3(20), float2(3), float4(4)));
-		Assert::AreNotEqual(v, Vertex(float3(1), float3(2), float2(30), float4(4)));
-		Assert::AreNotEqual(v, Vertex(float3(1), float3(2), float2(3), float4(40)));
+		Assert::AreNotEqual(v, Vertex(float3(10), float3(2), float2(3), float3(4), float3(5)));
+		Assert::AreNotEqual(v, Vertex(float3(1), float3(20), float2(3), float3(4), float3(5)));
+		Assert::AreNotEqual(v, Vertex(float3(1), float3(2), float2(30), float3(4), float3(5)));
+		Assert::AreNotEqual(v, Vertex(float3(1), float3(2), float2(3), float3(40), float3(5)));
+		Assert::AreNotEqual(v, Vertex(float3(1), float3(2), float2(3), float3(4), float3(50)));
 
-		Assert::AreEqual(v, Vertex(float3(1), float3(2), float2(3), float4(4)));
+		Assert::AreEqual(v, Vertex(float3(1), float3(2), float2(3), float3(4), float3(5)));
 	}
 };
 
@@ -520,18 +531,18 @@ public:
 
 		// right-handed basis
 		float3 normal_positive = float3::unit_z;
-		Vertex lb0 = Vertex(float3(-1, -1, 0), normal_positive, float2::zero); // left-bottom
-		Vertex rb0 = Vertex(float3(1, -1, 0), normal_positive, float2(1, 0)); // right-bottom
-		Vertex rt0 = Vertex(float3(1, 1, 0), normal_positive, float2::unit_xy); // right-top
+		Vertex_old lb0 = Vertex_old(float3(-1, -1, 0), normal_positive, float2::zero); // left-bottom
+		Vertex_old rb0 = Vertex_old(float3(1, -1, 0), normal_positive, float2(1, 0)); // right-bottom
+		Vertex_old rt0 = Vertex_old(float3(1, 1, 0), normal_positive, float2::unit_xy); // right-top
 
 		float4 tan_right = compute_tangent_h(lb0, rb0, rt0);
 		Assert::AreEqual(float4(float3::unit_x, 1.0f), tan_right);
 
 		// left-handed basis
 		float3 normal_negative = -float3::unit_z;
-		Vertex lb1 = Vertex(float3(-1, -1, 0), normal_negative, float2::zero); // left-bottom
-		Vertex rb1 = Vertex(float3(1, -1, 0), normal_negative, float2(1, 0)); // right-bottom
-		Vertex rt1 = Vertex(float3(1, 1, 0), normal_negative, float2::unit_xy); // right-top
+		Vertex_old lb1 = Vertex_old(float3(-1, -1, 0), normal_negative, float2::zero); // left-bottom
+		Vertex_old rb1 = Vertex_old(float3(1, -1, 0), normal_negative, float2(1, 0)); // right-bottom
+		Vertex_old rt1 = Vertex_old(float3(1, 1, 0), normal_negative, float2::unit_xy); // right-top
 
 		float4 tan_left = compute_tangent_h(lb1, rb1, rt1);
 		Assert::AreEqual(float4(float3::unit_x, -1.0f), tan_left);

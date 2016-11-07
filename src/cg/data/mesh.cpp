@@ -31,7 +31,7 @@ void Interleaved_mesh_data::push_back_indices(uint32_t i0, uint32_t i1, uint32_t
 	_indices.insert(_indices.end(), index_buffer, index_buffer + std::extent<decltype(index_buffer)>::value);
 }
 
-void Interleaved_mesh_data::push_back_vertex(const Vertex& v)
+void Interleaved_mesh_data::push_back_vertex(const Vertex_old& v)
 {
 	float data_buffer[12];
 	size_t offset = 0;
@@ -67,7 +67,7 @@ void Interleaved_mesh_data::push_back_vertex(const Vertex& v)
 	_data.insert(_data.end(), data_buffer, data_buffer + offset);
 }
 
-void Interleaved_mesh_data::push_back_vertices(const Vertex& v0, const Vertex& v1, const Vertex& v2)
+void Interleaved_mesh_data::push_back_vertices(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
 {
 	push_back_vertex(v0);
 	push_back_vertex(v1);
@@ -76,7 +76,7 @@ void Interleaved_mesh_data::push_back_vertices(const Vertex& v0, const Vertex& v
 
 // ----- funcs -----
 
-float4 compute_tangent_h(const Vertex& v0, const Vertex& v1, const Vertex& v2)
+float4 compute_tangent_h(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
 {
 	float3 pos0 = v0.position;
 	float3 pos1 = v1.position;
@@ -199,12 +199,31 @@ std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& f
 	return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const Vertex_old& v)
+{
+	out << "Vertex_old(p: " << v.position
+		<< "; n: " << v.normal
+		<< "; tc: " << v.tex_coord
+		<< "; tan_h: " << v.tangent_h << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Vertex_old& v)
+{
+	out << "Vertex_old(p: " << v.position
+		<< "; n: " << v.normal
+		<< "; tc: " << v.tex_coord
+		<< "; tan_h: " << v.tangent_h << ")";
+	return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const Vertex& v)
 {
 	out << "Vertex(p: " << v.position
 		<< "; n: " << v.normal
 		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
+		<< "; tan: " << v.tangent
+		<< "; bitan: " << v.bitangent << ")";
 	return out;
 }
 
@@ -213,7 +232,8 @@ std::wostream& operator<<(std::wostream& out, const Vertex& v)
 	out << "Vertex(p: " << v.position
 		<< "; n: " << v.normal
 		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
+		<< "; tan: " << v.tangent
+		<< "; bitan: " << v.bitangent << ")";
 	return out;
 }
 
