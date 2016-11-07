@@ -122,7 +122,8 @@ struct Interleaved_vertex_format final {
 };
 
 // Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
-// Implementation details: does not support base vertex counter.
+// Implementation details: does not support base vertex counter 
+// which means do not put more than one mesh into an Interleaved_mesh_data instance.
 class Interleaved_mesh_data final {
 public:
 
@@ -198,15 +199,38 @@ public:
 	// Removes all the vertices & indices from builder.
 	void clear() noexcept;
 
-	void push_back_vertex(const Vertex_ts& v);
+	// Total number of indices in the mesh.
+	size_t index_count() const noexcept
+	{
+		return _indices.size();
+	}
+
+	// Returns indices of the mesh being constructed.
+	const std::vector<uint32_t>& indices() const noexcept
+	{
+		return _indices;
+	}
+
+	void push_back_vertex(const Vertex_ts& vertex);
 
 	void push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2);
 
+	// Total number of vertices in the mesh.
+	size_t vertex_count() const noexcept
+	{
+		return _vertices.size();
+	}
+
+	// Returns vertices of the mesh being constructed.
+	const std::vector<Vertex_ts>& vertices() const noexcept
+	{
+		return _vertices;
+	}
+
 private:
-	//std::unordered_map<Vertex, uint32_t> _shared_vertices;
+	std::unordered_map<Vertex, uint32_t> _shared_vertices;
 	std::vector<Vertex_ts> _vertices;
 	std::vector<uint32_t> _indices;
-	uint32_t _curr_index_counter = 0;
 };
 
 

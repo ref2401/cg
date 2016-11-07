@@ -297,8 +297,8 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 {
 	assert(attribs != Vertex_attribs::none);
 
-	static thread_local Wf_mesh_data mesh_data;
-	mesh_data.clear();
+	static thread_local Wf_mesh_data wf_mesh_data;
+	wf_mesh_data.clear();
 
 	// read mesh data from file
 	for (; it != By_line_iterator::end; ++it) {
@@ -311,19 +311,19 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 		switch (line_type) {
 			case Wf_line_type::position: {
 				float3 p = parse_position(line);
-				mesh_data.positions.push_back(p);
+				wf_mesh_data.positions.push_back(p);
 				break;
 			}
 
 			case Wf_line_type::normal: {
 				float3 n = parse_normal(line);
-				mesh_data.normals.push_back(n);
+				wf_mesh_data.normals.push_back(n);
 				break;
 			}
 
 			case Wf_line_type::tex_coord: {
 				float2 tc = parse_tex_coord(line);
-				mesh_data.tex_coords.push_back(tc);
+				wf_mesh_data.tex_coords.push_back(tc);
 				break;
 			}
 
@@ -331,30 +331,29 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 	}
 
 	// validate mesh data
-	ENFORCE(mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
+	ENFORCE(wf_mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
 	if (has_normal(attribs)) 
-		ENFORCE(mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
+		ENFORCE(wf_mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
 	if (has_tex_coord(attribs))
-		ENFORCE(mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
+		ENFORCE(wf_mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
 
 	// pack data
-	size_t init_vertex_count = (approx_vertex_count) ? approx_vertex_count : mesh_data.positions.size();
-	size_t init_index_cout = (approx_index_cont) ? approx_index_cont : mesh_data.positions.size();
+	size_t init_vertex_count = (approx_vertex_count) ? approx_vertex_count : wf_mesh_data.positions.size();
+	size_t init_index_cout = (approx_index_cont) ? approx_index_cont : wf_mesh_data.positions.size();
 	cg::data::Interleaved_mesh_data imd(attribs, init_vertex_count, init_index_cout);
 
-	auto n = mesh_data.has_normals();
-	auto tc = mesh_data.has_tex_coords();
-	if (mesh_data.has_normals() && mesh_data.has_tex_coords()) {
-		parse_face_pntc(it, mesh_data, imd, has_tangent_space(attribs));
+
+	if (wf_mesh_data.has_normals() && wf_mesh_data.has_tex_coords()) {
+		parse_face_pntc(it, wf_mesh_data, imd, has_tangent_space(attribs));
 	}
-	else if (mesh_data.has_normals()) {
-		parse_face_pn(it, mesh_data, imd);
+	else if (wf_mesh_data.has_normals()) {
+		parse_face_pn(it, wf_mesh_data, imd);
 	}
-	else if (mesh_data.has_tex_coords()) {
-		parse_face_ptc(it, mesh_data, imd);
+	else if (wf_mesh_data.has_tex_coords()) {
+		parse_face_ptc(it, wf_mesh_data, imd);
 	}
 	else {
-		parse_faces_p(it, mesh_data, imd);
+		parse_faces_p(it, wf_mesh_data, imd);
 	}
 
 	return imd;

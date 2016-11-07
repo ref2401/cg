@@ -81,38 +81,38 @@ Mesh_builder::Mesh_builder(size_t vertex_count, size_t index_count)
 	assert(vertex_count > 0);
 	assert(index_count > 0);
 
-	//_shared_vertices.reserve(vertex_count);
+	_shared_vertices.reserve(vertex_count);
 	_vertices.reserve(vertex_count);
 	_indices.reserve(index_count);
 }
 
 void Mesh_builder::clear() noexcept
 {
-	//_shared_vertices.clear();
+	_shared_vertices.clear();
 	_vertices.clear();
 	_indices.clear();
-	_curr_index_counter = 0;
 }
 
-void Mesh_builder::push_back_vertex(const Vertex_ts& v)
+void Mesh_builder::push_back_vertex(const Vertex_ts& vertex)
 {
-	//auto it = _shared_vertices.find(v);
-	//
-	//uint32_t index;
-	//if (it == _shared_vertices.end()) {
-	//	index = static_cast<uint32_t>(_vertices.size());
+	Vertex v_key(vertex.position, vertex.normal, vertex.tex_coord);
+	auto it = _shared_vertices.find(v_key);
+	
+	uint32_t index;
+	if (it == _shared_vertices.end()) {
+		index = static_cast<uint32_t>(_vertices.size());
+		_shared_vertices[v_key] = index;
+		_vertices.push_back(vertex);
+	}
+	else {
+		index = it->second;
+		auto& v = _vertices[index];
 
-	//}
-	//else 
-	//{
-	//	index = it->second;
-	//	auto& vertex = _vertices[index];
+		v.tangent += vertex.tangent;
+		v.bitangent += vertex.bitangent;
+	}
 
-	//	vertex.tangent += v.tangent;
-	//	vertex.bitangent += v.bitangent;
-	//}
-
-	//_indices
+	_indices.push_back(index);
 }
 
 void Mesh_builder::push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2)

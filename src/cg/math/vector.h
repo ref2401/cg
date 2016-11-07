@@ -80,6 +80,7 @@ struct float3 {
 	static const float3 unit_x;
 	static const float3 unit_y;
 	static const float3 unit_z;
+	static const float3 unit_xy;
 	static const float3 unit_xyz;
 	static const float3 zero;
 

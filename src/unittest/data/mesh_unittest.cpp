@@ -12,6 +12,7 @@ using cg::float4;
 using cg::approx_equal;
 using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_vertex_format;
+using cg::data::Mesh_builder;
 using cg::data::Vertex_ts;
 using cg::data::Vertex_old;
 using cg::data::Vertex_attribs;
@@ -174,7 +175,7 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_Interleaved_vertex_fotmat) {
+TEST_CLASS(cg_data_mesh_Interleaved_vertex_fotmat) {
 public:
 
 	TEST_METHOD(byte_count)
@@ -317,6 +318,46 @@ public:
 
 		Assert::AreNotEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::position));
 		Assert::AreEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::mesh_textured));
+	}
+};
+
+TEST_CLASS(cg_data_mesh_Mesh_builder) {
+public:
+
+	TEST_METHOD(clear)
+	{
+		Vertex_ts v(float3::unit_xyz);
+		Mesh_builder ms(1, 1);
+
+		ms.push_back_vertex(v);
+		Assert::AreEqual(size_t(1), ms.vertex_count());
+		Assert::AreEqual(size_t(1), ms.index_count());
+
+		ms.clear();
+		Assert::AreEqual(size_t(0), ms.vertex_count());
+		Assert::AreEqual(size_t(0), ms.index_count());
+		Assert::IsTrue(ms.vertices().empty());
+		Assert::IsTrue(ms.indices().empty());
+	}
+
+	TEST_METHOD(push_back_vertex_triangle)
+	{
+		// vertices represent a square
+		Vertex_ts v0(float3::zero, float3::unit_z, float2::zero);		// left-bottom
+		Vertex_ts v1(float3::unit_x, float3::unit_z, float2::unit_x);	// right-bottom
+		Vertex_ts v2(float3::unit_xy, float3::unit_z, float2::unit_xy);	// right-top
+		Vertex_ts v3(float3::unit_y, float3::unit_z, float2::unit_y);	// left-top
+
+		Vertex_ts expected_vertices[4] = { v0, v1, v2, v3 };
+		uint32_t expected_indices[6] = { 0, 1, 2,  2, 3, 0 };
+		
+		Mesh_builder ms(3, 3);
+		ms.push_back_triangle(v0, v1, v2);
+		ms.push_back_triangle(v2, v3, v0);
+		Assert::AreEqual(size_t(4), ms.vertex_count());
+		Assert::AreEqual(size_t(6), ms.index_count());
+		Assert::IsTrue(std::equal(ms.vertices().cbegin(), ms.vertices().cend(), std::cbegin(expected_vertices)));
+		Assert::IsTrue(std::equal(ms.indices().cbegin(), ms.indices().cend(), std::cbegin(expected_indices)));
 	}
 };
 

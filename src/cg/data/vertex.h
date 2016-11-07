@@ -234,5 +234,16 @@ constexpr bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset)
 } // namespace data
 } // namespace cg
 
+namespace std {
+
+template<> 
+struct hash<cg::data::Vertex> {
+	size_t operator()(const cg::data::Vertex& v) const noexcept
+	{
+		return cg::data::get_hash(v);
+	}
+};
+
+} // namespace std
 
 #endif // CG_DATA_VERTEX_H_
