@@ -74,6 +74,54 @@ void Interleaved_mesh_data::push_back_vertices(const Vertex_old& v0, const Verte
 	push_back_vertex(v2);
 }
 
+// ----- Mesh_builder -----
+
+Mesh_builder::Mesh_builder(size_t vertex_count, size_t index_count)
+{
+	assert(vertex_count > 0);
+	assert(index_count > 0);
+
+	//_shared_vertices.reserve(vertex_count);
+	_vertices.reserve(vertex_count);
+	_indices.reserve(index_count);
+}
+
+void Mesh_builder::clear() noexcept
+{
+	//_shared_vertices.clear();
+	_vertices.clear();
+	_indices.clear();
+	_curr_index_counter = 0;
+}
+
+void Mesh_builder::push_back_vertex(const Vertex_ts& v)
+{
+	//auto it = _shared_vertices.find(v);
+	//
+	//uint32_t index;
+	//if (it == _shared_vertices.end()) {
+	//	index = static_cast<uint32_t>(_vertices.size());
+
+	//}
+	//else 
+	//{
+	//	index = it->second;
+	//	auto& vertex = _vertices[index];
+
+	//	vertex.tangent += v.tangent;
+	//	vertex.bitangent += v.bitangent;
+	//}
+
+	//_indices
+}
+
+void Mesh_builder::push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2)
+{
+	push_back_vertex(v0);
+	push_back_vertex(v1);
+	push_back_vertex(v2);
+}
+
 // ----- funcs -----
 
 float4 compute_tangent_h(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
@@ -151,41 +199,6 @@ float4 compute_tangent_handedness(const float3& tangent,
 	return float4(t, h);
 }
 
-std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
-{
-	out << "Vertex_attribs(";
-
-	if (attribs == Vertex_attribs::none) {
-		out << "none";
-	}
-	else {
-		if (has_position(attribs)) out << "position";
-		if (has_normal(attribs)) out << "normal ";
-		if (has_tex_coord(attribs)) out << "tex_coord ";
-		if (has_tangent_space(attribs)) out << "tangent_h";
-	}
-
-	out << ")";
-	return out;
-}
-
-std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
-{
-	out << "Vertex_attribs(";
-
-	if (attribs == Vertex_attribs::none) {
-		out << "none";
-	}
-	else {
-		if (has_position(attribs)) out << "position";
-		if (has_normal(attribs)) out << "normal ";
-		if (has_tex_coord(attribs)) out << "tex_coord ";
-		if (has_tangent_space(attribs)) out << "tangent_h";
-	}
-
-	out << ")";
-	return out;
-}
 
 std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt)
 {
@@ -196,44 +209,6 @@ std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt
 std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt)
 {
 	out << fmt.attribs;
-	return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Vertex_old& v)
-{
-	out << "Vertex_old(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
-	return out;
-}
-
-std::wostream& operator<<(std::wostream& out, const Vertex_old& v)
-{
-	out << "Vertex_old(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
-	return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Vertex& v)
-{
-	out << "Vertex(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan: " << v.tangent
-		<< "; bitan: " << v.bitangent << ")";
-	return out;
-}
-
-std::wostream& operator<<(std::wostream& out, const Vertex& v)
-{
-	out << "Vertex(p: " << v.position
-		<< "; n: " << v.normal
-		<< "; tc: " << v.tex_coord
-		<< "; tan: " << v.tangent
-		<< "; bitan: " << v.bitangent << ")";
 	return out;
 }
 

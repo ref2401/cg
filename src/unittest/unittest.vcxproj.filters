@@ -46,6 +46,9 @@
     <ClCompile Include="math\matrix_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="data\vertex_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="data\image.cpp" />
     <ClCompile Include="data\mesh.cpp" />
+    <ClCompile Include="data\vertex.cpp" />
     <ClCompile Include="file\file.cpp" />
     <ClCompile Include="file\image_tga.cpp" />
     <ClCompile Include="file\mesh_wavefront.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="data\image.h" />
     <ClInclude Include="data\mesh.h" />
     <ClInclude Include="data\shader.h" />
+    <ClInclude Include="data\vertex.h" />
     <ClInclude Include="file\file.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\matrix.h" />

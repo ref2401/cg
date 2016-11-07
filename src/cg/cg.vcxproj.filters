@@ -61,6 +61,9 @@
     <ClCompile Include="math\matrix.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="data\vertex.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="math\matrix.h">
       <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="data\vertex.h">
+      <Filter>data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

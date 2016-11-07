@@ -5,31 +5,17 @@
 #include <cstdint>
 #include <ostream>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
+#include "cg/data/vertex.h"
 
 
 namespace cg {
 namespace data {
 
-enum class Vertex_attribs : unsigned char {
-	none = 0,
-	position = 1,
-	normal = 2,
-	tex_coord = 4,
-	tangent_h = 8,
-
-	mesh_position = position,
-	mesh_textured = position | tex_coord,
-	mesh_tangent_space = position | tex_coord | normal | tangent_h
-};
-
-constexpr bool has_normal(Vertex_attribs attribs); // see defs & comments below
-constexpr bool has_position(Vertex_attribs attribs);
-constexpr bool has_tangent_space(Vertex_attribs attribs);
-constexpr bool has_tex_coord(Vertex_attribs attribs);
 
 // Describes the order and offset (byte & component) of every vertex attribute.
 // The relative order of the attributes is: position, normal, tex_coord, tangent_h.
@@ -135,68 +121,6 @@ struct Interleaved_vertex_format final {
 	Vertex_attribs attribs = Vertex_attribs::none;
 };
 
-struct Vertex_old {
-	Vertex_old() noexcept = default;
-
-	explicit Vertex_old(float3 position) noexcept
-		: Vertex_old(position, float3::zero, float2::zero, float4::zero)
-	{}
-
-	Vertex_old(float3 position, float3 normal) noexcept
-		: Vertex_old(position, normal, float2::zero, float4::zero)
-	{}
-
-	Vertex_old(float3 position, float2 tex_coord) noexcept
-		: Vertex_old(position, float3::zero, tex_coord, float4::zero)
-	{}
-
-	Vertex_old(float3 position, float3 normal, float2 tex_coord) noexcept
-		: Vertex_old(position, normal, tex_coord, float4::zero)
-	{}
-
-	Vertex_old(float3 position, float3 normal, float2 tex_coord, float4 tangent_h) noexcept
-		: position(position), normal(normal), tex_coord(tex_coord), tangent_h(tangent_h)
-	{}
-
-
-	float3 position = float3::zero;
-	float3 normal = float3::zero;
-	float2 tex_coord = float2::zero;
-	float4 tangent_h = float4::zero;
-};
-
-struct Vertex final {
-	Vertex() noexcept = default;
-
-	explicit Vertex(float3 position) noexcept : 
-		position(position) 
-	{}
-
-	Vertex(float3 position, float3 normal) noexcept : 
-		position(position), normal(normal)
-	{}
-
-	Vertex(float3 position, float2 tex_coord) noexcept :
-		position(position), tex_coord(tex_coord)
-	{}
-
-	Vertex(float3 position, float3 normal, float2 tex_coord) noexcept :
-		position(position), normal(normal), tex_coord(tex_coord)
-	{}
-
-	Vertex(float3 position, float3 normal, float2 tex_coord, float3 tangent, float3 bitangent) noexcept :
-		position(position), normal(normal), tex_coord(tex_coord), 
-		tangent(tangent), bitangent(bitangent)
-	{}
-
-
-	float3 position = float3::zero;
-	float3 normal = float3::zero;
-	float2 tex_coord = float2::zero;
-	float3 tangent = float3::zero;
-	float3 bitangent = float3::zero;
-};
-
 // Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
 // Implementation details: does not support base vertex counter.
 class Interleaved_mesh_data final {
@@ -263,30 +187,28 @@ private:
 	Interleaved_vertex_format _format;
 };
 
+// Mesh_builder composes a mesh from the given vertices. Shared vertices are merged, 
+// tangent & bitangent attribs for shared vertices are always accumulated to make them smooth.
+class Mesh_builder final {
+public:
 
-constexpr Vertex_attribs operator|(Vertex_attribs l, Vertex_attribs r)
-{
-	using Val_t = std::underlying_type<Vertex_attribs>::type;
-	return static_cast<Vertex_attribs>(static_cast<Val_t>(l) | static_cast<Val_t>(r));
-}
+	Mesh_builder(size_t vertex_count, size_t index_count);
 
-constexpr Vertex_attribs operator&(Vertex_attribs l, Vertex_attribs r)
-{
-	using Val_t = std::underlying_type<Vertex_attribs>::type;
-	return static_cast<Vertex_attribs>(static_cast<Val_t>(l) & static_cast<Val_t>(r));
-}
+	
+	// Removes all the vertices & indices from builder.
+	void clear() noexcept;
 
-inline Vertex_attribs& operator|=(Vertex_attribs& l, Vertex_attribs r) noexcept
-{
-	l = l | r;
-	return l;
-}
+	void push_back_vertex(const Vertex_ts& v);
 
-inline Vertex_attribs& operator&=(Vertex_attribs& l, Vertex_attribs r) noexcept
-{
-	l = l & r;
-	return l;
-}
+	void push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2);
+
+private:
+	//std::unordered_map<Vertex, uint32_t> _shared_vertices;
+	std::vector<Vertex_ts> _vertices;
+	std::vector<uint32_t> _indices;
+	uint32_t _curr_index_counter = 0;
+};
+
 
 inline bool operator==(const Interleaved_vertex_format& l, const Interleaved_vertex_format& r) noexcept
 {
@@ -298,48 +220,10 @@ inline bool operator!=(const Interleaved_vertex_format& l, const Interleaved_ver
 	return (l.attribs == r.attribs);
 }
 
-inline bool operator==(const Vertex_old& l, const Vertex_old& r) noexcept
-{
-	return (l.position == r.position)
-		&& (l.normal == r.normal)
-		&& (l.tex_coord == r.tex_coord)
-		&& (l.tangent_h == r.tangent_h);
-}
-
-inline bool operator!=(const Vertex_old& l, const Vertex_old& r) noexcept
-{
-	return !(l == r);
-}
-
-inline bool operator==(const Vertex& l, const Vertex& r) noexcept
-{
-	return (l.position == r.position)
-		&& (l.normal == r.normal)
-		&& (l.tex_coord == r.tex_coord)
-		&& (l.tangent == r.tangent)
-		&& (l.bitangent == r.bitangent);
-}
-
-inline bool operator!=(const Vertex& l, const Vertex& r) noexcept
-{
-	return !(l == r);
-}
-
-std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs);
-
-std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs);
-
 std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt);
 
 std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt);
 
-std::ostream& operator<<(std::ostream& out, const Vertex_old& v);
-
-std::wostream& operator<<(std::wostream& out, const Vertex_old& v);
-
-std::ostream& operator<<(std::ostream& out, const Vertex& v);
-
-std::wostream& operator<<(std::wostream& out, const Vertex& v);
 
 // Computes tangent and handedness of bitangent for a triangle that is specified by the 3 given vertices.
 // Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.
@@ -358,36 +242,6 @@ std::pair<cg::float3, cg::float3> compute_tangent_bitangent(
 // Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
 cg::float4 compute_tangent_handedness(const cg::float3& tangent,
 	const cg::float3& bitangent, const cg::float3& normal) noexcept;
-
-// Checks whether attribs contains Vertex_attribs::normal.
-constexpr bool has_normal(Vertex_attribs attribs)
-{
-	return (attribs & Vertex_attribs::normal) == Vertex_attribs::normal;
-}
-
-// Checks whether attribs contains Vertex_attribs::position.
-constexpr bool has_position(Vertex_attribs attribs)
-{
-	return (attribs & Vertex_attribs::position) == Vertex_attribs::position;
-}
-
-// Checks whether attribs contains Vertex_attribs::tangent_h.
-constexpr bool has_tangent_space(Vertex_attribs attribs)
-{
-	return (attribs & Vertex_attribs::tangent_h) == Vertex_attribs::tangent_h;
-}
-
-// Checks whether attribs contains Vertex_attribs::tex_coord.
-constexpr bool has_tex_coord(Vertex_attribs attribs)
-{
-	return (attribs & Vertex_attribs::tex_coord) == Vertex_attribs::tex_coord;
-}
-
-// Returns true if superset has all the vertex attributes that subset has, otherwise false.
-constexpr bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset)
-{
-	return (superset & subset) == subset;
-}
 
 
 } // data
