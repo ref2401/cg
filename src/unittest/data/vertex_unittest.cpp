@@ -67,80 +67,6 @@ TEST_CLASS(cg_data_vertex_Vertex_attribs) {
 		Assert::AreNotEqual(Vertex_attribs::tex_coord, a & Vertex_attribs::tex_coord);
 		Assert::AreNotEqual(Vertex_attribs::tangent_h, a & Vertex_attribs::tangent_h);
 	}
-
-	TEST_METHOD(has_vertex_attrib)
-	{
-		using cg::data::has_position;
-
-		// position
-		Assert::IsTrue(has_position(Vertex_attribs::position));
-		Assert::IsFalse(has_position(Vertex_attribs::tex_coord));
-		Assert::IsFalse(has_position(Vertex_attribs::normal));
-		Assert::IsFalse(has_position(Vertex_attribs::tangent_h));
-
-		Assert::IsTrue(has_position(Vertex_attribs::mesh_position));
-		Assert::IsTrue(has_position(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_position(Vertex_attribs::mesh_tangent_space));
-
-		// tex_coord
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::position));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::tex_coord));
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::normal));
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::tangent_h));
-
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::mesh_position));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_tangent_space));
-
-		// normal
-		Assert::IsFalse(has_normal(Vertex_attribs::position));
-		Assert::IsFalse(has_normal(Vertex_attribs::tex_coord));
-		Assert::IsTrue(has_normal(Vertex_attribs::normal));
-		Assert::IsFalse(has_normal(Vertex_attribs::tangent_h));
-
-		Assert::IsFalse(has_normal(Vertex_attribs::mesh_position));
-		Assert::IsFalse(has_normal(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_normal(Vertex_attribs::mesh_tangent_space));
-
-		// tangent_h
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::position));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::tex_coord));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::normal));
-		Assert::IsTrue(has_tangent_space(Vertex_attribs::tangent_h));
-
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_position));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_textured));
-		Assert::IsTrue(has_tangent_space(Vertex_attribs::mesh_tangent_space));
-	}
-
-	TEST_METHOD(is_superset_of)
-	{
-		using cg::data::is_superset_of;
-
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::position));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::tex_coord));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::normal));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::tangent_h));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_position));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_textured));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_tangent_space));
-
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tex_coord));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::normal));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tangent_h));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_textured));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_tangent_space));
-
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tex_coord));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::normal));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tangent_h));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_position));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_textured));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_tangent_space));
-	}
 };
 
 TEST_CLASS(cg_data_vertex_Vertex) {
@@ -284,6 +210,229 @@ public:
 		Assert::AreNotEqual(v, Vertex_ts(float3(1), float3(2), float2(3), float3(4), float3(50)));
 
 		Assert::AreEqual(v, Vertex_ts(float3(1), float3(2), float2(3), float3(4), float3(5)));
+	}
+};
+
+TEST_CLASS(cg_data_vertex_Funcs) {
+public:
+
+	TEST_METHOD(compute_tangent_h)
+	{
+		using cg::data::compute_tangent_h;
+
+		// right-handed basis
+		float3 normal_positive = float3::unit_z;
+		Vertex_old lb0 = Vertex_old(float3(-1, -1, 0), normal_positive, float2::zero); // left-bottom
+		Vertex_old rb0 = Vertex_old(float3(1, -1, 0), normal_positive, float2(1, 0)); // right-bottom
+		Vertex_old rt0 = Vertex_old(float3(1, 1, 0), normal_positive, float2::unit_xy); // right-top
+
+		float4 tan_right = compute_tangent_h(lb0, rb0, rt0);
+		Assert::AreEqual(float4(float3::unit_x, 1.0f), tan_right);
+
+		// left-handed basis
+		float3 normal_negative = -float3::unit_z;
+		Vertex_old lb1 = Vertex_old(float3(-1, -1, 0), normal_negative, float2::zero); // left-bottom
+		Vertex_old rb1 = Vertex_old(float3(1, -1, 0), normal_negative, float2(1, 0)); // right-bottom
+		Vertex_old rt1 = Vertex_old(float3(1, 1, 0), normal_negative, float2::unit_xy); // right-top
+
+		float4 tan_left = compute_tangent_h(lb1, rb1, rt1);
+		Assert::AreEqual(float4(float3::unit_x, -1.0f), tan_left);
+	}
+
+	TEST_METHOD(compute_tangent_bitangent)
+	{
+		using cg::normalize;
+		using cg::data::compute_tangent_bitangent;
+
+		float3 lb_pos0(-1, -1, 0);	float2 lb_tc0 = float2::zero;		// left-bottom
+		float3 lb_pos1(1, -1, 0);	float2 lb_tc1 = float2::unit_x;		// right-bottom
+		float3 lb_pos2(1, 1, 0);	float2 lb_tc2 = float2::unit_xy;	// right-top
+
+		auto tb0 = compute_tangent_bitangent(lb_pos0, lb_tc0, lb_pos1, lb_tc1, lb_pos2, lb_tc2);
+		auto expected_tb0 = std::make_pair(float3::unit_x, float3::unit_y);
+		Assert::AreEqual(float3::unit_x, normalize(tb0.first));		// tangent
+		Assert::AreEqual(float3::unit_y, normalize(tb0.second));	// bitangent
+	}
+
+	TEST_METHOD(compute_tangent_handedness)
+	{
+		using cg::normalize;
+		using cg::data::compute_tangent_handedness;
+
+		float3 tangent = normalize(float3(1, 0, 1)); // z component is set to 1 to check Gram-Schmidt orthogonalization
+		float3 bitangnet = float3::unit_y;
+		float3 normal_positive = float3::unit_z;
+		float3 normal_negative = -float3::unit_z;
+
+		// right-handed basis
+		auto th0 = compute_tangent_handedness(tangent, bitangnet, normal_positive);
+		Assert::AreEqual(float4(float3::unit_x, 1.0f), th0);
+
+		// left-handed basis
+		auto th1 = compute_tangent_handedness(tangent, bitangnet, normal_negative);
+		Assert::AreEqual(float4(float3::unit_x, -1.0f), th1);
+	}
+
+	TEST_METHOD(has_vertex_attrib)
+	{
+		using cg::data::has_position;
+
+		// position
+		Assert::IsTrue(has_position(Vertex_attribs::position));
+		Assert::IsFalse(has_position(Vertex_attribs::tex_coord));
+		Assert::IsFalse(has_position(Vertex_attribs::normal));
+		Assert::IsFalse(has_position(Vertex_attribs::tangent_h));
+
+		Assert::IsTrue(has_position(Vertex_attribs::mesh_position));
+		Assert::IsTrue(has_position(Vertex_attribs::mesh_textured));
+		Assert::IsTrue(has_position(Vertex_attribs::mesh_tangent_space));
+
+		// tex_coord
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::position));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::tex_coord));
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::normal));
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::tangent_h));
+
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::mesh_position));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_textured));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::mesh_tangent_space));
+
+		// normal
+		Assert::IsFalse(has_normal(Vertex_attribs::position));
+		Assert::IsFalse(has_normal(Vertex_attribs::tex_coord));
+		Assert::IsTrue(has_normal(Vertex_attribs::normal));
+		Assert::IsFalse(has_normal(Vertex_attribs::tangent_h));
+
+		Assert::IsFalse(has_normal(Vertex_attribs::mesh_position));
+		Assert::IsFalse(has_normal(Vertex_attribs::mesh_textured));
+		Assert::IsTrue(has_normal(Vertex_attribs::mesh_tangent_space));
+
+		// tangent_h
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::position));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::tex_coord));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::normal));
+		Assert::IsTrue(has_tangent_space(Vertex_attribs::tangent_h));
+
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_position));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::mesh_textured));
+		Assert::IsTrue(has_tangent_space(Vertex_attribs::mesh_tangent_space));
+	}
+
+	TEST_METHOD(is_superset_of)
+	{
+		using cg::data::is_superset_of;
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::position));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::tex_coord));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::normal));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::tangent_h));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_position));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_textured));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_position, Vertex_attribs::mesh_tangent_space));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tex_coord));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::normal));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::tangent_h));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_textured));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::mesh_textured, Vertex_attribs::mesh_tangent_space));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tex_coord));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::normal));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::tangent_h));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_position));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_textured));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::mesh_tangent_space, Vertex_attribs::mesh_tangent_space));
+	}
+
+	TEST_METHOD(to_array)
+	{
+		using cg::approx_equal;
+		using cg::data::to_array;
+		using cg::data::to_array_p;
+		using cg::data::to_array_p_n;
+		using cg::data::to_array_p_n_tc;
+		using cg::data::to_array_p_tc;
+
+
+		Vertex_ts v(float3(1, 2, 3), float3::unit_z, float2(4, 5), float3(2, 0, 0), float3(0, 2, 0));
+		
+		{ // position attribute
+			float expected_arr[3] = { 1, 2, 3 };
+			
+			float arr[3];
+			to_array_p(v, arr);
+			
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position & normal
+			float expected_arr[6] = {
+				1, 2, 3,
+				0, 0, 1
+			};
+
+			float arr[6];
+			to_array_p_n(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position, normal & tex_coord attributes
+			float expected_arr[8] = {
+				1, 2, 3,
+				0, 0, 1,
+				4, 5
+			};
+
+			float arr[8];
+			to_array_p_n_tc(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position & tex_coord attributes
+			float expected_arr[5] = {
+				1, 2, 3,
+				4, 5
+			};
+
+			float arr[5];
+			to_array_p_tc(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // all the attributes
+			float expected_arr[12] = {
+				1, 2, 3,
+				0, 0, 1,
+				4, 5,
+				1, 0, 0, 1
+			};
+
+			float arr[12];
+			to_array(v, arr);
+			
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
 	}
 };
 

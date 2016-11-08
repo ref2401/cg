@@ -343,7 +343,7 @@ void set_uniform<cg::mat3>(GLint location, const cg::mat3& mat) noexcept
 	assert(location != Invalid::uniform_location);
 
 	float arr[9];
-	cg::put_in_column_major_order(mat, arr);
+	cg::to_array_column_major_order(mat, arr);
 	glUniformMatrix3fv(location, 1, false, arr);
 }
 
@@ -353,7 +353,7 @@ void set_uniform<cg::mat4>(GLint location, const cg::mat4& mat) noexcept
 	assert(location != Invalid::uniform_location);
 
 	float arr[16];
-	cg::put_in_column_major_order(mat, arr);
+	cg::to_array_column_major_order(mat, arr);
 	glUniformMatrix4fv(location, 1, false, arr);
 }
 
@@ -393,7 +393,7 @@ void set_uniform_array<mat3, mat3>(GLint location, const mat3* ptr, size_t count
 	constexpr size_t component_count = 9; // each mat3 has exactly 3 components
 	std::vector<float> arr(count * component_count);
 	for (size_t i = 0; i < count; ++i) {
-		cg::put_in_column_major_order(ptr[i], arr.data() + i * component_count);
+		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
 	}
 
 	glUniformMatrix3fv(location, count, false, arr.data());
@@ -416,7 +416,7 @@ void set_uniform_array<mat4, mat4>(GLint location, const mat4* ptr, size_t count
 	constexpr size_t component_count = 16; // each mat4 has exactly 16 components
 	std::vector<float> arr(count * component_count);
 	for (size_t i = 0; i < count; ++i) {
-		cg::put_in_column_major_order(ptr[i], arr.data() + i * component_count);
+		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
 	}
 
 	glUniformMatrix4fv(location, count, false, arr.data());

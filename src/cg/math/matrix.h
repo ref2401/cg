@@ -439,7 +439,7 @@ inline float4 mul(const mat4& m, const float3& v, float w = 1.f) noexcept
 }
 
 // Puts the matrix m into a float array in a column major order.
-inline float* put_in_column_major_order(const mat3& m, float* arr) noexcept
+inline float* to_array_column_major_order(const mat3& m, float* arr) noexcept
 {
 	arr[0] = m.m00; arr[1] = m.m10; arr[2] = m.m20;
 	arr[3] = m.m01; arr[4] = m.m11; arr[5] = m.m21;
@@ -448,7 +448,7 @@ inline float* put_in_column_major_order(const mat3& m, float* arr) noexcept
 }
 
 // Puts the matrix m into a float array in a column major order.
-inline float* put_in_column_major_order(const mat4& m, float* arr) noexcept
+inline float* to_array_column_major_order(const mat4& m, float* arr) noexcept
 {
 	arr[0] = m.m00; arr[1] = m.m10; arr[2] = m.m20; arr[3] = m.m30;
 	arr[4] = m.m01; arr[5] = m.m11; arr[6] = m.m21; arr[7] = m.m31;
@@ -459,7 +459,7 @@ inline float* put_in_column_major_order(const mat4& m, float* arr) noexcept
 }
 
 // Puts the matrix m into a float array in a row major order.
-inline float* put_in_row_major_order(const mat3& m, float* arr) noexcept
+inline float* to_array_row_major_order(const mat3& m, float* arr) noexcept
 {
 	arr[0] = m.m00; arr[1] = m.m01; arr[2] = m.m02;
 	arr[3] = m.m10; arr[4] = m.m11; arr[5] = m.m12;
@@ -469,7 +469,7 @@ inline float* put_in_row_major_order(const mat3& m, float* arr) noexcept
 }
 
 // Puts the matrix m into a float array in a row major order.
-inline float* put_in_row_major_order(const mat4& m, float* arr) noexcept
+inline float* to_array_row_major_order(const mat4& m, float* arr) noexcept
 {
 	arr[0] = m.m00; arr[1] = m.m01; arr[2] = m.m02; arr[3] = m.m03;
 	arr[4] = m.m10; arr[5] = m.m11; arr[6] = m.m12; arr[7] = m.m13;

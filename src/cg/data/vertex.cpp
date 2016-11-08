@@ -97,10 +97,105 @@ std::wostream& operator<<(std::wostream& out, const Vertex_ts& v)
 	return out;
 }
 
+float4 compute_tangent_h(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
+{
+	float3 pos0 = v0.position;
+	float3 pos1 = v1.position;
+	float3 pos2 = v2.position;
+
+	float dx1 = pos1.x - pos0.x;
+	float dx2 = pos2.x - pos0.x;
+	float dy1 = pos1.y - pos0.y;
+	float dy2 = pos2.y - pos0.y;
+	float dz1 = pos1.z - pos0.z;
+	float dz2 = pos2.z - pos0.z;
+
+	float2 tc0 = v0.tex_coord;
+	float2 tc1 = v1.tex_coord;
+	float2 tc2 = v2.tex_coord;
+	float ds1 = tc1.x - tc0.x;
+	float ds2 = tc2.x - tc0.x;
+	float dt1 = tc1.y - tc0.y;
+	float dt2 = tc2.y - tc0.y;
+
+	float r = 1.0f / (ds1 * dt2 - ds2 * dt1);
+	float3 t = normalize(r * float3((dt2 * dx1 - dt1 * dx2), (dt2 * dy1 - dt1 * dy2), (dt2 * dz1 - dt1 * dz2)));
+	float3 b = normalize(r * float3((ds1 * dx2 - ds2 * dx1), (ds1 * dy2 - ds2 * dy1), (ds1 * dz2 - ds2 * dz1)));
+	float3 normal = v0.normal;
+	float handedness = (dot(b, cross(normal, t)) > 0.f) ? 1.f : -1.f;
+
+	// Gram-Schmidt orthogonalize.
+	// project tangent vector onto normal.
+	/*float3 t_prj_n = normal * dot(t, normal);
+	float3 tangent = normalize(t - t_prj_n);
+	return float4(tangent, handedness);*/
+	return float4(t, handedness);
+}
+
+std::pair<float3, float3> compute_tangent_bitangent(
+	const float3& pos0, const float2& tc0,
+	const float3& pos1, const float2& tc1,
+	const float3& pos2, const float2& tc2) noexcept
+{
+	float dx1 = pos1.x - pos0.x;
+	float dx2 = pos2.x - pos0.x;
+	float dy1 = pos1.y - pos0.y;
+	float dy2 = pos2.y - pos0.y;
+	float dz1 = pos1.z - pos0.z;
+	float dz2 = pos2.z - pos0.z;
+
+	float ds1 = tc1.x - tc0.x;
+	float ds2 = tc2.x - tc0.x;
+	float dt1 = tc1.y - tc0.y;
+	float dt2 = tc2.y - tc0.y;
+
+	float r = 1.0f / (ds1 * dt2 - ds2 * dt1);
+	float3 t = normalize(r * float3((dt2 * dx1 - dt1 * dx2), (dt2 * dy1 - dt1 * dy2), (dt2 * dz1 - dt1 * dz2)));
+	float3 b = normalize(r * float3((ds1 * dx2 - ds2 * dx1), (ds1 * dy2 - ds2 * dy1), (ds1 * dz2 - ds2 * dz1)));
+
+	return std::make_pair(t, b);
+}
+
+float4 compute_tangent_handedness(const float3& tangent,
+	const float3& bitangent, const float3& normal) noexcept
+{
+	assert(is_normalized(tangent));
+	assert(is_normalized(bitangent));
+	assert(is_normalized(normal));
+
+	// Gram-Schmidt orthogonalize.
+	// project tangent vector onto normal.
+	float3 t_prj_n = normal * dot(tangent, normal);
+	float3 t = normalize(tangent - t_prj_n);
+	float h = (dot(bitangent, cross(normal, t)) > 0.f) ? 1.f : -1.f;
+
+	return float4(t, h);
+}
+
 size_t get_hash(const Vertex& v) noexcept
 {
 	float l = len(v.position);
 	return std::hash<float>{}(l);
+}
+
+void to_array(const Vertex_ts& v, float* arr) noexcept
+{
+	arr[0] = v.position.x;
+	arr[1] = v.position.y;
+	arr[2] = v.position.z;
+	arr[3] = v.normal.x;
+	arr[4] = v.normal.y;
+	arr[5] = v.normal.z;
+	arr[6] = v.tex_coord.u;
+	arr[7] = v.tex_coord.v;
+
+	auto t = normalize(v.tangent);
+	auto b = normalize(v.bitangent);
+	auto tan_h = compute_tangent_handedness(t, b, v.normal);
+	arr[8] = tan_h.x;
+	arr[9] = tan_h.y;
+	arr[10] = tan_h.z;
+	arr[11] = tan_h.w;
 }
 
 } // namespace data

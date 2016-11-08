@@ -198,6 +198,24 @@ std::ostream& operator<<(std::ostream& out, const Vertex_ts& v);
 
 std::wostream& operator<<(std::wostream& out, const Vertex_ts& v);
 
+// Computes tangent and handedness of bitangent for a triangle that is specified by the 3 given vertices.
+// Assumes that all the normals are equal. Tangent_h components of each vertex are ignored.
+// Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
+float4 compute_tangent_h(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2);
+
+// Computes tangent and bitangent vectors for a triangle that is specified by 3 position, tex_coord attribures.
+// Returned vectors are not normalized.
+std::pair<cg::float3, cg::float3> compute_tangent_bitangent(
+	const cg::float3& pos0, const cg::float2& tc0,
+	const cg::float3& pos1, const cg::float2& tc1,
+	const cg::float3& pos2, const cg::float2& tc2) noexcept;
+
+// Computes orthogonalized tangent and bitangent's handedness.
+// All vectors have to be normalized.
+// Returns: vector of 4 floats, xyz stands for the tangent & w stands for the handedness value.
+cg::float4 compute_tangent_handedness(const cg::float3& tangent,
+	const cg::float3& bitangent, const cg::float3& normal) noexcept;
+
 // Calculates hash value for the given vertex.
 size_t get_hash(const Vertex& v) noexcept;
 
@@ -229,6 +247,58 @@ constexpr bool has_tex_coord(Vertex_attribs attribs)
 constexpr bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset)
 {
 	return (superset & subset) == subset;
+}
+
+// Puts the given vertex into a float array pointed to by arr.
+// The given array must have at least 12 elements.
+// Components: position.xyz, normal.xyz, tex_coord.uv, tangent_h.xyzw.
+// Tangent & handendess are compute by the function itself.
+void to_array(const Vertex_ts& v, float* arr) noexcept;
+
+// Puts position attibute of the given vertex into a float array pointed to by arr.
+// The given array must have at least 3 elements. 
+inline void to_array_p(const Vertex_ts& v, float* arr) noexcept
+{
+	arr[0] = v.position.x;
+	arr[1] = v.position.y;
+	arr[2] = v.position.z;
+}
+
+// Puts position & normal attibutes of the given vertex into a float array pointed to by arr.
+// The given array must have at least 6 elements. 
+inline void to_array_p_n(const Vertex_ts& v, float* arr) noexcept
+{
+	arr[0] = v.position.x;
+	arr[1] = v.position.y;
+	arr[2] = v.position.z;
+	arr[3] = v.normal.x;
+	arr[4] = v.normal.y;
+	arr[5] = v.normal.z;
+}
+
+// Puts position, normal & tex_coord attibutes of the given vertex into a float array pointed to by arr.
+// The given array must have at least 8 elements. 
+inline void to_array_p_n_tc(const Vertex_ts& v, float* arr) noexcept
+{
+	arr[0] = v.position.x;
+	arr[1] = v.position.y;
+	arr[2] = v.position.z;
+	arr[3] = v.normal.x;
+	arr[4] = v.normal.y;
+	arr[5] = v.normal.z;
+	arr[6] = v.tex_coord.u;
+	arr[7] = v.tex_coord.v;
+}
+
+// Puts position & tex_coord attibutes of the given vertex into a float array pointed to by arr.
+// The given array must have at least 5 elements. 
+inline void to_array_p_tc(const Vertex_ts& v, float* arr) noexcept
+{
+	arr[0] = v.position.x;
+	arr[1] = v.position.y;
+	arr[2] = v.position.z;
+	arr[3] = v.tex_coord.u;
+	arr[4] = v.tex_coord.v;
 }
 
 } // namespace data

@@ -101,7 +101,7 @@ void Frame::push_back_renderable(const Renderable& rnd)
 
 	// model matrix -> _uniform_arr_model_matrix
 	float model_matrix_arr[16];
-	put_in_column_major_order(rnd.model_matrix, model_matrix_arr);
+	to_array_column_major_order(rnd.model_matrix, model_matrix_arr);
 	_uniform_array_model_matrix.insert(_uniform_array_model_matrix.end(),
 		std::begin(model_matrix_arr), std::end(model_matrix_arr));
 

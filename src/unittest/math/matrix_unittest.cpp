@@ -230,10 +230,10 @@ TEST_CLASS(cg_math_Mat3) {
 		Assert::AreEqual(mul(m, v), mul(m, u, v.z));
 	}
 
-	TEST_METHOD(put_in_column_major_row_major_order)
+	TEST_METHOD(to_array_column_major_row_major_order)
 	{
-		using cg::put_in_column_major_order;
-		using cg::put_in_row_major_order;
+		using cg::to_array_column_major_order;
+		using cg::to_array_row_major_order;
 
 		mat3 m(0, 1, 2,
 			3, 4, 5,
@@ -245,14 +245,14 @@ TEST_CLASS(cg_math_Mat3) {
 		// column-major order
 		float col[count] = { 0, 3, 6,  1, 4, 7,  2, 5, 8 };
 
-		p = put_in_column_major_order(m, arr);
+		p = to_array_column_major_order(m, arr);
 		Assert::AreEqual<float*>(p, arr);
 		Assert::IsTrue(std::equal(col, col + count - 1, arr));
 
 		// row-major order
 		float row[count] = { 0, 1, 2,  3, 4, 5,  6, 7, 8 };
 
-		p = put_in_row_major_order(m, arr);
+		p = to_array_row_major_order(m, arr);
 		Assert::AreEqual<float*>(p, arr);
 		Assert::IsTrue(std::equal(row, row + count - 1, arr));
 	}
@@ -555,8 +555,8 @@ public:
 
 	TEST_METHOD(put_in_column_major_row_major_order)
 	{
-		using cg::put_in_column_major_order;
-		using cg::put_in_row_major_order;
+		using cg::to_array_column_major_order;
+		using cg::to_array_row_major_order;
 
 		mat4 m(0, 1, 2, 3,
 			4, 5, 6, 7,
@@ -569,14 +569,14 @@ public:
 		// column-major order
 		float col[count] = { 0, 4, 8, 12,  1, 5, 9, 13,  2, 6, 10, 14,  3, 7, 11, 15 };
 
-		p = put_in_column_major_order(m, arr);
+		p = to_array_column_major_order(m, arr);
 		Assert::AreEqual<float*>(p, arr);
 		Assert::IsTrue(std::equal(col, col + count - 1, arr));
 
 		// row-major order
 		float row[count] = { 0, 1, 2, 3,  4, 5, 6, 7,  8, 9, 10, 11,  12, 13, 14, 15 };
 
-		p = put_in_row_major_order(m, arr);
+		p = to_array_row_major_order(m, arr);
 		Assert::AreEqual<float*>(p, arr);
 		Assert::IsTrue(std::equal(row, row + count - 1, arr));
 	}
