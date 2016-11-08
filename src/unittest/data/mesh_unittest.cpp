@@ -10,8 +10,8 @@ using cg::float2;
 using cg::float3;
 using cg::float4;
 using cg::approx_equal;
-using cg::data::Interleaved_mesh_data;
-using cg::data::Interleaved_vertex_format;
+using cg::data::Interleaved_mesh_data_old;
+using cg::data::Interleaved_vertex_format_old;
 using cg::data::Mesh_builder;
 using cg::data::Vertex_ts;
 using cg::data::Vertex_old;
@@ -21,7 +21,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<Interleaved_vertex_format>(const Interleaved_vertex_format& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Interleaved_vertex_format_old>(const Interleaved_vertex_format_old& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Vertex_ts>(const Vertex_ts& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Vertex_old>(const Vertex_old& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
@@ -31,26 +31,26 @@ template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t)
 
 namespace unittest {
 
-TEST_CLASS(cg_data_mesh_Interleaved_mesh_data) {
+TEST_CLASS(cg_data_mesh_Interleaved_mesh_data_old) {
 public:
 
 	TEST_METHOD(ctors)
 	{
-		Interleaved_mesh_data md0(Vertex_attribs::position);
+		Interleaved_mesh_data_old md0(Vertex_attribs::position);
 		Assert::AreEqual(Vertex_attribs::position, md0.attribs());
 		Assert::AreEqual(0u, md0.data().capacity());
 		Assert::AreEqual(0u, md0.indices().capacity());
 
-		Interleaved_mesh_data md1(Vertex_attribs::mesh_textured, 4, 6);
-		Assert::AreEqual(Vertex_attribs::mesh_textured, md1.attribs());
+		Interleaved_mesh_data_old md1(Vertex_attribs::vertex_p_tc, 4, 6);
+		Assert::AreEqual(Vertex_attribs::vertex_p_tc, md1.attribs());
 		Assert::AreEqual(md1.data().capacity(),
-			4 * (Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_tex_coord));
+			4 * (Interleaved_vertex_format_old::component_count_position + Interleaved_vertex_format_old::component_count_tex_coord));
 		Assert::AreEqual(6u, md1.indices().capacity());
 	}
 
 	TEST_METHOD(index_count)
 	{
-		Interleaved_mesh_data md(Vertex_attribs::position);
+		Interleaved_mesh_data_old md(Vertex_attribs::position);
 		Assert::AreEqual<size_t>(0, md.index_count());
 
 		md.push_back_index(0);
@@ -67,7 +67,7 @@ public:
 	{
 		uint32_t expected_indices[5] = { 0, 1, 2, 3, 4 };
 
-		Interleaved_mesh_data md(Vertex_attribs::position);
+		Interleaved_mesh_data_old md(Vertex_attribs::position);
 		md.push_back_index(0);
 		md.push_back_indices(1, 2, 3);
 		md.push_back_index(4);
@@ -88,7 +88,7 @@ public:
 				v2.position.x, v2.position.y, v2.position.z
 			};
 
-			Interleaved_mesh_data md(Vertex_attribs::position);
+			Interleaved_mesh_data_old md(Vertex_attribs::position);
 			md.push_back_vertex(v0);
 			md.push_back_vertex(v1);
 			md.push_back_vertex(v2);
@@ -106,7 +106,7 @@ public:
 				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z
 			};
 
-			Interleaved_mesh_data md(Vertex_attribs::position | Vertex_attribs::normal);
+			Interleaved_mesh_data_old md(Vertex_attribs::position | Vertex_attribs::normal);
 			md.push_back_vertex(v0);
 			md.push_back_vertex(v1);
 			md.push_back_vertex(v2);
@@ -124,7 +124,7 @@ public:
 				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z, v2.tex_coord.u, v2.tex_coord.v,
 			};
 
-			Interleaved_mesh_data md(Vertex_attribs::position | Vertex_attribs::normal | Vertex_attribs::tex_coord);
+			Interleaved_mesh_data_old md(Vertex_attribs::position | Vertex_attribs::normal | Vertex_attribs::tex_coord);
 			md.push_back_vertex(v0);
 			md.push_back_vertex(v1);
 			md.push_back_vertex(v2);
@@ -138,16 +138,16 @@ public:
 		{ // position, normal & tex_coord attribs
 			float expected_data[36] = {
 				v0.position.x, v0.position.y, v0.position.z, v0.normal.x, v0.normal.y, v0.normal.z, 
-				v0.tex_coord.u, v0.tex_coord.v, v0.tangent_h.x, v0.tangent_h.y, v0.tangent_h.z, v0.tangent_h.w,
+				v0.tex_coord.u, v0.tex_coord.v, v0.tangent_space.x, v0.tangent_space.y, v0.tangent_space.z, v0.tangent_space.w,
 				
 				v1.position.x, v1.position.y, v1.position.z, v1.normal.x, v1.normal.y, v1.normal.z, 
-				v1.tex_coord.u, v1.tex_coord.v, v1.tangent_h.x, v1.tangent_h.y, v1.tangent_h.z, v1.tangent_h.w,
+				v1.tex_coord.u, v1.tex_coord.v, v1.tangent_space.x, v1.tangent_space.y, v1.tangent_space.z, v1.tangent_space.w,
 
 				v2.position.x, v2.position.y, v2.position.z, v2.normal.x, v2.normal.y, v2.normal.z, 
-				v2.tex_coord.u, v2.tex_coord.v, v2.tangent_h.x, v2.tangent_h.y, v2.tangent_h.z, v2.tangent_h.w,
+				v2.tex_coord.u, v2.tex_coord.v, v2.tangent_space.x, v2.tangent_space.y, v2.tangent_space.z, v2.tangent_space.w,
 			};
 
-			Interleaved_mesh_data md(Vertex_attribs::mesh_tangent_space);
+			Interleaved_mesh_data_old md(Vertex_attribs::vertex_ts);
 			md.push_back_vertex(v0);
 			md.push_back_vertex(v1);
 			md.push_back_vertex(v2);
@@ -161,7 +161,7 @@ public:
 
 	TEST_METHOD(vertex_count)
 	{
-		Interleaved_mesh_data md(Vertex_attribs::position);
+		Interleaved_mesh_data_old md(Vertex_attribs::position);
 		Assert::AreEqual<size_t>(0, md.vertex_count());
 
 		md.push_back_vertex(Vertex_old());
@@ -175,149 +175,149 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_mesh_Interleaved_vertex_fotmat) {
+TEST_CLASS(cg_data_mesh_Interleaved_vertex_fotmat_old) {
 public:
 
 	TEST_METHOD(byte_count)
 	{
-		Interleaved_vertex_format fmt0(Vertex_attribs::position);
+		Interleaved_vertex_format_old fmt0(Vertex_attribs::position);
 		Assert::AreEqual(fmt0.component_count() * sizeof(float), fmt0.byte_count());
 
-		Interleaved_vertex_format fmt1(Vertex_attribs::mesh_textured);
+		Interleaved_vertex_format_old fmt1(Vertex_attribs::vertex_p_tc);
 		Assert::AreEqual(fmt1.component_count() * sizeof(float), fmt1.byte_count());
 
-		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_space);
+		Interleaved_vertex_format_old fmt2(Vertex_attribs::vertex_ts);
 		Assert::AreEqual(fmt2.component_count() * sizeof(float), fmt2.byte_count());
 	}
 
 	TEST_METHOD(byte_offset)
 	{
-		Interleaved_vertex_format fmt(Vertex_attribs::mesh_tangent_space);
+		Interleaved_vertex_format_old fmt(Vertex_attribs::vertex_ts);
 		
 		Assert::AreEqual(fmt.byte_offset_position(), 0u);
 		
 		Assert::AreEqual(fmt.byte_offset_normal(), 
-			Interleaved_vertex_format::component_count_position * sizeof(float));
+			Interleaved_vertex_format_old::component_count_position * sizeof(float));
 		
 		Assert::AreEqual(fmt.byte_offset_tex_coord(), 
-			(Interleaved_vertex_format::component_count_position 
-			+ Interleaved_vertex_format::component_count_normal) * sizeof(float));
+			(Interleaved_vertex_format_old::component_count_position 
+			+ Interleaved_vertex_format_old::component_count_normal) * sizeof(float));
 
 		Assert::AreEqual(fmt.byte_offset_tangent_h(),
-			(Interleaved_vertex_format::component_count_position
-				+ Interleaved_vertex_format::component_count_normal
-				+ Interleaved_vertex_format::component_count_tex_coord) * sizeof(float));
+			(Interleaved_vertex_format_old::component_count_position
+				+ Interleaved_vertex_format_old::component_count_normal
+				+ Interleaved_vertex_format_old::component_count_tex_coord) * sizeof(float));
 	}
 
 	TEST_METHOD(ctors)
 	{
-		Interleaved_vertex_format fmt0;
+		Interleaved_vertex_format_old fmt0;
 		Assert::AreEqual(Vertex_attribs::none, fmt0.attribs);
 
-		Interleaved_vertex_format fmt1(Vertex_attribs::normal);
+		Interleaved_vertex_format_old fmt1(Vertex_attribs::normal);
 		Assert::AreEqual(Vertex_attribs::normal, fmt1.attribs);
 
-		Interleaved_vertex_format fmt2(Vertex_attribs::mesh_tangent_space);
-		Assert::AreEqual(Vertex_attribs::mesh_tangent_space, fmt2.attribs);
+		Interleaved_vertex_format_old fmt2(Vertex_attribs::vertex_ts);
+		Assert::AreEqual(Vertex_attribs::vertex_ts, fmt2.attribs);
 	}
 
 	TEST_METHOD(component_count)
 	{
-		Assert::AreEqual(Interleaved_vertex_format::component_count_position, 
-			Interleaved_vertex_format(Vertex_attribs::position).component_count());
+		Assert::AreEqual(Interleaved_vertex_format_old::component_count_position, 
+			Interleaved_vertex_format_old(Vertex_attribs::position).component_count());
 		
-		Assert::AreEqual(Interleaved_vertex_format::component_count_normal,
-			Interleaved_vertex_format(Vertex_attribs::normal).component_count());
+		Assert::AreEqual(Interleaved_vertex_format_old::component_count_normal,
+			Interleaved_vertex_format_old(Vertex_attribs::normal).component_count());
 		
-		Assert::AreEqual(Interleaved_vertex_format::component_count_tex_coord,
-			Interleaved_vertex_format(Vertex_attribs::tex_coord).component_count());
+		Assert::AreEqual(Interleaved_vertex_format_old::component_count_tex_coord,
+			Interleaved_vertex_format_old(Vertex_attribs::tex_coord).component_count());
 		
-		Assert::AreEqual(Interleaved_vertex_format::component_count_tangent_h,
-			Interleaved_vertex_format(Vertex_attribs::tangent_h).component_count());
+		Assert::AreEqual(Interleaved_vertex_format_old::component_count_tangent_h,
+			Interleaved_vertex_format_old(Vertex_attribs::tangent_space).component_count());
 
 		// position & normal
 		auto attribs_pn = Vertex_attribs::position | Vertex_attribs::normal;
-		size_t expected_pn = Interleaved_vertex_format::component_count_position
-			+ Interleaved_vertex_format::component_count_normal;
-		Assert::AreEqual(expected_pn, Interleaved_vertex_format(attribs_pn).component_count());
+		size_t expected_pn = Interleaved_vertex_format_old::component_count_position
+			+ Interleaved_vertex_format_old::component_count_normal;
+		Assert::AreEqual(expected_pn, Interleaved_vertex_format_old(attribs_pn).component_count());
 
 		// position & tex_coord
-		size_t expected_ptc = Interleaved_vertex_format::component_count_position
-			+ Interleaved_vertex_format::component_count_tex_coord;
-		Assert::AreEqual(expected_ptc, Interleaved_vertex_format(Vertex_attribs::mesh_textured).component_count());
+		size_t expected_ptc = Interleaved_vertex_format_old::component_count_position
+			+ Interleaved_vertex_format_old::component_count_tex_coord;
+		Assert::AreEqual(expected_ptc, Interleaved_vertex_format_old(Vertex_attribs::vertex_p_tc).component_count());
 
 		// position, normal & tex_coord
 		auto attribs_pntc = Vertex_attribs::position | Vertex_attribs::normal | Vertex_attribs::tex_coord;
-		size_t expected_pntc = Interleaved_vertex_format::component_count_position
-			+ Interleaved_vertex_format::component_count_normal
-			+ Interleaved_vertex_format::component_count_tex_coord;
-		Assert::AreEqual(expected_pntc, Interleaved_vertex_format(attribs_pntc).component_count());
+		size_t expected_pntc = Interleaved_vertex_format_old::component_count_position
+			+ Interleaved_vertex_format_old::component_count_normal
+			+ Interleaved_vertex_format_old::component_count_tex_coord;
+		Assert::AreEqual(expected_pntc, Interleaved_vertex_format_old(attribs_pntc).component_count());
 
 		// position, normal, tex_coord & tangnet_h
-		size_t expected_pntcth = Interleaved_vertex_format::component_count_position
-			+ Interleaved_vertex_format::component_count_normal
-			+ Interleaved_vertex_format::component_count_tex_coord
-			+ Interleaved_vertex_format::component_count_tangent_h;
-		Assert::AreEqual(expected_pntcth, Interleaved_vertex_format(Vertex_attribs::mesh_tangent_space).component_count());
+		size_t expected_pntcth = Interleaved_vertex_format_old::component_count_position
+			+ Interleaved_vertex_format_old::component_count_normal
+			+ Interleaved_vertex_format_old::component_count_tex_coord
+			+ Interleaved_vertex_format_old::component_count_tangent_h;
+		Assert::AreEqual(expected_pntcth, Interleaved_vertex_format_old(Vertex_attribs::vertex_ts).component_count());
 
 		// tex_coord & tangent_h
-		auto attribs_tcth = Vertex_attribs::tex_coord | Vertex_attribs::tangent_h;
-		size_t expected_tcth = Interleaved_vertex_format::component_count_tex_coord
-			+ Interleaved_vertex_format::component_count_tangent_h;
-		Assert::AreEqual(expected_tcth, Interleaved_vertex_format(attribs_tcth).component_count());
+		auto attribs_tcth = Vertex_attribs::tex_coord | Vertex_attribs::tangent_space;
+		size_t expected_tcth = Interleaved_vertex_format_old::component_count_tex_coord
+			+ Interleaved_vertex_format_old::component_count_tangent_h;
+		Assert::AreEqual(expected_tcth, Interleaved_vertex_format_old(attribs_tcth).component_count());
 	}
 
 	TEST_METHOD(component_offset_all)
 	{
-		Interleaved_vertex_format p_n_tc_th(Vertex_attribs::mesh_tangent_space);
+		Interleaved_vertex_format_old p_n_tc_th(Vertex_attribs::vertex_ts);
 		Assert::AreEqual(p_n_tc_th.component_offset_position(),	0u);
-		Assert::AreEqual(p_n_tc_th.component_offset_normal(), Interleaved_vertex_format::component_count_position);
+		Assert::AreEqual(p_n_tc_th.component_offset_normal(), Interleaved_vertex_format_old::component_count_position);
 		Assert::AreEqual(p_n_tc_th.component_offset_tex_coord(), 
-			Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_normal);
+			Interleaved_vertex_format_old::component_count_position + Interleaved_vertex_format_old::component_count_normal);
 		Assert::AreEqual(p_n_tc_th.component_offset_tangent_h(),
-			Interleaved_vertex_format::component_count_position + Interleaved_vertex_format::component_count_normal
-			+ Interleaved_vertex_format::component_count_tex_coord);
+			Interleaved_vertex_format_old::component_count_position + Interleaved_vertex_format_old::component_count_normal
+			+ Interleaved_vertex_format_old::component_count_tex_coord);
 
-		Interleaved_vertex_format n_tc_th(Vertex_attribs::normal
-			| Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
+		Interleaved_vertex_format_old n_tc_th(Vertex_attribs::normal
+			| Vertex_attribs::tex_coord | Vertex_attribs::tangent_space);
 		Assert::AreEqual(n_tc_th.component_offset_position(), 0u);
 		Assert::AreEqual(n_tc_th.component_offset_normal(), 0u);
-		Assert::AreEqual(n_tc_th.component_offset_tex_coord(), Interleaved_vertex_format::component_count_normal);
-		Assert::AreEqual(n_tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_normal 
-			+ Interleaved_vertex_format::component_count_tex_coord);
+		Assert::AreEqual(n_tc_th.component_offset_tex_coord(), Interleaved_vertex_format_old::component_count_normal);
+		Assert::AreEqual(n_tc_th.component_offset_tangent_h(), Interleaved_vertex_format_old::component_count_normal 
+			+ Interleaved_vertex_format_old::component_count_tex_coord);
 
-		Interleaved_vertex_format tc_th(Vertex_attribs::tex_coord | Vertex_attribs::tangent_h);
+		Interleaved_vertex_format_old tc_th(Vertex_attribs::tex_coord | Vertex_attribs::tangent_space);
 		Assert::AreEqual(tc_th.component_offset_position(), 0u);
 		Assert::AreEqual(tc_th.component_offset_normal(), 0u);
 		Assert::AreEqual(tc_th.component_offset_tex_coord(), 0u);
-		Assert::AreEqual(tc_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_tex_coord);
+		Assert::AreEqual(tc_th.component_offset_tangent_h(), Interleaved_vertex_format_old::component_count_tex_coord);
 
-		Interleaved_vertex_format th(Vertex_attribs::tangent_h);
+		Interleaved_vertex_format_old th(Vertex_attribs::tangent_space);
 		Assert::AreEqual(th.component_offset_position(), 0u);
 		Assert::AreEqual(th.component_offset_normal(), 0u);
 		Assert::AreEqual(th.component_offset_tex_coord(), 0u);
 		Assert::AreEqual(th.component_offset_tangent_h(), 0u);
 
-		Interleaved_vertex_format p_tc(Vertex_attribs::mesh_textured);
+		Interleaved_vertex_format_old p_tc(Vertex_attribs::vertex_p_tc);
 		Assert::AreEqual(p_tc.component_offset_position(), 0u);
-		Assert::AreEqual(p_tc.component_offset_normal(), Interleaved_vertex_format::component_count_position);
-		Assert::AreEqual(p_tc.component_offset_tex_coord(), Interleaved_vertex_format::component_count_position);
-		Assert::AreEqual(p_tc.component_offset_tangent_h(), Interleaved_vertex_format::component_count_position
-			+ Interleaved_vertex_format::component_count_tex_coord);
+		Assert::AreEqual(p_tc.component_offset_normal(), Interleaved_vertex_format_old::component_count_position);
+		Assert::AreEqual(p_tc.component_offset_tex_coord(), Interleaved_vertex_format_old::component_count_position);
+		Assert::AreEqual(p_tc.component_offset_tangent_h(), Interleaved_vertex_format_old::component_count_position
+			+ Interleaved_vertex_format_old::component_count_tex_coord);
 
-		Interleaved_vertex_format n_th(Vertex_attribs::normal | Vertex_attribs::tangent_h);
+		Interleaved_vertex_format_old n_th(Vertex_attribs::normal | Vertex_attribs::tangent_space);
 		Assert::AreEqual(n_th.component_offset_position(), 0u);
 		Assert::AreEqual(n_th.component_offset_normal(), 0u);
-		Assert::AreEqual(n_th.component_offset_tex_coord(), Interleaved_vertex_format::component_count_normal);
-		Assert::AreEqual(n_th.component_offset_tangent_h(), Interleaved_vertex_format::component_count_normal);
+		Assert::AreEqual(n_th.component_offset_tex_coord(), Interleaved_vertex_format_old::component_count_normal);
+		Assert::AreEqual(n_th.component_offset_tangent_h(), Interleaved_vertex_format_old::component_count_normal);
 	}
 
 	TEST_METHOD(equal_operator)
 	{
-		Interleaved_vertex_format fmt0(Vertex_attribs::mesh_textured);
+		Interleaved_vertex_format_old fmt0(Vertex_attribs::vertex_p_tc);
 
-		Assert::AreNotEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::position));
-		Assert::AreEqual(fmt0, Interleaved_vertex_format(Vertex_attribs::mesh_textured));
+		Assert::AreNotEqual(fmt0, Interleaved_vertex_format_old(Vertex_attribs::position));
+		Assert::AreEqual(fmt0, Interleaved_vertex_format_old(Vertex_attribs::vertex_p_tc));
 	}
 };
 

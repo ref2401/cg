@@ -173,7 +173,7 @@ public:
 
 	Static_vertex_spec() noexcept = default;
 
-	Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id, 
+	Static_vertex_spec(cg::data::Interleaved_vertex_format_old format, GLuint vao_id, 
 		GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
 
 	Static_vertex_spec(const Static_vertex_spec&) = delete;
@@ -186,7 +186,7 @@ public:
 	Static_vertex_spec& operator=(Static_vertex_spec&& spec) noexcept;
 
 
-	cg::data::Interleaved_vertex_format format() const noexcept
+	cg::data::Interleaved_vertex_format_old format() const noexcept
 	{
 		return _format;
 	}
@@ -215,7 +215,7 @@ private:
 	void dispose() noexcept;
 
 	GLuint _vao_id = Invalid::vao_id;
-	cg::data::Interleaved_vertex_format _format;
+	cg::data::Interleaved_vertex_format_old _format;
 	Static_buffer _vertex_buffer;
 	GLuint _vertex_buffer_binding_index = 0;
 	Static_buffer _index_buffer;
@@ -247,7 +247,7 @@ public:
 		return _vao_id != Invalid::vao_id;
 	}
 
-	DE_cmd push_back(const cg::data::Interleaved_mesh_data& mesh_data);
+	DE_cmd push_back(const cg::data::Interleaved_mesh_data_old& mesh_data);
 
 private:
 	std::vector<float> _vertex_data;
@@ -255,7 +255,7 @@ private:
 	// The following fields are related to the vertex specification building process.
 	// The fields are reset every begin() call
 	GLuint _vao_id = Invalid::vao_id;
-	cg::data::Interleaved_vertex_format _format;
+	cg::data::Interleaved_vertex_format_old _format;
 	size_t _vertex_limit_bytes;
 	size_t _offset_indices;
 	size_t _base_vertex;

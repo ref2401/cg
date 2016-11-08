@@ -2,8 +2,8 @@
 
 #include "cg/base/base.h"
 
-using cg::data::Interleaved_mesh_data;
-using cg::data::Interleaved_vertex_format;
+using cg::data::Interleaved_mesh_data_old;
+using cg::data::Interleaved_vertex_format_old;
 using cg::data::Vertex_attribs;
 using cg::data::has_normal;
 using cg::data::has_position;
@@ -30,7 +30,7 @@ Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept :
 	spec._vertex_buffer_binding_index = 0;
 }
 
-Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format format, GLuint vao_id,
+Static_vertex_spec::Static_vertex_spec(cg::data::Interleaved_vertex_format_old format, GLuint vao_id,
 	GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept
 :	_format(format), 
 	_vao_id(vao_id), 
@@ -91,7 +91,7 @@ void Static_vertex_spec_builder::begin(Vertex_attribs attribs, size_t vertex_lim
 {
 	assert(attribs != Vertex_attribs::none);
 
-	_format = Interleaved_vertex_format(attribs);
+	_format = Interleaved_vertex_format_old(attribs);
 	_vertex_limit_bytes = vertex_limit_bytes;
 	_vertex_data.reserve(_vertex_limit_bytes / _format.byte_count());
 	_offset_indices = 0;
@@ -159,7 +159,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 	return Static_vertex_spec(_format, vao_id_temp, ids[0], vb_binding_index, ids[1]);
 }
 
-DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_data& mesh_data)
+DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_data_old& mesh_data)
 {
 	assert(building_process());
 	assert(mesh_data.format() == _format);

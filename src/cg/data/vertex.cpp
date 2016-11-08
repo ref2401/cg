@@ -5,6 +5,8 @@
 namespace cg {
 namespace data {
 
+// ----- Vertex_interleaved_format -----
+
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
@@ -48,7 +50,7 @@ std::ostream& operator<<(std::ostream& out, const Vertex_old& v)
 	out << "Vertex_old(p: " << v.position
 		<< "; n: " << v.normal
 		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
+		<< "; tan_h: " << v.tangent_space << ")";
 	return out;
 }
 
@@ -57,7 +59,7 @@ std::wostream& operator<<(std::wostream& out, const Vertex_old& v)
 	out << "Vertex_old(p: " << v.position
 		<< "; n: " << v.normal
 		<< "; tc: " << v.tex_coord
-		<< "; tan_h: " << v.tangent_h << ")";
+		<< "; tan_h: " << v.tangent_space << ")";
 	return out;
 }
 

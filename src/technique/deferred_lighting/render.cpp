@@ -8,7 +8,7 @@
 
 using namespace cg;
 using namespace cg::rnd::opengl;
-using cg::data::Interleaved_mesh_data;
+using cg::data::Interleaved_mesh_data_old;
 using cg::data::Shader_program_source_code;
 
 namespace {
@@ -31,7 +31,7 @@ namespace deferred_lighting {
 
 Gbuffer::Gbuffer(const uint2& viewport_size,
 	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
-	const Interleaved_mesh_data& rect_1x1_mesh_data) :
+	const Interleaved_mesh_data_old& rect_1x1_mesh_data) :
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
 	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),

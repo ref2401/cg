@@ -29,16 +29,16 @@ namespace data {
 // total byte count = 5 * sizeof(float).
 // position's offset:	0 components, 0 bytes (position is first in the relative order).
 // tex_coord's offset:	3 components, 3 * sizeof(float) bytes (tex_coord goes right after the position).
-struct Interleaved_vertex_format final {
+struct Interleaved_vertex_format_old final {
 	static constexpr size_t component_count_normal = 3;
 	static constexpr size_t component_count_position = 3;
 	static constexpr size_t component_count_tangent_h = 4;
 	static constexpr size_t component_count_tex_coord = 2;
 
 
-	Interleaved_vertex_format() noexcept = default;
+	Interleaved_vertex_format_old() noexcept = default;
 
-	explicit Interleaved_vertex_format(Vertex_attribs attribs) noexcept
+	explicit Interleaved_vertex_format_old(Vertex_attribs attribs) noexcept
 		: attribs(attribs)
 	{}
 
@@ -88,7 +88,7 @@ struct Interleaved_vertex_format final {
 	size_t component_offset_normal() const noexcept
 	{
 		size_t prior_cmpt_count = has_position(attribs)
-			? (Interleaved_vertex_format::component_count_position)
+			? (Interleaved_vertex_format_old::component_count_position)
 			: 0u;
 		return component_offset_position() + prior_cmpt_count;
 	}
@@ -103,7 +103,7 @@ struct Interleaved_vertex_format final {
 	size_t component_offset_tangent_h() const noexcept
 	{
 		size_t prior_cmpt_count = has_tex_coord(attribs)
-			? (Interleaved_vertex_format::component_count_tex_coord)
+			? (Interleaved_vertex_format_old::component_count_tex_coord)
 			: 0u;
 		return component_offset_tex_coord() + prior_cmpt_count;
 	}
@@ -112,7 +112,7 @@ struct Interleaved_vertex_format final {
 	size_t component_offset_tex_coord() const noexcept
 	{
 		size_t prior_cmpt_count = has_normal(attribs)
-			? (Interleaved_vertex_format::component_count_normal)
+			? (Interleaved_vertex_format_old::component_count_normal)
 			: 0u;
 		return component_offset_normal() + prior_cmpt_count;
 	}
@@ -124,16 +124,16 @@ struct Interleaved_vertex_format final {
 // Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
 // Implementation details: does not support base vertex counter 
 // which means do not put more than one mesh into an Interleaved_mesh_data instance.
-class Interleaved_mesh_data final {
+class Interleaved_mesh_data_old final {
 public:
 
-	Interleaved_mesh_data() noexcept = default;
+	Interleaved_mesh_data_old() noexcept = default;
 
-	explicit Interleaved_mesh_data(Vertex_attribs attribs)
-		: Interleaved_mesh_data(attribs, 0, 0)
+	explicit Interleaved_mesh_data_old(Vertex_attribs attribs)
+		: Interleaved_mesh_data_old(attribs, 0, 0)
 	{}
 
-	Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count);
+	Interleaved_mesh_data_old(Vertex_attribs attribs, size_t vertex_count, size_t index_count);
 	
 
 
@@ -149,7 +149,7 @@ public:
 	}
 
 	// Represents format of this mesh data. Use format property to set offsets & strides.
-	Interleaved_vertex_format format() const
+	Interleaved_vertex_format_old format() const
 	{
 		return _format;
 	}
@@ -185,8 +185,18 @@ public:
 private:
 	std::vector<float> _data;
 	std::vector<uint32_t> _indices;
-	Interleaved_vertex_format _format;
+	Interleaved_vertex_format_old _format;
 };
+
+//template<Vertex_attribs attribs>
+//class Interleaved_mesh_data final {
+//public:
+//
+//private:
+//
+//	std::vector<float> _vertex_data;
+//	std::vector<uint32_t> _index_data;
+//};
 
 // Mesh_builder composes a mesh from the given vertices. Shared vertices are merged, 
 // tangent & bitangent attribs for shared vertices are always accumulated to make them smooth.
@@ -234,19 +244,19 @@ private:
 };
 
 
-inline bool operator==(const Interleaved_vertex_format& l, const Interleaved_vertex_format& r) noexcept
+inline bool operator==(const Interleaved_vertex_format_old& l, const Interleaved_vertex_format_old& r) noexcept
 {
 	return (l.attribs == r.attribs);
 }
 
-inline bool operator!=(const Interleaved_vertex_format& l, const Interleaved_vertex_format& r) noexcept
+inline bool operator!=(const Interleaved_vertex_format_old& l, const Interleaved_vertex_format_old& r) noexcept
 {
 	return (l.attribs == r.attribs);
 }
 
-std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt);
+std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format_old& fmt);
 
-std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt);
+std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format_old& fmt);
 
 
 } // data

@@ -13,7 +13,7 @@ namespace {
 using cg::float2;
 using cg::float3;
 using cg::float4;
-using cg::data::Interleaved_mesh_data;
+using cg::data::Interleaved_mesh_data_old;
 using cg::data::Vertex_old;
 using cg::data::Vertex_attribs;
 using cg::data::compute_tangent_h;
@@ -117,7 +117,7 @@ Wf_line_type parse_line_type(const std::string& line)
 
 // Parses wavefront face definitions which contain only vertex position (example: f 1 2 3)
 // constructs vertices and put them into Interleaved_mesh_data obejct.
-void parse_faces_p(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data& imd)
+void parse_faces_p(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data_old& imd)
 {
 	long long position_count = mesh_data.positions.size();
 
@@ -144,7 +144,7 @@ void parse_faces_p(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 
 // Parses wavefront face definitions which contain vertex position//normal (example: f 1//1 2//1 3//1)
 // constructs vertices and put them into Interleaved_mesh_data obejct.
-void parse_face_pn(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data& imd)
+void parse_face_pn(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data_old& imd)
 {
 	long long position_count = mesh_data.positions.size();
 	long long normal_count = mesh_data.normals.size();
@@ -176,7 +176,7 @@ void parse_face_pn(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_me
 
 // Parses wavefront face definitions which contain vertex position/tex_coord/normal (example: f 1/1/1 2/2/1 3/3/1)
 // constructs vertices and put them into Interleaved_mesh_data obejct.
-void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data& imd, bool calc_tangent_h)
+void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data_old& imd, bool calc_tangent_h)
 {
 	long long position_count = mesh_data.positions.size();
 	long long normal_count = mesh_data.normals.size();
@@ -208,8 +208,8 @@ void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_
 		vertices[2].tex_coord = mesh_data.tex_coords[static_cast<size_t>(tc2)];
 		
 		if (calc_tangent_h) {
-			float4 tangent_h = compute_tangent_h(vertices[0], vertices[1], vertices[2]);
-			vertices[0].tangent_h = vertices[1].tangent_h = vertices[2].tangent_h = tangent_h;
+			float4 tangent_space = compute_tangent_h(vertices[0], vertices[1], vertices[2]);
+			vertices[0].tangent_space = vertices[1].tangent_space = vertices[2].tangent_space = tangent_space;
 			
 			//if (vertices[0].normal != vertices[1].normal || vertices[1].normal != vertices[2].normal)
 			//{
@@ -229,7 +229,7 @@ void parse_face_pntc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_
 
 // Parses wavefront face definitions which contain vertex position/tex_coord (example: f 1/1 2/2 3/3)
 // constructs vertices and put them into Interleaved_mesh_data obejct.
-void parse_face_ptc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data& imd)
+void parse_face_ptc(By_line_iterator& it, Wf_mesh_data& mesh_data, Interleaved_mesh_data_old& imd)
 {
 	long long position_count = mesh_data.positions.size();
 	long long tex_coord_count = mesh_data.tex_coords.size();
@@ -292,7 +292,7 @@ float2 parse_tex_coord(const std::string& line)
 #pragma warning(pop)
 
 // Loads, parses and constructs a mesh object using the specified file iterator.
-Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs,
+Interleaved_mesh_data_old load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs,
 	size_t approx_vertex_count = 0, size_t approx_index_cont = 0)
 {
 	assert(attribs != Vertex_attribs::none);
@@ -340,7 +340,7 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 	// pack data
 	size_t init_vertex_count = (approx_vertex_count) ? approx_vertex_count : wf_mesh_data.positions.size();
 	size_t init_index_cout = (approx_index_cont) ? approx_index_cont : wf_mesh_data.positions.size();
-	cg::data::Interleaved_mesh_data imd(attribs, init_vertex_count, init_index_cout);
+	cg::data::Interleaved_mesh_data_old imd(attribs, init_vertex_count, init_index_cout);
 
 
 	if (wf_mesh_data.has_normals() && wf_mesh_data.has_tex_coords()) {
@@ -364,14 +364,14 @@ Interleaved_mesh_data load_mesh_wavefront(By_line_iterator it, Vertex_attribs at
 namespace cg {
 namespace file {
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const std::string& filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);
 	return ::load_mesh_wavefront(std::move(it), attribs, approx_vertex_count, approx_index_cont);
 }
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const char* filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const char* filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);

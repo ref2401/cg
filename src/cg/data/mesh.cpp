@@ -9,7 +9,7 @@ namespace data {
 
 // ----- Interleaved_mesh_data -----
 
-Interleaved_mesh_data::Interleaved_mesh_data(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
+Interleaved_mesh_data_old::Interleaved_mesh_data_old(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
 	: _format(attribs)
 {
 	assert(attribs != Vertex_attribs::none);
@@ -17,12 +17,12 @@ Interleaved_mesh_data::Interleaved_mesh_data(Vertex_attribs attribs, size_t vert
 	_indices.reserve(index_count);
 }
 
-void Interleaved_mesh_data::push_back_index(uint32_t i)
+void Interleaved_mesh_data_old::push_back_index(uint32_t i)
 {
 	_indices.push_back(i);
 }
 
-void Interleaved_mesh_data::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
+void Interleaved_mesh_data_old::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
 {
 	uint32_t index_buffer[3];
 	index_buffer[0] = i0;
@@ -31,7 +31,7 @@ void Interleaved_mesh_data::push_back_indices(uint32_t i0, uint32_t i1, uint32_t
 	_indices.insert(_indices.end(), index_buffer, index_buffer + std::extent<decltype(index_buffer)>::value);
 }
 
-void Interleaved_mesh_data::push_back_vertex(const Vertex_old& v)
+void Interleaved_mesh_data_old::push_back_vertex(const Vertex_old& v)
 {
 	float data_buffer[12];
 	size_t offset = 0;
@@ -57,17 +57,17 @@ void Interleaved_mesh_data::push_back_vertex(const Vertex_old& v)
 	}
 
 	if (has_tangent_space(_format.attribs)) {
-		data_buffer[offset]		= v.tangent_h.x;
-		data_buffer[offset + 1] = v.tangent_h.y;
-		data_buffer[offset + 2] = v.tangent_h.z;
-		data_buffer[offset + 3] = v.tangent_h.w;
+		data_buffer[offset]		= v.tangent_space.x;
+		data_buffer[offset + 1] = v.tangent_space.y;
+		data_buffer[offset + 2] = v.tangent_space.z;
+		data_buffer[offset + 3] = v.tangent_space.w;
 		offset += 4;
 	}
 
 	_data.insert(_data.end(), data_buffer, data_buffer + offset);
 }
 
-void Interleaved_mesh_data::push_back_vertices(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
+void Interleaved_mesh_data_old::push_back_vertices(const Vertex_old& v0, const Vertex_old& v1, const Vertex_old& v2)
 {
 	push_back_vertex(v0);
 	push_back_vertex(v1);
@@ -124,13 +124,13 @@ void Mesh_builder::push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, 
 
 // ----- funcs -----
 
-std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format& fmt)
+std::ostream& operator<<(std::ostream& out, const Interleaved_vertex_format_old& fmt)
 {
 	out << fmt.attribs;
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format& fmt)
+std::wostream& operator<<(std::wostream& out, const Interleaved_vertex_format_old& fmt)
 {
 	out << fmt.attribs;
 	return out;

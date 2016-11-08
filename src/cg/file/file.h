@@ -229,10 +229,10 @@ cg::data::Image_2d load_image_tga(const std::string& filename);
 
 cg::data::Image_2d load_image_tga(const char* filename);
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const std::string& filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const std::string& filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count = 0, size_t approx_index_cont = 0);
 
-cg::data::Interleaved_mesh_data load_mesh_wavefront(const char * filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const char * filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count = 0, size_t approx_index_cont = 0);
 
 // Returns the content of the specified text file.

@@ -21,7 +21,7 @@ public:
 
 	Gbuffer(const cg::uint2& viewport_size,
 		const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
-		const cg::data::Interleaved_mesh_data& rect_1x1_mesh_data);
+		const cg::data::Interleaved_mesh_data_old& rect_1x1_mesh_data);
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
 
@@ -336,7 +336,7 @@ struct Renderer_config final {
 
 	cg::rnd::opengl::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
-	cg::data::Interleaved_mesh_data rect_1x1_mesh_data;
+	cg::data::Interleaved_mesh_data_old rect_1x1_mesh_data;
 	cg::data::Shader_program_source_code gbuffer_pass_code;
 	cg::data::Shader_program_source_code lighting_pass_dir_code;
 	cg::data::Shader_program_source_code material_lighting_pass_code;

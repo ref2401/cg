@@ -309,7 +309,7 @@ Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
 		attr |= Vertex_attribs::tex_coord;
 
 	if (tangent_h_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs::tangent_h;
+		attr |= Vertex_attribs::tangent_space;
 
 	return attr;
 }

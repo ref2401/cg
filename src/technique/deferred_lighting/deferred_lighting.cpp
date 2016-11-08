@@ -39,7 +39,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::mesh_textured);
+	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront("../data/common_data/rect-1x1.obj", Vertex_attribs::vertex_p_tc);
 	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
 	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
@@ -205,7 +205,7 @@ void Deferred_lighting::init_geometry()
 		size_t approx_index_count;
 	};
 
-	auto vertex_attribs = Vertex_attribs::mesh_tangent_space;
+	auto vertex_attribs = Vertex_attribs::vertex_ts;
 	std::vector<Load_info> load_info_list = {
 		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
 		Load_info("../data/teapot_top.obj", &_cmd_teapot_top, 10656, 10656),
