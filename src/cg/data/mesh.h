@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <iterator>
 #include <ostream>
 #include <type_traits>
 #include <unordered_map>
@@ -121,7 +122,7 @@ struct Interleaved_vertex_format_old final {
 	Vertex_attribs attribs = Vertex_attribs::none;
 };
 
-// Interleaved_mesh_data is used to pack and store mesh data that is goint to be fed to the GPU.
+// Interleaved_mesh_data_old is used to pack and store mesh data that is goint to be fed to the GPU.
 // Implementation details: does not support base vertex counter 
 // which means do not put more than one mesh into an Interleaved_mesh_data instance.
 class Interleaved_mesh_data_old final {
@@ -188,15 +189,104 @@ private:
 	Interleaved_vertex_format_old _format;
 };
 
-//template<Vertex_attribs attribs>
-//class Interleaved_mesh_data final {
-//public:
-//
-//private:
-//
-//	std::vector<float> _vertex_data;
-//	std::vector<uint32_t> _index_data;
-//};
+// Interleaved_mesh_data is used to store mesh data that is goint to be fed to the GPU.
+// Each instnace of the Interleaved_mesh_data class contains data of a single mesh.
+template<Vertex_attribs attribs>
+class Interleaved_mesh_data final {
+public:
+
+	static_assert(attribs != Vertex_attribs::none, "Vertex_attribs parameter may not be none.");
+
+	using Format = Vertex_interleaved_format<attribs>;
+	using Vertex_data_array = float[Format::vertex_component_count];
+
+
+	Interleaved_mesh_data(size_t vertex_count, size_t index_count);
+
+
+	// Returns a buffer that contains all the components specified by the format,
+	// for every vertex beloning to the mesh.
+	const std::vector<float>& vertex_data() const noexcept
+	{
+		return _vertex_data;
+	}
+
+	// Returns the index buffer
+	const std::vector<uint32_t>& index_data() const noexcept
+	{
+		return _index_data;
+	}
+
+	// How many vertices are stored in this mesh data.
+	size_t vertex_count() const noexcept
+	{
+		return _vertex_data.size() / Format::vertex_component_count;
+	}
+
+	// How many indices are in this mesh data.
+	size_t index_count() const noexcept
+	{
+		return _index_data.size();
+	}
+
+
+	void push_back_vertex(const Vertex_data_array& arr);
+
+	void push_back_index(uint32_t index);
+
+	template<typename Container>
+	void push_back_indices(const Container& container);
+
+	template<size_t count>
+	void push_back_indices(const uint32_t (&indices)[count]);
+
+	template<typename Input_iterator>
+	void push_back_indices(Input_iterator b, Input_iterator e);
+
+private:
+	std::vector<float> _vertex_data;
+	std::vector<uint32_t> _index_data;
+};
+
+template<Vertex_attribs attribs>
+Interleaved_mesh_data<attribs>::Interleaved_mesh_data(size_t vertex_count, size_t index_count)
+{
+	_vertex_data.reserve(Format::vertex_component_count * vertex_count);
+	_index_data.reserve(index_count);
+}
+
+template<Vertex_attribs attribs>
+void Interleaved_mesh_data<attribs>::push_back_vertex(const Vertex_data_array& arr)
+{
+	_vertex_data.insert(_vertex_data.end(), std::cbegin(arr), std::cend(arr));
+}
+
+template<Vertex_attribs attribs>
+void Interleaved_mesh_data<attribs>::push_back_index(uint32_t index)
+{
+	_index_data.push_back(index);
+}
+
+template<Vertex_attribs attribs>
+template<typename Container>
+void Interleaved_mesh_data<attribs>::push_back_indices(const Container& container)
+{
+	_index_data.insert(_index_data.end(), container.cbegin(), container.cend());
+}
+
+template<Vertex_attribs attribs>
+template<size_t count>
+void Interleaved_mesh_data<attribs>::push_back_indices(const uint32_t (&indices)[count])
+{
+	_index_data.insert(_index_data.end(), std::cbegin(indices), std::cend(indices));
+}
+
+template<Vertex_attribs attribs>
+template<typename Input_iterator>
+void Interleaved_mesh_data<attribs>::push_back_indices(Input_iterator b, Input_iterator e)
+{
+	_index_data.insert(_index_data.end(), b, e);
+}
 
 // Mesh_builder composes a mesh from the given vertices. Shared vertices are merged, 
 // tangent & bitangent attribs for shared vertices are always accumulated to make them smooth.

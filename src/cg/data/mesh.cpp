@@ -7,7 +7,7 @@
 namespace cg {
 namespace data {
 
-// ----- Interleaved_mesh_data -----
+// ----- Interleaved_mesh_data_old -----
 
 Interleaved_mesh_data_old::Interleaved_mesh_data_old(Vertex_attribs attribs, size_t vertex_count, size_t index_count)
 	: _format(attribs)

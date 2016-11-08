@@ -10,6 +10,7 @@ using cg::float2;
 using cg::float3;
 using cg::float4;
 using cg::approx_equal;
+using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_mesh_data_old;
 using cg::data::Interleaved_vertex_format_old;
 using cg::data::Mesh_builder;
@@ -30,6 +31,67 @@ template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t)
 
 
 namespace unittest {
+
+TEST_CLASS(cg_data_mesh_Interleaved_mesh_data) {
+public:
+
+	TEST_METHOD(push_back_vertex_and_vertex_count)
+	{
+		Interleaved_mesh_data<Vertex_attribs::vertex_p_n> mesh_data(2, 0);
+		Assert::AreEqual(size_t(0), mesh_data.vertex_count());
+		Assert::IsTrue(mesh_data.vertex_data().empty());
+
+		float data[6] = { 0, 1, 2, 3, 4, 5 };
+
+		mesh_data.push_back_vertex(data);
+		Assert::AreEqual(size_t(1), mesh_data.vertex_count());
+		Assert::AreEqual(size_t(6), mesh_data.vertex_data().size());
+
+		mesh_data.push_back_vertex(data);
+		Assert::AreEqual(size_t(2), mesh_data.vertex_count());
+		Assert::AreEqual(size_t(12), mesh_data.vertex_data().size());
+
+		float expected_data[12] = { 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5 };
+		Assert::IsTrue(std::equal(
+			std::cbegin(expected_data), std::cend(expected_data),
+			mesh_data.vertex_data().cbegin(),
+			[](float a, float b) { return approx_equal<float>(a, b); }));
+	}
+
+	TEST_METHOD(push_back_indices_and_index_count)
+	{
+		Interleaved_mesh_data<Vertex_attribs::position> mesh_data(0, 4);
+		Assert::AreEqual(size_t(0), mesh_data.index_count());
+		Assert::IsTrue(mesh_data.index_data().empty());
+
+		// single vertex
+		mesh_data.push_back_index(0);
+		Assert::AreEqual(size_t(1), mesh_data.index_count());
+		Assert::AreEqual(size_t(1), mesh_data.index_data().size());
+
+		// static array
+		uint32_t indices[3] = { 1, 2, 3 };
+		mesh_data.push_back_indices(indices);
+		Assert::AreEqual(size_t(4), mesh_data.index_count());
+		Assert::AreEqual(size_t(4), mesh_data.index_data().size());
+
+		// container
+		std::vector<uint32_t> index_list = { 4, 5, 6, 7 };
+		mesh_data.push_back_indices(index_list);
+		Assert::AreEqual(size_t(8), mesh_data.index_count());
+		Assert::AreEqual(size_t(8), mesh_data.index_data().size());
+
+		// pair of iterators
+		mesh_data.push_back_indices(index_list.cbegin(), index_list.cend());
+		Assert::AreEqual(size_t(12), mesh_data.index_count());
+		Assert::AreEqual(size_t(12), mesh_data.index_data().size());
+
+		uint32_t expected_data[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7 };
+		Assert::IsTrue(std::equal(
+			std::cbegin(expected_data), std::cend(expected_data),
+			mesh_data.index_data().cbegin()));
+	}
+};
 
 TEST_CLASS(cg_data_mesh_Interleaved_mesh_data_old) {
 public:
