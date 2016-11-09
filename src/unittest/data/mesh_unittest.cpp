@@ -402,6 +402,126 @@ public:
 		Assert::IsTrue(ms.indices().empty());
 	}
 
+	TEST_METHOD(mesh_data)
+	{
+		// vertices represent a square
+		Vertex_ts v0(float3::zero, float3::unit_z, float2::zero, float3(2, 0, 0), float3(0, 2, 0));			// left-bottom
+		Vertex_ts v1(float3::unit_x, float3::unit_z, float2::unit_x, float3(2, 0, 0), float3(0, 2, 0));		// right-bottom
+		Vertex_ts v2(float3::unit_xy, float3::unit_z, float2::unit_xy, float3(2, 0, 0), float3(0, 2, 0));	// right-top
+		Vertex_ts v3(float3::unit_y, float3::unit_z, float2::unit_y, float3(2, 0, 0), float3(0, 2, 0));		// left-top
+
+		Mesh_builder mb(4, 6);
+		mb.push_back_triangle(v0, v1, v2);
+		mb.push_back_triangle(v2, v3, v0);
+
+		uint32_t expected_index_data[6] = { 0, 1, 2, 2, 3, 0 };
+
+		{ // position attrib
+			float expected_vertex_data[12] = {
+				0, 0, 0, 
+				1, 0, 0,
+				1, 1, 0,
+				0, 1, 0
+			};
+
+			Interleaved_mesh_data<Vertex_attribs::vertex_p> mesh_data = mb.mesh_data<Vertex_attribs::vertex_p>();
+			Assert::AreEqual(Vertex_attribs::vertex_p, decltype(mesh_data)::Format::attribs);
+
+			Assert::IsTrue(std::equal(
+				mesh_data.vertex_data().cbegin(), mesh_data.vertex_data().cend(),
+				std::cbegin(expected_vertex_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				mesh_data.index_data().cbegin(), mesh_data.index_data().cend(),
+				std::cbegin(expected_index_data)));
+		}
+
+		{ // position & normal attribs
+			float expected_vertex_data[24] = {
+				0, 0, 0,  0, 0, 1,
+				1, 0, 0,  0, 0, 1,
+				1, 1, 0,  0, 0, 1,
+				0, 1, 0,  0, 0, 1
+			};
+
+			auto mesh_data = mb.mesh_data<Vertex_attribs::vertex_p_n>();
+			Assert::AreEqual(Vertex_attribs::vertex_p_n, decltype(mesh_data)::Format::attribs);
+
+			Assert::IsTrue(std::equal(
+				mesh_data.vertex_data().cbegin(), mesh_data.vertex_data().cend(),
+				std::cbegin(expected_vertex_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				mesh_data.index_data().cbegin(), mesh_data.index_data().cend(),
+				std::cbegin(expected_index_data)));
+		}
+
+		{ // position normal & tex_coord attribs
+			float expected_vertex_data[32] = {
+				0, 0, 0,  0, 0, 1,  0, 0,
+				1, 0, 0,  0, 0, 1,  1, 0,
+				1, 1, 0,  0, 0, 1,  1, 1,
+				0, 1, 0,  0, 0, 1,  0, 1
+			};
+
+			auto mesh_data = mb.mesh_data<Vertex_attribs::vertex_p_n_tc>();
+			Assert::AreEqual(Vertex_attribs::vertex_p_n_tc, decltype(mesh_data)::Format::attribs);
+
+			Assert::IsTrue(std::equal(
+				mesh_data.vertex_data().cbegin(), mesh_data.vertex_data().cend(),
+				std::cbegin(expected_vertex_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				mesh_data.index_data().cbegin(), mesh_data.index_data().cend(),
+				std::cbegin(expected_index_data)));
+		}
+
+		{ // position & tex_coord attribs
+			float expected_vertex_data[20] = {
+				0, 0, 0,  0, 0,
+				1, 0, 0,  1, 0,
+				1, 1, 0,  1, 1,
+				0, 1, 0,  0, 1
+			};
+
+			auto mesh_data = mb.mesh_data<Vertex_attribs::vertex_p_tc>();
+			Assert::AreEqual(Vertex_attribs::vertex_p_tc, decltype(mesh_data)::Format::attribs);
+
+			Assert::IsTrue(std::equal(
+				mesh_data.vertex_data().cbegin(), mesh_data.vertex_data().cend(),
+				std::cbegin(expected_vertex_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				mesh_data.index_data().cbegin(), mesh_data.index_data().cend(),
+				std::cbegin(expected_index_data)));
+		}
+
+		{ // position normal & tex_coord attribs
+			float expected_vertex_data[48] = {
+				0, 0, 0,  0, 0, 1,  0, 0,  1, 0, 0, 1,
+				1, 0, 0,  0, 0, 1,  1, 0,  1, 0, 0, 1,
+				1, 1, 0,  0, 0, 1,  1, 1,  1, 0, 0, 1,
+				0, 1, 0,  0, 0, 1,  0, 1,  1, 0, 0, 1
+			};
+
+			auto mesh_data = mb.mesh_data<Vertex_attribs::vertex_ts>();
+			Assert::AreEqual(Vertex_attribs::vertex_ts, decltype(mesh_data)::Format::attribs);
+
+			Assert::IsTrue(std::equal(
+				mesh_data.vertex_data().cbegin(), mesh_data.vertex_data().cend(),
+				std::cbegin(expected_vertex_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				mesh_data.index_data().cbegin(), mesh_data.index_data().cend(),
+				std::cbegin(expected_index_data)));
+		}
+	}
+
 	TEST_METHOD(push_back_vertex_triangle)
 	{
 		// vertices represent a square
@@ -413,13 +533,13 @@ public:
 		Vertex_ts expected_vertices[4] = { v0, v1, v2, v3 };
 		uint32_t expected_indices[6] = { 0, 1, 2,  2, 3, 0 };
 		
-		Mesh_builder ms(3, 3);
-		ms.push_back_triangle(v0, v1, v2);
-		ms.push_back_triangle(v2, v3, v0);
-		Assert::AreEqual(size_t(4), ms.vertex_count());
-		Assert::AreEqual(size_t(6), ms.index_count());
-		Assert::IsTrue(std::equal(ms.vertices().cbegin(), ms.vertices().cend(), std::cbegin(expected_vertices)));
-		Assert::IsTrue(std::equal(ms.indices().cbegin(), ms.indices().cend(), std::cbegin(expected_indices)));
+		Mesh_builder mb(3, 3);
+		mb.push_back_triangle(v0, v1, v2);
+		mb.push_back_triangle(v2, v3, v0);
+		Assert::AreEqual(size_t(4), mb.vertex_count());
+		Assert::AreEqual(size_t(6), mb.index_count());
+		Assert::IsTrue(std::equal(mb.vertices().cbegin(), mb.vertices().cend(), std::cbegin(expected_vertices)));
+		Assert::IsTrue(std::equal(mb.indices().cbegin(), mb.indices().cend(), std::cbegin(expected_indices)));
 	}
 };
 

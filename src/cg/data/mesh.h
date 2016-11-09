@@ -203,6 +203,15 @@ public:
 
 	Interleaved_mesh_data(size_t vertex_count, size_t index_count);
 
+	Interleaved_mesh_data(const Interleaved_mesh_data<attribs>&) = delete;
+
+	Interleaved_mesh_data(Interleaved_mesh_data<attribs>&& mesh_data) noexcept;
+
+
+	Interleaved_mesh_data<attribs>& operator=(const Interleaved_mesh_data<attribs>&) = delete;
+
+	Interleaved_mesh_data<attribs>& operator=(Interleaved_mesh_data<attribs>&& mesh_data) noexcept;
+
 
 	// Returns a buffer that contains all the components specified by the format,
 	// for every vertex beloning to the mesh.
@@ -256,6 +265,23 @@ Interleaved_mesh_data<attribs>::Interleaved_mesh_data(size_t vertex_count, size_
 }
 
 template<Vertex_attribs attribs>
+Interleaved_mesh_data<attribs>::Interleaved_mesh_data(Interleaved_mesh_data<attribs>&& mesh_data) noexcept :
+	_vertex_data(std::move(mesh_data._vertex_data)),
+	_index_data(std::move(mesh_data._index_data))
+{}
+
+template<Vertex_attribs attribs>
+Interleaved_mesh_data<attribs>& Interleaved_mesh_data<attribs>::operator=(Interleaved_mesh_data<attribs>&& mesh_data) noexcept
+{
+	if (this == &mesh_data) return *this;
+
+	_vertex_data = std::move(mesh_data._vertex_data);
+	_index_data = std::move(mesh_data._index_data);
+
+	return *this;
+}
+
+template<Vertex_attribs attribs>
 void Interleaved_mesh_data<attribs>::push_back_vertex(const Vertex_data_array& arr)
 {
 	_vertex_data.insert(_vertex_data.end(), std::cbegin(arr), std::cend(arr));
@@ -295,14 +321,11 @@ public:
 
 	Mesh_builder(size_t vertex_count, size_t index_count);
 
-	
-	// Removes all the vertices & indices from builder.
-	void clear() noexcept;
 
-	// Total number of indices in the mesh.
-	size_t index_count() const noexcept
+	// Returns vertices of the mesh being constructed.
+	const std::vector<Vertex_ts>& vertices() const noexcept
 	{
-		return _indices.size();
+		return _vertices;
 	}
 
 	// Returns indices of the mesh being constructed.
@@ -311,27 +334,50 @@ public:
 		return _indices;
 	}
 
-	void push_back_vertex(const Vertex_ts& vertex);
-
-	void push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2);
-
 	// Total number of vertices in the mesh.
 	size_t vertex_count() const noexcept
 	{
 		return _vertices.size();
 	}
 
-	// Returns vertices of the mesh being constructed.
-	const std::vector<Vertex_ts>& vertices() const noexcept
+	// Total number of indices in the mesh.
+	size_t index_count() const noexcept
 	{
-		return _vertices;
+		return _indices.size();
 	}
+
+	// Removes all the vertices & indices from builder.
+	void clear() noexcept;
+
+	// Returns an object that contains indices and vertex data stored in interleaved format.
+	template<Vertex_attribs attribs>
+	Interleaved_mesh_data<attribs> mesh_data() const;
+
+	void push_back_vertex(const Vertex_ts& vertex);
+
+	void push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2);
 
 private:
 	std::unordered_map<Vertex, uint32_t> _shared_vertices;
 	std::vector<Vertex_ts> _vertices;
 	std::vector<uint32_t> _indices;
 };
+
+template<Vertex_attribs attribs>
+Interleaved_mesh_data<attribs> Mesh_builder::mesh_data() const
+{
+	Interleaved_mesh_data<attribs> md(vertex_count(), index_count());
+	Interleaved_mesh_data<attribs>::Vertex_data_array vert_arr;
+
+	for (const auto& v : _vertices) {
+		to_array<attribs>(v, vert_arr);
+		md.push_back_vertex(vert_arr);
+	}
+
+	md.push_back_indices(_indices);
+
+	return md;
+}
 
 
 inline bool operator==(const Interleaved_vertex_format_old& l, const Interleaved_vertex_format_old& r) noexcept

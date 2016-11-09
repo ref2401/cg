@@ -528,6 +528,94 @@ public:
 				[](float a, float b) { return approx_equal<float>(a, b); }));
 		}
 	}
+
+	TEST_METHOD(to_array_func_templte)
+	{
+		using cg::approx_equal;
+		using cg::data::to_array;
+		constexpr float end_guard = -100;
+
+		Vertex_ts v(float3(1, 2, 3), float3::unit_z, float2(4, 5), float3(2, 0, 0), float3(0, 2, 0));
+
+		{ // position attribute
+			float expected_arr[4] = { 1, 2, 3, end_guard };
+
+			float arr[4]; arr[3] = end_guard;
+			to_array<Vertex_attribs::vertex_p>(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position & normal
+			float expected_arr[7] = {
+				1, 2, 3,
+				0, 0, 1,
+				end_guard
+			};
+
+			float arr[7]; arr[6] = end_guard;
+			to_array<Vertex_attribs::vertex_p_n>(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position, normal & tex_coord attributes
+			float expected_arr[9] = {
+				1, 2, 3,
+				0, 0, 1,
+				4, 5,
+				end_guard
+			};
+
+			float arr[9]; arr[8] = end_guard;
+			to_array<Vertex_attribs::vertex_p_n_tc>(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // position & tex_coord attributes
+			float expected_arr[6] = {
+				1, 2, 3,
+				4, 5,
+				end_guard
+			};
+
+			float arr[6]; arr[5] = end_guard;
+			to_array<Vertex_attribs::vertex_p_tc>(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+
+		{ // all the attributes
+			float expected_arr[13] = {
+				1, 2, 3,
+				0, 0, 1,
+				4, 5,
+				1, 0, 0, 1,
+				end_guard
+			};
+
+			float arr[13]; arr[12] = end_guard;
+			to_array<Vertex_attribs::vertex_ts>(v, arr);
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(arr), std::cend(arr),
+				std::cbegin(expected_arr),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+		}
+	}
 };
 
 } // namespace unittest

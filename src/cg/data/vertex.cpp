@@ -5,8 +5,6 @@
 namespace cg {
 namespace data {
 
-// ----- Vertex_interleaved_format -----
-
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)

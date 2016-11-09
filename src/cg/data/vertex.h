@@ -409,6 +409,40 @@ inline void to_array_p_tc(const Vertex_ts& v, float* arr) noexcept
 	arr[4] = v.tex_coord.v;
 }
 
+// Calls one of the to_array_{...} functions in accordance with attribs template paramere.
+template<Vertex_attribs attribs>
+void to_array(const Vertex_ts& v, float* arr) noexcept;
+
+template<>
+inline void to_array<Vertex_attribs::vertex_p>(const Vertex_ts& v, float* arr) noexcept
+{
+	to_array_p(v, arr);
+}
+
+template<>
+inline void to_array<Vertex_attribs::vertex_p_n>(const Vertex_ts& v, float* arr) noexcept
+{
+	to_array_p_n(v, arr);
+}
+
+template<>
+inline void to_array<Vertex_attribs::vertex_p_n_tc>(const Vertex_ts& v, float* arr) noexcept
+{
+	to_array_p_n_tc(v, arr);
+}
+
+template<>
+inline void to_array<Vertex_attribs::vertex_p_tc>(const Vertex_ts& v, float* arr) noexcept
+{
+	to_array_p_tc(v, arr);
+}
+
+template<>
+inline void to_array<Vertex_attribs::vertex_ts>(const Vertex_ts& v, float* arr) noexcept
+{
+	to_array(v, arr);
+}
+
 } // namespace data
 } // namespace cg
 
