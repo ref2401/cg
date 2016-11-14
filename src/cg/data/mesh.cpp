@@ -81,9 +81,7 @@ Mesh_builder::Mesh_builder(size_t vertex_count, size_t index_count)
 	assert(vertex_count > 0);
 	assert(index_count > 0);
 
-	_shared_vertices.reserve(vertex_count);
-	_vertices.reserve(vertex_count);
-	_indices.reserve(index_count);
+	reserve(vertex_count, index_count);
 }
 
 void Mesh_builder::clear() noexcept
@@ -120,6 +118,18 @@ void Mesh_builder::push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, 
 	push_back_vertex(v0);
 	push_back_vertex(v1);
 	push_back_vertex(v2);
+}
+
+void Mesh_builder::reserve(size_t vertex_count, size_t index_count)
+{
+	if (vertex_count > 0) {
+		_shared_vertices.reserve(vertex_count);
+		_vertices.reserve(vertex_count);
+	}
+
+	if (index_count > 0) {
+		_indices.reserve(index_count);
+	}
 }
 
 // ----- funcs -----

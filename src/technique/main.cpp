@@ -32,8 +32,6 @@ std::string get_report_message(const Clock::Clock_report& report)
 
 int main(int argc, char* argv[])
 {
-	//auto md = cg::file::load_mesh_wavefront<cg::data::Vertex_attribs::position>("aaa");
-
 	uint2 wnd_position(90, 50);
 	uint2 wnd_size(960, 540);
 

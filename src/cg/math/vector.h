@@ -1026,9 +1026,9 @@ inline float4 lerp(const float4& lhs, const float4& rhs, float factor) noexcept
 inline float2 normalize(const float2& v) noexcept
 {
 	float l2 = len_squared(v);
-	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
+	if (approx_equal(l2, 0.0f) || approx_equal(l2, 1.0f)) return v;
 
-	float factor = 1.f / sqrt(l2);
+	float factor = 1.0f / sqrt(l2);
 	return v * factor;
 }
 
@@ -1036,9 +1036,9 @@ inline float2 normalize(const float2& v) noexcept
 inline float3 normalize(const float3& v) noexcept
 {
 	float l2 = len_squared(v);
-	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
+	if (approx_equal(l2, 0.0f) || approx_equal(l2, 1.0f)) return v;
 
-	float factor = 1.f / sqrt(l2);
+	float factor = 1.0f / sqrt(l2);
 	return v * factor;
 }
 
@@ -1046,9 +1046,9 @@ inline float3 normalize(const float3& v) noexcept
 inline float4 normalize(const float4& v) noexcept
 {
 	float l2 = len_squared(v);
-	if (approx_equal(l2, 0.f) || approx_equal(l2, 1.f)) return v;
+	if (approx_equal(l2, 0.0f) || approx_equal(l2, 1.0f)) return v;
 
-	float factor = 1.f / sqrt(l2);
+	float factor = 1.0f / sqrt(l2);
 	return v * factor;
 }
 

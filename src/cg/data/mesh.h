@@ -357,6 +357,9 @@ public:
 
 	void push_back_triangle(const Vertex_ts& v0, const Vertex_ts& v1, const Vertex_ts& v2);
 
+	// Reserves memory large enough to store vertex_count vertices and index_count indices.
+	void reserve(size_t vertex_count, size_t index_count);
+
 private:
 	std::unordered_map<Vertex, uint32_t> _shared_vertices;
 	std::vector<Vertex_ts> _vertices;
