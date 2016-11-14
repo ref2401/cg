@@ -1,7 +1,8 @@
-#include "cg/file/file.h"
+#include "cg/file/file_image.h"
 
 #include <cstdint>
 #include <type_traits>
+#include "cg/base/base.h"
 
 namespace {
 

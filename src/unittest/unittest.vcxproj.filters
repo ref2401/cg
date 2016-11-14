@@ -7,9 +7,6 @@
     <ClCompile Include="data\mesh_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="file\file_unittest.cpp">
-      <Filter>file</Filter>
-    </ClCompile>
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -48,6 +45,18 @@
     </ClCompile>
     <ClCompile Include="data\vertex_unittest.cpp">
       <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="file\file_base_unittest.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="file\file_image_unittest.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="file\file_unittest.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="file\file_mesh_unittest.cpp">
+      <Filter>file</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

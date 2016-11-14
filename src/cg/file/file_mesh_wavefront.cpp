@@ -1,4 +1,4 @@
-#include "cg/file/file.h"
+#include "cg/file/file_mesh.h"
 
 #include <cstdint>
 #include <array>
@@ -13,6 +13,7 @@ namespace {
 using cg::float2;
 using cg::float3;
 using cg::float4;
+using cg::data::Interleaved_mesh_data;
 using cg::data::Interleaved_mesh_data_old;
 using cg::data::Vertex_old;
 using cg::data::Vertex_attribs;
@@ -292,7 +293,7 @@ float2 parse_tex_coord(const std::string& line)
 #pragma warning(pop)
 
 // Loads, parses and constructs a mesh object using the specified file iterator.
-Interleaved_mesh_data_old load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs,
+Interleaved_mesh_data_old load_mesh_wavefront_old(By_line_iterator it, Vertex_attribs attribs,
 	size_t approx_vertex_count = 0, size_t approx_index_cont = 0)
 {
 	assert(attribs != Vertex_attribs::none);
@@ -364,18 +365,18 @@ Interleaved_mesh_data_old load_mesh_wavefront(By_line_iterator it, Vertex_attrib
 namespace cg {
 namespace file {
 
-cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const std::string& filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront_old(const std::string& filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);
-	return ::load_mesh_wavefront(std::move(it), attribs, approx_vertex_count, approx_index_cont);
+	return ::load_mesh_wavefront_old(std::move(it), attribs, approx_vertex_count, approx_index_cont);
 }
 
-cg::data::Interleaved_mesh_data_old load_mesh_wavefront(const char* filename, 
+cg::data::Interleaved_mesh_data_old load_mesh_wavefront_old(const char* filename, 
 	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_cont)
 {
 	By_line_iterator it(filename);
-	return ::load_mesh_wavefront(std::move(it), attribs, approx_vertex_count, approx_index_cont);
+	return ::load_mesh_wavefront_old(std::move(it), attribs, approx_vertex_count, approx_index_cont);
 }
 
 } // namespace file

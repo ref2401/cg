@@ -1,7 +1,6 @@
 #ifndef UNITTEST_FILE_COMMON_FILE_H_
 #define UNITTEST_FILE_COMMON_FILE_H_
 
-#include "cg/file/file.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

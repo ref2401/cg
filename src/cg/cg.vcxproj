@@ -129,8 +129,9 @@
     <ClCompile Include="data\mesh.cpp" />
     <ClCompile Include="data\vertex.cpp" />
     <ClCompile Include="file\file.cpp" />
-    <ClCompile Include="file\image_tga.cpp" />
-    <ClCompile Include="file\mesh_wavefront.cpp" />
+    <ClCompile Include="file\file_base.cpp" />
+    <ClCompile Include="file\file_image_tga.cpp" />
+    <ClCompile Include="file\file_mesh_wavefront.cpp" />
     <ClCompile Include="math\matrix.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="math\vector.cpp" />
@@ -154,6 +155,9 @@
     <ClInclude Include="data\shader.h" />
     <ClInclude Include="data\vertex.h" />
     <ClInclude Include="file\file.h" />
+    <ClInclude Include="file\file_base.h" />
+    <ClInclude Include="file\file_image.h" />
+    <ClInclude Include="file\file_mesh.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\matrix.h" />
     <ClInclude Include="math\transform.h" />
