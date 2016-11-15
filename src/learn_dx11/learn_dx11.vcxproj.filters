@@ -5,10 +5,16 @@
     <ClCompile Include="base\app.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="base\dx11.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
       <UniqueIdentifier>{a6bc244b-6061-406c-a99d-a23453fd30df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mesh_rnd">
+      <UniqueIdentifier>{00b5670e-9a13-46f6-b9b7-99dddaa81543}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -17,6 +23,9 @@
     </ClInclude>
     <ClInclude Include="base\dx11.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_rnd\static_mesh_example.h">
+      <Filter>mesh_rnd</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

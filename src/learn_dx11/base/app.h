@@ -28,12 +28,9 @@ public:
 	void run();
 
 private:
-	cg::uint2 _window_size;
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
-	unique_com<ID3D11Device> _device = nullptr;
-	unique_com<ID3D11DeviceContext> _device_ctx = nullptr;
-	unique_com<IDXGISwapChain> _swap_chain = nullptr;
+	Render_context _rnd_ctx;
 };
 
 } // learn_dx11
