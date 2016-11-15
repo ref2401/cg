@@ -15,5 +15,8 @@
     <ClInclude Include="base\app.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="base\dx11.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

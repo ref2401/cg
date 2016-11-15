@@ -2,6 +2,7 @@
 #define LEARN_DX11_BASE_APP_H_
 
 #include "cg/math/math.h"
+#include "learn_dx11/base/dx11.h"
 #include <windows.h>
 
 
@@ -27,9 +28,12 @@ public:
 	void run();
 
 private:
+	cg::uint2 _window_size;
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
-
+	unique_com<ID3D11Device> _device = nullptr;
+	unique_com<ID3D11DeviceContext> _device_ctx = nullptr;
+	unique_com<IDXGISwapChain> _swap_chain = nullptr;
 };
 
 } // learn_dx11
