@@ -51,46 +51,126 @@ Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept
 	);
 }
 
-mat4 orthographic_matrix(float width, float height, float near_z, float far_z) noexcept
+mat4 orthographic_matrix_directx(float width, float height, float near_z, float far_z) noexcept
 {
 	assert(width > 0);
 	assert(height > 0);
 	assert(near_z < far_z);
 
 	float far_minus_near = far_z - near_z;
-	float right = width / 2.f;
-	float top = height / 2.f;
+	float right = width / 2.0f;
+	float top = height / 2.0f;
 
 	return mat4(
-		1.f / right, 0, 0, 0,
-		0, 1.f / top, 0, 0,
-		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
+		1.0f / right, 0, 0, 0,
+		0, 1.0f / top, 0, 0,
+		0, 0, -1.0f / far_minus_near, -near_z / far_minus_near,
 		0, 0, 0, 1
 	);
 }
 
-mat4 orthographic_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
+mat4 orthographic_matrix_directx(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
 {
 	assert(left < right);
 	assert(bottom < top);
 	assert(near_z < far_z);
 
-	float doubled_near = 2.f * near_z;
+	float doubled_near = 2.0f * near_z;
 	float far_minus_near = far_z - near_z;
 	float right_minus_left = right - left;
 	float top_minus_bottom = top - bottom;
 
 	return mat4(
-		2.f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
-		0, 2.f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
-		0, 0, -2.f / far_minus_near, -(far_z + near_z) / far_minus_near,
+		2.0f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
+		0, 2.0f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
+		0, 0, -1.0f / far_minus_near, -near_z / far_minus_near,
 		0, 0, 0, 1
 	);
 }
 
-mat4 perspective_matrix(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
+mat4 orthographic_matrix_opengl(float width, float height, float near_z, float far_z) noexcept
 {
-	float doubled_near = 2.f * near_z;
+	assert(width > 0);
+	assert(height > 0);
+	assert(near_z < far_z);
+
+	float far_minus_near = far_z - near_z;
+	float right = width / 2.0f;
+	float top = height / 2.0f;
+
+	return mat4(
+		1.0f / right, 0, 0, 0,
+		0, 1.0f / top, 0, 0,
+		0, 0, -2.0f / far_minus_near, -(far_z + near_z) / far_minus_near,
+		0, 0, 0, 1
+	);
+}
+
+mat4 orthographic_matrix_opengl(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
+{
+	assert(left < right);
+	assert(bottom < top);
+	assert(near_z < far_z);
+
+	float doubled_near = 2.0f * near_z;
+	float far_minus_near = far_z - near_z;
+	float right_minus_left = right - left;
+	float top_minus_bottom = top - bottom;
+
+	return mat4(
+		2.0f / right_minus_left, 0, 0, -(right + left) / right_minus_left,
+		0, 2.0f / top_minus_bottom, 0, -(top + bottom) / top_minus_bottom,
+		0, 0, -2.0f / far_minus_near, -(far_z + near_z) / far_minus_near,
+		0, 0, 0, 1
+	);
+}
+
+mat4 perspective_matrix_directx(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
+{
+	float doubled_near = 2.0f * near_z;
+	float far_minus_near = far_z - near_z;
+	float right_minus_left = right - left;
+	float top_minus_bottom = top - bottom;
+
+
+	return mat4(
+		doubled_near / right_minus_left, 0, -(right + left) / right_minus_left, 0,
+		0, doubled_near / top_minus_bottom, -(top + bottom) / top_minus_bottom, 0,
+		0, 0, far_z / far_minus_near, -near_z * far_z / far_minus_near,
+		0, 0, 1, 0
+	);
+}
+
+mat4 perspective_matrix_directx(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept
+{
+	assert(0 < vert_fov && vert_fov < pi);
+	assert(0 < near_z && near_z < far_z);
+
+	float fat_minus_near = far_z - near_z;
+	float rev_tangent = 1.0f / std::tan(vert_fov * 0.5f);
+
+	/*
+	* TAN = tan(vert_fov / 2.0f)
+	* top = near * TAN
+	* right = top * wh_ratio = wh_ratio * near * TAN
+	*
+	* 2near / (right - (-rigth)) = 2near / 2right = near / right =
+	* near / (wh_ratio * near * TAN) = 1 / (wh_ratio * TAN)
+	*
+	* 2near / (top - (-top)) = 2near / 2top = neat / top =
+	* near / (near * TAN) = 1 / TAN */
+
+	return mat4(
+		(1.0f / wh_ratio) * rev_tangent, 0, 0, 0,
+		0, rev_tangent, 0, 0,
+		0, 0, far_z / fat_minus_near, -near_z * far_z / fat_minus_near,
+		0, 0, 1, 0
+	);
+}
+
+mat4 perspective_matrix_opengl(float left, float right, float bottom, float top, float near_z, float far_z) noexcept
+{
+	float doubled_near = 2.0f * near_z;
 	float far_minus_near = far_z - near_z;
 	float right_minus_left = right - left;
 	float top_minus_bottom = top - bottom;
@@ -104,16 +184,16 @@ mat4 perspective_matrix(float left, float right, float bottom, float top, float 
 	);
 }
 
-mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept
+mat4 perspective_matrix_opengl(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept
 {
 	assert(0 < vert_fov && vert_fov < pi);
 	assert(0 < near_z && near_z < far_z);
 
 	float fat_minus_near = far_z - near_z;
-	float rev_tangent = 1.f / std::tan(vert_fov * 0.5f);
+	float rev_tangent = 1.0f / std::tan(vert_fov * 0.5f);
 
 	/*
-	* TAN = tan(vert_fov / 2.0L)
+	* TAN = tan(vert_fov / 2.0f)
 	* top = near * TAN
 	* right = top * wh_ratio = wh_ratio * near * TAN
 	*
@@ -124,9 +204,9 @@ mat4 perspective_matrix(float vert_fov, float wh_ratio, float near_z, float far_
 	* near / (near * TAN) = 1 / TAN */
 
 	return mat4(
-		(1.f / wh_ratio) * rev_tangent, 0, 0, 0,
+		(1.0f / wh_ratio) * rev_tangent, 0, 0, 0,
 		0, rev_tangent, 0, 0,
-		0, 0, -(far_z + near_z) / fat_minus_near, -2.f * near_z * far_z / fat_minus_near,
+		0, 0, -(far_z + near_z) / fat_minus_near, -2.0f * near_z * far_z / fat_minus_near,
 		0, 0, -1, 0
 	);
 }

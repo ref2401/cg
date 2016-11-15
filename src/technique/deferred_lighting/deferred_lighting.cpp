@@ -157,7 +157,7 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	float width = 30.0f;
 	float height = width / _ctx.window().size().aspect_ratio<float>();
 	float distance_to_light = len(_dir_light.position - _dir_light.target);
-	_dir_light.projection_matrix = orthographic_matrix(width, height, -1, 1.5f * distance_to_light);
+	_dir_light.projection_matrix = orthographic_matrix_opengl(width, height, -1, 1.5f * distance_to_light);
 
 	update_viewpoint_projection();
 
@@ -329,7 +329,7 @@ void Deferred_lighting::update_viewpoint_projection()
 	float far_z = 50;
 	float vert_fov = cg::pi_3;
 	float wh_ratio = _ctx.window().size().aspect_ratio();
-	_projection_matrix = cg::perspective_matrix(vert_fov, wh_ratio, near_z, far_z);
+	_projection_matrix = cg::perspective_matrix_opengl(vert_fov, wh_ratio, near_z, far_z);
 
 	float far_y = far_z * std::tan(vert_fov * 0.5f);
 	float far_x = far_y * wh_ratio;

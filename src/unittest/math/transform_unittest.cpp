@@ -150,39 +150,75 @@ TEST_CLASS(cg_math_transform_Funcs) {
 		Assert::AreEqual(lerp(vp0.up, vp1.up, factor), vp.up);
 	}
 
-	TEST_METHOD(orthographic_matrix)
+	TEST_METHOD(orthographic_matrix_directx)
 	{
-		using cg::orthographic_matrix;
+		using cg::orthographic_matrix_directx;
 
-		float width = 800.f;
-		float height = 600.f;
-		float near = -5.f;
-		float far = 10.f;
+		float width = 800.0f;
+		float height = 600.0f;
+		float near = -5.0f;
+		float far = 100.f;
 
 		// manual computation of (left, right, bottom, top, near, far) tuple
-		float hw = width / 2.f;
-		float hh = height / 2.f;
+		float hw = width / 2.0f;
+		float hh = height / 2.0f;
 
-		mat4 om1 = orthographic_matrix(-hw, hw, -hh, hh, near, far);
-		mat4 om2 = orthographic_matrix(width, height, near, far);
+		mat4 om1 = orthographic_matrix_directx(-hw, hw, -hh, hh, near, far);
+		mat4 om2 = orthographic_matrix_directx(width, height, near, far);
 		Assert::AreEqual(om1, om2);
 	}
 
-	TEST_METHOD(perspective_matrix)
+	TEST_METHOD(orthographic_matrix_opengl)
 	{
-		using cg::perspective_matrix;
+		using cg::orthographic_matrix_opengl;
 
-		float near = 1.f;
-		float far = 100.f;
-		float fov = cg::pi_2;
-		float ratio = 800.f / 600.f;
+		float width = 800.0f;
+		float height = 600.0f;
+		float near = -5.0f;
+		float far = 10.0f;
 
 		// manual computation of (left, right, bottom, top, near, far) tuple
-		float height = near * std::tan(fov / 2.f);
+		float hw = width / 2.0f;
+		float hh = height / 2.0f;
+
+		mat4 om1 = orthographic_matrix_opengl(-hw, hw, -hh, hh, near, far);
+		mat4 om2 = orthographic_matrix_opengl(width, height, near, far);
+		Assert::AreEqual(om1, om2);
+	}
+
+	TEST_METHOD(perspective_matrix_directx)
+	{
+		using cg::perspective_matrix_directx;
+
+		float near = 1.0f;
+		float far = 100.0f;
+		float fov = cg::pi_2;
+		float ratio = 800.0f / 600.0f;
+
+		// manual computation of (left, right, bottom, top, near, far) tuple
+		float height = near * std::tan(fov / 2.0f);
 		float width = height * ratio;
 
-		mat4 pm1 = perspective_matrix(-width, width, -height, height, near, far);
-		mat4 pm2 = perspective_matrix(fov, ratio, near, far);
+		mat4 pm1 = perspective_matrix_directx(-width, width, -height, height, near, far);
+		mat4 pm2 = perspective_matrix_directx(fov, ratio, near, far);
+		Assert::AreEqual(pm1, pm2);
+	}
+
+	TEST_METHOD(perspective_matrix_opengl)
+	{
+		using cg::perspective_matrix_opengl;
+
+		float near = 1.0f;
+		float far = 100.0f;
+		float fov = cg::pi_2;
+		float ratio = 800.0f / 600.0f;
+
+		// manual computation of (left, right, bottom, top, near, far) tuple
+		float height = near * std::tan(fov / 2.0f);
+		float width = height * ratio;
+
+		mat4 pm1 = perspective_matrix_opengl(-width, width, -height, height, near, far);
+		mat4 pm2 = perspective_matrix_opengl(fov, ratio, near, far);
 		Assert::AreEqual(pm1, pm2);
 	}
 
