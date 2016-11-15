@@ -2,5 +2,18 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="base\app.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="base">
+      <UniqueIdentifier>{a6bc244b-6061-406c-a99d-a23453fd30df}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base\app.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

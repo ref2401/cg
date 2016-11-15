@@ -75,7 +75,6 @@ Application::Application()
 	_sys_message_queue.reserve(64);
 }
 
-
 void Application::clear_message_queue() noexcept
 {
 	_sys_message_queue.clear();
