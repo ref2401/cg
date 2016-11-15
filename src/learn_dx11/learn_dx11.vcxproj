@@ -129,6 +129,7 @@
     <ClCompile Include="base\app.cpp" />
     <ClCompile Include="base\dx11.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh_rnd\static_mesh_example.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">

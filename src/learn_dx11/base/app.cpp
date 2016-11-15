@@ -116,16 +116,22 @@ Application::~Application() noexcept
 	_hinstance = nullptr;
 }
 
-void Application::run()
+void Application::run_main_loop(Example& example)
+{
+	while (true) {
+		bool terminate = pump_sys_messages();
+		if (terminate) break;
+
+		example.update();
+		example.render();
+	}
+}
+
+void Application::show_window() noexcept
 {
 	ShowWindow(_hwnd, SW_SHOW);
 	SetForegroundWindow(_hwnd);
 	SetFocus(_hwnd);
-
-	while (true) {
-		bool terminate = pump_sys_messages();
-		if (terminate) break;
-	}
 }
 
 } // namespace learn_dx11

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cg/base/base.h"
 #include "learn_dx11/base/app.h"
+#include "learn_dx11/mesh_rnd/static_mesh_example.h"
 
 
 int main(int argc, char* argv[])
@@ -10,7 +11,7 @@ int main(int argc, char* argv[])
 
 	try {
 		learn_dx11::Application app(wnd_position, wnd_size);
-		app.run();
+		app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
 	}
 	catch(std::exception& exc) {
 		OutputDebugString("\nException:\n");

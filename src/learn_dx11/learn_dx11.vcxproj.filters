@@ -8,6 +8,9 @@
     <ClCompile Include="base\dx11.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="mesh_rnd\static_mesh_example.cpp">
+      <Filter>mesh_rnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">

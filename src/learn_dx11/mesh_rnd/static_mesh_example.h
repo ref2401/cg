@@ -8,7 +8,25 @@
 namespace learn_dx11 {
 namespace mesh_rnd {
 
-class Static_mesh_example final {
+class Static_mesh_example final : public Example {
+public:
+
+	Static_mesh_example(Render_context& rnd_ctx);
+
+	Static_mesh_example(const Static_mesh_example&) = delete;
+
+	Static_mesh_example(Static_mesh_example&&) = delete;
+
+
+	Static_mesh_example& operator=(const Static_mesh_example&) = delete;
+
+	Static_mesh_example& operator=(Static_mesh_example&&) = delete;
+
+	void render() override;
+
+	void update() override;
+
+private:
 };
 
 } // mesh_rnd
