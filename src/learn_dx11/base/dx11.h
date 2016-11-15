@@ -55,18 +55,37 @@ public:
 		return _device_ctx.get();
 	}
 
+	ID3D11RenderTargetView* rtv_back_buffer() noexcept
+	{
+		return _rtv_back_buffer.get();
+	}
+
 	IDXGISwapChain* swap_chain() noexcept
 	{
 		return _swap_chain.get();
 	}
 
 private:
+
+	void init_depth_stencil_state() noexcept;
+
+	void init_render_target_view() noexcept;
+
 	cg::uint2 _viewport_size;
 	unique_com<ID3D11Device> _device = nullptr;
 	unique_com<ID3D11DeviceContext> _device_ctx = nullptr;
 	unique_com<IDXGISwapChain> _swap_chain = nullptr;
+	unique_com<ID3D11RenderTargetView> _rtv_back_buffer = nullptr;
 };
 
+// Manually releases the given com object.
+inline void dispose_com(IUnknown* com_obj) noexcept
+{
+	if (com_obj == nullptr) return;
+
+	auto c = com_obj->Release();
+	com_obj = nullptr;
+}
 
 } // namespace learn_dx11
 

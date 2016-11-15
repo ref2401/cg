@@ -49,6 +49,37 @@ Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
 	_device.reset(device);
 	_device_ctx.reset(device_ctx);
 	_swap_chain.reset(swap_chain);
+
+	init_render_target_view();
+	init_depth_stencil_state();
+}
+
+void Render_context::init_depth_stencil_state() noexcept
+{
+	D3D11_DEPTH_STENCIL_DESC desc = {};
+	
+	ID3D11DepthStencilState* state = nullptr;
+	HRESULT hr =_device->CreateDepthStencilState(&desc, &state);
+	assert(hr == S_OK);
+
+	_device_ctx->OMSetDepthStencilState(state, 1);
+	dispose_com(state);
+}
+
+void Render_context::init_render_target_view() noexcept
+{
+	ID3D11Texture2D* tex_back_buffer = nullptr;
+	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
+	assert(hr == S_OK);
+
+	ID3D11RenderTargetView* rtv_back_buffer = nullptr;
+	hr = _device->CreateRenderTargetView(tex_back_buffer, nullptr, &rtv_back_buffer);
+	assert(hr == S_OK);
+
+	_rtv_back_buffer.reset(rtv_back_buffer);
+	dispose_com(tex_back_buffer);
+
+	_device_ctx->OMSetRenderTargets(1, &rtv_back_buffer, nullptr);
 }
 
 } // namespace learn_dx11
