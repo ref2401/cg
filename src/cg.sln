@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility_shaders", "utility_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "learn_dx11", "learn_dx11\learn_dx11.vcxproj", "{B21278D2-7A43-4FC4-8201-6FD52420C3A8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "learn_dx11", "learn_dx11", "{8766FCF4-6CDF-423B-8843-3BAA7C3E0180}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -92,5 +94,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{44D5E74A-E773-4AF8-ABF1-9B55CE0135B8} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{AF112729-F54C-42ED-B255-96AD38F61B9F} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
+		{8766FCF4-6CDF-423B-8843-3BAA7C3E0180} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 	EndGlobalSection
 EndGlobal

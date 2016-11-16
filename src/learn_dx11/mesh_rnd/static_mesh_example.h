@@ -28,6 +28,8 @@ public:
 	void update() override;
 
 private:
+
+	void init_geometry();
 };
 
 } // mesh_rnd

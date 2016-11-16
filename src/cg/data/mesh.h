@@ -238,6 +238,17 @@ public:
 		return _index_data.size();
 	}
 
+	// Total number of bytes required to store all the vertices of a mesh.
+	size_t vertex_data_byte_count() const noexcept
+	{
+		return sizeof(float) * _vertex_data.size();
+	}
+
+	// Total number of bytes required to store all the indices of a mesh.
+	size_t index_data_byte_count() const
+	{
+		return sizeof(uint32_t) * _index_data.size();
+	}
 
 	void push_back_vertex(const Vertex_data_array& arr);
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 #include "cg/math/math.h"
 #include "unittest/math/common_math.h"
 #include "CppUnitTest.h"
@@ -90,6 +91,27 @@ public:
 		Assert::IsTrue(std::equal(
 			std::cbegin(expected_data), std::cend(expected_data),
 			mesh_data.index_data().cbegin()));
+	}
+
+	TEST_METHOD(vertex_index_data_byte_count)
+	{
+		using Imd_t = Interleaved_mesh_data<Vertex_attribs::vertex_p_n>;
+		Imd_t::Vertex_data_array vertex_data;
+		std::fill(std::begin(vertex_data), std::end(vertex_data), 0.0f);
+		
+		Imd_t mesh_data(3, 3);
+		Assert::AreEqual<size_t>(0, mesh_data.vertex_data_byte_count());
+		Assert::AreEqual<size_t>(0, mesh_data.index_data_byte_count());
+
+		mesh_data.push_back_vertex(vertex_data);
+		mesh_data.push_back_vertex(vertex_data);
+		mesh_data.push_back_vertex(vertex_data);
+		Assert::AreEqual<size_t>(3 * Imd_t::Format::vertex_byte_count, mesh_data.vertex_data_byte_count());
+
+		uint32_t indices[9] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+		size_t expected_index_data_byte_count = std::extent<decltype(indices)>::value * sizeof(uint32_t);
+		mesh_data.push_back_indices(indices);
+		Assert::AreEqual<size_t>(expected_index_data_byte_count, mesh_data.index_data_byte_count());
 	}
 };
 
