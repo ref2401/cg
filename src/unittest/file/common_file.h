@@ -19,6 +19,8 @@ public:
 	static const std::string not_real_shader_program_name;
 	static const std::string not_real_vertex_glsl;
 	static const std::string not_real_pixel_glsl;
+	static const std::string not_real_vertex_hlsl;
+	static const std::string not_real_pixel_hlsl;
 	static const std::string tga_gayscale_r_compressed_rect_3x2;
 	static const std::string tga_grayscale_r_square_2x2;
 	static const std::string tga_true_color_rgb_compressed_rect_3x2;

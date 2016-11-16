@@ -8,6 +8,8 @@ const std::string Filenames::empty_file("../data/unittest/empty_file");
 const std::string Filenames::not_real_shader_program_name("../data/unittest/not_real");
 const std::string Filenames::not_real_vertex_glsl("../data/unittest/not_real.vertex.glsl");
 const std::string Filenames::not_real_pixel_glsl("../data/unittest/not_real.pixel.glsl");
+const std::string Filenames::not_real_vertex_hlsl("../data/unittest/not_real.vertex.hlsl");
+const std::string Filenames::not_real_pixel_hlsl("../data/unittest/not_real.pixel.hlsl");
 const std::string Filenames::tga_gayscale_r_compressed_rect_3x2("../data/unittest/tga_gayscale_r_compressed_rect_3x2.tga");
 const std::string Filenames::tga_grayscale_r_square_2x2("../data/unittest/tga_grayscale_r_square_2x2.tga");
 const std::string Filenames::tga_true_color_rgb_compressed_rect_3x2("../data/unittest/tga_true_color_rgb_compressed_rect_3x2.tga");
