@@ -58,6 +58,9 @@
     <ClCompile Include="file\file_mesh_unittest.cpp">
       <Filter>file</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\utility\utility_unittest_rnd.cpp">
+      <Filter>rnd\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -80,6 +83,9 @@
     </Filter>
     <Filter Include="rnd\opengl">
       <UniqueIdentifier>{2fa68817-8fc3-4252-8fc6-7b9800d5e867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rnd\utility">
+      <UniqueIdentifier>{c8186aee-521e-47a7-ae5f-34f297e12418}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

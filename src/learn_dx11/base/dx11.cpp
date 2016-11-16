@@ -1,6 +1,5 @@
 #include "learn_dx11/base/dx11.h"
 
-#include <cassert>
 
 using cg::uint2;
 using cg::greater_than;

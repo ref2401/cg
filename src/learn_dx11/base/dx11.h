@@ -1,8 +1,10 @@
 #ifndef LEARN_DX11_BASE_DX11_H_
 #define LEARN_DX11_BASE_DX11_H_
 
-#include "cg/math/math.h"
+#include <cassert>
 #include <memory>
+#include <type_traits>
+#include "cg/math/math.h"
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dcommon.h>

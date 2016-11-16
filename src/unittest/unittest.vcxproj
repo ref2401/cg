@@ -184,6 +184,7 @@
     <ClCompile Include="rnd\opengl\texture_unittest.cpp" />
     <ClCompile Include="rnd\opengl\utility_unittest_opengl.cpp" />
     <ClCompile Include="rnd\opengl\vertex_spec_unittest.cpp" />
+    <ClCompile Include="rnd\utility\utility_unittest_rnd.cpp" />
     <ClCompile Include="sys\input_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
