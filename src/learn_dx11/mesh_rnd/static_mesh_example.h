@@ -33,6 +33,7 @@ private:
 
 	void init_shaders();
 
+	Hlsl_shader_set _shader_set;
 	Unique_com_ptr<ID3D11Buffer> _vertex_buffer;
 	Unique_com_ptr<ID3D11Buffer> _index_buffer;
 };

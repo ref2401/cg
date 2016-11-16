@@ -4,20 +4,11 @@
     <ClCompile Include="math\transform_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="data\mesh_unittest.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="file\common_file.cpp">
       <Filter>file</Filter>
-    </ClCompile>
-    <ClCompile Include="data\shader_unittest_data.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
-    <ClCompile Include="data\image_unittest.cpp">
-      <Filter>data</Filter>
     </ClCompile>
     <ClCompile Include="math\utility_unittest_math.cpp">
       <Filter>math</Filter>
@@ -43,9 +34,6 @@
     <ClCompile Include="math\matrix_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="data\vertex_unittest.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="file\file_base_unittest.cpp">
       <Filter>file</Filter>
     </ClCompile>
@@ -60,6 +48,18 @@
     </ClCompile>
     <ClCompile Include="rnd\utility\utility_unittest_rnd.cpp">
       <Filter>rnd\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="data\data_shader_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="data\data_vertex_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="data\data_mesh_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="data\data_image_unittest.cpp">
+      <Filter>data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

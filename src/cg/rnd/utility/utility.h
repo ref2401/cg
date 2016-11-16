@@ -48,7 +48,7 @@ struct Unique_com_ptr final {
 
 		dispose();
 		ptr = com_ptr.ptr;
-		com_ptr = nullptr;
+		com_ptr.ptr = nullptr;
 		return *this;
 	}
 

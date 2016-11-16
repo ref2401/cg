@@ -59,7 +59,7 @@ public:
 
 	Shader_program() noexcept = default;
 
-	Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src);
+	Shader_program(const std::string& name, const cg::data::Glsl_program_data& src);
 
 	Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader);
 

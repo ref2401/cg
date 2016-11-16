@@ -9,11 +9,11 @@ using namespace cg::rnd::opengl;
 
 namespace {
 
-using cg::data::Shader_program_source_code;
-using cg::file::load_shader_program_source;
+using cg::data::Glsl_program_data;
+using cg::file::load_glsl_program_data;
 using cg::rnd::utility::Filter_kernel_radius;
 
-Shader_program_source_code load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
+Glsl_program_data load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
 {
 	assert(kernel_radius != Filter_kernel_radius::none);
 
@@ -34,7 +34,7 @@ Shader_program_source_code load_gaussina_filter_source_code(Filter_kernel_radius
 			break;
 	}
 
-	return load_shader_program_source(vertex_filename, pixel_filename);
+	return load_glsl_program_data(vertex_filename, pixel_filename);
 }
 
 } // namespace
@@ -53,7 +53,7 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 	assert(_filter_type != Filter_type::none);
 	assert(_kernel_radius != Filter_kernel_radius::none);
 
-	cg::data::Shader_program_source_code src_code = cg::file::load_shader_program_source(
+	cg::data::Glsl_program_data src_code = cg::file::load_glsl_program_data(
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
 

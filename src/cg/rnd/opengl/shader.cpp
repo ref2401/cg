@@ -90,15 +90,15 @@ std::string Shader::log() const noexcept
 
 // ----- Shader_program -----
 
-Shader_program::Shader_program(const std::string& name, const cg::data::Shader_program_source_code& src)
+Shader_program::Shader_program(const std::string& name, const cg::data::Glsl_program_data& src)
 	: _name(name)
 {
-	assert(src.vertex_source.size() > 0);
-	assert(src.pixel_source.size() > 0);
+	assert(src.vertex_shader_source_code.size() > 0);
+	assert(src.fragment_shader_source_code.size() > 0);
 
 	try {
-		Shader vertex_shader(GL_VERTEX_SHADER, src.vertex_source);
-		Shader pixel_shader(GL_FRAGMENT_SHADER, src.pixel_source);
+		Shader vertex_shader(GL_VERTEX_SHADER, src.vertex_shader_source_code);
+		Shader pixel_shader(GL_FRAGMENT_SHADER, src.fragment_shader_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, vertex_shader.id());

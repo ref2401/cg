@@ -4,6 +4,7 @@
 #include <cassert>
 #include <memory>
 #include <type_traits>
+#include "cg/data/shader.h"
 #include "cg/math/math.h"
 #include "cg/rnd/utility/utility.h"
 #include <windows.h>
@@ -18,6 +19,40 @@ using namespace DirectX;
 
 
 namespace learn_dx11 {
+
+class Hlsl_shader_set final {
+public:
+
+	Hlsl_shader_set() noexcept = default;
+
+	Hlsl_shader_set(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+
+	Hlsl_shader_set(const Hlsl_shader_set&) = delete;
+
+	Hlsl_shader_set(Hlsl_shader_set&& set) noexcept;
+
+	~Hlsl_shader_set() noexcept = default;
+
+
+	Hlsl_shader_set& operator=(const Hlsl_shader_set&) = delete;
+
+	Hlsl_shader_set& operator=(Hlsl_shader_set&& set) noexcept;
+
+
+	ID3D11VertexShader* vertex_shader() noexcept
+	{
+		return _vertex_shader.ptr;
+	}
+
+	ID3D11PixelShader* pixel_shader() noexcept
+	{
+		return _pixel_shader.ptr;
+	}
+
+private:
+	Unique_com_ptr<ID3D11VertexShader> _vertex_shader;
+	Unique_com_ptr<ID3D11PixelShader> _pixel_shader;
+};
 
 // The Render_context class provides access to all the DirectX's essential objects
 // which are required by every example from this project.
@@ -73,6 +108,7 @@ private:
 	Unique_com_ptr<IDXGISwapChain> _swap_chain;
 	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer;
 };
+
 
 } // namespace learn_dx11
 

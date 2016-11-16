@@ -1,11 +1,120 @@
 #include "learn_dx11/base/dx11.h"
 
+#include <exception>
+#include <string>
+#include <utility>
+#include "cg/base/base.h"
 
 using cg::uint2;
 using cg::greater_than;
+using cg::data::Hlsl_shader_set_data;
+
+
+namespace {
+
+Unique_com_ptr<ID3DBlob> compile_shader(const std::string& source_code, 
+	const std::string& source_filename, const std::string& entry_point_name,
+	const char* shader_model, uint32_t compile_flags)
+{
+	Unique_com_ptr<ID3DBlob> bytecode;
+	Unique_com_ptr<ID3DBlob> error_blob;
+
+	HRESULT hr = D3DCompile(
+		source_code.c_str(),
+		source_code.size(),
+		source_filename.c_str(),
+		nullptr,					// defines
+		nullptr,					// includes
+		entry_point_name.c_str(),
+		shader_model,
+		compile_flags,
+		0,							// effect compilation flags
+		&bytecode.ptr,
+		&error_blob.ptr
+	);
+
+	if (hr != S_OK) {
+		std::string error(static_cast<char*>(error_blob->GetBufferPointer()), error_blob->GetBufferSize());
+		throw std::runtime_error(error);
+	}
+
+	return bytecode;
+}
+
+Unique_com_ptr<ID3D11VertexShader> make_vertex_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+{
+	Unique_com_ptr<ID3D11VertexShader> vertex_shader;
+
+	try {
+		auto bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+			hlsl_data.vertex_shader_entry_point, "vs_5_0", hlsl_data.compile_flags);
+
+		HRESULT hr = device->CreateVertexShader(
+			bytecode->GetBufferPointer(), bytecode->GetBufferSize(),
+			nullptr, &vertex_shader.ptr);
+
+		ENFORCE(hr == S_OK, std::to_string(hr));
+	}
+	catch(...) {
+		std::string exc_msg = EXCEPTION_MSG("Vertex shader creation error.");
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	return vertex_shader;
+}
+
+Unique_com_ptr<ID3D11PixelShader> make_pixel_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+{
+	Unique_com_ptr<ID3D11PixelShader> pixel_shader;
+
+	try {
+		auto bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+			hlsl_data.pixel_shader_entry_point, "ps_5_0", hlsl_data.compile_flags);
+
+		HRESULT hr = device->CreatePixelShader(
+			bytecode->GetBufferPointer(), bytecode->GetBufferSize(),
+			nullptr, &pixel_shader.ptr);
+
+		ENFORCE(hr == S_OK, std::to_string(hr));
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Pixel shader creation error.");
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	return pixel_shader;
+}
+
+} // namespace
 
 
 namespace learn_dx11 {
+
+// ----- Hlsl_shader_set -----
+
+Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+{
+	assert(hlsl_data.has_vertex_shader());
+	assert(hlsl_data.has_pixel_shader());
+
+	_vertex_shader = make_vertex_shader(device, hlsl_data);
+	_pixel_shader = make_pixel_shader(device, hlsl_data);
+}
+
+Hlsl_shader_set::Hlsl_shader_set(Hlsl_shader_set&& set) noexcept :
+	_vertex_shader(std::move(set._vertex_shader)),
+	_pixel_shader(std::move(set._pixel_shader))
+{}
+
+Hlsl_shader_set& Hlsl_shader_set::operator=(Hlsl_shader_set&& set) noexcept
+{
+	if (this == &set) return *this;
+
+	_vertex_shader = std::move(set._vertex_shader);
+	_pixel_shader = std::move(set._pixel_shader);
+
+	return *this;
+}
 
 // ----- Rendering_context -----
 

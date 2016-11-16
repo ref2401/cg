@@ -71,6 +71,7 @@ public:
 			
 			ucp0 = std::move(ucp1);
 			Assert::AreEqual<long long>(0, com_obj0.counter);	// ucp0 prev resource was released
+			Assert::AreEqual<long long>(1, com_obj1.counter);	// ucp1 counter has not changed
 			Assert::IsTrue(&com_obj1 == ucp0.ptr);				// ucp0 points to the com_obj1 resource
 			Assert::IsNull(ucp1.ptr);							// ucp1 points to nothing
 		}
@@ -80,6 +81,7 @@ public:
 			Unique_com_ptr<Com_fake_class> ucp(&com_obj);
 
 			ucp = std::move(ucp);
+			Assert::AreEqual<long long>(1, com_obj.counter);	// counter has not changed
 			Assert::IsNotNull(ucp.ptr);
 			Assert::IsTrue(&com_obj == ucp.ptr);
 		}
@@ -92,6 +94,7 @@ public:
 
 			ucp = &com_obj1;
 			Assert::AreEqual<long long>(0, com_obj0.counter);	// ucp prev resource was released
+			Assert::AreEqual<long long>(1, com_obj1.counter);	// counter has not changed
 			Assert::IsTrue(&com_obj1 == ucp.ptr);				// ucp points to the com_obj1 resource
 		}
 	}
@@ -118,6 +121,7 @@ public:
 		Com_fake_class com_obj1;
 		Unique_com_ptr<Com_fake_class> ucp1(&com_obj1);
 		Unique_com_ptr<Com_fake_class> ucp2(std::move(ucp1));
+		Assert::AreEqual<long long>(1, com_obj1.counter);
 		Assert::IsNull(ucp1.ptr);
 		Assert::IsNotNull(ucp2.ptr);
 		Assert::IsTrue(&com_obj1 == ucp2.ptr);

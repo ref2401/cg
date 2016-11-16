@@ -14,4 +14,6 @@ Visual Studio Community 2015 is used. The solution is tested only under x86 (Win
 
 Due to refactoring `cg/data/mesh` and `cg/file/file_mesh` contain both old and new implementations of the `interleaved mesh data` concept and wavefront(.obj) file loading functions. Classes and funcs with suffix `_old` will be in the code base for a while for the sake of backward compatibility. 
 
-`cg/rnd/opengl` module will be refactored after the [learn direct x 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) project is done.
+After the [learn direct x 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) project is done:
+- `cg/rnd/opengl` module will be refactored.
+- `Shader_program_source_code` & `load_shader_program_source` will be deleted from the code base.

@@ -35,7 +35,7 @@ struct Directional_light_params final {
 class Gbuffer_pass_shader_program final {
 public:
 
-	explicit Gbuffer_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+	explicit Gbuffer_pass_shader_program(const cg::data::Glsl_program_data& source_code);
 
 	Gbuffer_pass_shader_program(const Gbuffer_pass_shader_program&) = delete;
 
@@ -62,7 +62,7 @@ private:
 class Lighting_pass_dir_shader_program final {
 public:
 
-	explicit Lighting_pass_dir_shader_program(const cg::data::Shader_program_source_code& dir_source_code);
+	explicit Lighting_pass_dir_shader_program(const cg::data::Glsl_program_data& dir_source_code);
 
 	Lighting_pass_dir_shader_program(const Lighting_pass_dir_shader_program&) = delete;
 
@@ -87,7 +87,7 @@ private:
 class Material_lighting_pass_shader_program final {
 public:
 
-	explicit Material_lighting_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+	explicit Material_lighting_pass_shader_program(const cg::data::Glsl_program_data& source_code);
 
 	Material_lighting_pass_shader_program(const Material_lighting_pass_shader_program&) = delete;
 
@@ -115,7 +115,7 @@ private:
 class Shadow_map_pass_shader_program final {
 public:
 
-	explicit Shadow_map_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+	explicit Shadow_map_pass_shader_program(const cg::data::Glsl_program_data& source_code);
 
 	Shadow_map_pass_shader_program(const Shadow_map_pass_shader_program&) = delete;
 
@@ -138,7 +138,7 @@ private:
 class Ssao_pass_shader_program final {
 public:
 
-	explicit Ssao_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+	explicit Ssao_pass_shader_program(const cg::data::Glsl_program_data& source_code);
 
 	Ssao_pass_shader_program(const Ssao_pass_shader_program&) = delete;
 
@@ -159,7 +159,7 @@ private:
 class Tone_mapping_pass_shader_program final {
 public:
 
-	explicit Tone_mapping_pass_shader_program(const cg::data::Shader_program_source_code& source_code);
+	explicit Tone_mapping_pass_shader_program(const cg::data::Glsl_program_data& source_code);
 
 	Tone_mapping_pass_shader_program(const Tone_mapping_pass_shader_program&) = delete;
 

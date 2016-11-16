@@ -40,12 +40,12 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs::vertex_p_tc);
-	config.gbuffer_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/gbuffer_pass");
-	config.lighting_pass_dir_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/lighting_pass_dir");
-	config.shadow_map_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/shadow_map_pass");
-	config.ssao_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/ssao_pass");
-	config.material_lighting_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/material_pass");
-	config.tone_mapping_pass_code = cg::file::load_glsl_program_source("../data/deferred_lighting_shaders/tone_mapping_pass");
+	config.gbuffer_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.shadow_map_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/shadow_map_pass");
+	config.ssao_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/ssao_pass");
+	config.material_lighting_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/material_pass");
+	config.tone_mapping_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/tone_mapping_pass");
 
 	return config;
 }

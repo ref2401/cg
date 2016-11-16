@@ -167,10 +167,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
-    <ClCompile Include="data\image_unittest.cpp" />
-    <ClCompile Include="data\mesh_unittest.cpp" />
-    <ClCompile Include="data\shader_unittest_data.cpp" />
-    <ClCompile Include="data\vertex_unittest.cpp" />
+    <ClCompile Include="data\data_image_unittest.cpp" />
+    <ClCompile Include="data\data_mesh_unittest.cpp" />
+    <ClCompile Include="data\data_shader_unittest.cpp" />
+    <ClCompile Include="data\data_vertex_unittest.cpp" />
     <ClCompile Include="file\common_file.cpp" />
     <ClCompile Include="file\file_base_unittest.cpp" />
     <ClCompile Include="file\file_image_unittest.cpp" />

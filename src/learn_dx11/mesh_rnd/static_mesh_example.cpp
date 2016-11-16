@@ -20,6 +20,7 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 	Example(rnd_ctx)
 {
 	init_geometry();
+	init_shaders();
 }
 
 void Static_mesh_example::init_geometry()
@@ -51,7 +52,11 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_shaders()
 {
+	auto hlsl_data = cg::file::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
+	hlsl_data.vertex_shader_entry_point = "vs_main";
+	hlsl_data.pixel_shader_entry_point = "ps_main";
 
+	_shader_set = Hlsl_shader_set(_device, hlsl_data);
 }
 
 void Static_mesh_example::render()
