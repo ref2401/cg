@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include "cg/math/math.h"
+#include "cg/rnd/utility/utility.h"
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dcommon.h>
@@ -12,24 +13,11 @@
 #include <DirectXMath.h>
 #include <dxgi.h>
 
+using cg::rnd::utility::Unique_com_ptr;
 using namespace DirectX;
 
 
 namespace learn_dx11 {
-
-// Represent a destruction policy for COM objects.
-struct Com_dispose_func final {
-	void operator()(IUnknown* com_obj) noexcept
-	{
-		if (com_obj == nullptr) return;
-
-		auto c = com_obj->Release();
-		com_obj = nullptr;
-	}
-};
-
-template<typename T>
-using unique_com = std::unique_ptr<T, Com_dispose_func>;
 
 // The Render_context class provides access to all the DirectX's essential objects
 // which are required by every example from this project.
@@ -49,22 +37,22 @@ public:
 
 	ID3D11Device* device() noexcept
 	{
-		return _device.get();
+		return _device.ptr;
 	}
 
 	ID3D11DeviceContext* device_ctx() noexcept
 	{
-		return _device_ctx.get();
+		return _device_ctx.ptr;
 	}
 
 	ID3D11RenderTargetView* rtv_back_buffer() noexcept
 	{
-		return _rtv_back_buffer.get();
+		return _rtv_back_buffer.ptr;
 	}
 
 	IDXGISwapChain* swap_chain() noexcept
 	{
-		return _swap_chain.get();
+		return _swap_chain.ptr;
 	}
 
 private:
@@ -74,20 +62,11 @@ private:
 	void init_render_target_view() noexcept;
 
 	cg::uint2 _viewport_size;
-	unique_com<ID3D11Device> _device = nullptr;
-	unique_com<ID3D11DeviceContext> _device_ctx = nullptr;
-	unique_com<IDXGISwapChain> _swap_chain = nullptr;
-	unique_com<ID3D11RenderTargetView> _rtv_back_buffer = nullptr;
+	Unique_com_ptr<ID3D11Device> _device = nullptr;
+	Unique_com_ptr<ID3D11DeviceContext> _device_ctx = nullptr;
+	Unique_com_ptr<IDXGISwapChain> _swap_chain = nullptr;
+	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer = nullptr;
 };
-
-// Manually releases the given com object.
-inline void dispose_com(IUnknown* com_obj) noexcept
-{
-	if (com_obj == nullptr) return;
-
-	auto c = com_obj->Release();
-	com_obj = nullptr;
-}
 
 } // namespace learn_dx11
 

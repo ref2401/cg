@@ -33,22 +33,15 @@ Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
 	swap_chain_desc.Windowed = true;
 	swap_chain_desc.OutputWindow = hwnd;
 
-	ID3D11Device* device = nullptr;
-	ID3D11DeviceContext* device_ctx = nullptr;
-	IDXGISwapChain* swap_chain = nullptr;
 	D3D_FEATURE_LEVEL expected_feature_level = D3D_FEATURE_LEVEL_11_0;
 	D3D_FEATURE_LEVEL actual_feature_level;
 	
 	hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
 		D3D11_CREATE_DEVICE_DEBUG, &expected_feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc,
-		&swap_chain, &device, &actual_feature_level, &device_ctx);
+		&_swap_chain.ptr, &_device.ptr, &actual_feature_level, &_device_ctx.ptr);
 	assert(hr == S_OK);
 	assert(actual_feature_level == expected_feature_level);
 	
-	_device.reset(device);
-	_device_ctx.reset(device_ctx);
-	_swap_chain.reset(swap_chain);
-
 	init_render_target_view();
 	init_depth_stencil_state();
 }
@@ -57,28 +50,23 @@ void Render_context::init_depth_stencil_state() noexcept
 {
 	D3D11_DEPTH_STENCIL_DESC desc = {};
 	
-	ID3D11DepthStencilState* state = nullptr;
-	HRESULT hr =_device->CreateDepthStencilState(&desc, &state);
+	Unique_com_ptr<ID3D11DepthStencilState> state = nullptr;
+	HRESULT hr =_device->CreateDepthStencilState(&desc, &state.ptr);
 	assert(hr == S_OK);
 
-	_device_ctx->OMSetDepthStencilState(state, 1);
-	dispose_com(state);
+	_device_ctx->OMSetDepthStencilState(state.ptr, 1);
 }
 
 void Render_context::init_render_target_view() noexcept
 {
-	ID3D11Texture2D* tex_back_buffer = nullptr;
+	Unique_com_ptr<ID3D11Texture2D> tex_back_buffer;
 	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
 	assert(hr == S_OK);
 
-	ID3D11RenderTargetView* rtv_back_buffer = nullptr;
-	hr = _device->CreateRenderTargetView(tex_back_buffer, nullptr, &rtv_back_buffer);
+	hr = _device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_rtv_back_buffer.ptr);
 	assert(hr == S_OK);
 
-	_rtv_back_buffer.reset(rtv_back_buffer);
-	dispose_com(tex_back_buffer);
-
-	_device_ctx->OMSetRenderTargets(1, &rtv_back_buffer, nullptr);
+	_device_ctx->OMSetRenderTargets(1, &_rtv_back_buffer.ptr, nullptr);
 }
 
 } // namespace learn_dx11

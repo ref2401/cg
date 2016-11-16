@@ -24,6 +24,8 @@ struct Unique_com_ptr final {
 		ptr(ptr)
 	{}
 
+	Unique_com_ptr(nullptr_t) noexcept {}
+
 	Unique_com_ptr(const Unique_com_ptr&) = delete;
 
 	Unique_com_ptr(Unique_com_ptr&& com_ptr) noexcept :

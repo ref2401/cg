@@ -75,6 +75,15 @@ public:
 			Assert::IsNull(ucp1.ptr);							// ucp1 points to nothing
 		}
 
+		{ // move assignment, self assignment
+			Com_fake_class com_obj;
+			Unique_com_ptr<Com_fake_class> ucp(&com_obj);
+
+			ucp = std::move(ucp);
+			Assert::IsNotNull(ucp.ptr);
+			Assert::IsTrue(&com_obj == ucp.ptr);
+		}
+
 		{ // ucp = raw_pointer
 			Com_fake_class com_obj0;
 			Unique_com_ptr<Com_fake_class> ucp(&com_obj0);
@@ -91,6 +100,9 @@ public:
 	{
 		Unique_com_ptr<Com_fake_class> ucp0;
 		Assert::IsNull(ucp0.ptr);
+
+		Unique_com_ptr<Com_fake_class> ucp00 = nullptr;
+		Assert::IsNull(ucp00.ptr);
 
 		// ctor(T*) & dtor().
 		Com_fake_class com_obj0;
