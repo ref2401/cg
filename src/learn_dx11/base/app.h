@@ -14,6 +14,7 @@ public:
 
 	Example(Render_context& rnd_ctx) noexcept : 
 		_device(rnd_ctx.device()),
+		_device_debug(rnd_ctx.device_debug()),
 		_device_ctx(rnd_ctx.device_ctx()),
 		_swap_chain(rnd_ctx.swap_chain()),
 		_rtv_back_buffer(rnd_ctx.rtv_back_buffer())
@@ -33,6 +34,7 @@ protected:
 	void swap_color_buffers() noexcept;
 
 	ID3D11Device* _device;
+	ID3D11Debug* _device_debug;
 	ID3D11DeviceContext* _device_ctx;
 	IDXGISwapChain* _swap_chain;
 	ID3D11RenderTargetView* _rtv_back_buffer;

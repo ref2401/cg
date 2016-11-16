@@ -30,6 +30,11 @@ public:
 private:
 
 	void init_geometry();
+
+	void init_shaders();
+
+	Unique_com_ptr<ID3D11Buffer> _vertex_buffer;
+	Unique_com_ptr<ID3D11Buffer> _index_buffer;
 };
 
 } // mesh_rnd

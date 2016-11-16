@@ -24,22 +24,33 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 
 void Static_mesh_example::init_geometry()
 {
-	using cg::file::load_mesh_wavefront;
+	auto mesh_data = cg::file::load_mesh_wavefront<Vertex_attribs::position>("../data/cube.obj", 24, 36);
 
-	auto mesh_data = load_mesh_wavefront<Vertex_attribs::position>("../data/cube.obj", 24, 36);
-
-	/*D3D11_BUFFER_DESC vb_desc = {};
+	// vertex buffer
+	D3D11_BUFFER_DESC vb_desc = {};
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vb_desc.ByteWidth = ;
+	vb_desc.ByteWidth = mesh_data.vertex_data_byte_count();
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
+	D3D11_SUBRESOURCE_DATA vb_data = {};
+	vb_data.pSysMem = mesh_data.vertex_data().data();
 
+	HRESULT hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
+	assert(hr == S_OK);
+
+	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ib_desc.ByteWidth = kilobytes(32);
-	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;*/
+	ib_desc.ByteWidth = mesh_data.index_data_byte_count();
+	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
+	D3D11_SUBRESOURCE_DATA ib_data = {};
+	ib_data.pSysMem = mesh_data.index_data().data();
 
+	hr = _device->CreateBuffer(&ib_desc, &ib_data, &_index_buffer.ptr);
+	assert(hr == S_OK);
+}
 
-	
+void Static_mesh_example::init_shaders()
+{
 
 }
 

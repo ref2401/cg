@@ -42,6 +42,8 @@ Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
 	assert(hr == S_OK);
 	assert(actual_feature_level == expected_feature_level);
 	
+	hr = _device->QueryInterface<ID3D11Debug>(&_device_debug.ptr);
+
 	init_render_target_view();
 	init_depth_stencil_state();
 }

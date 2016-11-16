@@ -45,6 +45,11 @@ public:
 		return _device_ctx.ptr;
 	}
 
+	ID3D11Debug* device_debug() noexcept
+	{
+		return _device_debug.ptr;
+	}
+
 	ID3D11RenderTargetView* rtv_back_buffer() noexcept
 	{
 		return _rtv_back_buffer.ptr;
@@ -62,10 +67,11 @@ private:
 	void init_render_target_view() noexcept;
 
 	cg::uint2 _viewport_size;
-	Unique_com_ptr<ID3D11Device> _device = nullptr;
-	Unique_com_ptr<ID3D11DeviceContext> _device_ctx = nullptr;
-	Unique_com_ptr<IDXGISwapChain> _swap_chain = nullptr;
-	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer = nullptr;
+	Unique_com_ptr<ID3D11Device> _device;
+	Unique_com_ptr<ID3D11Debug> _device_debug;
+	Unique_com_ptr<ID3D11DeviceContext> _device_ctx;
+	Unique_com_ptr<IDXGISwapChain> _swap_chain;
+	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer;
 };
 
 } // namespace learn_dx11
