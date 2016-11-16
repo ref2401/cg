@@ -73,6 +73,7 @@ struct float2 {
 	union {
 		struct { float x, y; };
 		struct { float u, v; };
+		float data[2];
 	};
 };
 
@@ -162,6 +163,7 @@ struct float3 {
 		struct { float x, y, z; };
 		struct { float r, g, b; };
 		struct { float width, height, depth; };
+		float data[3];
 	};
 };
 
@@ -268,6 +270,7 @@ struct float4 {
 	union {
 		struct { float x, y, z, w; };
 		struct { float r, g, b, a; };
+		float data[4];
 	};
 };
 
@@ -436,6 +439,7 @@ struct uint2 {
 	union {
 		struct { uint32_t x, y; };
 		struct { uint32_t width, height; };
+		uint32_t data[2];
 	};
 };
 

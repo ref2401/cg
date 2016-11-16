@@ -102,6 +102,18 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 
 namespace learn_dx11 {
 
+// ----- Example -----
+
+void Example::clear_color_buffer(const cg::float4& clear_color) noexcept
+{
+	_device_ctx->ClearRenderTargetView(_rtv_back_buffer, clear_color.data);
+}
+
+void Example::swap_color_buffers() noexcept
+{
+	_swap_chain->Present(0, 0);
+}
+
 // ----- Application -----
 
 Application::Application(cg::uint2 window_position, cg::uint2 window_size) :

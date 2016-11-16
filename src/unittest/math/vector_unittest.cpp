@@ -29,24 +29,29 @@ public:
 		float2 v0;
 		Assert::IsTrue((v0.x == 0) && (v0.y == 0));
 		Assert::IsTrue((v0.u == 0) && (v0.v == 0));
+		Assert::IsTrue((v0.data[0] == 0) && (v0.data[1] == 0));
 
 		float2 v1(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24));
 		Assert::IsTrue((v1.u == 24) && (v1.v == 24));
+		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24));
 
 		float2 v2(1, 2);
 		Assert::IsTrue((v2.x == 1) && (v2.y == 2));
 		Assert::IsTrue((v2.u == 1) && (v2.v == 2));
+		Assert::IsTrue((v2.data[0] == 1) && (v2.data[1] == 2));
 
 		// copy ctor
 		float2 vc = v2;
 		Assert::IsTrue((vc.x == v2.x) && (vc.y == v2.y));
 		Assert::IsTrue((vc.u == v2.u) && (vc.v == v2.v));
+		Assert::IsTrue((vc.data[0] == v2.data[0]) && (vc.data[1] == v2.data[1]));
 
 		// move ctor
 		float2 vm = std::move(v2);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y));
 		Assert::IsTrue((vm.u == vc.u) && (vm.v == vc.v));
+		Assert::IsTrue((vm.data[0] == vc.data[0]) && (vm.data[1] == vc.data[1]));
 	}
 
 	TEST_METHOD(assignments)
@@ -58,12 +63,14 @@ public:
 		vc = v;
 		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y));
 		Assert::IsTrue((vc.u == v.u) && (vc.v == v.v));
+		Assert::IsTrue((vc.data[0] == v.data[0]) && (vc.data[1] == v.data[1]));
 
 		// move assignment
 		float2 vm;
 		vm = std::move(v);
 		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y));
 		Assert::IsTrue((vm.u == v.u) && (vm.v == v.v));
+		Assert::IsTrue((vm.data[0] == v.data[0]) && (vm.data[1] == v.data[1]));
 	}
 
 	TEST_METHOD(compound_assignment_operators)
@@ -258,34 +265,40 @@ public:
 		Assert::IsTrue((v0.x == 0) && (v0.y == 0) && (v0.z == 0));
 		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0));
 		Assert::IsTrue((v0.width == 0) && (v0.height == 0) && (v0.depth == 0));
+		Assert::IsTrue((v0.data[0] == 0) && (v0.data[1] == 0) && (v0.data[2] == 0));
 
 		float3 v1(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24));
 		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24));
 		Assert::IsTrue((v1.width == 24) && (v1.height == 24) && (v1.depth == 24));
+		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24) && (v1.data[2] == 24));
 
 		cg::float2 vec2(3, 4);
 		float3 v3(vec2, 5);
 		Assert::IsTrue((v3.x == vec2.x) && (v3.y == vec2.y) && (v3.z == 5));
 		Assert::IsTrue((v3.r == vec2.x) && (v3.g == vec2.y) && (v3.b == 5));
 		Assert::IsTrue((v3.width == vec2.x) && (v3.height == vec2.y) && (v3.depth == 5));
+		Assert::IsTrue((v3.data[0] == vec2.x) && (v3.data[1] == vec2.y) && (v3.data[2] == 5));
 
 		float3 v4(1, 2, 3);
 		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3));
 		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3));
 		Assert::IsTrue((v4.width == 1) && (v4.height == 2) && (v4.depth == 3));
+		Assert::IsTrue((v4.data[0] == 1) && (v4.data[1] == 2) && (v4.data[2] == 3));
 
 		// copy ctor
 		float3 vc = v4;
 		Assert::IsTrue((vc.x == v4.x) && (vc.y == v4.y) && (vc.z == v4.z));
 		Assert::IsTrue((vc.r == v4.r) && (vc.g == v4.g) && (vc.b == v4.b));
 		Assert::IsTrue((vc.width == v4.width) && (vc.height == v4.height) && (vc.depth == v4.depth));
+		Assert::IsTrue((vc.data[0] == v4.data[0]) && (vc.data[1] == v4.data[1]) && (vc.data[2] == v4.data[2]));
 
 		// move ctor
 		float3 vm = std::move(v4);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z));
 		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b));
 		Assert::IsTrue((vm.width == vc.width) && (vm.height == vc.height) && (vm.depth == vc.depth));
+		Assert::IsTrue((vm.data[0] == vc.data[0]) && (vm.data[1] == vc.data[1]) && (vm.data[2] == vc.data[2]));
 	}
 
 	TEST_METHOD(assignments)
@@ -298,6 +311,7 @@ public:
 		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y) && (vc.z == v.z));
 		Assert::IsTrue((vc.r == v.r) && (vc.g == v.g) && (vc.b == v.b));
 		Assert::IsTrue((vc.width == v.width) && (vc.height == v.height) && (vc.depth == v.depth));
+		Assert::IsTrue((vc.data[0] == v.data[0]) && (vc.data[1] == v.data[1]) && (vc.data[2] == v.data[2]));
 
 		// move assignment
 		float3 vm;
@@ -305,6 +319,7 @@ public:
 		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z));
 		Assert::IsTrue((vm.r == v.r) && (vm.g == v.g) && (vm.b == v.b));
 		Assert::IsTrue((vm.width == v.width) && (vm.height == v.height) && (vm.depth == v.depth));
+		Assert::IsTrue((vm.data[0] == v.data[0]) && (vm.data[1] == v.data[1]) && (vm.data[2] == v.data[2]));
 	}
 
 	TEST_METHOD(compound_assignment_operators)
@@ -573,24 +588,29 @@ public:
 		float4 v0;
 		Assert::IsTrue((v0.x == 0) && (v0.y == 0) && (v0.z == 0) && (v0.w == 0));
 		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0) && (v0.a == 0));
+		Assert::IsTrue((v0.data[0] == 0) && (v0.data[1] == 0) && (v0.data[2] == 0) && (v0.data[3] == 0));
 
 		float4 v1(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24) && (v1.w == 24));
 		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24) && (v1.w == 24));
+		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24) && (v1.data[2] == 24) && (v1.data[3] == 24));
 
 		float4 v4(1, 2, 3, 4);
 		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3) && (v4.w == 4));
 		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3) && (v4.a == 4));
+		Assert::IsTrue((v4.data[0] == 1) && (v4.data[1] == 2) && (v4.data[2] == 3) && (v4.data[3] == 4));
 
 		// copy ctor
 		float4 vc = v4;
 		Assert::IsTrue((vc.x == v4.x) && (vc.y == v4.y) && (vc.z == v4.z) && (vc.w == v4.w));
 		Assert::IsTrue((vc.r == v4.r) && (vc.g == v4.g) && (vc.b == v4.b) && (vc.a == v4.a));
+		Assert::IsTrue((vc.data[0] == v4.data[0]) && (vc.data[1] == v4.data[1]) && (vc.data[2] == v4.data[2]) && (vc.data[3] == v4.data[3]));
 
 		// move ctor
 		float4 vm = std::move(v4);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z) && (vm.w == vc.w));
 		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b) && (vm.a == vc.a));
+		Assert::IsTrue((vm.data[0] == vc.data[0]) && (vm.data[1] == vc.data[1]) && (vm.data[2] == vc.data[2]) && (vm.data[3] == vc.data[3]));
 	}
 
 	TEST_METHOD(assignments)
@@ -602,12 +622,16 @@ public:
 		vc = v;
 		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y) && (vc.z == v.z) && (vc.w == v.w));
 		Assert::IsTrue((vc.r == v.r) && (vc.g == v.g) && (vc.b == v.b) && (vc.a == v.a));
+		Assert::IsTrue((vc.data[0] == v.data[0]) && (vc.data[1] == v.data[1]) 
+			&& (vc.data[2] == v.data[2]) && (vc.data[3] == v.data[3]));
 
 		// move assignment
 		float4 vm;
 		vm = std::move(v);
 		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z) && (vm.w == v.w));
 		Assert::IsTrue((vm.r == v.r) && (vm.g == v.g) && (vm.b == v.b) && (vm.a == v.a));
+		Assert::IsTrue((vm.data[0] == v.data[0]) && (vm.data[1] == v.data[1])
+			&& (vm.data[2] == v.data[2]) && (vm.data[3] == v.data[3]));
 	}
 
 	TEST_METHOD(compound_assignment_operators)
@@ -1063,24 +1087,29 @@ public:
 		uint2 v0;
 		Assert::IsTrue((v0.x == 0) && (v0.y == 0));
 		Assert::IsTrue((v0.width == 0) && (v0.height == 0));
+		Assert::IsTrue((v0.data[0] == 0) && (v0.data[1] == 0));
 
 		uint2 v1(24);
 		Assert::IsTrue((v1.x == 24) && (v1.y == 24));
 		Assert::IsTrue((v1.width == 24) && (v1.height == 24));
+		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24));
 
 		uint2 v2(1, 2);
 		Assert::IsTrue((v2.x == 1) && (v2.y == 2));
 		Assert::IsTrue((v2.width == 1) && (v2.height == 2));
+		Assert::IsTrue((v2.data[0] == 1) && (v2.data[1] == 2));
 
 		// copy ctor
 		uint2 vc = v2;
 		Assert::IsTrue((vc.x == v2.x) && (vc.y == v2.y));
 		Assert::IsTrue((vc.width == v2.width) && (vc.height == v2.height));
+		Assert::IsTrue((vc.data[0] == v2.data[0]) && (vc.data[1] == v2.data[1]));
 
 		// move ctor
 		uint2 vm = std::move(v2);
 		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y));
 		Assert::IsTrue((vm.width == vc.width) && (vm.height == vc.height));
+		Assert::IsTrue((vm.data[0] == vc.data[0]) && (vm.data[1] == vc.data[1]));
 	}
 
 	TEST_METHOD(compound_assignment_operators)

@@ -13,7 +13,10 @@ class Example {
 public:
 
 	Example(Render_context& rnd_ctx) noexcept : 
-		_rnd_ctx(rnd_ctx)
+		_device(rnd_ctx.device()),
+		_device_ctx(rnd_ctx.device_ctx()),
+		_swap_chain(rnd_ctx.swap_chain()),
+		_rtv_back_buffer(rnd_ctx.rtv_back_buffer())
 	{}
 
 	virtual ~Example() noexcept {}
@@ -24,7 +27,15 @@ public:
 	virtual void update() = 0;
 
 protected:
-	Render_context& _rnd_ctx;
+
+	void clear_color_buffer(const cg::float4& clear_color) noexcept;
+
+	void swap_color_buffers() noexcept;
+
+	ID3D11Device* _device;
+	ID3D11DeviceContext* _device_ctx;
+	IDXGISwapChain* _swap_chain;
+	ID3D11RenderTargetView* _rtv_back_buffer;
 };
 
 // Application class represents the entry point of the project.
