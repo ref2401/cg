@@ -33,8 +33,12 @@ private:
 
 	void init_shaders();
 
+	// Sets up the pipeline after initialization is complete.
+	void setup_pipeline();
+
 	Hlsl_shader_set _shader_set;
 	Unique_com_ptr<ID3D11Buffer> _vertex_buffer;
+	Unique_com_ptr<ID3D11InputLayout> _input_layout;
 	Unique_com_ptr<ID3D11Buffer> _index_buffer;
 };
 

@@ -19,8 +19,10 @@ namespace mesh_rnd {
 Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 	Example(rnd_ctx)
 {
-	init_geometry();
+	// function call order is important
 	init_shaders();
+	init_geometry(); // vertex shader bytecode is required to create vertex input layout
+	setup_pipeline(); 
 }
 
 void Static_mesh_example::init_geometry()
@@ -36,6 +38,18 @@ void Static_mesh_example::init_geometry()
 	vb_data.pSysMem = mesh_data.vertex_data().data();
 
 	HRESULT hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
+	assert(hr == S_OK);
+
+	// input layout
+	D3D11_INPUT_ELEMENT_DESC layout_desc = {};
+	layout_desc.SemanticName = "POSITION";
+	layout_desc.SemanticIndex = 0;
+	layout_desc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+
+	hr = _device->CreateInputLayout(&layout_desc, 1, 
+		_shader_set.vertex_shader_bytecode()->GetBufferPointer(),
+		_shader_set.vertex_shader_bytecode()->GetBufferSize(),
+		&_input_layout.ptr);
 	assert(hr == S_OK);
 
 	// index buffer
@@ -59,11 +73,28 @@ void Static_mesh_example::init_shaders()
 	_shader_set = Hlsl_shader_set(_device, hlsl_data);
 }
 
+void Static_mesh_example::setup_pipeline()
+{
+	size_t offset = 0;
+	size_t stride = sizeof(float3);
+	_device_ctx->IASetInputLayout(_input_layout.ptr);
+	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &stride, &offset);
+	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
+	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
+	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
+
+	HRESULT hr = _device_debug->ValidateContext(_device_ctx);
+	assert(hr == S_OK);
+}
+
 void Static_mesh_example::render()
 {
 	float4 clear_color(0.0f, 0.125f, 0.6f, 1.0f);
 
 	clear_color_buffer(clear_color);
+	_device_ctx->DrawIndexed(1, 0, 0);
 	swap_color_buffers();
 }
 

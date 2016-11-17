@@ -44,14 +44,31 @@ public:
 		return _vertex_shader.ptr;
 	}
 
+	ID3DBlob* vertex_shader_bytecode() noexcept
+	{
+		return _vertex_shader_bytecode.ptr;
+	}
+
 	ID3D11PixelShader* pixel_shader() noexcept
 	{
 		return _pixel_shader.ptr;
 	}
 
+	ID3DBlob* pixel_shader_bytecode() noexcept
+	{
+		return _pixel_shader_bytecode.ptr;
+	}
+
 private:
+
+	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+
+	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+
 	Unique_com_ptr<ID3D11VertexShader> _vertex_shader;
+	Unique_com_ptr<ID3DBlob> _vertex_shader_bytecode;
 	Unique_com_ptr<ID3D11PixelShader> _pixel_shader;
+	Unique_com_ptr<ID3DBlob> _pixel_shader_bytecode;
 };
 
 // The Render_context class provides access to all the DirectX's essential objects
@@ -96,6 +113,8 @@ public:
 	}
 
 private:
+
+	void init_device(HWND hwnd) noexcept;
 
 	void init_depth_stencil_state() noexcept;
 
