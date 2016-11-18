@@ -9,6 +9,7 @@
 namespace learn_dx11 {
 namespace mesh_rnd {
 
+
 class Static_mesh_example final : public Example {
 public:
 
@@ -29,6 +30,8 @@ public:
 
 private:
 
+	void init_cbuffers(const cg::uint2& viewport_size);
+
 	void init_geometry();
 
 	void init_shaders();
@@ -40,6 +43,11 @@ private:
 	Unique_com_ptr<ID3D11Buffer> _vertex_buffer;
 	Unique_com_ptr<ID3D11InputLayout> _input_layout;
 	Unique_com_ptr<ID3D11Buffer> _index_buffer;
+	// scene
+	size_t _model_index_count;
+	cg::mat4 _model_matrix;
+	Unique_com_ptr<ID3D11Buffer> _scene_cbuffer;
+	Unique_com_ptr<ID3D11Buffer> _model_cbuffer;
 };
 
 } // mesh_rnd

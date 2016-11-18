@@ -1,3 +1,13 @@
+cbuffer Scene : register(cb0) {
+	float4x4 g_projection_matrix	: packoffset(c0);
+	float4x4 g_view_matrix			: packoffset(c4);
+};
+
+cbuffer Model : register(cb1) {
+	float4x4 g_model_matrix			: packoffset(c0);
+};
+
+
 struct VS_input {
 	float3 position : POSITION;
 };
@@ -8,8 +18,11 @@ struct VS_output {
 
 VS_output vs_main(VS_input input)
 {
+	float4 pos_ws = mul(g_model_matrix, float4(input.position, 1));
+	float4 pos_cs = mul(mul(g_projection_matrix, g_view_matrix), pos_ws);
+
 	VS_output output;
-	output.position = float4(0, 0, 0.2, 1);//float4(input.position, 1);
+	output.position = pos_cs / pos_cs.w;
 	return output;
 }
 

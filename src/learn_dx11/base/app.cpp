@@ -20,14 +20,6 @@ void dispose_window(HWND& hwnd) noexcept
 	hwnd = nullptr;
 }
 
-// Initialized a device that represents the display adapter and a swap chain used for rendering.
-// After the function returns device, device_context & swap_chain point to appropriate directx objects.
-void initialize_directx_11(const uint2& window_size, HWND hwnd,
-	ID3D11Device** device, ID3D11DeviceContext** device_context, IDXGISwapChain** swap_chain) noexcept
-{
-	
-}
-
 HWND make_window(HINSTANCE hinstance, const uint2& position, const uint2& size)
 {
 	assert(hinstance);

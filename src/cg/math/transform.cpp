@@ -134,10 +134,10 @@ mat4 perspective_matrix_directx(float left, float right, float bottom, float top
 
 
 	return mat4(
-		doubled_near / right_minus_left, 0, -(right + left) / right_minus_left, 0,
-		0, doubled_near / top_minus_bottom, -(top + bottom) / top_minus_bottom, 0,
-		0, 0, far_z / far_minus_near, -near_z * far_z / far_minus_near,
-		0, 0, 1, 0
+		doubled_near / right_minus_left, 0, (right + left) / right_minus_left, 0,
+		0, doubled_near / top_minus_bottom, (top + bottom) / top_minus_bottom, 0,
+		0, 0, -far_z / far_minus_near, -near_z * far_z / far_minus_near,
+		0, 0, -1, 0
 	);
 }
 
@@ -149,22 +149,11 @@ mat4 perspective_matrix_directx(float vert_fov, float wh_ratio, float near_z, fl
 	float fat_minus_near = far_z - near_z;
 	float rev_tangent = 1.0f / std::tan(vert_fov * 0.5f);
 
-	/*
-	* TAN = tan(vert_fov / 2.0f)
-	* top = near * TAN
-	* right = top * wh_ratio = wh_ratio * near * TAN
-	*
-	* 2near / (right - (-rigth)) = 2near / 2right = near / right =
-	* near / (wh_ratio * near * TAN) = 1 / (wh_ratio * TAN)
-	*
-	* 2near / (top - (-top)) = 2near / 2top = neat / top =
-	* near / (near * TAN) = 1 / TAN */
-
 	return mat4(
 		(1.0f / wh_ratio) * rev_tangent, 0, 0, 0,
 		0, rev_tangent, 0, 0,
-		0, 0, far_z / fat_minus_near, -near_z * far_z / fat_minus_near,
-		0, 0, 1, 0
+		0, 0, -far_z / fat_minus_near, -near_z * far_z / fat_minus_near,
+		0, 0, -1, 0
 	);
 }
 

@@ -192,4 +192,21 @@ void Render_context::init_render_target_view() noexcept
 	_device_ctx->OMSetRenderTargets(1, &_rtv_back_buffer.ptr, nullptr);
 }
 
+// ----- funcs -----
+
+Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept
+{
+	assert(byte_count > 0);
+
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = byte_count;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	Unique_com_ptr<ID3D11Buffer> cbuffer;
+	device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
+
+	return cbuffer;
+}
+
 } // namespace learn_dx11

@@ -112,6 +112,11 @@ public:
 		return _swap_chain.ptr;
 	}
 
+	const cg::uint2& viewport_size() const noexcept
+	{
+		return _viewport_size;
+	}
+
 private:
 
 	void init_device(HWND hwnd) noexcept;
@@ -127,6 +132,17 @@ private:
 	Unique_com_ptr<IDXGISwapChain> _swap_chain;
 	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer;
 };
+
+
+// Creates an unitialized constant buffer object.
+Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept;
+
+// Creates an unitialized constant buffer object.
+template<typename T_cbuffer_data>
+inline Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device) noexcept
+{
+	return make_cbuffer(device, sizeof(T_cbuffer_data));
+}
 
 
 } // namespace learn_dx11

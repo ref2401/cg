@@ -147,27 +147,27 @@ quat from_rotation_matrix(const TMat& m) noexcept
 // Linearly interpolates between two viewpoints.
 Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept;
 
-// Creates a DirectX compatible orthographic projection matrix. 
+// Creates a right-handed DirectX compatible orthographic projection matrix.
 // right = -left, top = -bottom, near < far.
 mat4 orthographic_matrix_directx(float width, float height, float near_z, float far_z) noexcept;
 
-// Creates a DirectX compatible orthographic projection matrix.
+// Creates a right-handed, off screen scenter DirectX compatible orthographic projection matrix.
 // left < right, bottom < top, near < far.
 mat4 orthographic_matrix_directx(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
-// Creates an OpenGL compatible orthographic projection matrix. 
+// Creates a right-handed OpenGL compatible orthographic projection matrix. 
 // right = -left, top = -bottom, near < far.
 mat4 orthographic_matrix_opengl(float width, float height, float near_z, float far_z) noexcept;
 
-// Creates an OpenGL compatible orthographic projection matrix.
+// Creates a right-handed, off screen scenter OpenGL compatible orthographic projection matrix.
 // left < right, bottom < top, near < far.
 mat4 orthographic_matrix_opengl(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
-// Computes a DirectX compatible projection matrix for general frustum.
+// Computes a right-handed, off screen scenter DirectX compatible projection matrix for general frustum.
 // left < right, bottom < top, 0 < near < far.
 mat4 perspective_matrix_directx(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
-// Computes a DirectX compatible symmetric perspective projection matrix based on a field of view.
+// Computes a right-handed DirectX compatible symmetric perspective projection matrix based on a field of view.
 // 0 < vert_Fov < cg::pi, 0 < near < far.
 //	Params:
 //		vert_fov = Vertical field of view in radians.
@@ -176,11 +176,11 @@ mat4 perspective_matrix_directx(float left, float right, float bottom, float top
 //		far = the distance between a viewer and the far clipping plane.
 mat4 perspective_matrix_directx(float vert_fov, float wh_ratio, float near_z, float far_z) noexcept;
 
-// Computes an OpenGL compatible projection matrix for general frustum.
+// Computes a right-handed, off screen scenter OpenGL compatible projection matrix for general frustum.
 // left < right, bottom < top, 0 < near < far.
 mat4 perspective_matrix_opengl(float left, float right, float bottom, float top, float near_z, float far_z) noexcept;
 
-// Computes an OpenGL compatible symmetric perspective projection matrix based on a field of view.
+// Computes a right-handed OpenGL compatible symmetric perspective projection matrix based on a field of view.
 // 0 < vert_Fov < cg::pi, 0 < near < far.
 //	Params:
 //		vert_fov = Vertical field of view in radians.
