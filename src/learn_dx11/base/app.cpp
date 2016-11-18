@@ -98,7 +98,7 @@ namespace learn_dx11 {
 
 void Example::clear_color_buffer(const cg::float4& clear_color) noexcept
 {
-	_device_ctx->ClearRenderTargetView(_rtv_back_buffer, clear_color.data);
+	_device_ctx->ClearRenderTargetView(_pipeline_default_state.rtv_back_buffer(), clear_color.data);
 }
 
 void Example::swap_color_buffers() noexcept

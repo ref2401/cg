@@ -40,14 +40,14 @@ private:
 	void setup_pipeline();
 
 	Hlsl_shader_set _shader_set;
-	Unique_com_ptr<ID3D11Buffer> _vertex_buffer;
-	Unique_com_ptr<ID3D11InputLayout> _input_layout;
-	Unique_com_ptr<ID3D11Buffer> _index_buffer;
+	Com_ptr<ID3D11Buffer> _vertex_buffer;
+	Com_ptr<ID3D11InputLayout> _input_layout;
+	Com_ptr<ID3D11Buffer> _index_buffer;
 	// scene
 	size_t _model_index_count;
 	cg::mat4 _model_matrix;
-	Unique_com_ptr<ID3D11Buffer> _scene_cbuffer;
-	Unique_com_ptr<ID3D11Buffer> _model_cbuffer;
+	Com_ptr<ID3D11Buffer> _scene_cbuffer;
+	Com_ptr<ID3D11Buffer> _model_cbuffer;
 };
 
 } // mesh_rnd

@@ -2,7 +2,6 @@
 #define LEARN_DX11_BASE_DX11_H_
 
 #include <cassert>
-#include <memory>
 #include <type_traits>
 #include "cg/data/shader.h"
 #include "cg/math/math.h"
@@ -14,7 +13,7 @@
 #include <DirectXMath.h>
 #include <dxgi.h>
 
-using cg::rnd::utility::Unique_com_ptr;
+using cg::rnd::utility::Com_ptr;
 using namespace DirectX;
 
 
@@ -65,10 +64,56 @@ private:
 
 	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
 
-	Unique_com_ptr<ID3D11VertexShader> _vertex_shader;
-	Unique_com_ptr<ID3DBlob> _vertex_shader_bytecode;
-	Unique_com_ptr<ID3D11PixelShader> _pixel_shader;
-	Unique_com_ptr<ID3DBlob> _pixel_shader_bytecode;
+	Com_ptr<ID3D11VertexShader> _vertex_shader;
+	Com_ptr<ID3DBlob> _vertex_shader_bytecode;
+	Com_ptr<ID3D11PixelShader> _pixel_shader;
+	Com_ptr<ID3DBlob> _pixel_shader_bytecode;
+};
+
+class Pipeline_default_state final {
+public:
+
+	Pipeline_default_state() noexcept = default;
+
+	Pipeline_default_state(ID3D11Device* device, IDXGISwapChain* swap_chain);
+
+	Pipeline_default_state(const Pipeline_default_state&) = delete;
+
+	Pipeline_default_state(Pipeline_default_state&& state) noexcept;
+
+
+	Pipeline_default_state& operator=(const Pipeline_default_state&) = delete;
+
+	Pipeline_default_state& operator=(Pipeline_default_state&& state) noexcept;
+
+
+	ID3D11DepthStencilState* depth_stencil_state() noexcept
+	{
+		return _depth_stencil_state.ptr;
+	}
+
+	ID3D11RasterizerState* rasterizer_state() noexcept
+	{
+		return _rasterizer_state.ptr;
+	}
+
+	ID3D11RenderTargetView* rtv_back_buffer() noexcept
+	{
+		return _rtv_back_buffer.ptr;
+	}
+
+private:
+
+	void init_depth_stencil_state(ID3D11Device* device);
+
+	void init_rasterizer_state(ID3D11Device* device);
+
+	void init_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain);
+
+	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
+	Com_ptr<ID3D11RenderTargetView> _rtv_back_buffer;
+	
 };
 
 // The Render_context class provides access to all the DirectX's essential objects
@@ -97,14 +142,14 @@ public:
 		return _device_ctx.ptr;
 	}
 
-	ID3D11Debug* device_debug() noexcept
+	ID3D11Debug* debug() noexcept
 	{
-		return _device_debug.ptr;
+		return _debug.ptr;
 	}
 
-	ID3D11RenderTargetView* rtv_back_buffer() noexcept
+	Pipeline_default_state& pipeline_default_state() noexcept
 	{
-		return _rtv_back_buffer.ptr;
+		return _pipeline_default_state;
 	}
 
 	IDXGISwapChain* swap_chain() noexcept
@@ -121,25 +166,23 @@ private:
 
 	void init_device(HWND hwnd) noexcept;
 
-	void init_depth_stencil_state() noexcept;
-
-	void init_render_target_view() noexcept;
+	void setup_pipeline() noexcept;
 
 	cg::uint2 _viewport_size;
-	Unique_com_ptr<ID3D11Device> _device;
-	Unique_com_ptr<ID3D11Debug> _device_debug;
-	Unique_com_ptr<ID3D11DeviceContext> _device_ctx;
-	Unique_com_ptr<IDXGISwapChain> _swap_chain;
-	Unique_com_ptr<ID3D11RenderTargetView> _rtv_back_buffer;
+	Com_ptr<ID3D11Device> _device;
+	Com_ptr<ID3D11Debug> _debug;
+	Com_ptr<ID3D11DeviceContext> _device_ctx;
+	Com_ptr<IDXGISwapChain> _swap_chain;
+	Pipeline_default_state _pipeline_default_state;
 };
 
 
 // Creates an unitialized constant buffer object.
-Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept;
+Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept;
 
 // Creates an unitialized constant buffer object.
 template<typename T_cbuffer_data>
-inline Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device) noexcept
+inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device) noexcept
 {
 	return make_cbuffer(device, sizeof(T_cbuffer_data));
 }

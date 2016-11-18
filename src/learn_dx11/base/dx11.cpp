@@ -12,12 +12,12 @@ using cg::data::Hlsl_shader_set_data;
 
 namespace {
 
-Unique_com_ptr<ID3DBlob> compile_shader(const std::string& source_code, 
+Com_ptr<ID3DBlob> compile_shader(const std::string& source_code, 
 	const std::string& source_filename, const std::string& entry_point_name,
 	const char* shader_model, uint32_t compile_flags)
 {
-	Unique_com_ptr<ID3DBlob> bytecode;
-	Unique_com_ptr<ID3DBlob> error_blob;
+	Com_ptr<ID3DBlob> bytecode;
+	Com_ptr<ID3DBlob> error_blob;
 
 	HRESULT hr = D3DCompile(
 		source_code.c_str(),
@@ -114,6 +114,64 @@ void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const cg::data::Hl
 	}
 }
 
+// ----- Pipeline_default_state -----
+
+Pipeline_default_state::Pipeline_default_state(ID3D11Device* device, IDXGISwapChain* swap_chain)
+{
+	assert(device != nullptr);
+	assert(swap_chain != nullptr);
+
+	init_depth_stencil_state(device);
+	init_rasterizer_state(device);
+	init_render_target_view(device, swap_chain);
+}
+
+Pipeline_default_state::Pipeline_default_state(Pipeline_default_state&& state) noexcept :
+	_depth_stencil_state(std::move(state._depth_stencil_state)),
+	_rasterizer_state(std::move(state._rasterizer_state)),
+	_rtv_back_buffer(std::move(state._rtv_back_buffer))
+{}
+
+Pipeline_default_state& Pipeline_default_state::operator=(Pipeline_default_state&& state) noexcept
+{
+	if (this == &state) return *this;
+
+	_depth_stencil_state = std::move(state._depth_stencil_state);
+	_rasterizer_state = std::move(state._rasterizer_state);
+	_rtv_back_buffer = std::move(state._rtv_back_buffer);
+
+	return *this;
+}
+
+void Pipeline_default_state::init_depth_stencil_state(ID3D11Device* device)
+{
+	D3D11_DEPTH_STENCIL_DESC desc = {};
+
+	HRESULT hr = device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+}
+
+void Pipeline_default_state::init_rasterizer_state(ID3D11Device* device)
+{
+	D3D11_RASTERIZER_DESC desc = {};
+	desc.FillMode = D3D11_FILL_SOLID;
+	desc.CullMode = D3D11_CULL_BACK;
+	desc.FrontCounterClockwise = true;
+
+	HRESULT hr = device->CreateRasterizerState(&desc, &_rasterizer_state.ptr);
+	assert(hr == S_OK);
+}
+
+void Pipeline_default_state::init_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain)
+{
+	Com_ptr<ID3D11Texture2D> tex_back_buffer;
+	HRESULT hr = swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
+	assert(hr == S_OK);
+
+	hr = device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_rtv_back_buffer.ptr);
+	assert(hr == S_OK);
+}
+
 // ----- Rendering_context -----
 
 Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
@@ -123,9 +181,9 @@ Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
 	assert(hwnd);
 
 	init_device(hwnd);
-	init_render_target_view();
-	init_depth_stencil_state();
+	setup_pipeline();
 
+	// viewport
 	D3D11_VIEWPORT viewport;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
@@ -166,35 +224,23 @@ void Render_context::init_device(HWND hwnd) noexcept
 	assert(hr == S_OK);
 	assert(actual_feature_level == expected_feature_level);
 
-	hr = _device->QueryInterface<ID3D11Debug>(&_device_debug.ptr);
+	hr = _device->QueryInterface<ID3D11Debug>(&_debug.ptr);
 }
 
-void Render_context::init_depth_stencil_state() noexcept
+void Render_context::setup_pipeline() noexcept
 {
-	D3D11_DEPTH_STENCIL_DESC desc = {};
-	
-	Unique_com_ptr<ID3D11DepthStencilState> state = nullptr;
-	HRESULT hr =_device->CreateDepthStencilState(&desc, &state.ptr);
-	assert(hr == S_OK);
+	_pipeline_default_state = Pipeline_default_state(_device.ptr, _swap_chain.ptr);
 
-	_device_ctx->OMSetDepthStencilState(state.ptr, 1);
-}
+	_device_ctx->OMSetDepthStencilState(_pipeline_default_state.depth_stencil_state(), 1);
+	_device_ctx->RSSetState(_pipeline_default_state.rasterizer_state());
 
-void Render_context::init_render_target_view() noexcept
-{
-	Unique_com_ptr<ID3D11Texture2D> tex_back_buffer;
-	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
-	assert(hr == S_OK);
-
-	hr = _device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_rtv_back_buffer.ptr);
-	assert(hr == S_OK);
-
-	_device_ctx->OMSetRenderTargets(1, &_rtv_back_buffer.ptr, nullptr);
+	ID3D11RenderTargetView* rtv = _pipeline_default_state.rtv_back_buffer();
+	_device_ctx->OMSetRenderTargets(1, &rtv, nullptr);
 }
 
 // ----- funcs -----
 
-Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept
+Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept
 {
 	assert(byte_count > 0);
 
@@ -203,7 +249,7 @@ Unique_com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_coun
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	Unique_com_ptr<ID3D11Buffer> cbuffer;
+	Com_ptr<ID3D11Buffer> cbuffer;
 	device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
 
 	return cbuffer;

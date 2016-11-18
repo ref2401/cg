@@ -12,37 +12,37 @@ namespace utility {
 // Unique_com_ptr is a smart pointer that owns and manages a COM object through a pointer 
 // and disposes of that object when the Unique_com_ptr goes out of scope.
 template<typename T>
-struct Unique_com_ptr final {
+struct Com_ptr final {
 	
 	// Commented because unittests use fake COM interface.
 	//static_assert(std::is_base_of<IUnknown, T>::value, "T must be derived from IUnknown.");
 
 
-	Unique_com_ptr() noexcept {}
+	Com_ptr() noexcept {}
 
-	explicit Unique_com_ptr(T* ptr) noexcept :
+	explicit Com_ptr(T* ptr) noexcept :
 		ptr(ptr)
 	{}
 
-	Unique_com_ptr(nullptr_t) noexcept {}
+	Com_ptr(nullptr_t) noexcept {}
 
-	Unique_com_ptr(const Unique_com_ptr&) = delete;
+	Com_ptr(const Com_ptr&) = delete;
 
-	Unique_com_ptr(Unique_com_ptr&& com_ptr) noexcept :
+	Com_ptr(Com_ptr&& com_ptr) noexcept :
 		ptr(com_ptr.ptr)
 	{
 		com_ptr.ptr = nullptr;
 	}
 
-	~Unique_com_ptr() noexcept
+	~Com_ptr() noexcept
 	{
 		dispose();
 	}
 
 
-	Unique_com_ptr& operator=(const Unique_com_ptr&) = delete;
+	Com_ptr& operator=(const Com_ptr&) = delete;
 
-	Unique_com_ptr& operator=(Unique_com_ptr&& com_ptr) noexcept
+	Com_ptr& operator=(Com_ptr&& com_ptr) noexcept
 	{
 		if (this == &com_ptr) return *this;
 
@@ -52,14 +52,14 @@ struct Unique_com_ptr final {
 		return *this;
 	}
 
-	Unique_com_ptr& operator=(T* ptr) noexcept
+	Com_ptr& operator=(T* ptr) noexcept
 	{
 		dispose();
 		this->ptr = ptr;
 		return *this;
 	}
 
-	Unique_com_ptr& operator=(nullptr_t) noexcept
+	Com_ptr& operator=(nullptr_t) noexcept
 	{
 		dispose();
 		return *this;
@@ -98,7 +98,7 @@ struct Unique_com_ptr final {
 };
 
 template<typename T>
-void Unique_com_ptr<T>::dispose() noexcept
+void Com_ptr<T>::dispose() noexcept
 {
 	if (ptr == nullptr) return;
 
@@ -107,37 +107,37 @@ void Unique_com_ptr<T>::dispose() noexcept
 }
 
 template<typename T>
-inline bool operator==(const Unique_com_ptr<T>& l, const Unique_com_ptr<T>& r) noexcept
+inline bool operator==(const Com_ptr<T>& l, const Com_ptr<T>& r) noexcept
 {
 	return l.ptr == r.ptr;
 }
 
 template<typename T>
-inline bool operator==(const Unique_com_ptr<T>& com_ptr, nullptr_t) noexcept
+inline bool operator==(const Com_ptr<T>& com_ptr, nullptr_t) noexcept
 {
 	return com_ptr.ptr == nullptr;
 }
 
 template<typename T>
-inline bool operator==(nullptr_t, const Unique_com_ptr<T>& com_ptr) noexcept
+inline bool operator==(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 {
 	return com_ptr.ptr == nullptr;
 }
 
 template<typename T>
-inline bool operator!=(const Unique_com_ptr<T>& l, const Unique_com_ptr<T>& r) noexcept
+inline bool operator!=(const Com_ptr<T>& l, const Com_ptr<T>& r) noexcept
 {
 	return l.ptr != r.ptr;
 }
 
 template<typename T>
-inline bool operator!=(const Unique_com_ptr<T>& com_ptr, nullptr_t) noexcept
+inline bool operator!=(const Com_ptr<T>& com_ptr, nullptr_t) noexcept
 {
 	return com_ptr.ptr != nullptr;
 }
 
 template<typename T>
-inline bool operator!=(nullptr_t, const Unique_com_ptr<T>& com_ptr) noexcept
+inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 {
 	return com_ptr.ptr != nullptr;
 }

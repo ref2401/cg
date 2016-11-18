@@ -117,7 +117,7 @@ void Static_mesh_example::setup_pipeline()
 	_device_ctx->VSSetConstantBuffers(1, 1, &_model_cbuffer.ptr);
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
-	HRESULT hr = _device_debug->ValidateContext(_device_ctx);
+	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);
 }
 
