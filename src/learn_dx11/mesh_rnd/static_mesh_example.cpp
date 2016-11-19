@@ -47,7 +47,7 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto mesh_data = cg::file::load_mesh_wavefront<Vertex_attribs::position>("../data/cube.obj", 24, 36);
+	auto mesh_data = cg::file::load_mesh_wavefront<Vertex_attribs::vertex_p_n>("../data/cube.obj", 24, 36);
 	_model_index_count = mesh_data.index_count();
 
 	// vertex buffer
@@ -62,12 +62,12 @@ void Static_mesh_example::init_geometry()
 	assert(hr == S_OK);
 
 	// input layout
-	D3D11_INPUT_ELEMENT_DESC layout_desc = {};
-	layout_desc.SemanticName = "POSITION";
-	layout_desc.SemanticIndex = 0;
-	layout_desc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	D3D11_INPUT_ELEMENT_DESC layout_desc[2] = {
+		{ "V_POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "V_NORMAL" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float3), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
 
-	hr = _device->CreateInputLayout(&layout_desc, 1, 
+	hr = _device->CreateInputLayout(layout_desc, 2, 
 		_shader_set.vertex_shader_bytecode()->GetBufferPointer(),
 		_shader_set.vertex_shader_bytecode()->GetBufferSize(),
 		&_input_layout.ptr);
@@ -97,7 +97,7 @@ void Static_mesh_example::init_shaders()
 void Static_mesh_example::setup_pipeline_state()
 {
 	size_t offset = 0;
-	size_t stride = sizeof(float3);
+	size_t stride = sizeof(float3) * 2;
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &stride, &offset);
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
