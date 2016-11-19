@@ -1,4 +1,3 @@
-# cg
 Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11.
 
 ## Build

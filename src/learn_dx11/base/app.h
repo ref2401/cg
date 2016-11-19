@@ -1,6 +1,7 @@
 #ifndef LEARN_DX11_BASE_APP_H_
 #define LEARN_DX11_BASE_APP_H_
 
+#include <memory>
 #include <type_traits>
 #include "cg/math/math.h"
 #include "learn_dx11/base/dx11.h"
@@ -16,12 +17,13 @@ public:
 		_device(rnd_ctx.device()),
 		_debug(rnd_ctx.debug()),
 		_device_ctx(rnd_ctx.device_ctx()),
-		_swap_chain(rnd_ctx.swap_chain()),
-		_pipeline_default_state(rnd_ctx.pipeline_default_state())
+		_pipeline_state(rnd_ctx.pipeline_state())
 	{}
 
 	virtual ~Example() noexcept {}
 
+
+	virtual void on_viewport_resize(const cg::uint2& viewport_size) = 0;
 
 	virtual void render() = 0;
 
@@ -29,15 +31,12 @@ public:
 
 protected:
 
-	void clear_color_buffer(const cg::float4& clear_color) noexcept;
-
-	void swap_color_buffers() noexcept;
+	void clear_color_buffer(const cg::float4& clear_color);
 
 	ID3D11Device* _device;
 	ID3D11Debug* _debug;
 	ID3D11DeviceContext* _device_ctx;
-	IDXGISwapChain* _swap_chain;
-	Pipeline_default_state& _pipeline_default_state;
+	Pipeline_state& _pipeline_state;
 };
 
 // Application class represents the entry point of the project.
@@ -59,13 +58,18 @@ public:
 
 	Application& operator=(Application&&) = delete;
 
+
+	Com_ptr<ID3D11Debug> get_dx_debug();
+
+	void on_window_resize(const cg::uint2& window_size);
+
 	// The method instantiates the specified example T and runs it.
 	template<typename T>
 	void run();
 
 private:
 
-	void run_main_loop(Example& example);
+	void run_main_loop();
 
 	void show_window() noexcept;
 
@@ -73,17 +77,20 @@ private:
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
 	Render_context _rnd_ctx;
+	std::unique_ptr<Example> _example;
 };
 
 template<typename T>
 void Application::run()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from learn_dx11::Example.");
+	assert(!_example);
 
 	show_window();
-	T example(_rnd_ctx);
 
-	run_main_loop(example);
+	_example = std::make_unique<T>(_rnd_ctx);
+	run_main_loop();
+	_example.reset();
 }
 
 } // learn_dx11

@@ -9,6 +9,8 @@ namespace {
 
 constexpr char* wnd_class_name = "learn_dx11_window_class";
 
+learn_dx11::Application* g_app;
+
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param);
 
 
@@ -76,13 +78,19 @@ bool pump_sys_messages() noexcept
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
 {
-	//if (g_win_app == nullptr)
-	//	return DefWindowProc(hwnd, message, w_param, l_param);
+	if (g_app == nullptr)
+		return DefWindowProc(hwnd, message, w_param, l_param);
 
 	switch (message) {
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
+
+		case WM_SIZE:
+		{
+			g_app->on_window_resize(uint2(LOWORD(l_param), HIWORD(l_param)));
+			return 0;
+		}
 
 		default:
 			return DefWindowProc(hwnd, message, w_param, l_param);
@@ -96,14 +104,9 @@ namespace learn_dx11 {
 
 // ----- Example -----
 
-void Example::clear_color_buffer(const cg::float4& clear_color) noexcept
+void Example::clear_color_buffer(const cg::float4& clear_color)
 {
-	_device_ctx->ClearRenderTargetView(_pipeline_default_state.rtv_back_buffer(), clear_color.data);
-}
-
-void Example::swap_color_buffers() noexcept
-{
-	_swap_chain->Present(0, 0);
+	_device_ctx->ClearRenderTargetView(_pipeline_state.render_target_view(), clear_color.data);
 }
 
 // ----- Application -----
@@ -111,23 +114,46 @@ void Example::swap_color_buffers() noexcept
 Application::Application(cg::uint2 window_position, cg::uint2 window_size) :
 	_hinstance(GetModuleHandle(nullptr)),
 	_hwnd(make_window(_hinstance, window_position, window_size)),
-	_rnd_ctx(window_size, _hwnd)
-{}
+	_rnd_ctx(_hwnd, window_size)
+{
+	g_app = this;
+}
 
 Application::~Application() noexcept
 {
+	g_app = nullptr;
 	dispose_window(_hwnd);
 	_hinstance = nullptr;
 }
 
-void Application::run_main_loop(Example& example)
+Com_ptr<ID3D11Debug> Application::get_dx_debug()
+{
+	Com_ptr<ID3D11Debug> debug(_rnd_ctx.debug());
+	debug->AddRef();
+
+	return debug;
+}
+
+void Application::on_window_resize(const uint2& window_size)
+{
+	assert(greater_than(window_size, 0));
+
+	if (window_size == _rnd_ctx.pipeline_state().viewport_size()) return;
+
+	_rnd_ctx.resize_viewport(window_size);
+	if (_example)
+		_example->on_viewport_resize(window_size);
+}
+
+void Application::run_main_loop()
 {
 	while (true) {
 		bool terminate = pump_sys_messages();
 		if (terminate) break;
 
-		example.update();
-		example.render();
+		_example->update();
+		_example->render();
+		_rnd_ctx.swap_color_buffers();
 	}
 }
 

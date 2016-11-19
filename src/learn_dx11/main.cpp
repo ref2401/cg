@@ -10,8 +10,16 @@ int main(int argc, char* argv[])
 	cg::uint2 wnd_size(960, 540);
 
 	try {
-		learn_dx11::Application app(wnd_position, wnd_size);
-		app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+		Com_ptr<ID3D11Debug> debug;
+
+		{
+			learn_dx11::Application app(wnd_position, wnd_size);
+			debug = app.get_dx_debug();
+
+			app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+		}
+
+		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	}
 	catch(std::exception& exc) {
 		OutputDebugString("\nException:\n");

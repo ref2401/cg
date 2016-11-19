@@ -26,31 +26,22 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 	// function call order is important
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
-	init_cbuffers(rnd_ctx.viewport_size());
-	setup_pipeline(); 
+	init_cbuffers();
+	setup_pipeline_state(); 
+	setup_projection_view_matrices(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
 }
 
-void Static_mesh_example::init_cbuffers(const uint2& viewport_size)
+void Static_mesh_example::init_cbuffers()
 {
-	using cg::perspective_matrix_directx;
 	using cg::to_array_column_major_order;
-	using cg::view_matrix;
-
-	// projection & view matrices
-	mat4 proj_m = perspective_matrix_directx(cg::pi_3, viewport_size.aspect_ratio(), 0.1f, 10.0f);
-	mat4 view_m = view_matrix(float3(1, 4, 3), float3::zero);
-
-	float matrix_data[32];
-	to_array_column_major_order(proj_m, matrix_data);
-	to_array_column_major_order(view_m, &matrix_data[16]);
 
 	_scene_cbuffer = make_cbuffer(_device, 2 * sizeof(mat4));
-	_device_ctx->UpdateSubresource(_scene_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
-
+	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	
 	// model matrix
 	_model_matrix = mat4::identity;
+	float matrix_data[16];
 	to_array_column_major_order(_model_matrix, matrix_data);
-	_model_cbuffer = make_cbuffer(_device,  sizeof(mat4));
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 }
 
@@ -103,7 +94,7 @@ void Static_mesh_example::init_shaders()
 	_shader_set = Hlsl_shader_set(_device, hlsl_data);
 }
 
-void Static_mesh_example::setup_pipeline()
+void Static_mesh_example::setup_pipeline_state()
 {
 	size_t offset = 0;
 	size_t stride = sizeof(float3);
@@ -121,13 +112,33 @@ void Static_mesh_example::setup_pipeline()
 	assert(hr == S_OK);
 }
 
+void Static_mesh_example::setup_projection_view_matrices(float wh_aspect_ratio)
+{
+	using cg::perspective_matrix_directx;
+	using cg::to_array_column_major_order;
+	using cg::view_matrix;
+
+	_projection_matrix = perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 0.1f, 10.0f);
+	_view_matrix = view_matrix(float3(1, 4, 3), float3::zero);
+
+	float matrix_data[32];
+	to_array_column_major_order(_projection_matrix, matrix_data);
+	to_array_column_major_order(_view_matrix, &matrix_data[16]);
+
+	_device_ctx->UpdateSubresource(_scene_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
+}
+
+void Static_mesh_example::on_viewport_resize(const cg::uint2& viewport_size)
+{
+	setup_projection_view_matrices(viewport_size.aspect_ratio());
+}
+
 void Static_mesh_example::render()
 {
 	float4 clear_color(0.0f, 0.125f, 0.6f, 1.0f);
 
 	clear_color_buffer(clear_color);
 	_device_ctx->DrawIndexed(_model_index_count, 0, 0);
-	swap_color_buffers();
 }
 
 void Static_mesh_example::update()

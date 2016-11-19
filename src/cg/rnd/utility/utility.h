@@ -100,10 +100,11 @@ struct Com_ptr final {
 template<typename T>
 void Com_ptr<T>::dispose() noexcept
 {
-	if (ptr == nullptr) return;
+	T* temp = ptr;
+	if (temp == nullptr) return;
 
-	auto c = ptr->Release();
 	ptr = nullptr;
+	auto c = temp->Release();
 }
 
 template<typename T>

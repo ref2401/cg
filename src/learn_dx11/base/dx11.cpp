@@ -116,42 +116,52 @@ void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const cg::data::Hl
 
 // ----- Pipeline_default_state -----
 
-Pipeline_default_state::Pipeline_default_state(ID3D11Device* device, IDXGISwapChain* swap_chain)
+Pipeline_state::Pipeline_state(ID3D11Device* device, IDXGISwapChain* swap_chain,
+	const uint2& viewport_size)
 {
 	assert(device != nullptr);
 	assert(swap_chain != nullptr);
+	assert(greater_than(viewport_size, 0));
 
-	init_depth_stencil_state(device);
+	update_depth_stencil_state(device);
 	init_rasterizer_state(device);
-	init_render_target_view(device, swap_chain);
+	update_render_target_view(device, swap_chain);
+	update_viewport(viewport_size);
 }
 
-Pipeline_default_state::Pipeline_default_state(Pipeline_default_state&& state) noexcept :
+Pipeline_state::Pipeline_state(Pipeline_state&& state) noexcept :
 	_depth_stencil_state(std::move(state._depth_stencil_state)),
 	_rasterizer_state(std::move(state._rasterizer_state)),
-	_rtv_back_buffer(std::move(state._rtv_back_buffer))
-{}
+	_render_target_view(std::move(state._render_target_view)),
+	_viewport_size(state._viewport_size),
+	_viewport_desc(state._viewport_desc)
+{
+	state._viewport_size = uint2::zero;
+	state._viewport_desc = D3D11_VIEWPORT {};
+}
 
-Pipeline_default_state& Pipeline_default_state::operator=(Pipeline_default_state&& state) noexcept
+Pipeline_state& Pipeline_state::operator=(Pipeline_state&& state) noexcept
 {
 	if (this == &state) return *this;
 
 	_depth_stencil_state = std::move(state._depth_stencil_state);
 	_rasterizer_state = std::move(state._rasterizer_state);
-	_rtv_back_buffer = std::move(state._rtv_back_buffer);
+	_render_target_view = std::move(state._render_target_view);
+	_viewport_size = state._viewport_size;
+	_viewport_desc = state._viewport_desc;
+
+	state._viewport_size = uint2::zero;
+	state._viewport_desc = D3D11_VIEWPORT{};
 
 	return *this;
 }
 
-void Pipeline_default_state::init_depth_stencil_state(ID3D11Device* device)
+void Pipeline_state::clear_render_target_view()
 {
-	D3D11_DEPTH_STENCIL_DESC desc = {};
-
-	HRESULT hr = device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
-	assert(hr == S_OK);
+	_render_target_view = nullptr;
 }
 
-void Pipeline_default_state::init_rasterizer_state(ID3D11Device* device)
+void Pipeline_state::init_rasterizer_state(ID3D11Device* device)
 {
 	D3D11_RASTERIZER_DESC desc = {};
 	desc.FillMode = D3D11_FILL_SOLID;
@@ -162,48 +172,58 @@ void Pipeline_default_state::init_rasterizer_state(ID3D11Device* device)
 	assert(hr == S_OK);
 }
 
-void Pipeline_default_state::init_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain)
+void Pipeline_state::update_depth_stencil_state(ID3D11Device* device)
+{
+	D3D11_DEPTH_STENCIL_DESC desc = {};
+
+	HRESULT hr = device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+}
+
+void Pipeline_state::update_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain)
 {
 	Com_ptr<ID3D11Texture2D> tex_back_buffer;
 	HRESULT hr = swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
 	assert(hr == S_OK);
 
-	hr = device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_rtv_back_buffer.ptr);
+	hr = device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_render_target_view.ptr);
 	assert(hr == S_OK);
+}
+
+void Pipeline_state::update_viewport(const cg::uint2& viewport_size)
+{
+	_viewport_size = viewport_size;
+
+	_viewport_desc.TopLeftX = 0;
+	_viewport_desc.TopLeftY = 0;
+	_viewport_desc.Width = float(viewport_size.width);
+	_viewport_desc.Height = float(viewport_size.height);
+	_viewport_desc.MinDepth = 0.0;
+	_viewport_desc.MaxDepth = 1.0f;
 }
 
 // ----- Rendering_context -----
 
-Render_context::Render_context(const uint2& viewport_size, HWND hwnd) noexcept :
-	_viewport_size(viewport_size)
+Render_context::Render_context(HWND hwnd, const uint2& window_size)
 {
-	assert(greater_than(viewport_size, 0));
+	assert(greater_than(window_size, 0));
 	assert(hwnd);
 
-	init_device(hwnd);
-	setup_pipeline();
-
-	// viewport
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = float(_viewport_size.width);
-	viewport.Height = float(_viewport_size.height);
-	viewport.MinDepth = 0.0;
-	viewport.MaxDepth = 1.0f;
-
-	_device_ctx->RSSetViewports(1, &viewport);
+	init_device(hwnd, window_size);
+	
+	_pipeline_state = Pipeline_state(_device.ptr, _swap_chain.ptr, window_size);
+	setup_pipeline_state();
 }
 
-void Render_context::init_device(HWND hwnd) noexcept
+void Render_context::init_device(HWND hwnd, const uint2& window_size)
 {
 	HRESULT hr;
 
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
 	swap_chain_desc.BufferCount = 2;
 	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swap_chain_desc.BufferDesc.Width = _viewport_size.width;
-	swap_chain_desc.BufferDesc.Height = _viewport_size.height;
+	swap_chain_desc.BufferDesc.Width = window_size.width;
+	swap_chain_desc.BufferDesc.Height = window_size.height;
 	swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swap_chain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -227,15 +247,39 @@ void Render_context::init_device(HWND hwnd) noexcept
 	hr = _device->QueryInterface<ID3D11Debug>(&_debug.ptr);
 }
 
-void Render_context::setup_pipeline() noexcept
+void Render_context::resize_viewport(const cg::uint2& viewport_size)
 {
-	_pipeline_default_state = Pipeline_default_state(_device.ptr, _swap_chain.ptr);
+	assert(greater_than(viewport_size, 0));
 
-	_device_ctx->OMSetDepthStencilState(_pipeline_default_state.depth_stencil_state(), 1);
-	_device_ctx->RSSetState(_pipeline_default_state.rasterizer_state());
+	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
+	_pipeline_state.clear_render_target_view();
 
-	ID3D11RenderTargetView* rtv = _pipeline_default_state.rtv_back_buffer();
+	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
+	_swap_chain->GetDesc(&swap_chain_desc);
+	_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount, 
+		viewport_size.width, viewport_size.height,
+		swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
+	
+	_pipeline_state.update_render_target_view(_device.ptr, _swap_chain.ptr);
+	_pipeline_state.update_viewport(viewport_size);
+	setup_pipeline_state();
+}
+
+void Render_context::setup_pipeline_state()
+{
+	// rasterizer stage
+	_device_ctx->RSSetState(_pipeline_state.rasterizer_state());
+	_device_ctx->RSSetViewports(1, &_pipeline_state.viewport_desc());
+
+	// output merger stage
+	_device_ctx->OMSetDepthStencilState(_pipeline_state.depth_stencil_state(), 1);
+	ID3D11RenderTargetView* rtv = _pipeline_state.render_target_view();
 	_device_ctx->OMSetRenderTargets(1, &rtv, nullptr);
+}
+
+void Render_context::swap_color_buffers()
+{
+	_swap_chain->Present(0, 0);
 }
 
 // ----- funcs -----

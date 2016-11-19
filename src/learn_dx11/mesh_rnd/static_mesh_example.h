@@ -17,12 +17,14 @@ public:
 
 	Static_mesh_example(const Static_mesh_example&) = delete;
 
-	Static_mesh_example(Static_mesh_example&&) = delete;
+	Static_mesh_example(Static_mesh_example&&) noexcept = delete;
 
 
 	Static_mesh_example& operator=(const Static_mesh_example&) = delete;
 
-	Static_mesh_example& operator=(Static_mesh_example&&) = delete;
+	Static_mesh_example& operator=(Static_mesh_example&&) noexcept = delete;
+
+	void on_viewport_resize(const cg::uint2& viewport_size) override;
 
 	void render() override;
 
@@ -30,14 +32,16 @@ public:
 
 private:
 
-	void init_cbuffers(const cg::uint2& viewport_size);
+	void init_cbuffers();
 
 	void init_geometry();
 
 	void init_shaders();
 
+	void setup_projection_view_matrices(float wh_aspect_ratio);
+
 	// Sets up the pipeline after initialization is complete.
-	void setup_pipeline();
+	void setup_pipeline_state();
 
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
@@ -45,6 +49,8 @@ private:
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	// scene
 	size_t _model_index_count;
+	cg::mat4 _projection_matrix;
+	cg::mat4 _view_matrix;
 	cg::mat4 _model_matrix;
 	Com_ptr<ID3D11Buffer> _scene_cbuffer;
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
