@@ -33,6 +33,8 @@ protected:
 
 	void clear_color_buffer(const cg::float4& clear_color);
 
+	void clear_depth_stencil_buffer(float clear_depth);
+
 	ID3D11Device* _device;
 	ID3D11Debug* _debug;
 	ID3D11DeviceContext* _device_ctx;

@@ -89,12 +89,28 @@ public:
 
 	Pipeline_state& operator=(Pipeline_state&& state) noexcept;
 
+	// Releases the depth stencil texture and its dsv.
+	// Typically is used before resizing the swap chain.
+	void dispose_depth_stencil_view();
 
-	void clear_render_target_view();
+	// Releases the rtv managed resource.
+	// Typically is used before resizing the swap chain.
+	void dispose_render_target_view();
 
 	ID3D11DepthStencilState* depth_stencil_state() noexcept
 	{
 		return _depth_stencil_state.ptr;
+	}
+
+	// The texture is used in depth/stencil tests.
+	ID3D11Texture2D* tex_depth_stencil() noexcept
+	{
+		return _tex_depth_stencil.ptr;
+	}
+
+	ID3D11DepthStencilView* depth_stencil_view() noexcept
+	{
+		return _depth_stencil_view.ptr;
 	}
 
 	ID3D11RasterizerState* rasterizer_state() noexcept
@@ -107,11 +123,9 @@ public:
 		return _render_target_view.ptr;
 	}
 
-	void update_depth_stencil_state(ID3D11Device* device);
-
-	void update_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain);
-
-	void update_viewport(const cg::uint2& viewport_size);
+	// Updates viewport settings and creates new rtv & dsv with the specified size.
+	void update_viewport(const cg::uint2& viewport_size, 
+		ID3D11Device* device, IDXGISwapChain* swap_chain);
 
 	const D3D11_VIEWPORT& viewport_desc() const noexcept
 	{
@@ -127,7 +141,15 @@ private:
 
 	void init_rasterizer_state(ID3D11Device* device);
 
+	void init_depth_stencil_state(ID3D11Device* device);
+
+	void update_depth_stencil_view(ID3D11Device* device);
+
+	void update_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain);
+
 	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
+	Com_ptr<ID3D11DepthStencilView> _depth_stencil_view;
 	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	Com_ptr<ID3D11RenderTargetView> _render_target_view;
 	cg::uint2 _viewport_size;
@@ -190,14 +212,19 @@ private:
 
 
 // Creates an unitialized constant buffer object.
-Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept;
+Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count);
 
 // Creates an unitialized constant buffer object.
 template<typename T_cbuffer_data>
-inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device) noexcept
+inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device)
 {
 	return make_cbuffer(device, sizeof(T_cbuffer_data));
 }
+
+// Creates a new 2D texture which has the same configuration as tex_origin but differs in size.
+// The contents of the texture is uninitialized.
+Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
+	ID3D11Texture2D* tex_origin, const cg::uint2& size);
 
 
 } // namespace learn_dx11

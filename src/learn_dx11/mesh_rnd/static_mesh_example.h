@@ -38,6 +38,7 @@ private:
 
 	void init_shaders();
 
+	// Calculates projection & view matrices and writes values to the _scene_cbuffer.
 	void setup_projection_view_matrices(float wh_aspect_ratio);
 
 	// Sets up the pipeline after initialization is complete.

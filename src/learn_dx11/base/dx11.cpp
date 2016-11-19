@@ -123,14 +123,15 @@ Pipeline_state::Pipeline_state(ID3D11Device* device, IDXGISwapChain* swap_chain,
 	assert(swap_chain != nullptr);
 	assert(greater_than(viewport_size, 0));
 
-	update_depth_stencil_state(device);
+	init_depth_stencil_state(device);
 	init_rasterizer_state(device);
-	update_render_target_view(device, swap_chain);
-	update_viewport(viewport_size);
+	update_viewport(viewport_size, device, swap_chain);
 }
 
 Pipeline_state::Pipeline_state(Pipeline_state&& state) noexcept :
-	_depth_stencil_state(std::move(state._depth_stencil_state)),
+_depth_stencil_state(std::move(state._depth_stencil_state)),
+	_tex_depth_stencil(std::move(state._tex_depth_stencil)),
+	_depth_stencil_view(std::move(state._depth_stencil_view)),
 	_rasterizer_state(std::move(state._rasterizer_state)),
 	_render_target_view(std::move(state._render_target_view)),
 	_viewport_size(state._viewport_size),
@@ -145,6 +146,8 @@ Pipeline_state& Pipeline_state::operator=(Pipeline_state&& state) noexcept
 	if (this == &state) return *this;
 
 	_depth_stencil_state = std::move(state._depth_stencil_state);
+	_depth_stencil_view = std::move(state._depth_stencil_view);
+	_tex_depth_stencil = std::move(state._tex_depth_stencil);
 	_rasterizer_state = std::move(state._rasterizer_state);
 	_render_target_view = std::move(state._render_target_view);
 	_viewport_size = state._viewport_size;
@@ -156,9 +159,15 @@ Pipeline_state& Pipeline_state::operator=(Pipeline_state&& state) noexcept
 	return *this;
 }
 
-void Pipeline_state::clear_render_target_view()
+void Pipeline_state::dispose_depth_stencil_view()
 {
-	_render_target_view = nullptr;
+	_tex_depth_stencil.dispose();
+	_depth_stencil_view.dispose();
+}
+
+void Pipeline_state::dispose_render_target_view()
+{
+	_render_target_view.dispose();
 }
 
 void Pipeline_state::init_rasterizer_state(ID3D11Device* device)
@@ -172,16 +181,48 @@ void Pipeline_state::init_rasterizer_state(ID3D11Device* device)
 	assert(hr == S_OK);
 }
 
-void Pipeline_state::update_depth_stencil_state(ID3D11Device* device)
+void Pipeline_state::init_depth_stencil_state(ID3D11Device* device)
 {
 	D3D11_DEPTH_STENCIL_DESC desc = {};
+	desc.DepthEnable = true;
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	desc.DepthFunc = D3D11_COMPARISON_LESS;
 
 	HRESULT hr = device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
 	assert(hr == S_OK);
 }
 
+void Pipeline_state::update_depth_stencil_view(ID3D11Device* device)
+{
+	dispose_depth_stencil_view();
+	
+	D3D11_TEXTURE2D_DESC tex_desc = {};
+	tex_desc.Width = _viewport_size.width;
+	tex_desc.Height = _viewport_size.height;
+	tex_desc.MipLevels = 1;
+	tex_desc.ArraySize = 1;
+	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	
+	HRESULT hr = device->CreateTexture2D(&tex_desc, nullptr, &_tex_depth_stencil.ptr);
+	assert(hr == S_OK);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC view_desc = {};
+	view_desc.Format = tex_desc.Format;
+	view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	view_desc.Texture2D.MipSlice = 0;
+
+	hr = device->CreateDepthStencilView(_tex_depth_stencil.ptr, &view_desc, &_depth_stencil_view.ptr);
+	assert(hr == S_OK);
+}
+
 void Pipeline_state::update_render_target_view(ID3D11Device* device, IDXGISwapChain* swap_chain)
 {
+	dispose_render_target_view();
+
 	Com_ptr<ID3D11Texture2D> tex_back_buffer;
 	HRESULT hr = swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
 	assert(hr == S_OK);
@@ -190,9 +231,12 @@ void Pipeline_state::update_render_target_view(ID3D11Device* device, IDXGISwapCh
 	assert(hr == S_OK);
 }
 
-void Pipeline_state::update_viewport(const cg::uint2& viewport_size)
+void Pipeline_state::update_viewport(const uint2& viewport_size, 
+	ID3D11Device* device, IDXGISwapChain* swap_chain)
 {
 	_viewport_size = viewport_size;
+	update_depth_stencil_view(device);
+	update_render_target_view(device, swap_chain);
 
 	_viewport_desc.TopLeftX = 0;
 	_viewport_desc.TopLeftY = 0;
@@ -252,7 +296,8 @@ void Render_context::resize_viewport(const cg::uint2& viewport_size)
 	assert(greater_than(viewport_size, 0));
 
 	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
-	_pipeline_state.clear_render_target_view();
+	_pipeline_state.dispose_depth_stencil_view();
+	_pipeline_state.dispose_render_target_view();
 
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
 	_swap_chain->GetDesc(&swap_chain_desc);
@@ -260,8 +305,7 @@ void Render_context::resize_viewport(const cg::uint2& viewport_size)
 		viewport_size.width, viewport_size.height,
 		swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
 	
-	_pipeline_state.update_render_target_view(_device.ptr, _swap_chain.ptr);
-	_pipeline_state.update_viewport(viewport_size);
+	_pipeline_state.update_viewport(viewport_size, _device.ptr, _swap_chain.ptr);
 	setup_pipeline_state();
 }
 
@@ -274,7 +318,7 @@ void Render_context::setup_pipeline_state()
 	// output merger stage
 	_device_ctx->OMSetDepthStencilState(_pipeline_state.depth_stencil_state(), 1);
 	ID3D11RenderTargetView* rtv = _pipeline_state.render_target_view();
-	_device_ctx->OMSetRenderTargets(1, &rtv, nullptr);
+	_device_ctx->OMSetRenderTargets(1, &rtv, _pipeline_state.depth_stencil_view());
 }
 
 void Render_context::swap_color_buffers()
@@ -284,7 +328,7 @@ void Render_context::swap_color_buffers()
 
 // ----- funcs -----
 
-Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noexcept
+Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
 {
 	assert(byte_count > 0);
 
@@ -297,6 +341,24 @@ Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count) noex
 	device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
 
 	return cbuffer;
+}
+
+Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
+	ID3D11Texture2D* tex_origin, const cg::uint2& size)
+{
+	assert(tex_origin);
+	assert(greater_than(size, 0));
+
+	D3D11_TEXTURE2D_DESC desc;
+	tex_origin->GetDesc(&desc);
+	desc.Width = size.width;
+	desc.Height = size.height;
+	
+	Com_ptr<ID3D11Texture2D> tex;
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &tex.ptr);
+	assert(hr == S_OK);
+
+	return tex;
 }
 
 } // namespace learn_dx11

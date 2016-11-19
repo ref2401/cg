@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
 		Com_ptr<ID3D11Debug> debug;
 
 		{
+			OutputDebugString("----------------\n");
 			learn_dx11::Application app(wnd_position, wnd_size);
 			debug = app.get_dx_debug();
 

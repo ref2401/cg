@@ -138,6 +138,8 @@ void Static_mesh_example::render()
 	float4 clear_color(0.0f, 0.125f, 0.6f, 1.0f);
 
 	clear_color_buffer(clear_color);
+	clear_depth_stencil_buffer(1.0f);
+
 	_device_ctx->DrawIndexed(_model_index_count, 0, 0);
 }
 

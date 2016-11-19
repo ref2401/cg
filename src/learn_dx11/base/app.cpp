@@ -109,6 +109,12 @@ void Example::clear_color_buffer(const cg::float4& clear_color)
 	_device_ctx->ClearRenderTargetView(_pipeline_state.render_target_view(), clear_color.data);
 }
 
+void Example::clear_depth_stencil_buffer(float clear_depth)
+{
+	_device_ctx->ClearDepthStencilView(_pipeline_state.depth_stencil_view(),
+		D3D11_CLEAR_DEPTH, clear_depth, 1);
+}
+
 // ----- Application -----
 
 Application::Application(cg::uint2 window_position, cg::uint2 window_size) :

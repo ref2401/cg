@@ -22,7 +22,7 @@ VS_output vs_main(VS_input input)
 	float4 pos_cs = mul(mul(g_projection_matrix, g_view_matrix), pos_ws);
 
 	VS_output output;
-	output.position = pos_cs / pos_cs.w;
+	output.position = pos_cs;
 	return output;
 }
 
