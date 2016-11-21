@@ -1,4 +1,4 @@
-#include "cg/file/file_mesh.h"
+#include "cg/data/mesh.h"
 
 #include <cstdint>
 #include <array>
@@ -21,8 +21,8 @@ using cg::data::Vertex_attribs;
 using cg::data::Vertex_ts;
 using cg::data::compute_tangent_bitangent;
 using cg::data::compute_tangent_h;
-using cg::file::By_line_iterator;
-using cg::file::internal::Wf_mesh_data;
+using cg::data::By_line_iterator;
+using cg::data::internal::Wf_mesh_data;
 
 
 // Describes the type of wavefront data that is serialized as one line of characters.
@@ -70,10 +70,10 @@ Wf_line_type parse_line_type(const std::string& line)
 	if (line[0] != 'v' || line.size() == 1) return Wf_line_type::other;
 
 	switch (line[1]) {
-	case ' ': return Wf_line_type::position;
-	case 'n': return Wf_line_type::normal;
-	case 't': return Wf_line_type::tex_coord;
-	default: return Wf_line_type::other;
+		case ' ': return Wf_line_type::position;
+		case 'n': return Wf_line_type::normal;
+		case 't': return Wf_line_type::tex_coord;
+		default: return Wf_line_type::other;
 	}
 }
 
@@ -233,7 +233,7 @@ void parse_face_pntc_ts(By_line_iterator& it, Wf_mesh_data& wf_mesh_data, Mesh_b
 
 		auto tan_bitan = compute_tangent_bitangent(
 			vertices[0].position, vertices[0].tex_coord,
-			vertices[1].position, vertices[1].tex_coord, 
+			vertices[1].position, vertices[1].tex_coord,
 			vertices[2].position, vertices[2].tex_coord);
 		vertices[0].tangent = vertices[1].tangent = vertices[2].tangent = tan_bitan.first;
 		vertices[0].bitangent = vertices[1].bitangent = vertices[2].bitangent = tan_bitan.second;
@@ -316,7 +316,7 @@ void parse_face_pntc_old(By_line_iterator& it, Wf_mesh_data& wf_mesh_data, Inter
 		if (line_type != Wf_line_type::face) break;
 
 		long long p0, p1, p2, n0, n1, n2, tc0, tc1, tc2;
-		int count = sscanf(line.c_str(), "f %lld/%lld/%lld %lld/%lld/%lld %lld/%lld/%lld", 
+		int count = sscanf(line.c_str(), "f %lld/%lld/%lld %lld/%lld/%lld %lld/%lld/%lld",
 			&p0, &tc0, &n0, &p1, &tc1, &n1, &p2, &tc2, &n2);
 		ENFORCE(count == 9u, "Invalid face format. Position tex_coord and normal indices were expected.");
 		normalize_wf_indices(position_count, p0, p1, p2);
@@ -333,11 +333,11 @@ void parse_face_pntc_old(By_line_iterator& it, Wf_mesh_data& wf_mesh_data, Inter
 		vertices[0].tex_coord = wf_mesh_data.tex_coords[static_cast<size_t>(tc0)];
 		vertices[1].tex_coord = wf_mesh_data.tex_coords[static_cast<size_t>(tc1)];
 		vertices[2].tex_coord = wf_mesh_data.tex_coords[static_cast<size_t>(tc2)];
-		
+
 		if (calc_tangent_h) {
 			float4 tangent_space = compute_tangent_h(vertices[0], vertices[1], vertices[2]);
 			vertices[0].tangent_space = vertices[1].tangent_space = vertices[2].tangent_space = tangent_space;
-			
+
 			//if (vertices[0].normal != vertices[1].normal || vertices[1].normal != vertices[2].normal)
 			//{
 			//	// TODO(ref2401): get rid of this ugly workaround if you remember it's here.
@@ -460,7 +460,7 @@ Interleaved_mesh_data_old load_mesh_wavefront_old(By_line_iterator it, Vertex_at
 
 	// validate mesh data
 	ENFORCE(wf_mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
-	if (has_normal(attribs)) 
+	if (has_normal(attribs))
 		ENFORCE(wf_mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
 	if (has_tex_coord(attribs))
 		ENFORCE(wf_mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
@@ -490,113 +490,113 @@ Interleaved_mesh_data_old load_mesh_wavefront_old(By_line_iterator it, Vertex_at
 } // namespace
 
 namespace cg {
-namespace file {
+namespace data {
 
 namespace internal {
 
-// ----- Wf_mesh_data -----
+	// ----- Wf_mesh_data -----
 
-Wf_mesh_data::Wf_mesh_data(size_t vertex_count)
-{
-	reserve(vertex_count);
-}
-
-void Wf_mesh_data::clear() noexcept
-{
-	positions.clear();
-	normals.clear();
-	tex_coords.clear();
-}
-
-void Wf_mesh_data::reserve(size_t vertex_count)
-{
-	if (vertex_count > 0) {
-		positions.reserve(vertex_count);
-		normals.reserve(vertex_count);
-		tex_coords.reserve(vertex_count);
-	}
-}
-
-// ----- funcs -----
-
-void load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs, Wf_mesh_data& wf_mesh_data, Mesh_builder& mesh_builder)
-{
-	using cg::data::has_normal;
-	using cg::data::has_position;
-	using cg::data::has_tex_coord;
-
-	// read mesh data from file
-	for (; it != By_line_iterator::end; ++it) {
-		auto& line = *it;
-
-		auto line_type = parse_line_type(line);
-		if (line_type == Wf_line_type::other) continue;
-		if (line_type == Wf_line_type::face) break;
-
-		switch (line_type) {
-			case Wf_line_type::position: {
-				float3 p = parse_position(line);
-				wf_mesh_data.positions.push_back(p);
-				break;
-			}
-
-			case Wf_line_type::normal: {
-				float3 n = parse_normal(line);
-				wf_mesh_data.normals.push_back(n);
-				break;
-			}
-
-			case Wf_line_type::tex_coord: {
-				float2 tc = parse_tex_coord(line);
-				wf_mesh_data.tex_coords.push_back(tc);
-				break;
-			}
-
-		} // switch
+	Wf_mesh_data::Wf_mesh_data(size_t vertex_count)
+	{
+		reserve(vertex_count);
 	}
 
-	// validate mesh data
-	ENFORCE(wf_mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
-	if (has_normal(attribs))
-		ENFORCE(wf_mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
-	if (has_tex_coord(attribs))
-		ENFORCE(wf_mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
+	void Wf_mesh_data::clear() noexcept
+	{
+		positions.clear();
+		normals.clear();
+		tex_coords.clear();
+	}
 
-	if (wf_mesh_data.has_normals() && wf_mesh_data.has_tex_coords()) {
-		if (has_tangent_space(attribs)) {
-			parse_face_pntc_ts(it, wf_mesh_data, mesh_builder);
+	void Wf_mesh_data::reserve(size_t vertex_count)
+	{
+		if (vertex_count > 0) {
+			positions.reserve(vertex_count);
+			normals.reserve(vertex_count);
+			tex_coords.reserve(vertex_count);
+		}
+	}
+
+	// ----- funcs -----
+
+	void load_mesh_wavefront(By_line_iterator it, Vertex_attribs attribs, Wf_mesh_data& wf_mesh_data, Mesh_builder& mesh_builder)
+	{
+		using cg::data::has_normal;
+		using cg::data::has_position;
+		using cg::data::has_tex_coord;
+
+		// read mesh data from file
+		for (; it != By_line_iterator::end; ++it) {
+			auto& line = *it;
+
+			auto line_type = parse_line_type(line);
+			if (line_type == Wf_line_type::other) continue;
+			if (line_type == Wf_line_type::face) break;
+
+			switch (line_type) {
+				case Wf_line_type::position: {
+					float3 p = parse_position(line);
+					wf_mesh_data.positions.push_back(p);
+					break;
+				}
+
+				case Wf_line_type::normal: {
+					float3 n = parse_normal(line);
+					wf_mesh_data.normals.push_back(n);
+					break;
+				}
+
+				case Wf_line_type::tex_coord: {
+					float2 tc = parse_tex_coord(line);
+					wf_mesh_data.tex_coords.push_back(tc);
+					break;
+				}
+
+			} // switch
+		}
+
+		// validate mesh data
+		ENFORCE(wf_mesh_data.positions.size() > 0u, "Invalid mesh file. Expected position values.");
+		if (has_normal(attribs))
+			ENFORCE(wf_mesh_data.has_normals(), "Invalid mesh file. Expected normal values.");
+		if (has_tex_coord(attribs))
+			ENFORCE(wf_mesh_data.has_tex_coords(), "Invalid mesh file. Expected tex coord values.");
+
+		if (wf_mesh_data.has_normals() && wf_mesh_data.has_tex_coords()) {
+			if (has_tangent_space(attribs)) {
+				parse_face_pntc_ts(it, wf_mesh_data, mesh_builder);
+			}
+			else {
+				parse_face_pntc(it, wf_mesh_data, mesh_builder);
+			}
+		}
+		else if (wf_mesh_data.has_normals()) {
+			parse_face_pn(it, wf_mesh_data, mesh_builder);
+		}
+		else if (wf_mesh_data.has_tex_coords()) {
+			parse_face_ptc(it, wf_mesh_data, mesh_builder);
 		}
 		else {
-			parse_face_pntc(it, wf_mesh_data, mesh_builder);
+			parse_faces_p(it, wf_mesh_data, mesh_builder);
 		}
 	}
-	else if (wf_mesh_data.has_normals()) {
-		parse_face_pn(it, wf_mesh_data, mesh_builder);
-	}
-	else if (wf_mesh_data.has_tex_coords()) {
-		parse_face_ptc(it, wf_mesh_data, mesh_builder);
-	}
-	else {
-		parse_faces_p(it, wf_mesh_data, mesh_builder);
-	}
-}
 
 } // namespace internal
 
 
-cg::data::Interleaved_mesh_data_old load_mesh_wavefront_old(const std::string& filename, 
-	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_count)
+Interleaved_mesh_data_old load_mesh_wavefront_old(const std::string& filename,
+	Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_count)
 {
 	By_line_iterator it(filename);
 	return ::load_mesh_wavefront_old(std::move(it), attribs, approx_vertex_count, approx_index_count);
 }
 
-cg::data::Interleaved_mesh_data_old load_mesh_wavefront_old(const char* filename, 
-	cg::data::Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_count)
+Interleaved_mesh_data_old load_mesh_wavefront_old(const char* filename,
+	Vertex_attribs attribs, size_t approx_vertex_count, size_t approx_index_count)
 {
 	By_line_iterator it(filename);
 	return ::load_mesh_wavefront_old(std::move(it), attribs, approx_vertex_count, approx_index_count);
 }
 
-} // namespace file
+} // namespace data
 } // namespace cg

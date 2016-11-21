@@ -1,4 +1,4 @@
-#include "cg/file/file_base.h"
+#include "cg/data/file.h"
 
 #include <algorithm>
 #include <array>
@@ -7,16 +7,16 @@
 #include <utility>
 #include "cg/data/mesh.h"
 #include "cg/data/shader.h"
-#include "unittest/file/common_file.h"
+#include "unittest/data/common_file.h"
 
-using cg::file::By_line_iterator;
-using cg::file::File;
-using cg::file::File_seek_origin;
+using cg::data::By_line_iterator;
+using cg::data::File;
+using cg::data::File_seek_origin;
 
 
 namespace unittest {
 
-TEST_CLASS(cg_file_base_File) {
+TEST_CLASS(cg_data_File) {
 
 	TEST_METHOD(ctor_open_file)
 	{
@@ -249,7 +249,7 @@ public:
 
 	TEST_METHOD(exists)
 	{
-		using cg::file::exists;
+		using cg::data::exists;
 
 		Assert::IsTrue(exists(Filenames::empty_file));
 		Assert::IsTrue(exists(Filenames::ascii_single_line));
@@ -260,7 +260,7 @@ public:
 
 	TEST_METHOD(load_text)
 	{
-		using cg::file::load_text;
+		using cg::data::load_text;
 
 		{ // empty file
 			std::string text = load_text(Filenames::empty_file);

@@ -1,4 +1,4 @@
-#include "cg/file/file_base.h"
+#include "cg/data/file.h"
 
 #include <cstring>
 #include <type_traits>
@@ -7,7 +7,7 @@
 
 
 namespace cg {
-namespace file {
+namespace data {
 
 // ----- File -----
 
@@ -21,8 +21,8 @@ File::File(const char* filename)
 }
 
 File::File(File&& f) noexcept :
-	_filename(std::move(f._filename)), 
-	_handle(f._handle)
+_filename(std::move(f._filename)),
+_handle(f._handle)
 {
 	f._handle = nullptr;
 }
@@ -35,7 +35,7 @@ File::~File() noexcept
 File& File::operator=(File&& f) noexcept
 {
 	if (this == &f) return *this;
-	
+
 	close();
 	_filename = std::move(f._filename);
 	_handle = f._handle;
@@ -104,21 +104,21 @@ void File::seek(long offset, File_seek_origin origin) const
 
 // ----- By_line_iteator -----
 
-const By_line_iterator By_line_iterator::end {};
+const By_line_iterator By_line_iterator::end{};
 
-By_line_iterator::By_line_iterator(const std::string& filename, bool keep_line_feed) 
+By_line_iterator::By_line_iterator(const std::string& filename, bool keep_line_feed)
 	: By_line_iterator(filename.c_str(), keep_line_feed)
 {}
 
-By_line_iterator::By_line_iterator(const char* filename, bool keep_line_feed) 
+By_line_iterator::By_line_iterator(const char* filename, bool keep_line_feed)
 	: _file(filename), _keep_line_feed(keep_line_feed)
 {
 	read_next_line();
 }
 
-By_line_iterator::By_line_iterator(By_line_iterator&& it) noexcept 
-	: _file(std::move(it._file)), 
-	_keep_line_feed(it._keep_line_feed), 
+By_line_iterator::By_line_iterator(By_line_iterator&& it) noexcept
+	: _file(std::move(it._file)),
+	_keep_line_feed(it._keep_line_feed),
 	_line_buffer(std::move(it._line_buffer))
 {}
 
@@ -189,7 +189,7 @@ std::string load_text(const char* filename)
 	File f(filename);
 
 	std::string text;
-	
+
 	char buffer_id[1024];
 	while (!f.eof()) {
 		size_t actual_bytes = f.read_bytes(buffer_id, std::extent<decltype(buffer_id)>::value);
@@ -200,5 +200,5 @@ std::string load_text(const char* filename)
 	return text;
 }
 
-} // namespace file
+} // namespace data
 } // namespace cg

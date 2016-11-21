@@ -36,6 +36,8 @@ private:
 
 	void init_geometry();
 
+	void init_material();
+
 	void init_shaders();
 
 	// Calculates projection & view matrices and writes values to the _scene_cbuffer.
@@ -53,6 +55,9 @@ private:
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
 	cg::mat4 _model_matrix;
+	Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
+	Com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_view;
+	Com_ptr<ID3D11SamplerState> _sampler_state;
 	Com_ptr<ID3D11Buffer> _scene_cbuffer;
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
 };

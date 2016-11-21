@@ -2,11 +2,12 @@
 
 #include <sstream>
 #include "cg/base/base.h"
+#include "cg/data/image.h"
 #include "cg/data/mesh.h"
 #include "cg/data/vertex.h"
-#include "cg/file/file.h"
 #include <DirectXMath.h>
 
+using cg::float2;
 using cg::float3;
 using cg::float4;
 using cg::mat4;
@@ -23,10 +24,10 @@ namespace mesh_rnd {
 Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 	Example(rnd_ctx)
 {
-	// function call order is important
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_cbuffers();
+	init_material();
 	setup_pipeline_state(); 
 	setup_projection_view_matrices(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
 }
@@ -47,7 +48,7 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto mesh_data = cg::file::load_mesh_wavefront<Vertex_attribs::vertex_p_n>("../data/cube.obj", 24, 36);
+	auto mesh_data = cg::data::load_mesh_wavefront<Vertex_attribs::vertex_p_n_tc>("../data/cube.obj", 24, 36);
 	_model_index_count = mesh_data.index_count();
 
 	// vertex buffer
@@ -62,12 +63,13 @@ void Static_mesh_example::init_geometry()
 	assert(hr == S_OK);
 
 	// input layout
-	D3D11_INPUT_ELEMENT_DESC layout_desc[2] = {
+	D3D11_INPUT_ELEMENT_DESC layout_desc[3] = {
 		{ "V_POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "V_NORMAL" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float3), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "V_NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float3), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "V_TEX_COORD" , 0, DXGI_FORMAT_R32G32_FLOAT, 0, 2 * sizeof(float3), D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	hr = _device->CreateInputLayout(layout_desc, 2, 
+	hr = _device->CreateInputLayout(layout_desc, 3, 
 		_shader_set.vertex_shader_bytecode()->GetBufferPointer(),
 		_shader_set.vertex_shader_bytecode()->GetBufferSize(),
 		&_input_layout.ptr);
@@ -85,9 +87,54 @@ void Static_mesh_example::init_geometry()
 	assert(hr == S_OK);
 }
 
+void Static_mesh_example::init_material()
+{
+	auto image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+
+	// texture
+	D3D11_TEXTURE2D_DESC tex_desc = {};
+	tex_desc.Width = image.size().width;
+	tex_desc.Height = image.size().height;
+	tex_desc.MipLevels = 1;
+	tex_desc.ArraySize = 1;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	
+	D3D11_SUBRESOURCE_DATA data = {};
+	data.pSysMem = image.data();
+	data.SysMemPitch = image.size().width * cg::data::byte_count(image.format());
+	data.SysMemSlicePitch = image.byte_count();
+
+	HRESULT hr = _device->CreateTexture2D(&tex_desc, &data, &_tex_diffuse_rgb.ptr);
+	assert(hr == S_OK);
+
+	// shader resource view
+	D3D11_SHADER_RESOURCE_VIEW_DESC view_desc = {};
+	view_desc.Format = tex_desc.Format;
+	view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	view_desc.Texture2D.MostDetailedMip = 0;
+	view_desc.Texture2D.MipLevels = 1;
+
+	hr = _device->CreateShaderResourceView(_tex_diffuse_rgb.ptr, &view_desc, &_tex_diffuse_rgb_view.ptr);
+	assert(hr == S_OK);
+
+	// sampler
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+	hr = _device->CreateSamplerState(&sampler_desc, &_sampler_state.ptr);
+	assert(hr == S_OK);
+}
+
 void Static_mesh_example::init_shaders()
 {
-	auto hlsl_data = cg::file::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
+	auto hlsl_data = cg::data::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
@@ -97,7 +144,7 @@ void Static_mesh_example::init_shaders()
 void Static_mesh_example::setup_pipeline_state()
 {
 	size_t offset = 0;
-	size_t stride = sizeof(float3) * 2;
+	size_t stride = sizeof(float2) + 2 * sizeof(float3);
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &stride, &offset);
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
@@ -106,7 +153,10 @@ void Static_mesh_example::setup_pipeline_state()
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_scene_cbuffer.ptr);
 	_device_ctx->VSSetConstantBuffers(1, 1, &_model_cbuffer.ptr);
+	
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
+	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_diffuse_rgb_view.ptr);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);

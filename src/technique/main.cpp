@@ -3,7 +3,6 @@
 #include <utility>
 #include <windows.h>
 #include "cg/base/base.h"
-#include "cg/file/file.h"
 #include "cg/math/math.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/deferred_lighting.h"

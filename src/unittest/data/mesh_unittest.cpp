@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "cg/math/math.h"
 #include "unittest/math/common_math.h"
+#include "unittest/data/common_file.h"
 #include "CppUnitTest.h"
 
 using cg::float2;
@@ -568,7 +569,405 @@ public:
 TEST_CLASS(cg_data_mesh_Funcs) {
 public:
 
-	
+	TEST_METHOD(load_mesh_wavefront_rect_negative_vertex_indices)
+	{
+		using cg::approx_equal;
+		using cg::data::Vertex_attribs;
+		using cg::data::load_mesh_wavefront;
+
+		uint32_t expected_indices[6] = { 0, 1, 2, 3, 0, 2 };
+		{ // positions only
+			float expected_data[18] = {
+				-2, -1, 0,	 2, -1, 0,	2, 1, 0,  -2, 1, 0
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p>(Filenames::wavefront_rect_negative_indices_p);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & normals
+			float expected_data[24] = {
+				-2, -1, 0,	0, 0, 1,
+				2, -1, 0,	0, 0, 1,
+				2, 1, 0,	0, 0, 1,
+				-2, 1, 0,	0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_n>(Filenames::wavefront_rect_negative_indices_pn);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & tex_coords
+			float expected_data[20] = {
+				-2, -1, 0,	0, 0,
+				2, -1, 0,	1, 0,
+				2, 1, 0,	1, 1,
+				-2, 1, 0,	0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_tc>(Filenames::wavefront_rect_negative_indices_ptc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal & tex_coords
+			float expected_data[32] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,
+				2, -1, 0,	0, 0, 1,	1, 0,
+				2, 1, 0,	0, 0, 1,	1, 1,
+				-2, 1, 0,	0, 0, 1,	0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_n_tc>(Filenames::wavefront_rect_negative_indices_pntc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal, tex_coords, tangent_h
+			float expected_data[48] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, -1, 0,	0, 0, 1,	1, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1,
+				-2, 1, 0,	0, 0, 1,	0, 1,	1, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_ts>(Filenames::wavefront_rect_negative_indices_pntc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+	}
+
+	TEST_METHOD(load_mesh_wavefront_rect_positive_vertex_indices)
+	{
+		using cg::approx_equal;
+		using cg::data::Interleaved_mesh_data;
+		using cg::data::Vertex_attribs;
+		using cg::data::load_mesh_wavefront;
+
+		uint32_t expected_indices[6] = { 0, 1, 2, 3, 0, 2 };
+		{ // positions only
+			float expected_data[12] = {
+				-2, -1, 0,	 2, -1, 0,	2, 1, 0,  -2, 1, 0
+			};
+			auto md = load_mesh_wavefront<Vertex_attribs::position>(Filenames::wavefront_rect_positive_indices_p);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & normals
+			float expected_data[24] = {
+				-2, -1, 0,	0, 0, 1,
+				2, -1, 0,	0, 0, 1,
+				2, 1, 0,	0, 0, 1,
+				-2, 1, 0,	0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_n>(Filenames::wavefront_rect_positive_indices_pn);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & tex_coords
+			float expected_data[20] = {
+				-2, -1, 0,	0, 0,
+				2, -1, 0,	1, 0,
+				2, 1, 0,	1, 1,
+				-2, 1, 0,	0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_tc>(Filenames::wavefront_rect_positive_indices_ptc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal & tex_coords
+			float expected_data[32] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,
+				2, -1, 0,	0, 0, 1,	1, 0,
+				2, 1, 0,	0, 0, 1,	1, 1,
+				-2, 1, 0,	0, 0, 1,	0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_p_n_tc>(Filenames::wavefront_rect_positive_indices_pntc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal, tex_coords, tangent_h
+			float expected_data[48] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, -1, 0,	0, 0, 1,	1, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1,
+				-2, 1, 0,	0, 0, 1,	0, 1,	1, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront<Vertex_attribs::vertex_ts>(Filenames::wavefront_rect_positive_indices_pntc);
+
+			Assert::IsTrue(std::equal(
+				md.vertex_data().cbegin(), md.vertex_data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.index_data().cbegin(), md.index_data().cend(), std::cbegin(expected_indices)));
+		}
+	}
+
+
+	TEST_METHOD(load_mesh_wavefront_old_rect_negative_vertex_indices)
+	{
+		using cg::approx_equal;
+		using cg::data::Interleaved_mesh_data_old;
+		using cg::data::Vertex_attribs;
+		using cg::data::load_mesh_wavefront_old;
+
+		uint32_t expected_indices[6] = { 0, 1, 2, 3, 4, 5 };
+		{ // positions only
+			float expected_data[18] = {
+				-2, -1, 0,	 2, -1, 0,	2, 1, 0,
+				-2,	 1, 0,	-2, -1, 0,	2, 1, 0
+			};
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_negative_indices_p, Vertex_attribs::position);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & normals
+			float expected_data[36] = {
+				-2, -1, 0, 0, 0, 1,	 2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1,
+				-2,	 1, 0, 0, 0, 1,	-2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_negative_indices_pn,
+				Vertex_attribs::position | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & tex_coords
+			float expected_data[30] = {
+				-2, -1, 0, 0, 0,   2, -1, 0, 1, 0,  2, 1, 0, 1, 1,
+				-2,	 1, 0, 0, 1,  -2, -1, 0, 0, 0,  2, 1, 0, 1, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_negative_indices_ptc, Vertex_attribs::vertex_p_tc);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal & tex_coords
+			float expected_data[48] = {
+				-2, -1, 0, 0, 0, 1, 0, 0,   2, -1, 0, 0, 0, 1, 1, 0,  2, 1, 0, 0, 0, 1, 1, 1,
+				-2,	 1, 0, 0, 0, 1, 0, 1,  -2, -1, 0, 0, 0, 1, 0, 0,  2, 1, 0, 0, 0, 1, 1, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_negative_indices_pntc,
+				Vertex_attribs::vertex_p_tc | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal, tex_coords, tangent_h
+			float expected_data[72] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, -1, 0,	0, 0, 1,	1, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1,
+				-2,	 1, 0,	0, 0, 1,	0, 1,	1, 0, 0, 1,
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_negative_indices_pntc, Vertex_attribs::vertex_ts);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+	}
+
+	TEST_METHOD(load_mesh_wavefront_old_rect_positive_vertex_indices)
+	{
+		using cg::approx_equal;
+		using cg::data::Interleaved_mesh_data_old;
+		using cg::data::Vertex_attribs;
+		using cg::data::load_mesh_wavefront_old;
+
+		uint32_t expected_indices[6] = { 0, 1, 2, 3, 4, 5 };
+		{ // positions only
+			float expected_data[18] = {
+				-2, -1, 0,	 2, -1, 0,	2, 1, 0,
+				-2,	 1, 0,	-2, -1, 0,	2, 1, 0
+			};
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_positive_indices_p, Vertex_attribs::position);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & normals
+			float expected_data[36] = {
+				-2, -1, 0, 0, 0, 1,	 2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1,
+				-2,	 1, 0, 0, 0, 1,	-2, -1, 0, 0, 0, 1,  2, 1, 0, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_positive_indices_pn,
+				Vertex_attribs::position | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions & tex_coords
+			float expected_data[30] = {
+				-2, -1, 0, 0, 0,   2, -1, 0, 1, 0,  2, 1, 0, 1, 1,
+				-2,	 1, 0, 0, 1,  -2, -1, 0, 0, 0,  2, 1, 0, 1, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_positive_indices_ptc, Vertex_attribs::vertex_p_tc);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal & tex_coords
+			float expected_data[48] = {
+				-2, -1, 0, 0, 0, 1, 0, 0,   2, -1, 0, 0, 0, 1, 1, 0,  2, 1, 0, 0, 0, 1, 1, 1,
+				-2,	 1, 0, 0, 0, 1, 0, 1,  -2, -1, 0, 0, 0, 1, 0, 0,  2, 1, 0, 0, 0, 1, 1, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_positive_indices_pntc,
+				Vertex_attribs::vertex_p_tc | Vertex_attribs::normal);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+
+		{ // positions, normal, tex_coords, tangent_h
+			float expected_data[72] = {
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, -1, 0,	0, 0, 1,	1, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1,
+				-2,	 1, 0,	0, 0, 1,	0, 1,	1, 0, 0, 1,
+				-2, -1, 0,	0, 0, 1,	0, 0,	1, 0, 0, 1,
+				2, 1, 0,	0, 0, 1,	1, 1,	1, 0, 0, 1
+			};
+
+			auto md = load_mesh_wavefront_old(Filenames::wavefront_rect_positive_indices_pntc, Vertex_attribs::vertex_ts);
+
+			Assert::IsTrue(std::equal(
+				md.data().cbegin(), md.data().cend(),
+				std::cbegin(expected_data),
+				[](float a, float b) { return approx_equal<float>(a, b); }));
+
+			Assert::IsTrue(std::equal(
+				md.indices().cbegin(), md.indices().cend(), std::cbegin(expected_indices)));
+		}
+	}
+
 };
 
 } // namespace unittest

@@ -1,8 +1,9 @@
-#include "cg/file/file_image.h"
+#include "cg/data/image.h"
 
 #include <cstdint>
 #include <type_traits>
 #include "cg/base/base.h"
+#include "cg/data/file.h"
 
 namespace {
 
@@ -11,8 +12,8 @@ using cg::greater_than;
 using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::data::byte_count;
-using cg::file::File;
-using cg::file::File_seek_origin;
+using cg::data::File;
+using cg::data::File_seek_origin;
 
 
 enum class Tga_image_type {
@@ -90,21 +91,23 @@ Tga_header read_header(File& file)
 	if (header_buffer[0] > 0)
 		file.seek(header_buffer[0], File_seek_origin::current_position); // skip id field if any
 
-	// Color map type
-	// 0 if image file contains no color map, 1 if present.
+																		 // Color map type
+																		 // 0 if image file contains no color map, 1 if present.
 	ENFORCE(header_buffer[1] == 0, "Reading tga image error. Tga image mustn't have a color map.", file.filename());
 
 	// Image type
 	auto type = parse_image_type(header_buffer[2]);
 	ENFORCE(type != Tga_image_type::invalid, "Reading tga image error. Unknown tga image type.", file.filename());
-	ENFORCE(type != Tga_image_type::no_data && type != Tga_image_type::color_map && type != Tga_image_type::color_map_compressed,
+	ENFORCE(type != Tga_image_type::no_data
+		&& type != Tga_image_type::color_map
+		&& type != Tga_image_type::color_map_compressed,
 		"Reading tga image error. Forbidden tga image type.", file.filename());
 
-	header.compressed = (type == Tga_image_type::true_color_compressed 
+	header.compressed = (type == Tga_image_type::true_color_compressed
 		|| type == Tga_image_type::grayscale_compressed);
 
 	// Image specification (x/y origin)
-	uint2 origin(bytes_to_uint16(header_buffer[9], header_buffer[8]), 
+	uint2 origin(bytes_to_uint16(header_buffer[9], header_buffer[8]),
 		bytes_to_uint16(header_buffer[11], header_buffer[10]));
 	ENFORCE(origin == uint2::zero, "Reading tga image error. Unexpected origin coordinates. ", file.filename());
 
@@ -112,13 +115,13 @@ Tga_header read_header(File& file)
 	header.size.width = bytes_to_uint16(header_buffer[13], header_buffer[12]);
 	header.size.height = bytes_to_uint16(header_buffer[15], header_buffer[14]);
 	ENFORCE(greater_than(header.size, 0), "Reading tga image error. Image size must be greater than 0.", file.filename());
-	
+
 	// Image specification (pixel depth)
 	unsigned char bits_per_pixel = header_buffer[16];
 
 	// Image specification (descriptor)
 	auto origin_corner = parse_origin_corner(header_buffer[17]);
-	ENFORCE(origin_corner == Tga_origin_corner::bottom_left, 
+	ENFORCE(origin_corner == Tga_origin_corner::bottom_left,
 		"Reading tga image error. Unexpected origin corner. ", file.filename());
 
 	unsigned char alpha_bits = header_buffer[17] & 0xF;
@@ -190,8 +193,9 @@ Image_2d load_image_tga(File file)
 
 } // namespace
 
+
 namespace cg {
-namespace file {
+namespace data {
 
 cg::data::Image_2d load_image_tga(const std::string& filename)
 {
@@ -203,5 +207,5 @@ cg::data::Image_2d load_image_tga(const char* filename)
 	return ::load_image_tga(File(filename));
 }
 
-} // namespace file
+} // namespace data
 } // namespace cg

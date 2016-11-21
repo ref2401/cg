@@ -1,5 +1,5 @@
-#ifndef CG_FILE_FILE_BASE_H_
-#define CG_FILE_FILE_BASE_H_
+#ifndef CG_DATA_FILE_H_
+#define CG_DATA_FILE_H_
 
 #include <cassert>
 #include <cstdio>
@@ -8,7 +8,7 @@
 
 
 namespace cg {
-namespace file {
+namespace data {
 
 enum class File_seek_origin : unsigned char {
 	current_position = 0,
@@ -24,7 +24,7 @@ public:
 	explicit File(const std::string& filename);
 
 	explicit File(const char* filename);
-	
+
 	File(const File& f) = delete;
 
 	File(File&& f) noexcept;
@@ -65,7 +65,7 @@ public:
 	// Reads one byte and stores it in buff.
 	// Returns: true is the read operation succeeded.
 	bool read_byte(void* buff) const;
-	
+
 	// Reads a chunk of bytes and stores it in buff.
 	// Returns: actual count of bytes read.
 	size_t File::read_bytes(void* buff, size_t byte_count) const;
@@ -147,7 +147,7 @@ public:
 		read_next_line();
 		return p;
 	}
-	
+
 
 	// Returns the name of the file.
 	const std::string& filename() const noexcept
@@ -193,7 +193,8 @@ std::string load_text(const std::string& filename);
 // Returns the content of the specified text file
 std::string load_text(const char* filename);
 
-} // namespace file
+} // namespace data
 } // namespace cg
 
-#endif // CG_FILE_FILE_BASE_H_
+#endif // CG_DATA_FILE_H_
+

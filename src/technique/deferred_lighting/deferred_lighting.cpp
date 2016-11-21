@@ -5,7 +5,9 @@
 #include <type_traits>
 #include <utility>
 #include "cg/base/base.h"
-#include "cg/file/file.h"
+#include "cg/data/image.h"
+#include "cg/data/mesh.h"
+#include "cg/data/shader.h"
 
 
 using cg::data::Vertex_attribs;
@@ -39,13 +41,13 @@ Renderer_config make_render_config(uint2 viewport_size)
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::file::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs::vertex_p_tc);
-	config.gbuffer_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/gbuffer_pass");
-	config.lighting_pass_dir_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/lighting_pass_dir");
-	config.shadow_map_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/shadow_map_pass");
-	config.ssao_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/ssao_pass");
-	config.material_lighting_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/material_pass");
-	config.tone_mapping_pass_code = cg::file::load_glsl_program_data("../data/deferred_lighting_shaders/tone_mapping_pass");
+	config.rect_1x1_mesh_data = cg::data::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs::vertex_p_tc);
+	config.gbuffer_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.shadow_map_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/shadow_map_pass");
+	config.ssao_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/ssao_pass");
+	config.material_lighting_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/material_pass");
+	config.tone_mapping_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/tone_mapping_pass");
 
 	return config;
 }
@@ -82,12 +84,12 @@ Material_library::Material_library()
 	Sampler_config bilinear_repeat(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::repeat);
 
 
-	auto material_default_normal_map = cg::file::load_image_tga("../data/common_data/material-default-normal-map.tga");
-	auto specular_intensity_0_18_image = cg::file::load_image_tga("../data/common_data/material-specular-intensity-0.18f.tga");
-	auto specular_intensity_1_00_image = cg::file::load_image_tga("../data/common_data/material-specular-intensity-1.00f.tga");
+	auto material_default_normal_map = cg::data::load_image_tga("../data/common_data/material-default-normal-map.tga");
+	auto specular_intensity_0_18_image = cg::data::load_image_tga("../data/common_data/material-specular-intensity-0.18f.tga");
+	auto specular_intensity_1_00_image = cg::data::load_image_tga("../data/common_data/material-specular-intensity-1.00f.tga");
 
 	{ // default material
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+		auto diffuse_rgb_image = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
 
 		_default_material.smoothness = 10.0f;
 		_default_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -96,9 +98,9 @@ Material_library::Material_library()
 	}
 
 	{ // brick wall
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/bricks-red-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/bricks-red-specular-intensity.tga");
+		auto diffuse_rgb_image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+		auto normal_map_image = cg::data::load_image_tga("../data/bricks-red-normal-map.tga");
+		auto specular_image = cg::data::load_image_tga("../data/bricks-red-specular-intensity.tga");
 
 		_brick_wall_material.smoothness = 5.0f;
 		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -107,7 +109,7 @@ Material_library::Material_library()
 	}
 
 	{ // chess board
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/chess-board-diffuse-rgb.tga");
+		auto diffuse_rgb_image = cg::data::load_image_tga("../data/chess-board-diffuse-rgb.tga");
 
 		_chess_board_material.smoothness = 1.0f;
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
@@ -116,8 +118,8 @@ Material_library::Material_library()
 	}
 
 	{ // teapot material
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/teapot-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/teapot-normal-map.tga");
+		auto diffuse_rgb_image = cg::data::load_image_tga("../data/teapot-diffuse-rgb.tga");
+		auto normal_map_image = cg::data::load_image_tga("../data/teapot-normal-map.tga");
 
 		_teapot_material.smoothness = 10.0f;
 		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -126,9 +128,9 @@ Material_library::Material_library()
 	}
 
 	{ // wooden box
-		auto diffuse_rgb_image = cg::file::load_image_tga("../data/wooden-box-diffuse-rgb.tga");
-		auto normal_map_image = cg::file::load_image_tga("../data/wooden-box-normal-map.tga");
-		auto specular_image = cg::file::load_image_tga("../data/wooden-box-specular-intensity.tga");
+		auto diffuse_rgb_image = cg::data::load_image_tga("../data/wooden-box-diffuse-rgb.tga");
+		auto normal_map_image = cg::data::load_image_tga("../data/wooden-box-normal-map.tga");
+		auto specular_image = cg::data::load_image_tga("../data/wooden-box-specular-intensity.tga");
 
 		_wooden_box_material.smoothness = 4.0f;
 		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -216,7 +218,7 @@ void Deferred_lighting::init_geometry()
 	_vs_builder.begin(vertex_attribs, megabytes(4));
 
 	for (auto& load_info : load_info_list) {
-		auto mesh_data = cg::file::load_mesh_wavefront_old(load_info.filename, 
+		auto mesh_data = cg::data::load_mesh_wavefront_old(load_info.filename, 
 			vertex_attribs, load_info.approx_vertex_count, load_info.approx_index_count);
 		
 		*load_info.cmd = _vs_builder.push_back(mesh_data);

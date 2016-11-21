@@ -125,20 +125,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="data\file.cpp" />
     <ClCompile Include="data\image.cpp" />
+    <ClCompile Include="data\image_file_tga.cpp" />
     <ClCompile Include="data\mesh.cpp" />
+    <ClCompile Include="data\mesh_file_wavefront.cpp" />
+    <ClCompile Include="data\shader.cpp" />
     <ClCompile Include="data\vertex.cpp" />
-    <ClCompile Include="file\file.cpp" />
-    <ClCompile Include="file\file_base.cpp" />
-    <ClCompile Include="file\file_image_tga.cpp" />
-    <ClCompile Include="file\file_mesh_wavefront.cpp" />
     <ClCompile Include="math\matrix.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="math\vector.cpp" />
     <ClCompile Include="rnd\opengl\buffer.cpp" />
     <ClCompile Include="rnd\opengl\framebuffer.cpp" />
     <ClCompile Include="rnd\opengl\opengl_def.cpp" />
-    <ClCompile Include="rnd\opengl\shader.cpp" />
+    <ClCompile Include="rnd\opengl\shader_opengl.cpp" />
     <ClCompile Include="rnd\opengl\texture.cpp" />
     <ClCompile Include="rnd\opengl\utility.cpp" />
     <ClCompile Include="rnd\opengl\vertex_spec.cpp" />
@@ -150,14 +150,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\base.h" />
+    <ClInclude Include="data\file.h" />
     <ClInclude Include="data\image.h" />
     <ClInclude Include="data\mesh.h" />
     <ClInclude Include="data\shader.h" />
     <ClInclude Include="data\vertex.h" />
-    <ClInclude Include="file\file.h" />
-    <ClInclude Include="file\file_base.h" />
-    <ClInclude Include="file\file_image.h" />
-    <ClInclude Include="file\file_mesh.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\matrix.h" />
     <ClInclude Include="math\transform.h" />

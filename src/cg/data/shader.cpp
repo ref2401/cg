@@ -1,19 +1,18 @@
-#include "cg/file/file.h"
+#include "cg/data/shader.h"
 
 #include <cassert>
 #include <cstring>
 #include "cg/base/base.h"
+#include "cg/data/file.h"
 
-using cg::data::Glsl_program_data;
-using cg::data::Hlsl_shader_set_data;
-using cg::file::exists;
-using cg::file::load_text;
+using cg::data::exists;
+using cg::data::load_text;
 
 
 namespace cg {
-namespace file {
+namespace data {
 
-cg::data::Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
+Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
 {
 	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));
 	Hlsl_shader_set_data data;
@@ -26,7 +25,7 @@ cg::data::Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
 
 Glsl_program_data load_glsl_program_data(const char* filename)
 {
-	if (!filename) return Glsl_program_data {};
+	if (!filename) return Glsl_program_data{};
 
 	std::string fn;
 	Glsl_program_data glsl_data;
@@ -49,12 +48,12 @@ Glsl_program_data load_glsl_program_data(const char* filename)
 
 Glsl_program_data load_glsl_program_data(const char* vertex_shader_filename, const char* fragment_shader_filename)
 {
-	ENFORCE(exists(vertex_shader_filename), 
+	ENFORCE(exists(vertex_shader_filename),
 		EXCEPTION_MSG("The specified glsl file '", vertex_shader_filename, "' does not exist."));
-	
+
 	ENFORCE(exists(fragment_shader_filename),
 		EXCEPTION_MSG("The specified glsl file '", fragment_shader_filename, "' does not exist."));
-	
+
 	Glsl_program_data glsl_data;
 	glsl_data.vertex_shader_source_code = load_text(vertex_shader_filename);
 	glsl_data.fragment_shader_source_code = load_text(fragment_shader_filename);
@@ -62,6 +61,5 @@ Glsl_program_data load_glsl_program_data(const char* vertex_shader_filename, con
 	return glsl_data;
 }
 
-
-} // namespace file
+} // namespace data
 } // namespace cg
