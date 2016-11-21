@@ -185,7 +185,7 @@ void read_image_data(File& file, Image_2d& image, bool compressed) noexcept
 Image_2d load_image_tga(File file)
 {
 	auto header = read_header(file);
-	Image_2d image(header.size, header.format);
+	Image_2d image(header.format, header.size);
 	read_image_data(file, image, header.compressed);
 	// tga footer is omitted
 	return image;

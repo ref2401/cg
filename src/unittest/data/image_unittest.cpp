@@ -36,13 +36,13 @@ public:
 		Assert::AreEqual(Image_format::none, img0.format());
 		Assert::AreEqual<size_t>(0, img0.byte_count());
 
-		Image_2d img1(uint2(3, 2), Image_format::red_8);
+		Image_2d img1(Image_format::red_8, uint2(3, 2));
 		Assert::IsNotNull(img1.data());
 		Assert::AreEqual(uint2(3, 2), img1.size());
 		Assert::AreEqual(Image_format::red_8, img1.format());
 		Assert::AreEqual<size_t>(3 * 2 * byte_count(Image_format::red_8), img1.byte_count());
 
-		Image_2d img2(uint2(4, 3), Image_format::rgba_8);
+		Image_2d img2(Image_format::rgba_8, uint2(4, 3));
 		Assert::IsNotNull(img2.data());
 		Assert::AreEqual(uint2(4, 3), img2.size());
 		Assert::AreEqual(Image_format::rgba_8, img2.format());
@@ -82,7 +82,7 @@ public:
 
 	TEST_METHOD(assignments)
 	{
-		Image_2d img(uint2(4, 3), Image_format::bgra_8);
+		Image_2d img(Image_format::bgra_8, uint2(4, 3));
 
 		// copy assignment
 		Image_2d img_c;
@@ -129,7 +129,7 @@ public:
 
 	TEST_METHOD(write)
 	{
-		Image_2d img(uint2(2, 2), Image_format::red_8);
+		Image_2d img(Image_format::red_8, uint2(2, 2));
 		
 		std::array<unsigned char, 4> arr = { 0, 1, 2, 3 };
 		for (size_t i = 0; i < arr.size(); ++i) {

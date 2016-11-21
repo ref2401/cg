@@ -7,13 +7,14 @@
 namespace cg {
 namespace data {
 
-Image_2d::Image_2d(uint2 size, Image_format format) :
-	_ptr(new unsigned char[size.width * size.height * cg::data::byte_count(format)]),
+Image_2d::Image_2d(Image_format format, uint2 size) :
 	_size(size),
 	_format(format)
 {
 	assert(greater_than(_size, 0));
 	assert(format != Image_format::none);
+
+	_ptr = new unsigned char[size.width * size.height * cg::data::byte_count(format)];
 }
 
 Image_2d::Image_2d(const Image_2d& img) :

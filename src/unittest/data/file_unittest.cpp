@@ -16,7 +16,7 @@ using cg::data::File_seek_origin;
 
 namespace unittest {
 
-TEST_CLASS(cg_data_File) {
+TEST_CLASS(cg_data_file_File) {
 
 	TEST_METHOD(ctor_open_file)
 	{
@@ -143,7 +143,7 @@ TEST_CLASS(cg_data_File) {
 	}
 };
 
-TEST_CLASS(cg_file_base_By_line_iterator) {
+TEST_CLASS(cg_data_file_By_line_iterator) {
 public:
 
 	TEST_METHOD(ctors_and_end_iterator)
@@ -244,7 +244,7 @@ public:
 	}
 };
 
-TEST_CLASS(cg_file_base_Funcs) {
+TEST_CLASS(cg_data_file_Funcs) {
 public:
 
 	TEST_METHOD(exists)

@@ -28,7 +28,7 @@ public:
 
 	Image_2d() noexcept = default;
 
-	Image_2d(uint2 size, Image_format format);
+	Image_2d(Image_format format, uint2 size);
 
 	Image_2d(const Image_2d& img);
 

@@ -27,6 +27,13 @@ const quat quat::k(0, 0, 1, 0);
 const quat quat::identity(0, 0, 0, 1);
 const quat quat::zero(0, 0, 0, 0);
 
+const ubyte4 ubyte4::unit_x(1, 0, 0, 0);
+const ubyte4 ubyte4::unit_y(0, 1, 0, 0);
+const ubyte4 ubyte4::unit_z(0, 0, 1, 0);
+const ubyte4 ubyte4::unit_w(0, 0, 0, 1);
+const ubyte4 ubyte4::unit_xyzw(1);
+const ubyte4 ubyte4::zero(0);
+
 const uint2 uint2::zero(0);
 const uint2 uint2::unit_x(1, 0);
 const uint2 uint2::unit_y(0, 1);
@@ -80,6 +87,18 @@ std::ostream& operator<<(std::ostream& out, const quat& q)
 std::wostream& operator<<(std::wostream& out, const quat& q)
 {
 	out << "quat(" << q.x << ", " << q.y << ", " << q.z << ", " << q.a << ")";
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ubyte4& v)
+{
+	out << "ubyte4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const ubyte4& v)
+{
+	out << "ubyte4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;
 }
 

@@ -95,7 +95,7 @@ public:
 		Assert::AreEqual<GLenum>(GL_FLOAT, tex_img0.pixel_type);
 		Assert::AreEqual<const void*>(data, tex_img0.pixels);
 
-		Image_2d img(uint2(4, 3), Image_format::bgra_8);
+		Image_2d img(Image_format::bgra_8, uint2(4, 3));
 		Texture_2d_sub_image_params tex_img1(1, uint2(1), img);
 		Assert::AreEqual<size_t>(1, tex_img1.mipmap_index);
 		Assert::AreEqual(uint2(1), tex_img1.offset);
