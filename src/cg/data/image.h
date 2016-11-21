@@ -99,15 +99,42 @@ private:
 	Image_format _format = Image_format::none;
 };
 
+// Load_image_params struct specifies which image file to load, 
+// whether the pixel conversion & vertical flip must be performed.
+struct Load_image_params final {
+	Load_image_params() = default;
+
+	Load_image_params(const std::string& filename, Image_format format, bool flip_vertical) :
+		filename(filename), format(format), flip_vertical(flip_vertical)
+	{}
+
+	Load_image_params(const char* filename, Image_format format, bool flip_vertical) : 
+		filename(filename), format(format), flip_vertical(flip_vertical)
+	{}
+
+	// Full image's file name.
+	std::string filename;
+
+	// format describes the desirted format of the image. It may differ from the
+	// orginal image fromat stored in file.
+	// If format == Image_format::none then no pixel conversion will be performed.
+	Image_format format = Image_format::none;
+
+	// Specifies whether the image must be flipped before after loading.
+	bool flip_vertical = false;
+};
+
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Image_format& fmt);
 
 std::wostream& operator<<(std::wostream& out, const Image_format& fmt);
 
-cg::data::Image_2d load_image_tga(const std::string& filename);
+Image_2d load_image_tga(const std::string& filename);
 
-cg::data::Image_2d load_image_tga(const char* filename);
+Image_2d load_image_tga(const char* filename);
+
+Image_2d load_image_tga(const Load_image_params& params);
 
 } // namespace data
 } // namespace cg

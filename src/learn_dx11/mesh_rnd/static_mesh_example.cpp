@@ -40,7 +40,7 @@ void Static_mesh_example::init_cbuffers()
 	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
 	
 	// model matrix
-	_model_matrix = mat4::identity;
+	_model_matrix = cg::scale_matrix<mat4>(float3(2));
 	float matrix_data[16];
 	to_array_column_major_order(_model_matrix, matrix_data);
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
@@ -89,7 +89,8 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_material()
 {
-	auto image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+	cg::data::Load_image_params lip("../data/bricks-red-diffuse-rgb.tga", cg::data::Image_format::bgra_8, false);
+	auto image = cg::data::load_image_tga(lip);
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};
@@ -169,7 +170,7 @@ void Static_mesh_example::setup_projection_view_matrices(float wh_aspect_ratio)
 	using cg::view_matrix;
 
 	_projection_matrix = perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 0.1f, 10.0f);
-	_view_matrix = view_matrix(float3(1, 4, 3), float3::zero);
+	_view_matrix = view_matrix(float3(2.5f, 3.0f, 1.7f), float3::zero);
 
 	float matrix_data[32];
 	to_array_column_major_order(_projection_matrix, matrix_data);
@@ -185,7 +186,7 @@ void Static_mesh_example::on_viewport_resize(const cg::uint2& viewport_size)
 
 void Static_mesh_example::render()
 {
-	float4 clear_color(0.0f, 0.125f, 0.6f, 1.0f);
+	static const float4 clear_color = cg::rgba(0xbca8ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);

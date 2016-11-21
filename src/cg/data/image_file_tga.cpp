@@ -197,14 +197,31 @@ Image_2d load_image_tga(File file)
 namespace cg {
 namespace data {
 
-cg::data::Image_2d load_image_tga(const std::string& filename)
+Image_2d load_image_tga(const std::string& filename)
 {
 	return ::load_image_tga(File(filename));
 }
 
-cg::data::Image_2d load_image_tga(const char* filename)
+Image_2d load_image_tga(const char* filename)
 {
 	return ::load_image_tga(File(filename));
+}
+
+Image_2d load_image_tga(const Load_image_params& params)
+{
+	auto origin_image = load_image_tga(params.filename);
+
+	if (params.flip_vertical)
+		origin_image.flip_vertical();
+
+	if (params.format == Image_format::none || origin_image.format() == params.format) {
+		return origin_image;
+	} 
+	else {
+		Image_2d req_image(params.format, origin_image.size());
+		req_image.write(origin_image);
+		return req_image;
+	}
 }
 
 } // namespace data

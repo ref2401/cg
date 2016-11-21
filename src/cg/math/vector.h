@@ -1270,10 +1270,10 @@ inline float3 rgb(uint32_t val) noexcept
 inline float4 rgba(uint32_t val) noexcept
 {
 	return float4(
-		((val >> 24) & 0xFF) / 255.f,
-		((val >> 16) & 0xFF) / 255.f,
-		((val >> 8) & 0xFF) / 255.f,
-		(val & 0xFF) / 255.f
+		((val >> 24) & 0xFF) / 255.0f,
+		((val >> 16) & 0xFF) / 255.0f,
+		((val >> 8) & 0xFF) / 255.0f,
+		(val & 0xFF) / 255.0f
 	);
 }
 

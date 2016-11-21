@@ -38,14 +38,27 @@ static float pi = 3.1415926535;
 SamplerState sampler_linear			: register(s0);
 Texture2D<float3> g_tex_diffuse_rgb : register(t0);
 
+float3 calc_ambient_term(float3 normal_vs);
+
 float4 ps_main(VS_output frag) : SV_Target
 {
-	float3 light_pos_ws = float3(1, 5, 2);
+	float3 light_pos_ws = float3(2, 5, 3);
 	float3 light_dir_ws = normalize(light_pos_ws - frag.position_ws);
 	float cosTi = max(0, dot(frag.normal_ws, light_dir_ws));
 	
 	float3 diffuse_rgb = g_tex_diffuse_rgb.Sample(sampler_linear, frag.tex_coord);
 	float3 diffuse_term = diffuse_rgb * cosTi / pi;
+	float3 ambient_term = diffuse_rgb * calc_ambient_term(frag.normal_ws);
 
-	return float4(diffuse_term, 1);
+	return float4(ambient_term + diffuse_term, 1);
+}
+
+float3 calc_ambient_term(float3 normal_vs)
+{
+	static const float3 down_rgb = float3(0.5, 0.5, 0.5);
+	static const float3 up_rgb = float3(1, 1, 1);
+
+	// Hemispheric ambient lighting
+	float blend_factor = dot(normal_vs, float3(0, 1, 0)) * 0.5f + 0.5f;
+	return 0.5 * lerp(down_rgb, up_rgb, blend_factor);
 }
