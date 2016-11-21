@@ -61,7 +61,7 @@ public:
 		return _ptr;
 	}
 
-	void flip_vertical() noexcept;
+	void flip_vertical();
 
 	// Pixel format of this image.
 	Image_format format() const noexcept
@@ -75,6 +75,8 @@ public:
 		return _size;
 	}
 
+	void write(const Image_2d& src_image) noexcept;
+
 	// Writes a sequence of bytes into the image's underlying buffer.
 	// -	offset: Byte offset from the beginig of the underlying buffer.
 	// -	ptr: Pointer to the first byte in source the sequence.
@@ -87,6 +89,10 @@ public:
 
 private:
 	void dispose() noexcept;
+
+	void write_converted(const Image_2d& src_image) noexcept;
+
+	void write_converted_swap_rb(const Image_2d& src_image) noexcept;
 
 	uint8_t* _ptr = nullptr;
 	uint2 _size = uint2::zero;

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include "cg/math/math.h"
 #include "unittest/data/common_file.h"
@@ -228,7 +229,115 @@ public:
 		}
 	}
 
-	TEST_METHOD(write)
+	TEST_METHOD(write_same_format_and_size)
+	{
+		uint8_t data[18] = {
+			0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09,
+			0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+		};
+
+		Image_2d src_image(Image_format::rgb_8, uint2(3, 2));
+		Assert::AreEqual(std::extent<decltype(data)>::value, src_image.byte_count());
+		src_image.write(0, data, src_image.byte_count());
+
+		// self as src image param
+		src_image.write(src_image);
+		Assert::IsTrue(std::equal(std::cbegin(data), std::cend(data),
+			src_image.data()));
+
+		// no pixel convertion, bare copying
+		Image_2d dest_image(src_image.format(), src_image.size());
+		dest_image.write(src_image);
+
+		Assert::IsTrue(std::equal(std::cbegin(data), std::cend(data),
+			dest_image.data()));
+	}
+
+	TEST_METHOD(write_diff_format_same_size_no_swap_rb)
+	{
+		uint8_t origin_data[18] = {
+			0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09,
+			0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+		};
+
+		Image_2d src_image(Image_format::rgb_8, uint2(3, 2));
+		Assert::AreEqual(std::extent<decltype(origin_data)>::value, src_image.byte_count());
+		src_image.write(0, origin_data, src_image.byte_count());
+
+		{ // dest format = red_8 (green and blue are thrown)
+			uint8_t expected_data[6] = {
+				0x01,	0x04,	0x07,
+				0x11,	0x14,	0x17
+			};
+			
+			Image_2d dest_image(Image_format::red_8, src_image.size());
+			Assert::AreEqual(std::extent<decltype(expected_data)>::value, dest_image.byte_count());
+			
+			dest_image.write(src_image);
+
+			Assert::IsTrue(std::equal(std::cbegin(expected_data), std::cend(expected_data),
+				dest_image.data()));
+		}
+
+		{ // dest format = rgba_8 (added alpha channel, value alwas 1)
+			uint8_t expected_data[24] = {
+				0x01, 0x02, 0x03, 0x01,		0x04, 0x05, 0x06, 0x01,		0x07, 0x08, 0x09, 0x01,
+				0x11, 0x12, 0x13, 0x01,		0x14, 0x15, 0x16, 0x01,		0x17, 0x18, 0x19, 0x01
+			};
+
+			Image_2d dest_image(Image_format::rgba_8, src_image.size());
+			Assert::AreEqual(std::extent<decltype(expected_data)>::value, dest_image.byte_count());
+
+			dest_image.write(src_image);
+
+			Assert::IsTrue(std::equal(std::cbegin(expected_data), std::cend(expected_data),
+				dest_image.data()));
+		}
+	}
+
+	TEST_METHOD(write_diff_format_same_size_with_swap_rb)
+	{
+		uint8_t origin_data[18] = {
+			0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09,
+			0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+		};
+
+		Image_2d src_image(Image_format::bgr_8, uint2(3, 2));
+		Assert::AreEqual(std::extent<decltype(origin_data)>::value, src_image.byte_count());
+		src_image.write(0, origin_data, src_image.byte_count());
+
+		{ // dest format = red_8 (green and blue are thrown)
+			uint8_t expected_data[6] = {
+				0x03,	0x06,	0x09,
+				0x13,	0x16,	0x19
+			};
+
+			Image_2d dest_image(Image_format::red_8, src_image.size());
+			Assert::AreEqual(std::extent<decltype(expected_data)>::value, dest_image.byte_count());
+
+			dest_image.write(src_image);
+
+			Assert::IsTrue(std::equal(std::cbegin(expected_data), std::cend(expected_data),
+				dest_image.data()));
+		}
+
+		{ // dest format = rgba_8 (added alpha channel, value alwas 1)
+			uint8_t expected_data[24] = {
+				0x03, 0x02, 0x01, 0x01,		0x06, 0x05, 0x04, 0x01,		0x09, 0x08, 0x07, 0x01,
+				0x13, 0x12, 0x11, 0x01,		0x16, 0x15, 0x14, 0x01,		0x19, 0x18, 0x17, 0x01
+			}; 
+
+			Image_2d dest_image(Image_format::rgba_8, src_image.size());
+			Assert::AreEqual(std::extent<decltype(expected_data)>::value, dest_image.byte_count());
+
+			dest_image.write(src_image);
+
+			Assert::IsTrue(std::equal(std::cbegin(expected_data), std::cend(expected_data),
+				dest_image.data()));
+		}
+	}
+
+	TEST_METHOD(write_raw_bytes)
 	{
 		Image_2d img(Image_format::red_8, uint2(2, 2));
 		
@@ -345,6 +454,5 @@ public:
 		}
 	}
 };
-
 
 } // namespace unittest

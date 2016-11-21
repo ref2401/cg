@@ -2,7 +2,36 @@
 
 #include <cassert>
 #include <cstring>
+#include <algorithm>
 #include <vector>
+
+
+namespace {
+
+using cg::data::Image_format;
+
+bool is_swap_rb_required(const Image_format& fmt_a, const Image_format& fmt_b) noexcept
+{
+	if (fmt_a == fmt_b) return false;
+
+	switch (fmt_a) {
+		default:
+		case Image_format::none: return false;
+
+		case Image_format::red_8:
+		case Image_format::rgb_8:
+		case Image_format::rgba_8:
+			return fmt_b == Image_format::bgr_8 || fmt_b == Image_format::bgra_8;
+
+		case Image_format::bgr_8:
+		case Image_format::bgra_8:
+			return fmt_b == Image_format::red_8 
+				|| fmt_b == Image_format::rgb_8
+				|| fmt_b == Image_format::rgba_8;
+	}
+}
+
+} // namespace
 
 
 namespace cg {
@@ -79,7 +108,7 @@ void Image_2d::dispose() noexcept
 	_ptr = nullptr;
 }
 
-void Image_2d::flip_vertical() noexcept
+void Image_2d::flip_vertical()
 {
 	if (_size.height <= 1) return;
 
@@ -99,6 +128,28 @@ void Image_2d::flip_vertical() noexcept
 	}
 }
 
+void Image_2d::write(const Image_2d& src_image) noexcept
+{
+	if (this == &src_image) return;
+
+	assert(src_image._size != uint2::zero);
+	assert(src_image._format != Image_format::none);
+	assert(_size == src_image._size); // other options are not implemented
+
+	if (_format == src_image._format) {
+		memcpy(_ptr, src_image._ptr, src_image.byte_count());
+	} 
+	else {
+		bool swap_rg = is_swap_rb_required(_format, src_image._format);
+		if (swap_rg) {
+			write_converted_swap_rb(src_image);
+		}
+		else {
+			write_converted(src_image);
+		}
+	}
+}
+
 size_t Image_2d::write(size_t offset, uint8_t* ptr, size_t count) noexcept
 {
 	if (count == 0) return offset;
@@ -109,6 +160,46 @@ size_t Image_2d::write(size_t offset, uint8_t* ptr, size_t count) noexcept
 
 	std::memcpy(_ptr + offset, ptr, bytes_to_write);
 	return ret_offset;
+}
+
+void Image_2d::write_converted(const Image_2d& src_image) noexcept
+{
+	const size_t src_byte_count = cg::data::byte_count(src_image._format);
+	const size_t dest_byte_count = cg::data::byte_count(_format);
+
+	uint8_t* src_ptr = src_image._ptr;
+	uint8_t* dest_ptr = _ptr;
+
+
+	for (size_t i = 0; i < src_image.byte_count(); i += src_byte_count) {
+		ubyte4 pixel(0, 0, 0, 1);
+		memcpy(pixel.data, src_ptr, src_byte_count);
+		memcpy(dest_ptr, pixel.data, dest_byte_count);
+
+		src_ptr += src_byte_count;
+		dest_ptr += dest_byte_count;
+	}
+}
+
+void Image_2d::write_converted_swap_rb(const Image_2d& src_image) noexcept
+{
+	const size_t src_byte_count = cg::data::byte_count(src_image._format);
+	const size_t dest_byte_count = cg::data::byte_count(_format);
+
+	uint8_t* src_ptr = src_image._ptr;
+	uint8_t* dest_ptr = _ptr;
+
+
+	for (size_t i = 0; i < src_image.byte_count(); i += src_byte_count) {
+		ubyte4 pixel(0, 0, 0, 1);
+		memcpy(pixel.data, src_ptr, src_byte_count);
+		
+		std::swap(pixel.r, pixel.b);
+		memcpy(dest_ptr, pixel.data, dest_byte_count);
+
+		src_ptr += src_byte_count;
+		dest_ptr += dest_byte_count;
+	}
 }
 
 // ----- funcs -----
