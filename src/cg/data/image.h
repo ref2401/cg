@@ -1,6 +1,7 @@
 #ifndef CG_DATA_IMAGE_H_
 #define CG_DATA_IMAGE_H_
 
+#include <cstdint>
 #include <iostream>
 #include "cg/math/math.h"
 
@@ -49,7 +50,7 @@ public:
 	}
 
 	// Returns pointer to the underlying buffer serving as pixel storage.
-	unsigned char* data() noexcept 
+	uint8_t* data() noexcept 
 	{
 		return _ptr;
 	}
@@ -59,6 +60,8 @@ public:
 	{
 		return _ptr;
 	}
+
+	void flip_vertical() noexcept;
 
 	// Pixel format of this image.
 	Image_format format() const noexcept
@@ -80,12 +83,12 @@ public:
 	// 
 	// Returns:	offset + sizeof(unsigned char) * count.
 	//			Byte offset into the buffer that can be used for subsequent writes.	
-	size_t write(size_t offset, unsigned char* ptr, size_t count) noexcept;
+	size_t write(size_t offset, uint8_t* ptr, size_t count) noexcept;
 
 private:
 	void dispose() noexcept;
 
-	unsigned char* _ptr = nullptr;
+	uint8_t* _ptr = nullptr;
 	uint2 _size = uint2::zero;
 	Image_format _format = Image_format::none;
 };

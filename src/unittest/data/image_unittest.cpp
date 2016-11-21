@@ -1,7 +1,9 @@
 #include "cg/data/image.h"
 
+#include <cstdint>
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <utility>
 #include "cg/math/math.h"
 #include "unittest/data/common_file.h"
@@ -127,11 +129,110 @@ public:
 		Assert::AreEqual<size_t>(0, img0.byte_count());
 	}
 
+	TEST_METHOD(flip_vertical)
+	{
+		{ // An empty image
+			Image_2d img;
+			img.flip_vertical();
+			Assert::IsNull(img.data());
+			Assert::AreEqual(uint2::zero, img.size());
+			Assert::AreEqual(Image_format::none, img.format());
+			Assert::AreEqual<size_t>(0, img.byte_count());
+		}
+
+		{ // A single row image
+			uint8_t expected_data[5] = { 0, 1, 2, 3, 4 };
+			Image_2d img(Image_format::red_8, uint2(5, 1));
+			img.write(0, expected_data, std::extent<decltype(expected_data)>::value);
+
+			img.flip_vertical();
+
+			Assert::IsTrue(std::equal(
+				std::cbegin(expected_data), std::cend(expected_data),
+				img.data()));
+		}
+
+		// Test data is represent by 3x5 rgb(bgr) pixels
+		uint8_t origin_data[45] = {
+			0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09,
+			0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+			0x21, 0x22, 0x23,	0x24, 0x25, 0x26,	0x27, 0x28, 0x29,
+			0x31, 0x32, 0x33,	0x34, 0x35, 0x36,	0x37, 0x38, 0x39,
+			0x41, 0x42, 0x43,	0x44, 0x45, 0x46,	0x47, 0x48, 0x49
+		};
+
+		{ // An image with 2 rows
+			uint8_t expected_data[18] = {
+				0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+				0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09
+			};
+
+			Image_2d img(Image_format::rgb_8, uint2(3, 2));
+			img.write(0, origin_data, img.byte_count());
+
+			img.flip_vertical();
+			Assert::IsTrue(std::equal(
+				std::cbegin(expected_data), std::cend(expected_data),
+				img.data()));
+		}
+
+		{ // An image with 3 rows
+			uint8_t expected_data[27] = {
+				0x21, 0x22, 0x23,	0x24, 0x25, 0x26,	0x27, 0x28, 0x29,
+				0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+				0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09
+			};
+
+			Image_2d img(Image_format::rgb_8, uint2(3, 3));
+			img.write(0, origin_data, img.byte_count());
+
+			img.flip_vertical();
+			Assert::IsTrue(std::equal(
+				std::cbegin(expected_data), std::cend(expected_data),
+				img.data()));
+		}
+
+		{ // An image with 4 rows
+			uint8_t expected_data[36] = {
+				0x31, 0x32, 0x33,	0x34, 0x35, 0x36,	0x37, 0x38, 0x39,
+				0x21, 0x22, 0x23,	0x24, 0x25, 0x26,	0x27, 0x28, 0x29,
+				0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+				0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09
+			};
+
+			Image_2d img(Image_format::rgb_8, uint2(3, 4));
+			img.write(0, origin_data, img.byte_count());
+
+			img.flip_vertical();
+			Assert::IsTrue(std::equal(
+				std::cbegin(expected_data), std::cend(expected_data),
+				img.data()));
+		}
+
+		{ // An image with 5 rows
+			uint8_t expected_data[45] = {
+				0x41, 0x42, 0x43,	0x44, 0x45, 0x46,	0x47, 0x48, 0x49,
+				0x31, 0x32, 0x33,	0x34, 0x35, 0x36,	0x37, 0x38, 0x39,
+				0x21, 0x22, 0x23,	0x24, 0x25, 0x26,	0x27, 0x28, 0x29,
+				0x11, 0x12, 0x13,	0x14, 0x15, 0x16,	0x17, 0x18, 0x19,
+				0x01, 0x02, 0x03,	0x04, 0x05, 0x06,	0x07, 0x08, 0x09,
+			};
+
+			Image_2d img(Image_format::rgb_8, uint2(3, 5));
+			img.write(0, origin_data, img.byte_count());
+
+			img.flip_vertical();
+			Assert::IsTrue(std::equal(
+				std::cbegin(expected_data), std::cend(expected_data),
+				img.data()));
+		}
+	}
+
 	TEST_METHOD(write)
 	{
 		Image_2d img(Image_format::red_8, uint2(2, 2));
 		
-		std::array<unsigned char, 4> arr = { 0, 1, 2, 3 };
+		std::array<uint8_t, 4> arr = { 0, 1, 2, 3 };
 		for (size_t i = 0; i < arr.size(); ++i) {
 			size_t offset = img.write(i, &arr[i], 1);
 			Assert::AreEqual(i + 1, offset);

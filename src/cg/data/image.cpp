@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <vector>
 
 
 namespace cg {
@@ -78,7 +79,27 @@ void Image_2d::dispose() noexcept
 	_ptr = nullptr;
 }
 
-size_t Image_2d::write(size_t offset, unsigned char* ptr, size_t count) noexcept
+void Image_2d::flip_vertical() noexcept
+{
+	if (_size.height <= 1) return;
+
+	const size_t row_byte_count = _size.width * cg::data::byte_count(_format);
+	std::vector<uint8_t> temp_buffer(row_byte_count);
+
+	uint8_t* up_ptr = _ptr;
+	uint8_t* bottom_ptr = _ptr + row_byte_count * (_size.height - 1);
+
+	while (up_ptr < bottom_ptr) {
+		memcpy(temp_buffer.data(), up_ptr, row_byte_count);
+		memcpy(up_ptr, bottom_ptr, row_byte_count);
+		memcpy(bottom_ptr, temp_buffer.data(), row_byte_count);
+
+		up_ptr += row_byte_count;
+		bottom_ptr -= row_byte_count;
+	}
+}
+
+size_t Image_2d::write(size_t offset, uint8_t* ptr, size_t count) noexcept
 {
 	if (count == 0) return offset;
 
