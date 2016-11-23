@@ -28,8 +28,8 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_cbuffers();
 	init_material();
-	setup_pipeline_state(); 
 	setup_projection_view_matrices(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
+	setup_pipeline_state();
 }
 
 void Static_mesh_example::init_cbuffers()

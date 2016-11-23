@@ -128,6 +128,7 @@
   <ItemGroup>
     <ClCompile Include="base\app.cpp" />
     <ClCompile Include="base\dx11.cpp" />
+    <ClCompile Include="base\model.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh_rnd\static_mesh_example.cpp" />
     <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp" />
@@ -140,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="base\app.h" />
     <ClInclude Include="base\dx11.h" />
+    <ClInclude Include="base\model.h" />
     <ClInclude Include="mesh_rnd\static_mesh_example.h" />
     <ClInclude Include="mesh_rnd\vertex_skinning_example.h" />
   </ItemGroup>

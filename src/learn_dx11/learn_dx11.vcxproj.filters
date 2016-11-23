@@ -14,6 +14,9 @@
     <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp">
       <Filter>mesh_rnd</Filter>
     </ClCompile>
+    <ClCompile Include="base\model.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="mesh_rnd\vertex_skinning_example.h">
       <Filter>mesh_rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="base\model.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

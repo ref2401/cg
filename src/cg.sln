@@ -50,6 +50,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mesh_rnd", "mesh_rnd", "{FC5A5AAD-B9BC-4240-82B4-00DA66ABCC2E}"
 	ProjectSection(SolutionItems) = preProject
 		..\data\learn_dx11\mesh_rnd\static_mesh.hlsl = ..\data\learn_dx11\mesh_rnd\static_mesh.hlsl
+		..\data\learn_dx11\mesh_rnd\vertex_skinning.hlsl = ..\data\learn_dx11\mesh_rnd\vertex_skinning.hlsl
 	EndProjectSection
 EndProject
 Global

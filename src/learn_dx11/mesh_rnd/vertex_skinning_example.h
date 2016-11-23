@@ -30,6 +30,28 @@ public:
 	void update() override;
 
 private:
+
+	void init_cbuffers();
+
+	void init_geometry();
+
+	void init_shaders();
+
+	void setup_pipeline_state();
+
+	void update_projection_matrix(float wh_aspect_ratio);
+
+	void setup_projection_view_matrices();
+
+	Hlsl_shader_set _shader_set;
+	Com_ptr<ID3D11Buffer> _scene_cbuffer;
+	Com_ptr<ID3D11Buffer> _vertex_buffer;
+	Com_ptr<ID3D11InputLayout> _input_layout;
+
+	// scene
+	size_t _draw_count;
+	cg::mat4 _projection_matrix;
+	cg::mat4 _view_matrix;
 };
 
 } // namespace mesh_rnd
