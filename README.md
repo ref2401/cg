@@ -1,9 +1,9 @@
 Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11.
 
 ## Clone, init & build
-Required tools:
-	- Visual Studio Community 2015 
-	- CMake
+Required tools
+- Visual Studio Community 2015
+- CMake
 
 
 Clone the repository as usual and then execute init.cmd script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```.
