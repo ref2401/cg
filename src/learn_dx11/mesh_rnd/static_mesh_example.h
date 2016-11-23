@@ -24,6 +24,7 @@ public:
 
 	Static_mesh_example& operator=(Static_mesh_example&&) noexcept = delete;
 
+
 	void on_viewport_resize(const cg::uint2& viewport_size) override;
 
 	void render() override;

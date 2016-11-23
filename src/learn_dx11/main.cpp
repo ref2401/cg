@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cg/base/base.h"
 #include "learn_dx11/base/app.h"
+#include "learn_dx11/mesh_rnd/vertex_skinning_example.h"
 #include "learn_dx11/mesh_rnd/static_mesh_example.h"
 
 
@@ -17,7 +18,9 @@ int main(int argc, char* argv[])
 			learn_dx11::Application app(wnd_position, wnd_size);
 			debug = app.get_dx_debug();
 
-			app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+			// Uncomment any line to execute the appropriate example.
+			//app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+			app.run<learn_dx11::mesh_rnd::Vertex_skinning_example>();
 		}
 
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);

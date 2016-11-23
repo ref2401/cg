@@ -11,6 +11,9 @@
     <ClCompile Include="mesh_rnd\static_mesh_example.cpp">
       <Filter>mesh_rnd</Filter>
     </ClCompile>
+    <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp">
+      <Filter>mesh_rnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -28,6 +31,9 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="mesh_rnd\static_mesh_example.h">
+      <Filter>mesh_rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_rnd\vertex_skinning_example.h">
       <Filter>mesh_rnd</Filter>
     </ClInclude>
   </ItemGroup>
