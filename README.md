@@ -5,14 +5,9 @@ Required tools
 - Visual Studio Community 2015
 - CMake
 
-
 Clone the repository as usual and then execute init.cmd script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```.
 
-
 Only Debug mode work at the moment. The reason is that extern/Assimp does not build under Release mode. Also the projects is only tested under x86 (Win32) platform.
-
-
-is used. The solution is tested only under x86 (Win32) platform.
 
 ## Techniques
 1. [Deferred Lighting Renderer](https://github.com/ref2401/cg/wiki/Deferred-Lighting-Renderer) (OpenGL 4.5)

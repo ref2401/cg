@@ -12,41 +12,44 @@ set dir_assimp=%dir_extern%\assimp
 set dir_assimp_vs_solution=%dir_assimp%\_vs_solution
 
 
-echo [clear]
+echo [1/8 clear]
 echo:
 RD /S /Q %dir_bin_debug% %dir_bin_release% %dir_bin_debug_libs% %dir_bin_release_libs% %dir_assimp_vs_solution%
 
+echo [2/8 fetch submodules]
+echo:
+git submodule init
+git submodule update
+sleep 2
+
+echo[3/8 create folders]
+echo:
 md %dir_bin_debug%
 md %dir_bin_release%
 md %dir_bin_debug_libs%
 md %dir_bin_release_libs%
 md %dir_assimp_vs_solution%
 
-echo [fetch submodules]
-echo:
-git submodule init
-git submodule update
-
-echo [extern project: Assimp]
+echo [4/8 extern project: Assimp]
 echo:
 pushd %dir_assimp_vs_solution%
 
-	echo [Assimp: [cmake vs2015 projects]]
+	echo [5/8 Assimp: [cmake vs2015 projects]]
 	echo:	
 	cmake ..
 
-	echo [Assimp: [build debug]]
+	echo [6/8 Assimp: [build debug]]
 	echo:
 	devenv Assimp.sln /build Debug
 
 	:: NOTE(ref2401): Assimp does not build under Release mode
-	::echo [Assimp: [build release]]
+	::echo [7/8 Assimp: [build release]]
 	::echo:
 	::devenv Assimp.sln /build Release
 
 popd
 
-echo [Assimp: [copy libraries]]
+echo [8/8 Assimp: [copy libraries]]
 copy /B /Y %dir_assimp_vs_solution%\code\Debug\assimp-vc140-mt.dll %dir_bin_debug%\assimp-vc140-mt.dll
 copy /B /Y %dir_assimp_vs_solution%\code\Debug\assimp-vc140-mt.ilk %dir_bin_debug%\assimp-vc140-mt.ilk
 copy /B /Y %dir_assimp_vs_solution%\code\Debug\assimp-vc140-mt.pdb %dir_bin_debug%\assimp-vc140-mt.pdb
