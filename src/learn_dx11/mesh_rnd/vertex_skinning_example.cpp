@@ -22,7 +22,7 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) :
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	
-	_view_matrix = cg::view_matrix(float3(0, 0, 50.0f), float3::zero);
+	_view_matrix = cg::view_matrix(float3(0, 1, 10.0f), float3::zero);
 	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
 	setup_projection_view_matrices();
 	setup_pipeline_state();
@@ -31,19 +31,26 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) :
 void Vertex_skinning_example::init_cbuffers()
 {
 	_scene_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+
+	float matrix_data[16];
+	_model_matrix = cg::rotation_matrix_oy<mat4>(cg::pi);
+	to_array_column_major_order(_model_matrix, matrix_data);
+
+	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 }
 
 void Vertex_skinning_example::init_geometry()
 {
-	Animated_model model("../data/models/bob_lamp/boblampclean.md5mesh");
-	_draw_count = model.positions().size();
+	Bob_lamp_md5_model model;
+	_draw_count = model.bone_positions().size();
 
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = model.positions().size() * sizeof(float3);
+	vb_desc.ByteWidth = _draw_count * sizeof(float3);
 	vb_desc.Usage = D3D11_USAGE_DEFAULT;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
-	vb_data.pSysMem = model.positions().data();
+	vb_data.pSysMem = model.bone_positions().data();
 
 	HRESULT hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
 	assert(hr == S_OK);
@@ -70,7 +77,7 @@ void Vertex_skinning_example::init_shaders()
 
 void Vertex_skinning_example::update_projection_matrix(float wh_aspect_ratio)
 {
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 0.1f, 50.0f);
+	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 100.0f);
 }
 
 void Vertex_skinning_example::setup_pipeline_state()
@@ -84,6 +91,7 @@ void Vertex_skinning_example::setup_pipeline_state()
 
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_scene_cbuffer.ptr);
+	_device_ctx->VSSetConstantBuffers(1, 1, &_model_cbuffer.ptr);
 
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 

@@ -45,6 +45,7 @@ private:
 
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _scene_cbuffer;
+	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
 
@@ -52,6 +53,7 @@ private:
 	size_t _draw_count;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
+	cg::mat4 _model_matrix;
 };
 
 } // namespace mesh_rnd
