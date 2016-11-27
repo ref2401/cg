@@ -39,6 +39,12 @@ const uint2 uint2::unit_x(1, 0);
 const uint2 uint2::unit_y(0, 1);
 const uint2 uint2::unit_xy(1);
 
+const uint4 uint4::unit_x(1, 0, 0, 0);
+const uint4 uint4::unit_y(0, 1, 0, 0);
+const uint4 uint4::unit_z(0, 0, 1, 0);
+const uint4 uint4::unit_w(0, 0, 0, 1);
+const uint4 uint4::unit_xyzw(1);
+const uint4 uint4::zero(0);
 
 // ----- funcs -----
 
@@ -111,6 +117,18 @@ std::ostream& operator<<(std::ostream& out, const uint2& v)
 std::wostream& operator<<(std::wostream& out, const uint2& v)
 {
 	out << "uint2(" << v.x << ", " << v.y << ")";
+	return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const uint4& v)
+{
+	out << "uint4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const uint4& v)
+{
+	out << "uint4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
 	return out;
 }
 

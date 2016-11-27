@@ -10,6 +10,7 @@ using cg::float4;
 using cg::quat;
 using cg::ubyte4;
 using cg::uint2;
+using cg::uint4;
 
 
 namespace unittest {
@@ -1344,6 +1345,147 @@ public:
 		Assert::AreEqual(20., r.square<double>());
 	}
 
+};
+
+TEST_CLASS(cg_math_uint4) {
+public:
+
+	TEST_METHOD(static_members)
+	{
+		Assert::AreEqual(uint4(1, 0, 0, 0), uint4::unit_x);
+		Assert::AreEqual(uint4(0, 1, 0, 0), uint4::unit_y);
+		Assert::AreEqual(uint4(0, 0, 1, 0), uint4::unit_z);
+		Assert::AreEqual(uint4(0, 0, 0, 1), uint4::unit_w);
+		Assert::AreEqual(uint4(1, 1, 1, 1), uint4::unit_xyzw);
+		Assert::AreEqual(uint4(0, 0, 0, 0), uint4::zero);
+	}
+
+	TEST_METHOD(assignment_operators)
+	{
+		uint4 v(5, 6, 7, 8);
+
+		// copy assignment
+		uint4 vc;
+		vc = v;
+		Assert::IsTrue((vc.x == v.x) && (vc.y == v.y) && (vc.z == v.z) && (vc.w == v.w));
+		Assert::IsTrue((vc.r == v.r) && (vc.g == v.g) && (vc.b == v.b) && (vc.a == v.a));
+		Assert::IsTrue((vc.data[0] == v.data[0]) && (vc.data[1] == v.data[1])
+			&& (vc.data[2] == v.data[2]) && (vc.data[3] == v.data[3]));
+
+		// move assignment
+		uint4 vm;
+		vm = std::move(v);
+		Assert::IsTrue((vm.x == v.x) && (vm.y == v.y) && (vm.z == v.z) && (vm.w == v.w));
+		Assert::IsTrue((vm.r == v.r) && (vm.g == v.g) && (vm.b == v.b) && (vm.a == v.a));
+		Assert::IsTrue((vm.data[0] == v.data[0]) && (vm.data[1] == v.data[1])
+			&& (vm.data[2] == v.data[2]) && (vm.data[3] == v.data[3]));
+	}
+
+	TEST_METHOD(binary_operators)
+	{
+		uint4 v(5, 6, 7, 8);
+
+		// operator+
+		Assert::AreEqual(uint4(15, 16, 17, 18), v + 10);
+		Assert::AreEqual(uint4(15, 16, 17, 18), 10 + v);
+		Assert::AreEqual(uint4(15, 26, 37, 48), v + uint4(10, 20, 30, 40));
+		Assert::AreEqual(uint4(15, 26, 37, 48), uint4(10, 20, 30, 40) + v);
+
+		// operator-
+		Assert::AreEqual(uint4(4, 5, 6, 7), v - 1);
+		Assert::AreEqual(uint4(5, 4, 3, 2), 10 - v);
+		Assert::AreEqual(uint4::zero, v - uint4(5, 6, 7, 8));
+		Assert::AreEqual(uint4::zero, uint4(5, 6, 7, 8) - v);
+
+		// operator*
+		Assert::AreEqual(uint4(50, 60, 70, 80), v * 10);
+		Assert::AreEqual(uint4(50, 60, 70, 80), 10 * v);
+
+		// operator/
+		Assert::AreEqual(uint4(2, 3, 3, 4), v / 2);
+		Assert::AreEqual(uint4::zero, 0 / v);
+	}
+
+	TEST_METHOD(ctors)
+	{
+		uint4 v0;
+		Assert::IsTrue((v0.x == 0) && (v0.y == 0) && (v0.z == 0) && (v0.w == 0));
+		Assert::IsTrue((v0.r == 0) && (v0.g == 0) && (v0.b == 0) && (v0.a == 0));
+		Assert::IsTrue((v0.data[0] == 0) && (v0.data[1] == 0) && (v0.data[2] == 0) && (v0.data[3] == 0));
+
+		uint4 v1(24);
+		Assert::IsTrue((v1.x == 24) && (v1.y == 24) && (v1.z == 24) && (v1.w == 24));
+		Assert::IsTrue((v1.r == 24) && (v1.g == 24) && (v1.b == 24) && (v1.w == 24));
+		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24) && (v1.data[2] == 24) && (v1.data[3] == 24));
+
+		uint4 v4(1, 2, 3, 4);
+		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3) && (v4.w == 4));
+		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3) && (v4.a == 4));
+		Assert::IsTrue((v4.data[0] == 1) && (v4.data[1] == 2) && (v4.data[2] == 3) && (v4.data[3] == 4));
+
+		// copy ctor
+		uint4 vc = v4;
+		Assert::IsTrue((vc.x == v4.x) && (vc.y == v4.y) && (vc.z == v4.z) && (vc.w == v4.w));
+		Assert::IsTrue((vc.r == v4.r) && (vc.g == v4.g) && (vc.b == v4.b) && (vc.a == v4.a));
+		Assert::IsTrue((vc.data[0] == v4.data[0]) && (vc.data[1] == v4.data[1]) && (vc.data[2] == v4.data[2]) && (vc.data[3] == v4.data[3]));
+
+		// move ctor
+		uint4 vm = std::move(v4);
+		Assert::IsTrue((vm.x == vc.x) && (vm.y == vc.y) && (vm.z == vc.z) && (vm.w == vc.w));
+		Assert::IsTrue((vm.r == vc.r) && (vm.g == vc.g) && (vm.b == vc.b) && (vm.a == vc.a));
+		Assert::IsTrue((vm.data[0] == vc.data[0]) && (vm.data[1] == vc.data[1]) && (vm.data[2] == vc.data[2]) && (vm.data[3] == vc.data[3]));
+	}
+
+	TEST_METHOD(compound_assignment_operators)
+	{
+		uint4 v(1, 2, 3, 4);
+		(v += 5) += 5;
+		Assert::AreEqual(uint4(11, 12, 13, 14), v);
+
+		(v -= 7) -= 3;
+		Assert::AreEqual(uint4(1, 2, 3, 4), v);
+
+		(v *= 2) *= 3;
+		Assert::AreEqual(uint4(6, 12, 18, 24), v);
+
+		(v /= 3) /= 2;
+		Assert::AreEqual(uint4(1, 2, 3, 4), v);
+
+		(v += v) += v;
+		Assert::AreEqual(uint4(4, 8, 12, 16), v);
+
+		v -= v;
+		Assert::AreEqual(uint4::zero, v);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		uint4 v(1, 2, 3, 4);
+
+		Assert::AreNotEqual(v, uint4(100, 2, 3, 4));
+		Assert::AreNotEqual(v, uint4(1, 100, 3, 4));
+		Assert::AreNotEqual(v, uint4(1, 2, 100, 4));
+		Assert::AreNotEqual(v, uint4(1, 2, 3, 100));
+
+		Assert::AreEqual(v, v);
+		Assert::AreEqual(v, uint4(1, 2, 3, 4));
+	}
+
+	TEST_METHOD(greater_than)
+	{
+		using cg::greater_than;
+
+		Assert::IsFalse(greater_than(uint4(0, 5, 7, 9), 1));
+		Assert::IsFalse(greater_than(uint4(1, 5, 7, 9), 1));
+		Assert::IsFalse(greater_than(uint4(4, 0, 7, 9), 1));
+		Assert::IsFalse(greater_than(uint4(4, 1, 7, 9), 1));
+		Assert::IsFalse(greater_than(uint4(4, 5, 0, 9), 1));
+		Assert::IsFalse(greater_than(uint4(4, 5, 1, 9), 1));
+		Assert::IsFalse(greater_than(uint4(4, 5, 7, 0), 1));
+		Assert::IsFalse(greater_than(uint4(4, 5, 7, 1), 1));
+
+		Assert::IsTrue(greater_than(uint4(4, 5, 7, 9), 1));
+	}
 };
 
 } // namespace unittest
