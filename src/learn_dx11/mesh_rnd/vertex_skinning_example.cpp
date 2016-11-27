@@ -19,7 +19,7 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) :
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	
-	_view_matrix = cg::view_matrix(float3(0, 0, 10.0f), float3::zero);
+	_view_matrix = cg::view_matrix(float3(0, 2, 10.0f), float3::zero);
 	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
 	setup_projection_view_matrices();
 	setup_pipeline_state();
@@ -75,10 +75,12 @@ void Vertex_skinning_example::init_geometry()
 	hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
 	assert(hr == S_OK);
 
-	D3D11_INPUT_ELEMENT_DESC layout_descs[3] = {
+	D3D11_INPUT_ELEMENT_DESC layout_descs[5] = {
 		{ "V_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "V_NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(Vertex, normal), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "V_TEX_COORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(Vertex, tex_coord), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "V_TEX_COORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offsetof(Vertex, tex_coord), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "V_BONE_INDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, offsetof(Vertex, bone_indices), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "V_BONE_WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(Vertex, bone_weights), D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	hr = _device->CreateInputLayout(layout_descs, std::extent<decltype(layout_descs)>::value,
@@ -110,7 +112,7 @@ void Vertex_skinning_example::init_shaders()
 
 void Vertex_skinning_example::update_projection_matrix(float wh_aspect_ratio)
 {
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 200.0f);
+	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 100.0f);
 }
 
 void Vertex_skinning_example::setup_pipeline_state()
@@ -162,7 +164,7 @@ void Vertex_skinning_example::render()
 
 void Vertex_skinning_example::update()
 {
-	static const float ms_step = 3;
+	static const float ms_step = 2;
 	static float ms_counter = -ms_step;
 
 	if (ms_counter + ms_step > 5791.0f) {

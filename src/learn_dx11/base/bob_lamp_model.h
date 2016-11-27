@@ -62,9 +62,13 @@ struct Vertex final {
 		position(position), normal(normal), tex_coord(tex_coord)
 	{}
 
+	void register_bone(size_t bone_index, float bone_weight) noexcept;
+
 	cg::float3 position;
 	cg::float3 normal;
 	cg::float2 tex_coord;
+	cg::uint4 bone_indices;
+	cg::float4 bone_weights;
 };
 
 class Skeleton_animation final {
@@ -147,7 +151,7 @@ public:
 		return _curr_bone_matrices_data;
 	}
 
-	void update_bone_matrices(float milliseconds = -1.0f);
+	void update_bone_matrices(float milliseconds);
 
 private:
 

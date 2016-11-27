@@ -60,6 +60,24 @@ Bone::Bone(const char* name, size_t parent_index, const cg::mat4& bp_matrix) :
 	bp_matrix_inv(inverse(bp_matrix))
 {}
 
+// ----- Vertex -----
+
+void Vertex::register_bone(size_t bone_index, float bone_weight) noexcept
+{
+	assert(bone_index != Bone::blank_parent_index);
+	assert(bone_weight >= 0.0f);
+
+	for (size_t i = 0; i < 4; ++i) {
+		if (approx_equal(bone_weights.data[i], 0.0f)) {
+			bone_indices.data[i] = bone_index;
+			bone_weights.data[i] = bone_weight;
+			return;
+		}
+	}
+
+	assert(false); // only 4 bones per vertex are allowed.
+}
+
 // ----- Skeleton_animation -----
 
 Skeleton_animation::Skeleton_animation(size_t bone_count, const aiAnimation* animation, 
@@ -185,18 +203,6 @@ void Model_animation::init_bones(size_t bone_count, const aiNode* root_node)
 
 void Model_animation::update_bone_matrices(float milliseconds)
 {
-	if (milliseconds < 0.0f) {
-		float* ptr = _curr_bone_matrices_data.data();
-		for (size_t i = 0; i < bone_count(); ++i) {
-			mat4 bm = mat4::identity;
-			to_array_column_major_order(bm, ptr);
-
-			ptr += 16;
-		}
-
-		return;
-	}
-
 	size_t frame_index = size_t(milliseconds / _skeleton_animation.frame_milliseconds());
 	size_t next_frame_index = frame_index + 1;
 	if (next_frame_index >= _skeleton_animation.frame_count()) {
@@ -251,6 +257,7 @@ Bob_lamp_md5_model::Bob_lamp_md5_model()
 void Bob_lamp_md5_model::init_geometry(const aiScene* scene, 
 	const std::unordered_map<std::string, size_t>& bone_mapping)
 {
+	const auto mapping_end_it = bone_mapping.cend();
 	size_t vertex_count = 0;
 	size_t index_count = 0;
 	for (size_t mi = 0; mi < scene->mNumMeshes; ++mi) {
@@ -271,12 +278,26 @@ void Bob_lamp_md5_model::init_geometry(const aiScene* scene,
 		assert(mesh->HasTextureCoords(0));
 
 		_draw_params.emplace_back(mesh->mNumFaces * 3, index_offset, base_vertex);
-		index_offset += mesh->mNumFaces * 3;
-		base_vertex += mesh->mNumVertices;
 
+		// position, normal & tex_coord
 		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
 			_vertices.emplace_back(make_cg_vector(mesh->mVertices[vi]),
 				make_cg_vector(mesh->mNormals[vi]), make_cg_vector(mesh->mTextureCoords[0][vi]).uv());
+		}
+
+		// bone index & weight
+		for (size_t bi = 0; bi < mesh->mNumBones; ++bi) {
+			const aiBone* bone = mesh->mBones[bi];
+
+			// find bone index by its name
+			auto it = bone_mapping.find(bone->mName.C_Str());
+			assert(it != mapping_end_it);
+			const size_t bone_index = it->second;
+
+			for (size_t wi = 0; wi < bone->mNumWeights; ++wi) {
+				size_t vertex_id = base_vertex + bone->mWeights[wi].mVertexId;
+				_vertices[vertex_id].register_bone(bone_index, bone->mWeights[wi].mWeight);
+			}
 		}
 
 		for (size_t fi = 0; fi < mesh->mNumFaces; ++fi) {
@@ -286,6 +307,9 @@ void Bob_lamp_md5_model::init_geometry(const aiScene* scene,
 			_indices.push_back(face.mIndices[1]);
 			_indices.push_back(face.mIndices[2]);
 		}
+
+		index_offset += mesh->mNumFaces * 3;
+		base_vertex += mesh->mNumVertices;
 	}
 }
 
