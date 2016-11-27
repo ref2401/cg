@@ -14,7 +14,7 @@
     <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp">
       <Filter>mesh_rnd</Filter>
     </ClCompile>
-    <ClCompile Include="base\model.cpp">
+    <ClCompile Include="base\bob_lamp_model.cpp">
       <Filter>base</Filter>
     </ClCompile>
   </ItemGroup>
@@ -39,7 +39,7 @@
     <ClInclude Include="mesh_rnd\vertex_skinning_example.h">
       <Filter>mesh_rnd</Filter>
     </ClInclude>
-    <ClInclude Include="base\model.h">
+    <ClInclude Include="base\bob_lamp_model.h">
       <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>

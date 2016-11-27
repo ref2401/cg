@@ -1,9 +1,11 @@
 #ifndef LEARN_DX11_MESH_RND_VERTEX_SKINNING_EXAMPLE_H_
 #define LEARN_DX11_MESH_RND_VERTEX_SKINNING_EXAMPLE_H_
 
+#include <memory>
 #include "cg/math/math.h"
 #include "learn_dx11/base/app.h"
 #include "learn_dx11/base/dx11.h"
+#include "learn_dx11/base/bob_lamp_model.h"
 
 
 namespace learn_dx11 {
@@ -46,11 +48,15 @@ private:
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _scene_cbuffer;
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
+	Com_ptr<ID3D11Buffer> _model_bone_matrices_buffer;
+	Com_ptr<ID3D11ShaderResourceView> _model_bone_matrices_buffer_srv;
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
+	Com_ptr<ID3D11Buffer> _index_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
 
 	// scene
-	size_t _draw_count;
+	std::vector<Draw_indexed_params> _draw_params;
+	std::unique_ptr<Model_animation> _model_animation;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
 	cg::mat4 _model_matrix;
