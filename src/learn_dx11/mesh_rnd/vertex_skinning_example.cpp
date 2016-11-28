@@ -162,16 +162,17 @@ void Vertex_skinning_example::render()
 	}
 }
 
-void Vertex_skinning_example::update()
+void Vertex_skinning_example::update(float dt_milliseconds)
 {
-	static const float ms_step = 2.5;
-	static float ms_counter = -ms_step;
+	static float ms_counter = 0;
 
-	if (ms_counter + ms_step > 5791.0f) {
-		ms_counter = -ms_step;
+	if (ms_counter + dt_milliseconds > 5791.0f) {
+		ms_counter = 0;
+	}
+	else {
+		ms_counter += dt_milliseconds;
 	}
 
-	ms_counter += ms_step;
 
 	_model_animation->update_bone_matrices(ms_counter);
 	_device_ctx->UpdateSubresource(_model_bone_matrices_buffer.ptr, 0, nullptr,

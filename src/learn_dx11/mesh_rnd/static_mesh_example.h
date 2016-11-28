@@ -29,7 +29,7 @@ public:
 
 	void render() override;
 
-	void update() override;
+	void update(float dt_milliseconds) override {}
 
 private:
 

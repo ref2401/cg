@@ -194,9 +194,5 @@ void Static_mesh_example::render()
 	_device_ctx->DrawIndexed(_model_index_count, 0, 0);
 }
 
-void Static_mesh_example::update()
-{
-}
-
 } // namespace mesh_rnd
 } // namespace learn_dx11

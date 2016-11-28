@@ -1,6 +1,7 @@
 #include "learn_dx11/base/app.h"
 
 #include <cassert>
+#include <chrono>
 
 using cg::uint2;
 using cg::greater_than;
@@ -163,11 +164,22 @@ void Application::on_window_resize(const uint2& window_size)
 
 void Application::run_main_loop()
 {
+	using Time_point_t = std::chrono::high_resolution_clock::time_point;
+	using Duration_milliseconds_t = std::chrono::duration<std::chrono::milliseconds::rep, std::milli>;
+
+	Time_point_t prev_frame_time;
+	Time_point_t curr_frame_time = std::chrono::high_resolution_clock::now();
+
 	while (true) {
 		bool terminate = pump_sys_messages();
 		if (terminate) break;
 
-		_example->update();
+		prev_frame_time = curr_frame_time;
+		curr_frame_time = std::chrono::high_resolution_clock::now();
+		Duration_milliseconds_t dt = std::chrono::duration_cast<Duration_milliseconds_t>(
+			curr_frame_time - prev_frame_time);
+		
+		_example->update(float(dt.count()));
 		_example->render();
 		_rnd_ctx.swap_color_buffers();
 	}

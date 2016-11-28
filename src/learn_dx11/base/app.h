@@ -4,6 +4,7 @@
 #include <memory>
 #include <type_traits>
 #include "cg/math/math.h"
+#include "cg/sys/app.h"
 #include "learn_dx11/base/dx11.h"
 #include <windows.h>
 
@@ -29,7 +30,7 @@ public:
 
 	virtual void render() = 0;
 
-	virtual void update() = 0;
+	virtual void update(float dt_milliseconds) = 0;
 
 protected:
 
