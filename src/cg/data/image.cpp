@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstring>
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 
@@ -172,7 +173,7 @@ void Image_2d::write_converted(const Image_2d& src_image) noexcept
 
 
 	for (size_t i = 0; i < src_image.byte_count(); i += src_byte_count) {
-		ubyte4 pixel(0, 0, 0, 1);
+		ubyte4 pixel(0, 0, 0, std::numeric_limits<uint8_t>::max());
 		memcpy(pixel.data, src_ptr, src_byte_count);
 		memcpy(dest_ptr, pixel.data, dest_byte_count);
 
@@ -191,7 +192,7 @@ void Image_2d::write_converted_swap_rb(const Image_2d& src_image) noexcept
 
 
 	for (size_t i = 0; i < src_image.byte_count(); i += src_byte_count) {
-		ubyte4 pixel(0, 0, 0, 1);
+		ubyte4 pixel(0, 0, 0, std::numeric_limits<uint8_t>::max());
 		memcpy(pixel.data, src_ptr, src_byte_count);
 		
 		std::swap(pixel.r, pixel.b);
@@ -280,6 +281,25 @@ size_t byte_count(const Image_format& fmt) noexcept
 		case Image_format::rgba_8: return 4;
 		case Image_format::bgr_8: return 3;
 		case Image_format::bgra_8: return 4;
+	}
+}
+
+size_t channel_count(const Image_format& fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Image_format::none: return 0;
+		
+		case Image_format::red_8: 
+			return 1;
+		
+		case Image_format::rgb_8:
+		case Image_format::bgr_8: 
+			return 3;
+
+		case Image_format::rgba_8:
+		case Image_format::bgra_8:
+			return 4;
 	}
 }
 

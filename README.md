@@ -9,9 +9,14 @@ Clone the repository as usual and then execute init.cmd script. The script creat
 
 Only Debug mode works at the moment. The reason is that extern/Assimp does not build under Release mode. Also the projects is tested only under x86 (Win32) platform.
 
-## Techniques
-1. [Deferred Lighting Renderer](https://github.com/ref2401/cg/wiki/Deferred-Lighting-Renderer) (OpenGL 4.5)
-2. [Learn DirectX 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) (DirectX 11)
+## Techniques (new ones go first)
+1. [Learn DirectX 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) (DirectX 11)
+2. [Deferred Lighting Renderer](https://github.com/ref2401/cg/wiki/Deferred-Lighting-Renderer) (OpenGL 4.5)
+
+## Meshes
+http://graphics.cs.williams.edu/data/meshes.xml
+http://www.cc.gatech.edu/projects/large_models/
+http://www.katsbits.com/download/models/
 
 ## Notes
 1. [Want to Implement List](https://github.com/ref2401/cg/wiki#wanna-implement)

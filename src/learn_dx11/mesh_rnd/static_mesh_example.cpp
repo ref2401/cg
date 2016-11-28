@@ -98,9 +98,9 @@ void Static_mesh_example::init_material()
 	tex_desc.Height = image.size().height;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
+	tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 	tex_desc.SampleDesc.Count = 1;
 	tex_desc.SampleDesc.Quality = 0;
-	tex_desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
 	tex_desc.Usage = D3D11_USAGE_DEFAULT;
 	tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	

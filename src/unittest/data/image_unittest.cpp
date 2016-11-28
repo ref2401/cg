@@ -279,10 +279,10 @@ public:
 				dest_image.data()));
 		}
 
-		{ // dest format = rgba_8 (added alpha channel, value alwas 1)
+		{ // dest format = rgba_8 (added alpha channel, value always 255)
 			uint8_t expected_data[24] = {
-				0x01, 0x02, 0x03, 0x01,		0x04, 0x05, 0x06, 0x01,		0x07, 0x08, 0x09, 0x01,
-				0x11, 0x12, 0x13, 0x01,		0x14, 0x15, 0x16, 0x01,		0x17, 0x18, 0x19, 0x01
+				0x01, 0x02, 0x03, 0xFF,		0x04, 0x05, 0x06, 0xFF,		0x07, 0x08, 0x09, 0xFF,
+				0x11, 0x12, 0x13, 0xFF,		0x14, 0x15, 0x16, 0xFF,		0x17, 0x18, 0x19, 0xFF
 			};
 
 			Image_2d dest_image(Image_format::rgba_8, src_image.size());
@@ -321,10 +321,10 @@ public:
 				dest_image.data()));
 		}
 
-		{ // dest format = rgba_8 (added alpha channel, value alwas 1)
+		{ // dest format = rgba_8 (added alpha channel, value always 255)
 			uint8_t expected_data[24] = {
-				0x03, 0x02, 0x01, 0x01,		0x06, 0x05, 0x04, 0x01,		0x09, 0x08, 0x07, 0x01,
-				0x13, 0x12, 0x11, 0x01,		0x16, 0x15, 0x14, 0x01,		0x19, 0x18, 0x17, 0x01
+				0x03, 0x02, 0x01, 0xFF,		0x06, 0x05, 0x04, 0xFF,		0x09, 0x08, 0x07, 0xFF,
+				0x13, 0x12, 0x11, 0xFF,		0x16, 0x15, 0x14, 0xFF,		0x19, 0x18, 0x17, 0xFF
 			}; 
 
 			Image_2d dest_image(Image_format::rgba_8, src_image.size());
@@ -364,6 +364,20 @@ public:
 		Assert::AreEqual<size_t>(4, byte_count(Image_format::rgba_8));
 		Assert::AreEqual<size_t>(3, byte_count(Image_format::bgr_8));
 		Assert::AreEqual<size_t>(4, byte_count(Image_format::bgra_8));
+	}
+
+	TEST_METHOD(channel_count)
+	{
+		using cg::data::channel_count;
+
+		Assert::AreEqual<size_t>(0, channel_count(Image_format::none));
+		Assert::AreEqual<size_t>(1, channel_count(Image_format::red_8));
+
+		Assert::AreEqual<size_t>(3, channel_count(Image_format::rgb_8));
+		Assert::AreEqual<size_t>(3, channel_count(Image_format::bgr_8));
+
+		Assert::AreEqual<size_t>(4, channel_count(Image_format::rgba_8));
+		Assert::AreEqual<size_t>(4, channel_count(Image_format::bgra_8));
 	}
 };
 

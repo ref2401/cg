@@ -153,8 +153,7 @@ void Skeleton_animation::validate_frames()
 
 // ----- Model_animation -----
 
-Model_animation::Model_animation(size_t bone_count, const aiNode* root_node, const aiAnimation* animation) :
-	_curr_bone_matrices_data(bone_count * 16, 0)
+Model_animation::Model_animation(size_t bone_count, const aiNode* root_node, const aiAnimation* animation)
 {
 	assert(bone_count > 0);
 	assert(root_node);
@@ -201,8 +200,10 @@ void Model_animation::init_bones(size_t bone_count, const aiNode* root_node)
 	}
 }
 
-void Model_animation::update_bone_matrices(float milliseconds)
+void Model_animation::update_bone_matrices(float milliseconds, std::vector<float>& bone_matrces_data)
 {
+	assert(bone_matrces_data.size() == bone_count() * 16);
+
 	size_t frame_index = size_t(milliseconds / _skeleton_animation.frame_milliseconds());
 	size_t next_frame_index = frame_index + 1;
 	if (next_frame_index >= _skeleton_animation.frame_count()) {
@@ -212,7 +213,7 @@ void Model_animation::update_bone_matrices(float milliseconds)
 	float interpolatio_factor = (milliseconds - frame_index * _skeleton_animation.frame_milliseconds()) 
 		/ _skeleton_animation.frame_milliseconds();
 
-	float* ptr = _curr_bone_matrices_data.data();
+	float* ptr = bone_matrces_data.data();
 	const auto& frame0 = _skeleton_animation[frame_index];
 	const auto& frame1 = _skeleton_animation[next_frame_index];
 	std::vector<Transform> curr_transforms(bone_count() + 1);
@@ -250,10 +251,32 @@ Bob_lamp_md5_model::Bob_lamp_md5_model()
 	_model_animation = std::make_unique<Model_animation>(bone_count, 
 		scene->mRootNode->mChildren[1]->mChildren[0], scene->mAnimations[0]);
 
-	init_geometry(scene, _model_animation->bone_mapping());
+	_mesh_draw_params = std::vector<Mesh_draw_params>(scene->mNumMeshes);
+	assert(scene->mNumMeshes == 6);
+	init_images();
+	init_vertices(scene, _model_animation->bone_mapping());
 }
 
-void Bob_lamp_md5_model::init_geometry(const aiScene* scene, 
+void Bob_lamp_md5_model::init_images()
+{
+	using cg::data::Image_format;
+	using cg::data::Load_image_params;
+
+	const Load_image_params load_params[6] = {
+		{ "../data/models/bob_lamp/bob_body.tga", Image_format::bgra_8, false },
+		{ "../data/models/bob_lamp/bob_head.tga", Image_format::bgra_8, false },
+		{ "../data/models/bob_lamp/bob_helmet.tga", Image_format::bgra_8, false },
+		{ "../data/models/bob_lamp/lantern.tga", Image_format::bgra_8, false },
+		{ "../data/models/bob_lamp/lantern_top.tga", Image_format::bgra_8, false },
+		{ "../data/models/bob_lamp/bob_body.tga", Image_format::bgra_8, false }
+	};
+
+	for (size_t i = 0; i < std::extent<decltype(load_params)>::value; ++i) {
+		_mesh_draw_params[i].diffuse_rgb_image = cg::data::load_image_tga(load_params[i]);
+	}
+}
+
+void Bob_lamp_md5_model::init_vertices(const aiScene* scene,
 	const std::unordered_map<std::string, size_t>& bone_mapping)
 {
 	const auto mapping_end_it = bone_mapping.cend();
@@ -264,7 +287,6 @@ void Bob_lamp_md5_model::init_geometry(const aiScene* scene,
 		index_count += scene->mMeshes[mi]->mNumFaces * 3;
 	}
 
-	_draw_params.reserve(scene->mNumMeshes);
 	_vertices.reserve(vertex_count);
 	_indices.reserve(index_count);
 
@@ -276,7 +298,9 @@ void Bob_lamp_md5_model::init_geometry(const aiScene* scene,
 		assert(mesh->HasNormals());
 		assert(mesh->HasTextureCoords(0));
 
-		_draw_params.emplace_back(mesh->mNumFaces * 3, index_offset, base_vertex);
+		_mesh_draw_params[mi].index_count = mesh->mNumFaces * 3;
+		_mesh_draw_params[mi].index_offset = index_offset;
+		_mesh_draw_params[mi].base_vertex = base_vertex;
 
 		// position, normal & tex_coord
 		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {

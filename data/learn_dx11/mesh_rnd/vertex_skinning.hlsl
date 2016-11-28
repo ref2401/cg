@@ -20,7 +20,7 @@ struct VS_output {
 	float4 position_cs	: SV_Position;
 	float3 position_ws	: FRAG_POSITION_WS;
 	float3 normal_ws	: FRAG_NORMAL_WS;
-	float3 rgb			: FRAG_RGB;
+	float2 tex_coord	: FRAG_TEX_COORD;
 };
 
 struct Skinned_vertex {
@@ -41,7 +41,7 @@ VS_output vs_main(Vertex vertex)
 	output.position_cs = mul(g_projection_view_matrix, pos_ws);
 	output.position_cs /= output.position_cs.w;
 	output.normal_ws = normalize(mul(normal_matrix, v.normal));
-	output.rgb = float3(0.3, 0.3, 0.3);
+	output.tex_coord = vertex.tex_coord;
 
 	return output;
 }
@@ -59,34 +59,38 @@ Skinned_vertex get_skinned_verte(Vertex vertex)
 	const float4x4 bone_transform_matrix0 = g_model_bone_matrices[vertex.bone_indices[0]];
 	const float3x3 bone_normal_matrix0 = (float3x3)bone_transform_matrix0;
 	v.position += mul(bone_transform_matrix0, pos).xyz * bone_weight0;
-	v.normal += mul(pos, vertex.normal) * bone_weight0;
+	v.normal += mul(bone_normal_matrix0, vertex.normal) * bone_weight0;
 
 	// bone #1
 	const float bone_weight1 = vertex.bone_weights[1];
 	const float4x4 bone_transform_matrix1 = g_model_bone_matrices[vertex.bone_indices[1]];
 	const float3x3 bone_normal_matrix1 = (float3x3)bone_transform_matrix1;
 	v.position += mul(bone_transform_matrix1, pos).xyz * bone_weight1;
-	v.normal += mul(pos, vertex.normal) * bone_weight1;
+	v.normal += mul(bone_normal_matrix1, vertex.normal) * bone_weight1;
 
 	// bone #2
 	const float bone_weight2 = vertex.bone_weights[2];
 	const float4x4 bone_transform_matrix2 = g_model_bone_matrices[vertex.bone_indices[2]];
 	const float3x3 bone_normal_matrix2 = (float3x3)bone_transform_matrix2;
 	v.position += mul(bone_transform_matrix2, pos).xyz * bone_weight2;
-	v.normal += mul(pos, vertex.normal) * bone_weight2;
+	v.normal += mul(bone_normal_matrix2, vertex.normal) * bone_weight2;
 
 	// bone #3
 	const float bone_weight3 = vertex.bone_weights[3];
 	const float4x4 bone_transform_matrix3 = g_model_bone_matrices[vertex.bone_indices[3]];
 	const float3x3 bone_normal_matrix3 = (float3x3)bone_transform_matrix3;
 	v.position += mul(bone_transform_matrix3, pos).xyz * bone_weight3;
-	v.normal += mul(pos, vertex.normal) * bone_weight3;
+	v.normal += mul(bone_normal_matrix3, vertex.normal) * bone_weight3;
 
 	return v;
 }
 
+// ----- Pixel shader -----
 
 static float pi = 3.1415926535;
+SamplerState sampler_linear			: register(s0);
+Texture2D<float4> g_tex_diffuse_rgba	: register(t1);
+
 
 float3 calc_ambient_term(float3 normal_vs);
 
@@ -97,10 +101,14 @@ float4 ps_main(VS_output frag) : SV_Target
 	float3 light_dir_ws = normalize(light_pos_ws - frag.position_ws);
 	float cosTi = max(0, dot(frag.normal_ws, light_dir_ws));
 
-	float3 diffuse_rgb = frag.rgb;
-	float3 diffuse_term = diffuse_rgb * cosTi / pi;
-	float3 ambient_term = diffuse_rgb * calc_ambient_term(frag.normal_ws);
-	return float4(diffuse_rgb + ambient_term, 1);
+	float4 diffuse = g_tex_diffuse_rgba.Sample(sampler_linear, frag.tex_coord);
+	if (diffuse.a < 0.1)
+		discard;
+
+	float3 diffuse_term = diffuse.rgb * cosTi / pi;
+	float3 ambient_term = diffuse.rgb * calc_ambient_term(frag.normal_ws);
+	//return float4(diffuse_term + ambient_term, 1);
+	return float4(diffuse.rgb, 1);
 }
 
 float3 calc_ambient_term(float3 normal_vs)

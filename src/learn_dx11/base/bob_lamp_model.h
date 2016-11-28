@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include "cg/math/math.h"
+#include "cg/data/image.h"
 #include "assimp/scene.h"
 
 
@@ -31,13 +32,10 @@ struct Bone final {
 	cg::mat4 bp_matrix_inv;
 };
 
-struct Draw_indexed_params final {
-	Draw_indexed_params() noexcept = default;
+struct Mesh_draw_params final {
+	Mesh_draw_params() noexcept = default;
 
-	Draw_indexed_params(size_t index_count, size_t index_offset, size_t base_vertex) noexcept :
-		index_count(index_count), index_offset(index_offset), base_vertex(base_vertex)
-	{}
-
+	cg::data::Image_2d diffuse_rgb_image;
 	size_t index_count = 0;
 	size_t index_offset = 0;
 	size_t base_vertex = 0;
@@ -146,24 +144,22 @@ public:
 		return _bone_mapping;
 	}
 
-	const std::vector<float> curr_bone_matirces_data() const noexcept
+	float total_milliseconds() const noexcept
 	{
-		return _curr_bone_matrices_data;
+		return (_skeleton_animation.frame_count() - 1) * _skeleton_animation.frame_milliseconds();
 	}
 
-	void update_bone_matrices(float milliseconds);
+	void update_bone_matrices(float milliseconds, std::vector<float>& bone_matrces_data);
 
 private:
 
 	void init_bones(size_t bone_count, const aiNode* root_node);
 
 	// Bones are stored in level-order: root, its chilred, their children, ect.
-	// For any i [0, _bones.size()) _bones[i] & _bone_position[i] represent the same bone.
+	// _bone_mapping stores name of each bone and its index in _bones vector.
 	std::vector<Bone> _bones;
 	std::unordered_map<std::string, size_t> _bone_mapping;
 	Skeleton_animation _skeleton_animation;
-	//
-	std::vector<float> _curr_bone_matrices_data;
 };
 
 class Bob_lamp_md5_model final {
@@ -172,9 +168,9 @@ public:
 	Bob_lamp_md5_model();
 
 
-	std::vector<Draw_indexed_params> get_draw_params() noexcept
+	const std::vector<Mesh_draw_params>& mesh_draw_params() noexcept
 	{
-		return std::move(_draw_params);
+		return _mesh_draw_params;
 	}
 
 	std::unique_ptr<Model_animation> get_model_animation() noexcept
@@ -204,9 +200,11 @@ public:
 
 private:
 
-	void init_geometry(const aiScene* scene, const std::unordered_map<std::string, size_t>& bone_mapping);
+	void init_vertices(const aiScene* scene, const std::unordered_map<std::string, size_t>& bone_mapping);
 
-	std::vector<Draw_indexed_params> _draw_params;
+	void init_images();
+
+	std::vector<Mesh_draw_params> _mesh_draw_params;
 	std::vector<Vertex> _vertices;
 	std::vector<uint32_t> _indices;
 	std::unique_ptr<Model_animation> _model_animation;

@@ -21,8 +21,11 @@ enum class Image_format :unsigned char {
 	bgra_8
 };
 
-// Returns a number of bytes occupied by one pixel of the specified format.
+// Returns the number of bytes occupied by one pixel of the specified format.
 size_t byte_count(const Image_format& fmt) noexcept;
+
+// Returns the number of color channels for the given image format.
+size_t channel_count(const Image_format& fmt) noexcept;
 
 class Image_2d final {
 public:
