@@ -9,7 +9,6 @@ cbuffer Model : register(cb1) {
 StructuredBuffer<float4x4> g_model_bone_matrices : register(t0);
 
 struct Vertex {
-	uint id				: SV_VERTEXID;
 	float3 position		: V_POSITION;
 	float3 normal		: V_NORMAL;
 	float2 tex_coord	: V_TEX_COORD;
@@ -33,8 +32,6 @@ Skinned_vertex get_skinned_verte(Vertex vertex);
 
 VS_output vs_main(Vertex vertex)
 {
-	//float4x4 bone_matrix = g_model_bone_matrices[vertex_id];
-	//float4 pos = float4(bone_matrix._14_24_34, 1);
 	const Skinned_vertex v = get_skinned_verte(vertex);
 	const float3x3 normal_matrix = (float3x3)g_model_matrix;
 	const float4 pos_ws = mul(g_model_matrix, float4(v.position, 1));

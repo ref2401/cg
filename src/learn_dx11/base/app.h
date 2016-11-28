@@ -23,6 +23,8 @@ public:
 	virtual ~Example() noexcept {}
 
 
+	virtual void on_keypress() {}
+
 	virtual void on_viewport_resize(const cg::uint2& viewport_size) = 0;
 
 	virtual void render() = 0;
@@ -62,6 +64,8 @@ public:
 
 
 	Com_ptr<ID3D11Debug> get_dx_debug();
+
+	void on_keypress();
 
 	void on_window_resize(const cg::uint2& window_size);
 

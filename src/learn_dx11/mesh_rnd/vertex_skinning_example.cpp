@@ -164,7 +164,7 @@ void Vertex_skinning_example::render()
 
 void Vertex_skinning_example::update()
 {
-	static const float ms_step = 2;
+	static const float ms_step = 2.5;
 	static float ms_counter = -ms_step;
 
 	if (ms_counter + ms_step > 5791.0f) {

@@ -226,8 +226,7 @@ void Model_animation::update_bone_matrices(float milliseconds)
 
 		curr_transform.position = cg::rotate(parent_transform.rotation, pos) + parent_transform.position;
 		curr_transform.rotation = cg::normalize(parent_transform.rotation * rot);
-		mat4 tm = cg::tr_matrix(curr_transform.position, curr_transform.rotation) 
-			* _bones[i].bp_matrix_inv;
+		mat4 tm = cg::tr_matrix(curr_transform.position, curr_transform.rotation) * _bones[i].bp_matrix_inv;
 		to_array_column_major_order(tm, ptr);
 		ptr += 16;
 	}

@@ -86,6 +86,10 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 			PostQuitMessage(0);
 			return 0;
 
+		case WM_KEYDOWN:
+			g_app->on_keypress();
+			return 0;
+
 		case WM_SIZE:
 		{
 			g_app->on_window_resize(uint2(LOWORD(l_param), HIWORD(l_param)));
@@ -138,6 +142,12 @@ Com_ptr<ID3D11Debug> Application::get_dx_debug()
 	debug->AddRef();
 
 	return debug;
+}
+
+void Application::on_keypress()
+{
+	if (_example)
+		_example->on_keypress();
 }
 
 void Application::on_window_resize(const uint2& window_size)
