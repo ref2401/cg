@@ -9,7 +9,6 @@
 namespace learn_dx11 {
 namespace mesh_rnd {
 
-
 class Static_mesh_example final : public Example {
 public:
 

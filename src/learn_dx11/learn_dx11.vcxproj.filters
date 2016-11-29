@@ -17,6 +17,9 @@
     <ClCompile Include="base\bob_lamp_model.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="mesh_rnd\displacement_mapping_example.cpp">
+      <Filter>mesh_rnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -41,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="base\bob_lamp_model.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_rnd\displacement_mapping_example.h">
+      <Filter>mesh_rnd</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

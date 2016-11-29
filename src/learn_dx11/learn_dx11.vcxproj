@@ -130,6 +130,7 @@
     <ClCompile Include="base\dx11.cpp" />
     <ClCompile Include="base\bob_lamp_model.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh_rnd\displacement_mapping_example.cpp" />
     <ClCompile Include="mesh_rnd\static_mesh_example.cpp" />
     <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp" />
   </ItemGroup>
@@ -142,6 +143,7 @@
     <ClInclude Include="base\app.h" />
     <ClInclude Include="base\dx11.h" />
     <ClInclude Include="base\bob_lamp_model.h" />
+    <ClInclude Include="mesh_rnd\displacement_mapping_example.h" />
     <ClInclude Include="mesh_rnd\static_mesh_example.h" />
     <ClInclude Include="mesh_rnd\vertex_skinning_example.h" />
   </ItemGroup>
