@@ -2,10 +2,6 @@ cbuffer Model : register(cb0) {
 	float4x4 g_model_matrix	: packoffset(c0);
 };
 
-cbuffer Projection_view : register(cb1) {
-	float4x4 g_projection_view_matrix	: packoffset(c0);
-};
-
 struct VS_result {
 	float4 position_ws	: SV_Position;
 	float2 tex_coord	: FRAG_TEX_COORD;
@@ -28,11 +24,21 @@ VS_result vs_main(uint vertex_id : SV_VertexID)
 		result.tex_coord = float2(0, 1);
 	}
 	
-	float4 pos_ws = mul(g_model_matrix, vertex_position);
-	result.position_ws = mul(g_projection_view_matrix, pos_ws);
+	result.position_ws = mul(g_model_matrix, vertex_position);
 	
 	return result;
 }
+
+// ----- Hull Shader -----
+
+
+// ----- Domain Shader -----
+// mul(g_projection_view_matrix, pos_ws);
+
+cbuffer Projection_view : register(cb1) {
+	float4x4 g_projection_view_matrix	: packoffset(c0);
+};
+
 
 // ----- Pixel Shader -----
 

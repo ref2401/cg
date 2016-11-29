@@ -48,6 +48,26 @@ public:
 		return _vertex_shader_bytecode.ptr;
 	}
 
+	ID3D11HullShader* hull_shader() noexcept
+	{
+		return _hull_shader.ptr;
+	}
+
+	ID3DBlob* hull_shader_bytecode() noexcept
+	{
+		return _hull_shader_bytecode.ptr;
+	}
+
+	ID3D11DomainShader* domain_shader() noexcept
+	{
+		return _domain_shader.ptr;
+	}
+
+	ID3DBlob* domain_shader_bytecode() noexcept
+	{
+		return _domain_shader_bytecode.ptr;
+	}
+
 	ID3D11PixelShader* pixel_shader() noexcept
 	{
 		return _pixel_shader.ptr;
@@ -62,10 +82,18 @@ private:
 
 	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
 
+	void init_hull_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+
+	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+
 	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
 
 	Com_ptr<ID3D11VertexShader> _vertex_shader;
 	Com_ptr<ID3DBlob> _vertex_shader_bytecode;
+	Com_ptr<ID3D11HullShader> _hull_shader;
+	Com_ptr<ID3DBlob> _hull_shader_bytecode;
+	Com_ptr<ID3D11DomainShader> _domain_shader;
+	Com_ptr<ID3DBlob> _domain_shader_bytecode;
 	Com_ptr<ID3D11PixelShader> _pixel_shader;
 	Com_ptr<ID3DBlob> _pixel_shader_bytecode;
 };
@@ -117,6 +145,8 @@ public:
 	{
 		return _rasterizer_state.ptr;
 	}
+
+	void set_rasterizer_state(ID3D11RasterizerState* state);
 
 	ID3D11RenderTargetView* render_target_view() noexcept
 	{

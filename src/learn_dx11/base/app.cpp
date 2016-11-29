@@ -120,6 +120,16 @@ void Example::clear_depth_stencil_buffer(float clear_depth)
 		D3D11_CLEAR_DEPTH, clear_depth, 1);
 }
 
+void Example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
+{
+	ID3D11RasterizerState* state = nullptr;
+	HRESULT hr = _device->CreateRasterizerState(&desc, &state);
+	assert(hr == S_OK);
+
+	_device_ctx->RSSetState(state);
+	_pipeline_state.set_rasterizer_state(state);
+}
+
 // ----- Application -----
 
 Application::Application(cg::uint2 window_position, cg::uint2 window_size) :

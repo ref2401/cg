@@ -52,14 +52,24 @@ Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_dat
 {
 	assert(hlsl_data.has_vertex_shader());
 	assert(hlsl_data.has_pixel_shader());
+	
+	if (hlsl_data.has_hull_shader()) {
+		assert(hlsl_data.has_domain_shader());
+	}
 
 	init_vertex_shader(device, hlsl_data);
+	if (hlsl_data.has_hull_shader()) init_hull_shader(device, hlsl_data);
+	if (hlsl_data.has_domain_shader()) init_domain_shader(device, hlsl_data);
 	init_pixel_shader(device, hlsl_data);
 }
 
 Hlsl_shader_set::Hlsl_shader_set(Hlsl_shader_set&& set) noexcept :
 	_vertex_shader(std::move(set._vertex_shader)),
 	_vertex_shader_bytecode(std::move(set._vertex_shader_bytecode)),
+	_hull_shader(std::move(set._hull_shader)),
+	_hull_shader_bytecode(std::move(set._hull_shader_bytecode)),
+	_domain_shader(std::move(set._domain_shader)),
+	_domain_shader_bytecode(std::move(set._domain_shader_bytecode)),
 	_pixel_shader(std::move(set._pixel_shader)),
 	_pixel_shader_bytecode(std::move(set._pixel_shader_bytecode))
 {}
@@ -70,6 +80,10 @@ Hlsl_shader_set& Hlsl_shader_set::operator=(Hlsl_shader_set&& set) noexcept
 
 	_vertex_shader = std::move(set._vertex_shader);
 	_vertex_shader_bytecode = std::move(set._vertex_shader_bytecode);
+	_hull_shader = std::move(set._hull_shader);
+	_hull_shader_bytecode = std::move(set._hull_shader_bytecode);
+	_domain_shader = std::move(set._domain_shader);
+	_domain_shader_bytecode = std::move(set._domain_shader_bytecode);
 	_pixel_shader = std::move(set._pixel_shader);
 	_pixel_shader_bytecode = std::move(set._pixel_shader_bytecode);
 
@@ -95,7 +109,45 @@ void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader
 	}
 }
 
-void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data)
+void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+{
+	try {
+		_hull_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+			hlsl_data.hull_shader_entry_point, "hs_5_0", hlsl_data.compile_flags);
+
+		HRESULT hr = device->CreateHullShader(
+			_hull_shader_bytecode->GetBufferPointer(),
+			_hull_shader_bytecode->GetBufferSize(),
+			nullptr, &_hull_shader.ptr);
+
+		ENFORCE(hr == S_OK, std::to_string(hr));
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Hull shader creation error.");
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+}
+
+void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+{
+	try {
+		_domain_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+			hlsl_data.domain_shader_entry_point, "ds_5_0", hlsl_data.compile_flags);
+
+		HRESULT hr = device->CreateDomainShader(
+			_domain_shader_bytecode->GetBufferPointer(),
+			_domain_shader_bytecode->GetBufferSize(),
+			nullptr, &_domain_shader.ptr);
+
+		ENFORCE(hr == S_OK, std::to_string(hr));
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Domain shader creation error.");
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+}
+
+void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
 {
 	try {
 		_pixel_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -190,6 +242,11 @@ void Pipeline_state::init_depth_stencil_state(ID3D11Device* device)
 
 	HRESULT hr = device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
 	assert(hr == S_OK);
+}
+
+void Pipeline_state::set_rasterizer_state(ID3D11RasterizerState* state)
+{
+	_rasterizer_state = state;
 }
 
 void Pipeline_state::update_depth_stencil_view(ID3D11Device* device)

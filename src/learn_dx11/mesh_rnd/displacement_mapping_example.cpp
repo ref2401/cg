@@ -14,7 +14,7 @@ namespace mesh_rnd {
 Displacement_mapping_example::Displacement_mapping_example(Render_context& rnd_ctx) :
 	Example(rnd_ctx)
 {
-	_view_matrix = cg::view_matrix(float3(0, 2, 8.0f), float3::zero);
+	_view_matrix = cg::view_matrix(float3(0, 0, 3), float3::zero);
 	_model_matrix = mat4::identity;
 
 	init_shaders();
@@ -41,6 +41,8 @@ void Displacement_mapping_example::init_shaders()
 		"../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
 	
 	hlsl_data.vertex_shader_entry_point = "vs_main";
+	//hlsl_data.hull_shader_entry_point = "hs_main";
+	//hlsl_data.domain_shader_entry_point = "ds_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
 	_shader_set = Hlsl_shader_set(_device, hlsl_data);
@@ -68,7 +70,10 @@ void Displacement_mapping_example::setup_pipeline_state()
 
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_model_cbuffer.ptr);
-	_device_ctx->VSSetConstantBuffers(1, 1, &_projection_view_cbuffer.ptr);
+
+	// hull
+	// domain
+	//_device_ctx->VSSetConstantBuffers(1, 1, &_projection_view_cbuffer.ptr);
 
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
@@ -76,6 +81,7 @@ void Displacement_mapping_example::setup_pipeline_state()
 	D3D11_RASTERIZER_DESC rastr_state_desc = {};
 	_pipeline_state.rasterizer_state()->GetDesc(&rastr_state_desc);
 	rastr_state_desc.FillMode = D3D11_FILL_WIREFRAME;
+	setup_rasterizer_state(rastr_state_desc);
 	
 	HRESULT hr = _device->CreateRasterizerState(&rastr_state_desc, &_wireframe_rasterizer_state.ptr);
 	assert(hr == S_OK);
@@ -96,7 +102,7 @@ void Displacement_mapping_example::setup_projection_view_matrix()
 
 void Displacement_mapping_example::update_projection_matrix(float wh_aspect_ratio)
 {
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 100.0f);
+	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 10.0f);
 }
 
 } // namespace mesh_rnd

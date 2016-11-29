@@ -50,6 +50,18 @@ struct Hlsl_shader_set_data final {
 		return !vertex_shader_entry_point.empty();
 	}
 
+	// Returns true if hull shader's entry point is specified.
+	bool has_hull_shader() const noexcept
+	{
+		return !hull_shader_entry_point.empty();
+	}
+
+	// Returns true if domain shader's entry point is specified.
+	bool has_domain_shader() const noexcept
+	{
+		return !domain_shader_entry_point.empty();
+	}
+
 	// Returns true if pixel shader's entry point is specified.
 	bool has_pixel_shader() const noexcept
 	{
@@ -65,6 +77,12 @@ struct Hlsl_shader_set_data final {
 
 	// The name of a function where vertex shader execution begins.
 	std::string vertex_shader_entry_point;
+	
+	// The name of a function where hull shader execution begins.
+	std::string hull_shader_entry_point;
+
+	// The name of a function where domain shader execution begins.
+	std::string domain_shader_entry_point;
 
 	// The name of a function where pixel shader execution begins.
 	std::string pixel_shader_entry_point;

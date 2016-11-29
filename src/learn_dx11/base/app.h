@@ -38,6 +38,10 @@ protected:
 
 	void clear_depth_stencil_buffer(float clear_depth);
 
+	// Creates a new rasterizer state object, overwrites _pipeline_state.resterizer_state() 
+	// object with the new one and sets the new state as the current of the pipeline.
+	void setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc);
+
 	ID3D11Device* _device;
 	ID3D11Debug* _debug;
 	ID3D11DeviceContext* _device_ctx;
