@@ -18,7 +18,21 @@ Displacement_mapping_example::Displacement_mapping_example(Render_context& rnd_c
 	_model_matrix = mat4::identity;
 
 	init_shaders();
+	init_cbuffers();
+
+	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
+	setup_projection_view_matrix();
 	setup_pipeline_state();
+}
+
+void Displacement_mapping_example::init_cbuffers()
+{
+	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	float matrix_data[16];
+	to_array_column_major_order(_model_matrix, matrix_data);
+	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
+
+	_projection_view_cbuffer = make_cbuffer(_device, sizeof(mat4));
 }
 
 void Displacement_mapping_example::init_shaders()
@@ -34,6 +48,8 @@ void Displacement_mapping_example::init_shaders()
 
 void Displacement_mapping_example::on_viewport_resize(const uint2& viewport_size)
 {
+	update_projection_matrix(viewport_size.aspect_ratio());
+	setup_projection_view_matrix();
 }
 
 void Displacement_mapping_example::render()
@@ -43,19 +59,39 @@ void Displacement_mapping_example::render()
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);
 
-	_device_ctx->Draw(1, 0);
+	_device_ctx->Draw(3, 0);
 }
 
 void Displacement_mapping_example::setup_pipeline_state()
 {
-	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
+	_device_ctx->VSSetConstantBuffers(0, 1, &_model_cbuffer.ptr);
+	_device_ctx->VSSetConstantBuffers(1, 1, &_projection_view_cbuffer.ptr);
 
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
-	HRESULT hr = _debug->ValidateContext(_device_ctx);
+	// wireframe rasterizer state
+	D3D11_RASTERIZER_DESC rastr_state_desc = {};
+	_pipeline_state.rasterizer_state()->GetDesc(&rastr_state_desc);
+	rastr_state_desc.FillMode = D3D11_FILL_WIREFRAME;
+	
+	HRESULT hr = _device->CreateRasterizerState(&rastr_state_desc, &_wireframe_rasterizer_state.ptr);
 	assert(hr == S_OK);
+	_device_ctx->RSSetState(_wireframe_rasterizer_state.ptr);
+
+	hr = _debug->ValidateContext(_device_ctx);
+	assert(hr == S_OK);
+}
+
+void Displacement_mapping_example::setup_projection_view_matrix()
+{
+	float matrix_data[16];
+	mat4 proj_view_matrix = _projection_matrix * _view_matrix;
+	to_array_column_major_order(proj_view_matrix, matrix_data);
+
+	_device_ctx->UpdateSubresource(_projection_view_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 }
 
 void Displacement_mapping_example::update_projection_matrix(float wh_aspect_ratio)

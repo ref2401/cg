@@ -14,9 +14,9 @@ Only Debug mode works at the moment. The reason is that extern/Assimp does not b
 2. [Deferred Lighting Renderer](https://github.com/ref2401/cg/wiki/Deferred-Lighting-Renderer) (OpenGL 4.5)
 
 ## Meshes
-http://graphics.cs.williams.edu/data/meshes.xml
-http://www.cc.gatech.edu/projects/large_models/
-http://www.katsbits.com/download/models/
+- http://graphics.cs.williams.edu/data/meshes.xml
+- http://www.cc.gatech.edu/projects/large_models/
+- http://www.katsbits.com/download/models/
 
 ## Notes
 1. [Want to Implement List](https://github.com/ref2401/cg/wiki#wanna-implement)

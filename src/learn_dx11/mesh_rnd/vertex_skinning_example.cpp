@@ -31,7 +31,6 @@ void Vertex_skinning_example::init_cbuffers()
 	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
 
 	float matrix_data[16];
-	_model_matrix = mat4::identity;
 	_model_matrix = cg::translation_matrix(float3(0, -3.4f, 0)) * cg::rotation_matrix_ox<mat4>(-cg::pi_2);
 	to_array_column_major_order(_model_matrix, matrix_data);
 
