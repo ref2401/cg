@@ -39,7 +39,7 @@ VS_output vs_main(Vertex vertex)
 	VS_output output;
 	output.position_ws = pos_ws.xyz;
 	output.position_cs = mul(g_projection_view_matrix, pos_ws);
-	output.position_cs /= output.position_cs.w;
+	output.position_cs /= output.position_cs.w; // for debugging purpose only
 	output.normal_ws = normalize(mul(normal_matrix, v.normal));
 	output.tex_coord = vertex.tex_coord;
 

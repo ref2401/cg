@@ -35,6 +35,8 @@ private:
 
 	void init_shaders();
 
+	void init_terrain_textures();
+
 	void setup_pipeline_state();
 
 	void setup_projection_view_matrix();
@@ -45,6 +47,11 @@ private:
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
 	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
+	Com_ptr<ID3D11Texture2D> _tex_terrain_displacement_map;
+	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_displacement_map_srv;
+	Com_ptr<ID3D11Texture2D> _tex_terrain_normal_map;
+	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_normal_map_srv;
+	Com_ptr<ID3D11SamplerState> _linear_sampler;
 
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
