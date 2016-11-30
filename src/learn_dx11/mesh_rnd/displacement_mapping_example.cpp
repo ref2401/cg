@@ -41,8 +41,8 @@ void Displacement_mapping_example::init_shaders()
 		"../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
 	
 	hlsl_data.vertex_shader_entry_point = "vs_main";
-	//hlsl_data.hull_shader_entry_point = "hs_main";
-	//hlsl_data.domain_shader_entry_point = "ds_main";
+	hlsl_data.hull_shader_entry_point = "hs_main";
+	hlsl_data.domain_shader_entry_point = "ds_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
 	_shader_set = Hlsl_shader_set(_device, hlsl_data);
@@ -66,14 +66,16 @@ void Displacement_mapping_example::render()
 
 void Displacement_mapping_example::setup_pipeline_state()
 {
-	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_model_cbuffer.ptr);
 
 	// hull
+	_device_ctx->HSSetShader(_shader_set.hull_shader(), nullptr, 0);
 	// domain
-	//_device_ctx->VSSetConstantBuffers(1, 1, &_projection_view_cbuffer.ptr);
+	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
+	_device_ctx->DSSetConstantBuffers(0, 1, &_projection_view_cbuffer.ptr);
 
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
