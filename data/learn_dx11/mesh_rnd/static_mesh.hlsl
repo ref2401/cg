@@ -15,7 +15,6 @@ struct Vertex {
 
 struct VS_output {
 	float4 position		: SV_Position;
-	float3 position_ws	: POSITION_WS;
 	float3 normal_ws	: NORMAL_WS;
 	float2 tex_coord	: TEX_COORD;
 };
@@ -27,7 +26,6 @@ VS_output vs_main(Vertex vertex)
 
 	VS_output output;
 	output.position = pos_cs;
-	output.position_ws = pos_ws.xyz;
 	output.normal_ws = mul(g_model_matrix, float4(vertex.normal, 1)).xyz;
 	output.tex_coord = vertex.tex_coord;
 	return output;
@@ -42,9 +40,8 @@ float3 calc_ambient_term(float3 normal_vs);
 
 float4 ps_main(VS_output frag) : SV_Target
 {
-	float3 light_pos_ws = float3(2, 5, 3);
-	float3 light_dir_ws = normalize(light_pos_ws - frag.position_ws);
-	float cosTi = max(0, dot(frag.normal_ws, light_dir_ws));
+	static const float3 direction_to_light = normalize(float3(2, 5, 3));
+	float cosTi = max(0, dot(frag.normal_ws, direction_to_light));
 	
 	float3 diffuse_rgb = g_tex_diffuse_rgb.Sample(sampler_linear, frag.tex_coord);
 	float3 diffuse_term = diffuse_rgb * cosTi / pi;

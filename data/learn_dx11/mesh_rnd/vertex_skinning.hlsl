@@ -18,7 +18,6 @@ struct Vertex {
 
 struct VS_output {
 	float4 position_cs	: SV_Position;
-	float3 position_ws	: FRAG_POSITION_WS;
 	float3 normal_ws	: FRAG_NORMAL_WS;
 	float2 tex_coord	: FRAG_TEX_COORD;
 };
@@ -37,9 +36,7 @@ VS_output vs_main(Vertex vertex)
 	const float4 pos_ws = mul(g_model_matrix, float4(v.position, 1));
 
 	VS_output output;
-	output.position_ws = pos_ws.xyz;
 	output.position_cs = mul(g_projection_view_matrix, pos_ws);
-	output.position_cs /= output.position_cs.w; // for debugging purpose only
 	output.normal_ws = normalize(mul(normal_matrix, v.normal));
 	output.tex_coord = vertex.tex_coord;
 
@@ -96,19 +93,17 @@ float3 calc_ambient_term(float3 normal_vs);
 
 float4 ps_main(VS_output frag) : SV_Target
 {
-	static const float3 light_pos_ws = float3(2, 5, 3);
-	
-	float3 light_dir_ws = normalize(light_pos_ws - frag.position_ws);
-	float cosTi = max(0, dot(frag.normal_ws, light_dir_ws));
+	static const float3 direction_to_light = normalize(float3(2, 5, 3));
 
 	float4 diffuse = g_tex_diffuse_rgba.Sample(sampler_linear, frag.tex_coord);
 	if (diffuse.a < 0.1)
 		discard;
 
+	float cosTi = max(0, dot(frag.normal_ws, direction_to_light));
+
 	float3 diffuse_term = diffuse.rgb * cosTi / pi;
 	float3 ambient_term = diffuse.rgb * calc_ambient_term(frag.normal_ws);
-	//return float4(diffuse_term + ambient_term, 1);
-	return float4(diffuse.rgb, 1);
+	return float4(diffuse_term + ambient_term, 1);
 }
 
 float3 calc_ambient_term(float3 normal_vs)

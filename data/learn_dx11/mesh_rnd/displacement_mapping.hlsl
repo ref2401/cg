@@ -113,7 +113,6 @@ SamplerState g_sampler					: register(s0);
 
 struct DS_result {
 	float4 position_cs	: SV_Position;
-	float3 position_ws	: FRAG_POSITION_WS;
 	float3 normal_ws	: FRAG_NORMAL_WS;
 	float2 tex_coord	: FRAG_TEX_COORD;
 	float3 tangent_ws	: FRAG_TANGENT_WS;
@@ -153,7 +152,6 @@ DS_result ds_main(const OutputPatch<HS_result, 3> patch,
 
 	DS_result result;
 	result.position_cs = mul(g_projection_view_matrix, float4(pos_ws, 1));
-	result.position_ws = pos_ws;
 	result.normal_ws = normal_ws;
 	result.tex_coord = tex_coord;
 	result.tangent_ws = tangent_ws;
