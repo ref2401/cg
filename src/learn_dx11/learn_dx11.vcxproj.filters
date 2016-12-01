@@ -20,6 +20,9 @@
     <ClCompile Include="mesh_rnd\displacement_mapping_example.cpp">
       <Filter>mesh_rnd</Filter>
     </ClCompile>
+    <ClCompile Include="tess\terrain_tessellation_example.cpp">
+      <Filter>tess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -27,6 +30,9 @@
     </Filter>
     <Filter Include="mesh_rnd">
       <UniqueIdentifier>{00b5670e-9a13-46f6-b9b7-99dddaa81543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tess">
+      <UniqueIdentifier>{20b3a81f-f97a-4798-b93d-bafe032253ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="mesh_rnd\displacement_mapping_example.h">
       <Filter>mesh_rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\terrain_tessellation_example.h">
+      <Filter>tess</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

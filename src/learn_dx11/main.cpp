@@ -4,6 +4,7 @@
 #include "learn_dx11/mesh_rnd/displacement_mapping_example.h"
 #include "learn_dx11/mesh_rnd/vertex_skinning_example.h"
 #include "learn_dx11/mesh_rnd/static_mesh_example.h"
+#include "learn_dx11/tess/terrain_tessellation_example.h"
 
 
 int main(int argc, char* argv[])
@@ -22,7 +23,8 @@ int main(int argc, char* argv[])
 			// Uncomment any line to execute the appropriate example.
 			//app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
 			//app.run<learn_dx11::mesh_rnd::Vertex_skinning_example>();
-			app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
+			//app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
+			app.run<learn_dx11::tess::Terrain_tessellation_example>();
 		}
 
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);

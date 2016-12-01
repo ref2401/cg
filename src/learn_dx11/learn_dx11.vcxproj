@@ -133,6 +133,7 @@
     <ClCompile Include="mesh_rnd\displacement_mapping_example.cpp" />
     <ClCompile Include="mesh_rnd\static_mesh_example.cpp" />
     <ClCompile Include="mesh_rnd\vertex_skinning_example.cpp" />
+    <ClCompile Include="tess\terrain_tessellation_example.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">
@@ -146,6 +147,7 @@
     <ClInclude Include="mesh_rnd\displacement_mapping_example.h" />
     <ClInclude Include="mesh_rnd\static_mesh_example.h" />
     <ClInclude Include="mesh_rnd\vertex_skinning_example.h" />
+    <ClInclude Include="tess\terrain_tessellation_example.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
