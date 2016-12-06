@@ -23,7 +23,8 @@ enum class Vertex_attribs : unsigned char {
 	p_n_tc_ts
 };
 
-//
+// Describes the order and byte offset of the specified vertex attributes.
+// The relative order of the attributes is: position, normal, tex_coord, tangent_h.
 template<Vertex_attribs attribs>
 struct Vertex_interleaved_format;
 

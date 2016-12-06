@@ -162,6 +162,22 @@ namespace data {
 
 // ----- funcs -----
 
+std::ostream& operator<<(std::ostream& o, const Model_mesh_info& mi)
+{
+	o << "Model_mesh_info(" << mi.vertex_count << ", " << mi.base_vertex
+		<< ", " << mi.index_count << ", " << mi.index_offset << ")";
+
+	return o;
+}
+
+std::wostream& operator<<(std::wostream& o, const Model_mesh_info& mi)
+{
+	o << "Model_mesh_info(" << mi.vertex_count << ", " << mi.base_vertex
+		<< ", " << mi.index_count << ", " << mi.index_offset << ")";
+
+	return o;
+}
+
 template<>
 Model_geometry_data<Vertex_attribs::p> load_model<Vertex_attribs::p>(const char* filename)
 {

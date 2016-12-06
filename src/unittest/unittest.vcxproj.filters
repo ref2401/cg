@@ -49,6 +49,9 @@
     <ClCompile Include="data\file_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="data\model_unittest.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

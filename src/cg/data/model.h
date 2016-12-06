@@ -116,26 +116,27 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> final {
 	};
 };
 
+// Model_mesh_info stores all the necessary info to be able to draw a single mesh.
+struct Model_mesh_info final {
+	Model_mesh_info() noexcept = default;
+
+	Model_mesh_info(size_t vertex_count, size_t base_vertex, size_t index_count, size_t index_offset) noexcept :
+		vertex_count(vertex_count), base_vertex(base_vertex),
+		index_count(index_count), index_offset(index_offset)
+	{}
+
+	size_t vertex_count = 0;
+	size_t base_vertex = 0;
+	size_t index_count = 0;
+	size_t index_offset = 0;
+};
+
+// Any part of a model may require different material instance or different
+// renderer pipeline settings. Such parts of a model are called a mesh.
 // 
 template<Vertex_attribs attribs>
 class Model_geometry_data final {
 public:
-
-	struct Mesh_data_info final {
-		Mesh_data_info() noexcept = default;
-
-		Mesh_data_info(size_t vertex_count, size_t base_vertex,
-			size_t index_count, size_t index_offset) noexcept :
-		vertex_count(vertex_count), base_vertex(base_vertex),
-			index_count(index_count), index_offset(index_offset)
-		{}
-
-		size_t vertex_count = 0;
-		size_t base_vertex = 0;
-		size_t index_count = 0;
-		size_t index_offset = 0;
-	};
-
 
 	using Format = Vertex_interleaved_format<attribs>;
 
@@ -150,7 +151,7 @@ public:
 		return _meshes.size();
 	}
 
-	const std::vector<Mesh_data_info>& meshes() const noexcept
+	const std::vector<Model_mesh_info>& meshes() const noexcept
 	{
 		return _meshes;
 	}
@@ -195,7 +196,7 @@ public:
 	void push_back_vertex(const Vertex& vertex);
 
 private:
-	std::vector<Mesh_data_info> _meshes;
+	std::vector<Model_mesh_info> _meshes;
 	std::vector<unsigned char> _vertex_data;
 	std::vector<uint32_t> _index_data;
 };
@@ -240,6 +241,23 @@ void Model_geometry_data<attribs>::push_back_vertex(const Vertex& vertex)
 	_vertex_data.insert(_vertex_data.cend(), std::cbegin(vertex.data), std::cend(vertex.data));
 }
 
+
+inline bool operator==(const Model_mesh_info& l, const Model_mesh_info& r) noexcept
+{
+	return (l.vertex_count == r.vertex_count)
+		&& (l.base_vertex == r.base_vertex)
+		&& (l.index_count == r.index_count)
+		&& (l.index_offset == r.index_offset);
+}
+
+inline bool operator!=(const Model_mesh_info& l, const Model_mesh_info& r) noexcept
+{
+	return !(l == r);
+}
+
+std::ostream& operator<<(std::ostream& o, const Model_mesh_info& mi);
+
+std::wostream& operator<<(std::wostream& o, const Model_mesh_info& mi);
 
 template<Vertex_attribs attribs>
 Model_geometry_data<attribs> load_model(const char* filename);
