@@ -270,6 +270,11 @@ public:
 		return _vertex_data;
 	}
 
+	size_t vertex_data_byte_count() const noexcept
+	{
+		return _vertex_data.size();
+	}
+
 	size_t index_count() const noexcept
 	{
 		return _index_data.size();
@@ -278,6 +283,11 @@ public:
 	const std::vector<uint32_t>& index_data() const noexcept
 	{
 		return _index_data;
+	}
+
+	size_t index_data_byte_count() const noexcept
+	{
+		return _index_data.size() * sizeof(uint32_t);
 	}
 
 	void push_back_mesh(size_t vertex_count, size_t base_vertex, 
@@ -355,44 +365,6 @@ inline Model_geometry_data<attribs> load_model(const std::string& filename)
 	return load_model<attribs>(filename.c_str());
 }
 
-
-//template<>
-//void Model_geometry_data<Vertex_attribs_new::p_n>::push_back_vertex(const cg::float3& position, 
-//	const cg::float3& normal)
-//{
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(position.data), std::cend(position.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(normal.data), std::cend(normal.data));
-//}
-//
-//template<>
-//void Model_geometry_data<Vertex_attribs_new::p_n_tc>::push_back_vertex(const cg::float3& position, 
-//	const cg::float3& normal, const cg::float2& tex_coord)
-//{
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(position.data), std::cend(position.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(normal.data), std::cend(normal.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(tex_coord.data), std::cend(tex_coord.data));
-//}
-//
-//template<>
-//void Model_geometry_data<Vertex_attribs_new::p_tc>::push_back_vertex(const cg::float3& position,
-//	const cg::float2& tex_coord)
-//{
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(position.data), std::cend(position.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(tex_coord.data), std::cend(tex_coord.data));
-//}
-//
-//template<>
-//void Model_geometry_data<Vertex_attribs_new::p_n_tc_ts>::push_back_vertex(const cg::float3& position, 
-//	const cg::float3& normal, const cg::float2& tex_coord, 
-//	const cg::float3& tangent, const cg::float3& bitangent)
-//{
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(position.data), std::cend(position.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(normal.data), std::cend(normal.data));
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(tex_coord.data), std::cend(tex_coord.data));
-//
-//	cg::float4 tangent_h = compute_tangent_handedness(tangent, bitangent, normal);
-//	_vertex_data.insert(_vertex_data.cend(), std::cbegin(tangent_h.data), std::cend(tangent_h.data));
-//}
 
 } // namespace data
 } // namespace cg

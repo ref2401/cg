@@ -3,8 +3,7 @@
 #include <sstream>
 #include "cg/base/base.h"
 #include "cg/data/image.h"
-#include "cg/data/mesh.h"
-#include "cg/data/vertex.h"
+#include "cg/data/model.h"
 #include <DirectXMath.h>
 
 using cg::float2;
@@ -12,8 +11,7 @@ using cg::float3;
 using cg::float4;
 using cg::mat4;
 using cg::uint2;
-using cg::data::Interleaved_mesh_data;
-using cg::data::Vertex_attribs;
+using cg::data::Vertex_attribs_new;
 
 
 namespace learn_dx11 {
@@ -48,16 +46,16 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto mesh_data = cg::data::load_mesh_wavefront<Vertex_attribs::vertex_p_n_tc>("../data/cube.obj", 24, 36);
-	_model_index_count = mesh_data.index_count();
+	auto model_geometry = cg::data::load_model<Vertex_attribs_new::p_n_tc>("../data/cube.obj");
+	_model_index_count = model_geometry.index_count();
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = mesh_data.vertex_data_byte_count();
+	vb_desc.ByteWidth = model_geometry.vertex_data_byte_count();
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
-	vb_data.pSysMem = mesh_data.vertex_data().data();
+	vb_data.pSysMem = model_geometry.vertex_data().data();
 
 	HRESULT hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
 	assert(hr == S_OK);
@@ -78,10 +76,10 @@ void Static_mesh_example::init_geometry()
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ib_desc.ByteWidth = mesh_data.index_data_byte_count();
+	ib_desc.ByteWidth = model_geometry.index_data_byte_count();
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	D3D11_SUBRESOURCE_DATA ib_data = {};
-	ib_data.pSysMem = mesh_data.index_data().data();
+	ib_data.pSysMem = model_geometry.index_data().data();
 
 	hr = _device->CreateBuffer(&ib_desc, &ib_data, &_index_buffer.ptr);
 	assert(hr == S_OK);
