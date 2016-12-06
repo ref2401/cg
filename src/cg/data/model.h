@@ -10,6 +10,7 @@
 #include "cg/data/vertex.h"
 #include "cg/math/math.h"
 
+
 namespace cg {
 namespace data {
 
@@ -116,7 +117,7 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> final {
 	};
 };
 
-// Model_mesh_info stores all the necessary info to be able to draw a single mesh.
+// Model_mesh_info stores all the necessary info that is used to draw a single mesh.
 struct Model_mesh_info final {
 	Model_mesh_info() noexcept = default;
 
@@ -143,7 +144,9 @@ public:
 	using Vertex = Model_geometry_vertex<attribs>;
 
 
-	Model_geometry_data(size_t mesh_count);
+	Model_geometry_data() = default;
+
+	explicit Model_geometry_data(size_t mesh_count);
 
 
 	size_t mesh_count() const noexcept
@@ -193,6 +196,15 @@ public:
 
 	void push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2);
 
+	template<typename Container>
+	void push_back_indices(const Container& container);
+
+	template<size_t count>
+	void push_back_indices(const uint32_t(&indices)[count]);
+
+	template<typename Input_iterator>
+	void push_back_indices(Input_iterator b, Input_iterator e);
+
 	void push_back_vertex(const Vertex& vertex);
 
 private:
@@ -233,6 +245,27 @@ void Model_geometry_data<attribs>::push_back_indices(uint32_t i0, uint32_t i1, u
 	_index_data.push_back(i0);
 	_index_data.push_back(i1);
 	_index_data.push_back(i2);
+}
+
+template<Vertex_attribs attribs>
+template<typename Container>
+void Model_geometry_data<attribs>::push_back_indices(const Container& container)
+{
+	_index_data.insert(_index_data.end(), container.cbegin(), container.cend());
+}
+
+template<Vertex_attribs attribs>
+template<size_t count>
+void Model_geometry_data<attribs>::push_back_indices(const uint32_t(&indices)[count])
+{
+	_index_data.insert(_index_data.end(), std::cbegin(indices), std::cend(indices));
+}
+
+template<Vertex_attribs attribs>
+template<typename Input_iterator>
+void Model_geometry_data<attribs>::push_back_indices(Input_iterator b, Input_iterator e)
+{
+	_index_data.insert(_index_data.end(), b, e);
 }
 
 template<Vertex_attribs attribs>
