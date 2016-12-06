@@ -11,7 +11,7 @@ using cg::float3;
 using cg::float4;
 using cg::mat4;
 using cg::uint2;
-using cg::data::Vertex_attribs_new;
+using cg::data::Vertex_attribs;
 
 
 namespace learn_dx11 {
@@ -46,7 +46,7 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto model_geometry = cg::data::load_model<Vertex_attribs_new::p_n_tc>("../data/cube.obj");
+	auto model_geometry = cg::data::load_model<Vertex_attribs::p_n_tc>("../data/cube.obj");
 	_model_index_count = model_geometry.index_count();
 
 	// vertex buffer

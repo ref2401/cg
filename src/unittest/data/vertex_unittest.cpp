@@ -6,15 +6,116 @@
 using cg::float2;
 using cg::float3;
 using cg::float4;
+using cg::data::Vertex_attribs;
+using cg::data::Vertex_interleaved_format;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
+template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
+
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {
+
+TEST_CLASS(cg_data_vertex_Vertex_interleaved_format) {
+public:
+
+	TEST_METHOD(Vertex_attribs_p)
+	{
+		using Fmt = Vertex_interleaved_format<Vertex_attribs::p>;
+		Assert::AreEqual(Vertex_attribs::p, Fmt::attribs);
+
+		Assert::AreEqual(size_t(3), Fmt::position_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
+		Assert::AreEqual(size_t(0), Fmt::position_byte_offset);
+
+		Assert::AreEqual(size_t(3), Fmt::vertex_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::vertex_byte_count);
+	}
+
+	TEST_METHOD(Vertex_attribs_p_n)
+	{
+		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n>;
+		Assert::AreEqual(Vertex_attribs::p_n, Fmt::attribs);
+
+		Assert::AreEqual(size_t(3), Fmt::position_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
+		Assert::AreEqual(size_t(0), Fmt::position_byte_offset);
+
+		Assert::AreEqual(size_t(3), Fmt::normal_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::normal_byte_count);
+		Assert::AreEqual(Fmt::position_byte_count, Fmt::normal_byte_offset);
+
+		Assert::AreEqual(size_t(6), Fmt::vertex_component_count);
+		Assert::AreEqual(6 * sizeof(float), Fmt::vertex_byte_count);
+	}
+
+	TEST_METHOD(Vertex_attribs_p_n_tc)
+	{
+		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
+		Assert::AreEqual(Vertex_attribs::p_n_tc, Fmt::attribs);
+
+		Assert::AreEqual(size_t(3), Fmt::position_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
+		Assert::AreEqual(size_t(0), Fmt::position_byte_offset);
+
+		Assert::AreEqual(size_t(3), Fmt::normal_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::normal_byte_count);
+		Assert::AreEqual(Fmt::position_byte_count, Fmt::normal_byte_offset);
+
+		Assert::AreEqual(size_t(2), Fmt::tex_coord_component_count);
+		Assert::AreEqual(2 * sizeof(float), Fmt::tex_coord_byte_count);
+		Assert::AreEqual(Fmt::normal_byte_offset + Fmt::normal_byte_count, Fmt::tex_coord_byte_offset);
+
+		Assert::AreEqual(size_t(8), Fmt::vertex_component_count);
+		Assert::AreEqual(8 * sizeof(float), Fmt::vertex_byte_count);
+	}
+
+	TEST_METHOD(Vertex_attrib_p_tc)
+	{
+		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_tc>;
+		Assert::AreEqual(Vertex_attribs::p_tc, Fmt::attribs);
+
+		Assert::AreEqual(size_t(3), Fmt::position_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
+		Assert::AreEqual(size_t(0), Fmt::position_byte_offset);
+
+		Assert::AreEqual(size_t(2), Fmt::tex_coord_component_count);
+		Assert::AreEqual(2 * sizeof(float), Fmt::tex_coord_byte_count);
+		Assert::AreEqual(Fmt::position_byte_count + Fmt::position_byte_offset, Fmt::tex_coord_byte_offset);
+
+		Assert::AreEqual(size_t(5), Fmt::vertex_component_count);
+		Assert::AreEqual(5 * sizeof(float), Fmt::vertex_byte_count);
+	}
+
+	TEST_METHOD(Vertex_attribs_p_n_tc_ts)
+	{
+		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+		Assert::AreEqual(Vertex_attribs::p_n_tc_ts, Fmt::attribs);
+
+		Assert::AreEqual(size_t(3), Fmt::position_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
+		Assert::AreEqual(size_t(0), Fmt::position_byte_offset);
+
+		Assert::AreEqual(size_t(3), Fmt::normal_component_count);
+		Assert::AreEqual(3 * sizeof(float), Fmt::normal_byte_count);
+		Assert::AreEqual(Fmt::position_byte_count, Fmt::normal_byte_offset);
+
+		Assert::AreEqual(size_t(2), Fmt::tex_coord_component_count);
+		Assert::AreEqual(2 * sizeof(float), Fmt::tex_coord_byte_count);
+		Assert::AreEqual(Fmt::normal_byte_offset + Fmt::normal_byte_count, Fmt::tex_coord_byte_offset);
+
+		Assert::AreEqual(size_t(4), Fmt::tangent_space_component_count);
+		Assert::AreEqual(4 * sizeof(float), Fmt::tangent_space_byte_count);
+		Assert::AreEqual(Fmt::tex_coord_byte_count + Fmt::tex_coord_byte_offset, Fmt::tangent_space_byte_offset);
+
+		Assert::AreEqual(size_t(12), Fmt::vertex_component_count);
+		Assert::AreEqual(12 * sizeof(float), Fmt::vertex_byte_count);
+	}
+};
 
 TEST_CLASS(cg_data_vertex_Funcs) {
 public:

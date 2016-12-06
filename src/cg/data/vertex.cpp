@@ -1,11 +1,70 @@
 #include "cg/data/vertex.h"
 
 
-
 namespace cg {
 namespace data {
 
 // ----- funcs -----
+
+std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
+{
+	out << "Vertex_attribs(";
+
+	switch (attribs) {
+		case Vertex_attribs::p:
+			out << 'p';
+			break;
+
+		case Vertex_attribs::p_n:
+			out << "p_n";
+			break;
+
+		case Vertex_attribs::p_n_tc:
+			out << "p_n_tc";
+			break;
+
+		case Vertex_attribs::p_tc:
+			out << "p_tc";
+			break;
+
+		case Vertex_attribs::p_n_tc_ts:
+			out << "p_n_tc_ts";
+			break;
+	}
+
+	out << ")";
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
+{
+	out << "Vertex_attribs(";
+
+	switch (attribs) {
+		case Vertex_attribs::p:
+			out << 'p';
+			break;
+
+		case Vertex_attribs::p_n:
+			out << "p_n";
+			break;
+
+		case Vertex_attribs::p_n_tc:
+			out << "p_n_tc";
+			break;
+
+		case Vertex_attribs::p_tc:
+			out << "p_tc";
+			break;
+
+		case Vertex_attribs::p_n_tc_ts:
+			out << "p_n_tc_ts";
+			break;
+	}
+
+	out << ")";
+	return out;
+}
 
 std::pair<float3, float3> compute_tangent_bitangent(
 	const float3& pos0, const float2& tc0,
@@ -31,22 +90,21 @@ std::pair<float3, float3> compute_tangent_bitangent(
 	return std::make_pair(t, b);
 }
 
-//float4 compute_tangent_handedness(const float3& tangent,
-//	const float3& bitangent, const float3& normal) noexcept
-//{
-//	assert(is_normalized(tangent));
-//	assert(is_normalized(bitangent));
-//	assert(is_normalized(normal));
-//
-//	// Gram-Schmidt orthogonalize.
-//	// project tangent vector onto normal.
-//	float3 t_prj_n = normal * dot(tangent, normal);
-//	float3 t = normalize(tangent - t_prj_n);
-//	float h = (dot(bitangent, cross(normal, t)) > 0.f) ? 1.f : -1.f;
-//
-//	return float4(t, h);
-//}
-	
+float4 compute_tangent_handedness(const float3& tangent,
+	const float3& bitangent, const float3& normal) noexcept
+{
+	assert(is_normalized(tangent));
+	assert(is_normalized(bitangent));
+	assert(is_normalized(normal));
 
+	// Gram-Schmidt orthogonalize.
+	// project tangent vector onto normal.
+	float3 t_prj_n = normal * dot(tangent, normal);
+	float3 t = normalize(tangent - t_prj_n);
+	float h = (dot(bitangent, cross(normal, t)) >= 0.0f) ? 1.0f : -1.0f;
+
+	return float4(t, h);
+}
+	
 } // namespace data
 } // namespace cg

@@ -19,7 +19,7 @@ namespace {
 
 using cg::data::Model_geometry_data;
 using cg::data::Model_geometry_vertex;
-using cg::data::Vertex_attribs_new;
+using cg::data::Vertex_attribs;
 
 inline float3 make_cg_vector(const aiVector3D& v)
 {
@@ -31,7 +31,7 @@ inline float2 make_cg_vector(const aiVector2D& v)
 	return float2(v.x, v.y);
 }
 
-template<Vertex_attribs_new attribs>
+template<Vertex_attribs attribs>
 Model_geometry_data<attribs> load_model(const char* filename, const Assimp_load_flags& flags)
 {
 	Assimp::Importer importer;
@@ -48,39 +48,39 @@ Model_geometry_data<attribs> load_model(const char* filename, const Assimp_load_
 	return process_meshes<attribs>(scene);
 }
 
-void process_vertex(Model_geometry_data<Vertex_attribs_new::p>& geometry_data,
+void process_vertex(Model_geometry_data<Vertex_attribs::p>& geometry_data,
 	const aiMesh* mesh, size_t vertex_index)
 {
 	assert(mesh);
 	assert(vertex_index < mesh->mNumVertices);
 
-	Model_geometry_vertex<Vertex_attribs_new::p> vertex(
+	Model_geometry_vertex<Vertex_attribs::p> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index])
 	);
 
 	geometry_data.push_back_vertex(vertex);
 }
 
-void process_vertex(Model_geometry_data<Vertex_attribs_new::p_n>& geometry_data,
+void process_vertex(Model_geometry_data<Vertex_attribs::p_n>& geometry_data,
 	const aiMesh* mesh, size_t vertex_index)
 {
 	assert(mesh);
 	assert(vertex_index < mesh->mNumVertices);
 
-	Model_geometry_vertex<Vertex_attribs_new::p_n> vertex(
+	Model_geometry_vertex<Vertex_attribs::p_n> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
 		make_cg_vector(mesh->mNormals[vertex_index]));
 
 	geometry_data.push_back_vertex(vertex);
 }
 
-void process_vertex(Model_geometry_data<Vertex_attribs_new::p_n_tc>& geometry_data,
+void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc>& geometry_data,
 	const aiMesh* mesh, size_t vertex_index)
 {
 	assert(mesh);
 	assert(vertex_index < mesh->mNumVertices);
 
-	Model_geometry_vertex<Vertex_attribs_new::p_n_tc> vertex(
+	Model_geometry_vertex<Vertex_attribs::p_n_tc> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
 		make_cg_vector(mesh->mNormals[vertex_index]),
 		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv());
@@ -88,20 +88,20 @@ void process_vertex(Model_geometry_data<Vertex_attribs_new::p_n_tc>& geometry_da
 	geometry_data.push_back_vertex(vertex);
 }
 
-void process_vertex(Model_geometry_data<Vertex_attribs_new::p_tc>& geometry_data,
+void process_vertex(Model_geometry_data<Vertex_attribs::p_tc>& geometry_data,
 	const aiMesh* mesh, size_t vertex_index)
 {
 	assert(mesh);
 	assert(vertex_index < mesh->mNumVertices);
 
-	Model_geometry_vertex<Vertex_attribs_new::p_tc> vertex(
+	Model_geometry_vertex<Vertex_attribs::p_tc> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
 		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv());
 
 	geometry_data.push_back_vertex(vertex);
 }
 
-void process_vertex(Model_geometry_data<Vertex_attribs_new::p_n_tc_ts>& geometry_data,
+void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc_ts>& geometry_data,
 	const aiMesh* mesh, size_t vertex_index)
 {
 	assert(mesh);
@@ -115,13 +115,13 @@ void process_vertex(Model_geometry_data<Vertex_attribs_new::p_n_tc_ts>& geometry
 	float3 bitangent = make_cg_vector(mesh->mBitangents[vertex_index]);
 	float4 tangent_h = cg::data::compute_tangent_handedness(tangent, bitangent, normal);
 
-	Model_geometry_vertex<Vertex_attribs_new::p_n_tc_ts> vertex(
+	Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> vertex(
 		position, normal, tex_coord, tangent_h);
 	
 	geometry_data.push_back_vertex(vertex);
 }
 
-template<Vertex_attribs_new attribs>
+template<Vertex_attribs attribs>
 Model_geometry_data<attribs> process_meshes(const aiScene* scene)
 {
 	assert(scene);
@@ -162,116 +162,40 @@ namespace data {
 
 // ----- funcs -----
 
-std::ostream& operator<<(std::ostream& out, const Vertex_attribs_new& attribs)
-{
-	out << "Vertex_attribs(";
-
-	switch (attribs) {
-		case Vertex_attribs_new::p:
-			out << 'p';
-			break;
-		
-		case Vertex_attribs_new::p_n:
-			out << "p_n";
-			break;
-
-		case Vertex_attribs_new::p_n_tc:
-			out << "p_n_tc";
-			break;
-
-		case Vertex_attribs_new::p_tc:
-			out << "p_tc";
-			break;
-
-		case Vertex_attribs_new::p_n_tc_ts:
-			out << "p_n_tc_ts";
-			break;
-	}
-
-	out << ")";
-	return out;
-}
-
-std::wostream& operator<<(std::wostream& out, const Vertex_attribs_new& attribs)
-{
-	out << "Vertex_attribs(";
-
-	switch (attribs) {
-		case Vertex_attribs_new::p:
-			out << 'p';
-			break;
-
-		case Vertex_attribs_new::p_n:
-			out << "p_n";
-			break;
-
-		case Vertex_attribs_new::p_n_tc:
-			out << "p_n_tc";
-			break;
-
-		case Vertex_attribs_new::p_tc:
-			out << "p_tc";
-			break;
-
-		case Vertex_attribs_new::p_n_tc_ts:
-			out << "p_n_tc_ts";
-			break;
-	}
-
-	out << ")";
-	return out;
-}
-
-float4 compute_tangent_handedness(const float3& tangent,
-	const float3& bitangent, const float3& normal) noexcept
-{
-	assert(is_normalized(tangent));
-	assert(is_normalized(bitangent));
-	assert(is_normalized(normal));
-
-	// Gram-Schmidt orthogonalize.
-	// project tangent vector onto normal.
-	float3 t_prj_n = normal * dot(tangent, normal);
-	float3 t = normalize(tangent - t_prj_n);
-	float h = (dot(bitangent, cross(normal, t)) >= 0.0f) ? 1.0f : -1.0f;
-
-	return float4(t, h);
-}
-
 template<>
-Model_geometry_data<Vertex_attribs_new::p> load_model<Vertex_attribs_new::p>(const char* filename)
+Model_geometry_data<Vertex_attribs::p> load_model<Vertex_attribs::p>(const char* filename)
 {
 	Assimp_load_flags flags = default_load_flags;
-	return ::load_model<Vertex_attribs_new::p>(filename, flags);
+	return ::load_model<Vertex_attribs::p>(filename, flags);
 }
 
 template<>
-Model_geometry_data<Vertex_attribs_new::p_n> load_model<Vertex_attribs_new::p_n>(const char* filename)
+Model_geometry_data<Vertex_attribs::p_n> load_model<Vertex_attribs::p_n>(const char* filename)
 {
 	Assimp_load_flags flags = default_load_flags | aiProcess_GenNormals;
-	return ::load_model<Vertex_attribs_new::p_n>(filename, flags);
+	return ::load_model<Vertex_attribs::p_n>(filename, flags);
 }
 
 template<>
-Model_geometry_data<Vertex_attribs_new::p_n_tc> load_model<Vertex_attribs_new::p_n_tc>(const char* filename)
+Model_geometry_data<Vertex_attribs::p_n_tc> load_model<Vertex_attribs::p_n_tc>(const char* filename)
 {
 	Assimp_load_flags flags = default_load_flags | aiProcess_GenNormals;
-	return ::load_model<Vertex_attribs_new::p_n_tc>(filename, flags);
+	return ::load_model<Vertex_attribs::p_n_tc>(filename, flags);
 }
 
 template<>
-Model_geometry_data<Vertex_attribs_new::p_tc> load_model<Vertex_attribs_new::p_tc>(const char* filename)
+Model_geometry_data<Vertex_attribs::p_tc> load_model<Vertex_attribs::p_tc>(const char* filename)
 {
 	Assimp_load_flags flags = default_load_flags;
-	return ::load_model<Vertex_attribs_new::p_tc>(filename, flags);
+	return ::load_model<Vertex_attribs::p_tc>(filename, flags);
 }
 
 template<>
-Model_geometry_data<Vertex_attribs_new::p_n_tc_ts> load_model<Vertex_attribs_new::p_n_tc_ts>(const char* filename)
+Model_geometry_data<Vertex_attribs::p_n_tc_ts> load_model<Vertex_attribs::p_n_tc_ts>(const char* filename)
 {
 	Assimp_load_flags flags = default_load_flags 
 		| aiProcess_GenNormals | aiProcess_CalcTangentSpace;
-	return ::load_model<Vertex_attribs_new::p_n_tc_ts>(filename, flags);
+	return ::load_model<Vertex_attribs::p_n_tc_ts>(filename, flags);
 }
 
 } // namespace data
