@@ -8,7 +8,7 @@
 #include "cg/rnd/opengl/opengl_def.h"
 
 using namespace cg;
-using cg::data::Vertex_attribs;
+using cg::data::Vertex_attribs_old;
 
 
 namespace cg {
@@ -295,21 +295,21 @@ bool Shader_program::valid() const noexcept
 
 // ----- Vertex_attrib_layout
 
-Vertex_attribs Vertex_attrib_layout::attribs() const noexcept
+Vertex_attribs_old Vertex_attrib_layout::attribs() const noexcept
 {
-	auto attr = Vertex_attribs::none;
+	auto attr = Vertex_attribs_old::none;
 
 	if (position_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs::position;
+		attr |= Vertex_attribs_old::position;
 
 	if (normal_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs::normal;
+		attr |= Vertex_attribs_old::normal;
 
 	if (tex_coord_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs::tex_coord;
+		attr |= Vertex_attribs_old::tex_coord;
 
 	if (tangent_h_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs::tangent_space;
+		attr |= Vertex_attribs_old::tangent_space;
 
 	return attr;
 }

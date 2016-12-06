@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "cg/data/shader.h"
-#include "cg/data/mesh.h"
+#include "cg/data/mesh_old.h"
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/utility.h"
@@ -123,7 +123,7 @@ struct Vertex_attrib_layout {
 	{}
 
 
-	cg::data::Vertex_attribs attribs() const noexcept;
+	cg::data::Vertex_attribs_old attribs() const noexcept;
 
 	GLint position_location = Invalid::vertex_attrib_location;
 	GLint normal_location = Invalid::vertex_attrib_location;

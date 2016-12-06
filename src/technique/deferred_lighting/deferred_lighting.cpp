@@ -6,11 +6,11 @@
 #include <utility>
 #include "cg/base/base.h"
 #include "cg/data/image.h"
-#include "cg/data/mesh.h"
+#include "cg/data/mesh_old.h"
 #include "cg/data/shader.h"
 
 
-using cg::data::Vertex_attribs;
+using cg::data::Vertex_attribs_old;
 using namespace cg;
 using namespace cg::rnd::opengl;
 
@@ -41,7 +41,7 @@ Renderer_config make_render_config(uint2 viewport_size)
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::data::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs::vertex_p_tc);
+	config.rect_1x1_mesh_data = cg::data::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs_old::vertex_p_tc);
 	config.gbuffer_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/lighting_pass_dir");
 	config.shadow_map_pass_code = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/shadow_map_pass");
@@ -207,7 +207,7 @@ void Deferred_lighting::init_geometry()
 		size_t approx_index_count;
 	};
 
-	auto vertex_attribs = Vertex_attribs::vertex_ts;
+	auto vertex_attribs = Vertex_attribs_old::vertex_ts;
 	std::vector<Load_info> load_info_list = {
 		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
 		Load_info("../data/teapot_top.obj", &_cmd_teapot_top, 10656, 10656),

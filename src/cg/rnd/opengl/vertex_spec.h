@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "cg/data/mesh.h"
+#include "cg/data/mesh_old.h"
 #include "cg/rnd/opengl/buffer.h"
 #include "cg/rnd/opengl/shader.h"
 #include "cg/rnd/opengl/opengl_def.h"
@@ -233,7 +233,7 @@ public:
 	// Params:
 	// -	attribs: Describes required vertex attributes.
 	// -	vertex_bytes_limit: The memory threshold for the vertex buffer.
-	void begin(cg::data::Vertex_attribs attribs, size_t vertex_limit_bytes);
+	void begin(cg::data::Vertex_attribs_old attribs, size_t vertex_limit_bytes);
 
 	// Ends the building process and returns a Static_vertex_spec object 
 	// that manages internal OpenGL resources.

@@ -40,9 +40,6 @@
     <ClCompile Include="data\image_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="data\mesh_unittest.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="data\shader_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>

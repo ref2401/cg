@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="data\mesh.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="data\image.cpp">
       <Filter>data</Filter>
     </ClCompile>
@@ -64,10 +61,10 @@
     <ClCompile Include="data\image_file_tga.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="data\mesh_file_wavefront.cpp">
+    <ClCompile Include="data\model.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="data\model.cpp">
+    <ClCompile Include="data\mesh_old.cpp">
       <Filter>data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,9 +97,6 @@
     </ClInclude>
     <ClInclude Include="math\transform.h">
       <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="data\mesh.h">
-      <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="base\base.h">
       <Filter>base</Filter>
@@ -171,6 +165,9 @@
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="data\model.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="data\mesh_old.h">
       <Filter>data</Filter>
     </ClInclude>
   </ItemGroup>

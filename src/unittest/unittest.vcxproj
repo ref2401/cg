@@ -170,7 +170,6 @@
     <ClCompile Include="data\common_file.cpp" />
     <ClCompile Include="data\file_unittest.cpp" />
     <ClCompile Include="data\image_unittest.cpp" />
-    <ClCompile Include="data\mesh_unittest.cpp" />
     <ClCompile Include="data\shader_unittest.cpp" />
     <ClCompile Include="data\vertex_unittest.cpp" />
     <ClCompile Include="math\matrix_unittest.cpp" />

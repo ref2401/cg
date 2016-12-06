@@ -131,8 +131,7 @@
     <ClCompile Include="data\file.cpp" />
     <ClCompile Include="data\image.cpp" />
     <ClCompile Include="data\image_file_tga.cpp" />
-    <ClCompile Include="data\mesh.cpp" />
-    <ClCompile Include="data\mesh_file_wavefront.cpp" />
+    <ClCompile Include="data\mesh_old.cpp" />
     <ClCompile Include="data\model.cpp" />
     <ClCompile Include="data\shader.cpp" />
     <ClCompile Include="data\vertex.cpp" />
@@ -156,7 +155,7 @@
     <ClInclude Include="base\base.h" />
     <ClInclude Include="data\file.h" />
     <ClInclude Include="data\image.h" />
-    <ClInclude Include="data\mesh.h" />
+    <ClInclude Include="data\mesh_old.h" />
     <ClInclude Include="data\model.h" />
     <ClInclude Include="data\shader.h" />
     <ClInclude Include="data\vertex.h" />

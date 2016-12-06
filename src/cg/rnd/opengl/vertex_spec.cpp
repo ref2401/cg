@@ -4,7 +4,7 @@
 
 using cg::data::Interleaved_mesh_data_old;
 using cg::data::Interleaved_vertex_format_old;
-using cg::data::Vertex_attribs;
+using cg::data::Vertex_attribs_old;
 using cg::data::has_normal;
 using cg::data::has_position;
 using cg::data::has_tangent_space;
@@ -26,7 +26,7 @@ Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept :
 	_index_buffer(std::move(spec._index_buffer))
 {
 	spec._vao_id = Invalid::vao_id;
-	spec._format.attribs = Vertex_attribs::none;
+	spec._format.attribs = Vertex_attribs_old::none;
 	spec._vertex_buffer_binding_index = 0;
 }
 
@@ -47,7 +47,7 @@ Static_vertex_spec::~Static_vertex_spec() noexcept
 	dispose();
 
 	_vao_id = Invalid::vao_id;
-	_format.attribs = Vertex_attribs::none;
+	_format.attribs = Vertex_attribs_old::none;
 	_vertex_buffer_binding_index = 0;
 }
 
@@ -64,7 +64,7 @@ Static_vertex_spec& Static_vertex_spec::operator=(Static_vertex_spec&& spec) noe
 	_index_buffer = std::move(spec._index_buffer);
 
 	spec._vao_id = Invalid::vao_id;
-	spec._format.attribs = Vertex_attribs::none;
+	spec._format.attribs = Vertex_attribs_old::none;
 	spec._vertex_buffer_binding_index = 0;
 
 	return *this;
@@ -87,9 +87,9 @@ Static_vertex_spec_builder::Static_vertex_spec_builder(
 	_index_data.reserve(index_buffer_capacity);
 }
 
-void Static_vertex_spec_builder::begin(Vertex_attribs attribs, size_t vertex_limit_bytes)
+void Static_vertex_spec_builder::begin(Vertex_attribs_old attribs, size_t vertex_limit_bytes)
 {
-	assert(attribs != Vertex_attribs::none);
+	assert(attribs != Vertex_attribs_old::none);
 
 	_format = Interleaved_vertex_format_old(attribs);
 	_vertex_limit_bytes = vertex_limit_bytes;
