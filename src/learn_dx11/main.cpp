@@ -7,6 +7,8 @@
 #include "learn_dx11/tess/terrain_tessellation_example.h"
 
 
+#include "cg/data/model.h"
+
 int main(int argc, char* argv[])
 {
 	cg::uint2 wnd_position(90, 50);
@@ -21,10 +23,10 @@ int main(int argc, char* argv[])
 			debug = app.get_dx_debug();
 
 			// Uncomment any line to execute the appropriate example.
-			//app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+			app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
 			//app.run<learn_dx11::mesh_rnd::Vertex_skinning_example>();
 			//app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
-			app.run<learn_dx11::tess::Terrain_tessellation_example>();
+			//app.run<learn_dx11::tess::Terrain_tessellation_example>();
 		}
 
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);

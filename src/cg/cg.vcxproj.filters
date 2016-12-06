@@ -67,6 +67,9 @@
     <ClCompile Include="data\mesh_file_wavefront.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="data\model.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -165,6 +168,9 @@
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="data\file.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="data\model.h">
       <Filter>data</Filter>
     </ClInclude>
   </ItemGroup>

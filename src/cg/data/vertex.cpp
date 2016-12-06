@@ -156,21 +156,21 @@ std::pair<float3, float3> compute_tangent_bitangent(
 	return std::make_pair(t, b);
 }
 
-float4 compute_tangent_handedness(const float3& tangent,
-	const float3& bitangent, const float3& normal) noexcept
-{
-	assert(is_normalized(tangent));
-	assert(is_normalized(bitangent));
-	assert(is_normalized(normal));
-
-	// Gram-Schmidt orthogonalize.
-	// project tangent vector onto normal.
-	float3 t_prj_n = normal * dot(tangent, normal);
-	float3 t = normalize(tangent - t_prj_n);
-	float h = (dot(bitangent, cross(normal, t)) > 0.f) ? 1.f : -1.f;
-
-	return float4(t, h);
-}
+//float4 compute_tangent_handedness(const float3& tangent,
+//	const float3& bitangent, const float3& normal) noexcept
+//{
+//	assert(is_normalized(tangent));
+//	assert(is_normalized(bitangent));
+//	assert(is_normalized(normal));
+//
+//	// Gram-Schmidt orthogonalize.
+//	// project tangent vector onto normal.
+//	float3 t_prj_n = normal * dot(tangent, normal);
+//	float3 t = normalize(tangent - t_prj_n);
+//	float h = (dot(bitangent, cross(normal, t)) > 0.f) ? 1.f : -1.f;
+//
+//	return float4(t, h);
+//}
 
 size_t get_hash(const Vertex& v) noexcept
 {
@@ -196,7 +196,7 @@ void to_array(const Vertex_ts& v, float* arr) noexcept
 	arr[9] = tan_h.y;
 	arr[10] = tan_h.z;
 	arr[11] = tan_h.w;
-}
+}		
 
 } // namespace data
 } // namespace cg
