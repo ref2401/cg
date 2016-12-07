@@ -1,14 +1,13 @@
-#ifndef CG_RND_OPENGL_UTILITY_H_
-#define CG_RND_OPENGL_UTILITY_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_UTILITY_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_UTILITY_H_
 
 #include <cstring>
 #include <type_traits>
 #include "cg/rnd/opengl/opengl_def.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 class Invalid final {
 public:
@@ -80,9 +79,8 @@ constexpr bool is_valid_texture_sub_image_type(const GLenum& v) noexcept
 // if sync_obj is nullptr then the func returns immediately.
 void wait_for(GLsync sync_obj) noexcept;
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
 
-#endif // CG_RND_OPENGL_UTILITY_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_UTILITY_H_
 

@@ -1,14 +1,13 @@
-#include "cg/rnd/opengl/texture.h"
+#include "technique/deferred_lighting/rnd/texture.h"
 
-
+using cg::uint2;
 using cg::greater_than;
 using cg::data::Image_2d;
 using cg::data::Image_format;
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- Sampler_config -----
 
@@ -738,6 +737,5 @@ GLenum get_texture_wrap(Wrap_mode wrap_mode) noexcept
 	return GL_NONE;
 }
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting

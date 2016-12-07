@@ -7,8 +7,8 @@ using cg::float2;
 using cg::float3;
 using cg::uint2;
 using cg::data::Glsl_program_data;
-using cg::rnd::opengl::set_uniform;
-using cg::rnd::opengl::set_uniform_array;
+using deferred_lighting::rnd::set_uniform;
+using deferred_lighting::rnd::set_uniform_array;
 
 
 namespace deferred_lighting {

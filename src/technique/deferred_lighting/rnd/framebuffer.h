@@ -1,22 +1,21 @@
-#ifndef CG_RND_OPENGL_FRAMEBUFFER_H_
-#define CG_RND_OPENGL_FRAMEBUFFER_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_FRAMEBUFFER_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_FRAMEBUFFER_H_
 
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
-#include "cg/rnd/opengl/texture.h"
-#include "cg/rnd/opengl/utility.h"
+#include "technique/deferred_lighting/rnd/texture.h"
+#include "technique/deferred_lighting/rnd/utility.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 class Renderbuffer final {
 public:
 
 	Renderbuffer() noexcept = default;
 
-	Renderbuffer(Texture_format format, const uint2& size) noexcept;
+	Renderbuffer(Texture_format format, const cg::uint2& size) noexcept;
 
 	Renderbuffer(const Renderbuffer&) = delete;
 
@@ -40,24 +39,24 @@ public:
 	}
 
 	// Reallocates a new storage for the renderbuffer object.
-	void reallocate_storate(Texture_format format, const uint2& size) noexcept;
+	void reallocate_storate(Texture_format format, const cg::uint2& size) noexcept;
 
 	//  Size of the renderbuffer in pixels.
-	uint2 size() const noexcept
+	cg::uint2 size() const noexcept
 	{
 		return _size;
 	}
 
 	// Sets the new size of the renderbuffer. 
 	// Internally calls the reallocate_storage method. 
-	void set_size(const uint2& size) noexcept;
+	void set_size(const cg::uint2& size) noexcept;
 
 private:
 	void dispose() noexcept;
 
 	GLuint _id = Invalid::renderbuffer_id;
 	Texture_format _format = Texture_format::none;
-	uint2 _size = uint2::zero;
+	cg::uint2 _size = cg::uint2::zero;
 };
 
 // Framebuffer object supports 8 simultaneous color attachments.
@@ -129,8 +128,7 @@ private:
 	GLuint _id = Invalid::framebuffer_id;
 };
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
 
-#endif // CG_RND_OPENGL_FRAMEBUFFER_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_FRAMEBUFFER_H_

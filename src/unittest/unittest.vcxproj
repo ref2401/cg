@@ -177,10 +177,22 @@
     <ClCompile Include="math\transform_unittest.cpp" />
     <ClCompile Include="math\utility_unittest_math.cpp" />
     <ClCompile Include="math\vector_unittest.cpp" />
-    <ClCompile Include="rnd\opengl\shader_unittest_opengl.cpp" />
-    <ClCompile Include="rnd\opengl\texture_unittest.cpp" />
-    <ClCompile Include="rnd\opengl\utility_unittest_opengl.cpp" />
-    <ClCompile Include="rnd\opengl\vertex_spec_unittest.cpp" />
+    <ClCompile Include="rnd\opengl_old\shader_unittest_opengl.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl_old\texture_unittest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl_old\utility_unittest_opengl.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl_old\vertex_spec_unittest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="rnd\utility\utility_unittest_rnd.cpp" />
     <ClCompile Include="sys\input_unittest.cpp" />
   </ItemGroup>

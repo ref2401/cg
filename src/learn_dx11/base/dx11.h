@@ -191,7 +191,7 @@ private:
 class Render_context final {
 public:
 
-	Render_context::Render_context(HWND hwnd, const cg::uint2& window_size);
+	Render_context(HWND hwnd, const cg::uint2& window_size);
 
 	Render_context(const Render_context&) = delete;
 

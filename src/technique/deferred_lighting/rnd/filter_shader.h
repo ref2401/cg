@@ -1,13 +1,12 @@
-#ifndef CG_RND_UTILITY_FILTER_SHADER_H_
-#define CG_RND_UTILITY_FILTER_SHADER_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_
 
 #include "cg/math/math.h"
-#include "cg/rnd/opengl/opengl.h"
+#include "technique/deferred_lighting/rnd/opengl.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace utility {
 
 enum class Filter_type {
 	none,
@@ -60,15 +59,20 @@ private:
 
 	Filter_type _filter_type = Filter_type::none;
 	Filter_kernel_radius _kernel_radius = Filter_kernel_radius::none;
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
+	Shader_program _prog;
+	GLint _u_filter_direction_location = Invalid::uniform_location;
 };
 
 
+// Generates random vectors within a unit hemisphere.
+// The hemisphere is located at (0, 0, 0) and oriendted along the positive OZ axis.
+std::vector<cg::float3> generate_hemispherical_sample_kernel(size_t sample_count);
+
+std::vector<cg::float3> generate_sphere_normalized_sample_kernel(size_t sample_count);
+
 std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_kernel_radius kernel_radius) noexcept;
 
-} // utility
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
 
-#endif // CG_RND_UTILITY_FILTER_SHADER_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_

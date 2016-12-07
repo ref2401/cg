@@ -14,10 +14,34 @@
     <ClCompile Include="deferred_lighting\render_pass_shader.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\buffer.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\filter_shader.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\framebuffer.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\shader_opengl.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\texture.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\utility.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\rnd\vertex_spec.cpp">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
       <UniqueIdentifier>{e1edcfa4-828c-4e85-a079-5fc90649716a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deferred_lighting\rnd">
+      <UniqueIdentifier>{1022edf7-189f-48f5-b8c7-286248d61119}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +56,30 @@
     </ClInclude>
     <ClInclude Include="deferred_lighting\render_pass_shader.h">
       <Filter>deferred_lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\buffer.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\filter_shader.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\framebuffer.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\opengl.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\shader.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\texture.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\utility.h">
+      <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\rnd\vertex_spec.h">
+      <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

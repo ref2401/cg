@@ -7,7 +7,7 @@
 #include "cg/rnd/utility/utility.h"
 
 using namespace cg;
-using namespace cg::rnd::opengl;
+using namespace deferred_lighting::rnd;
 using cg::data::Interleaved_mesh_data_old;
 using cg::data::Glsl_program_data;
 
@@ -30,7 +30,7 @@ namespace deferred_lighting {
 // ----- Gbuffer -----
 
 Gbuffer::Gbuffer(const uint2& viewport_size,
-	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
+	const Vertex_attrib_layout& vertex_attrib_layout,
 	const Interleaved_mesh_data_old& rect_1x1_mesh_data) :
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
@@ -238,7 +238,7 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code),
-	_filter_shader_program(cg::rnd::utility::Filter_type::gaussian, cg::rnd::utility::Filter_kernel_radius::radius_03)
+	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_03)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
@@ -303,8 +303,8 @@ void Shadow_map_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 Ssao_pass::Ssao_pass(Gbuffer& gbuffer, const Glsl_program_data& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code),
-	_sample_rays(cg::rnd::utility::generate_sphere_normalized_sample_kernel(sample_ray_count + random_normal_count)),
-	_filter_shader_program(cg::rnd::utility::Filter_type::gaussian, cg::rnd::utility::Filter_kernel_radius::radius_05)
+	_sample_rays(generate_sphere_normalized_sample_kernel(sample_ray_count + random_normal_count)),
+	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_05)
 {
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_ssao_map());
 	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_ssao_map_aux());

@@ -5,7 +5,7 @@
 #include <numeric>
 
 using namespace cg;
-using namespace cg::rnd::opengl;
+using namespace deferred_lighting::rnd;
 
 
 namespace {

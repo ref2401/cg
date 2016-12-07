@@ -1,20 +1,19 @@
-#ifndef CG_RND_OPENGL_VERTEX_SPEC_H_
-#define CG_RND_OPENGL_VERTEX_SPEC_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_VERTEX_SPEC_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_VERTEX_SPEC_H_
 
 #include <cassert>
 #include <iostream>
 #include <memory>
 #include <vector>
 #include "cg/data/mesh_old.h"
-#include "cg/rnd/opengl/buffer.h"
-#include "cg/rnd/opengl/shader.h"
 #include "cg/rnd/opengl/opengl_def.h"
-#include "cg/rnd/opengl/utility.h"
+#include "technique/deferred_lighting/rnd/buffer.h"
+#include "technique/deferred_lighting/rnd/shader.h"
+#include "technique/deferred_lighting/rnd/utility.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // Specifies params to call the glDrawElementsBaseVertex func.
 // glDrawElementsBaseVertex(mode, index_count, index_type, offset_bytes, base_vertex);
@@ -361,8 +360,7 @@ inline void draw_elements_base_vertex(const DE_cmd& cmd) noexcept
 	draw_elements_base_vertex(cmd.get_base_vertex_params());
 }
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
 
-#endif // CG_OPENGL_VERTEX_SPEC_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_VERTEX_SPEC_H_

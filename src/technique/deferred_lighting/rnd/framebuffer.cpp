@@ -1,15 +1,17 @@
-#include "cg/rnd/opengl/framebuffer.h"
+#include "technique/deferred_lighting/rnd/framebuffer.h"
 
 #include <cassert>
 #include <exception>
 #include <type_traits>
+
+using cg::uint2;
 
 
 namespace {
 
 void validate_framebuffer(GLuint id, GLenum target)
 {
-	assert(id != cg::rnd::opengl::Invalid::framebuffer_id);
+	assert(id != deferred_lighting::rnd::Invalid::framebuffer_id);
 	assert(target == GL_FRAMEBUFFER
 		|| target == GL_READ_FRAMEBUFFER
 		|| target == GL_DRAW_FRAMEBUFFER);
@@ -32,9 +34,8 @@ void validate_framebuffer(GLuint id, GLenum target)
 } // namespace
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- Renderbuffer -----
 
@@ -236,6 +237,5 @@ void Framebuffer::validate() const
 }
 
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting

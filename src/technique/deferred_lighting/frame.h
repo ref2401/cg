@@ -3,8 +3,8 @@
 
 #include <array>
 #include "cg/math/math.h"
-#include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
+#include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {
@@ -60,9 +60,9 @@ struct Material_instance final {
 
 struct Renderable final {
 
-	Renderable(const cg::rnd::opengl::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
+	Renderable(const rnd::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
 
-	cg::rnd::opengl::DE_cmd cmd;
+	rnd::DE_cmd cmd;
 	cg::mat4 model_matrix;
 	Material_instance material;
 };
@@ -109,7 +109,7 @@ public:
 
 	void push_back_renderable(const Renderable& rnd);
 
-	void reset(const cg::rnd::opengl::Static_vertex_spec& vertex_spec) noexcept;	
+	void reset(const rnd::Static_vertex_spec& vertex_spec) noexcept;
 
 
 	// frame packet stuff:
@@ -174,12 +174,12 @@ private:
 	// batch_size equals to 13 because the 'material_pass.pixel.glsl' shader imposes the most severe restriction.
 	const size_t _batch_size = 13;
 	std::array<GLsync, 3> _sync_objects;
-	cg::rnd::opengl::Partitioned_buffer<cg::rnd::opengl::Persistent_buffer> _draw_indirect_buffer;
-	cg::rnd::opengl::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
+	rnd::Partitioned_buffer<rnd::Persistent_buffer> _draw_indirect_buffer;
+	rnd::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
 	size_t _offset_draw_indirect = 0;
 
 	// future Frame_packet stuff:
-	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
+	GLuint _vao_id = rnd::Invalid::vao_id;
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
 	std::vector<float> _uniform_array_smoothness;

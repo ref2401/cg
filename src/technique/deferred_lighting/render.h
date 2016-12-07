@@ -8,10 +8,10 @@
 #include "cg/math/math.h"
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
-#include "cg/rnd/opengl/opengl.h"
-#include "cg/rnd/utility/filter_shader.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
+#include "technique/deferred_lighting/rnd/opengl.h"
+#include "technique/deferred_lighting/rnd/filter_shader.h"
 
 
 namespace deferred_lighting {
@@ -20,7 +20,7 @@ class Gbuffer final {
 public:
 
 	Gbuffer(const cg::uint2& viewport_size,
-		const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout,
+		const rnd::Vertex_attrib_layout& vertex_attrib_layout,
 		const cg::data::Interleaved_mesh_data_old& rect_1x1_mesh_data);
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
@@ -32,13 +32,13 @@ public:
 
 	// Auxiliary depth32f buffer that can be used in an rendering pass.
 	// The renderbuffer is used in shadow_map_pass for depth test.
-	cg::rnd::opengl::Renderbuffer& aux_depth_renderbuffer() noexcept
+	rnd::Renderbuffer& aux_depth_renderbuffer() noexcept
 	{
 		return _aux_depth_renderbuffer;
 	}
 
 	// Rect 1x1 (a square) is usually used to perform a full screen pass.
-	const cg::rnd::opengl::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
+	const rnd::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
 	{
 		return _aux_geometry_rect_1x1_params;
 	}
@@ -51,13 +51,13 @@ public:
 	}
 	
 	// Default bilinear sampler (clamp_to_edge).
-	const cg::rnd::opengl::Sampler& bilinear_sampler() const noexcept
+	const rnd::Sampler& bilinear_sampler() const noexcept
 	{
 		return _bilinear_sampler;
 	}
 
 	// Default nearest sampler (clamp_to_edge).
-	const cg::rnd::opengl::Sampler& nearest_sampler() const noexcept
+	const rnd::Sampler& nearest_sampler() const noexcept
 	{
 		return _nearest_sampler;
 	}
@@ -68,28 +68,28 @@ public:
 	// Auxiliary texture that can be used by any render pass.
 	// The texture is not supposed to transfer rendering results from pass to pass.
 	// At the begining of every pass assume that texture's contents is undefined.
-	cg::rnd::opengl::Texture_2d& tex_aux_render_target() noexcept
+	rnd::Texture_2d& tex_aux_render_target() noexcept
 	{
 		return _tex_aux_render_target;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain ambient radiance.
-	cg::rnd::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
+	rnd::Texture_2d& tex_lighting_ambient_term() noexcept
 	{
 		return _tex_lighting_ambient_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain diffuse radiance.
-	cg::rnd::opengl::Texture_2d& tex_lighting_diffuse_term() noexcept
+	rnd::Texture_2d& tex_lighting_diffuse_term() noexcept
 	{
 		return _tex_lighting_diffuse_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain specular radiance.
-	cg::rnd::opengl::Texture_2d& tex_lighting_specular_term() noexcept
+	rnd::Texture_2d& tex_lighting_specular_term() noexcept
 	{
 		return _tex_lighting_specular_term;
 	}
@@ -97,7 +97,7 @@ public:
 	// Material_lighting_pass's render target texture.
 	// xyz components contain fully lit material color.
 	// The computations are made in HDR.
-	cg::rnd::opengl::Texture_2d& tex_material_lighting_result() noexcept
+	rnd::Texture_2d& tex_material_lighting_result() noexcept
 	{
 		return _tex_material_lighting_result;
 	}
@@ -105,7 +105,7 @@ public:
 	// Gbuffer_pass's render target texture.
 	// xyz components contain normal in the view space.
 	// w component contains material.smoothness parameter.
-	cg::rnd::opengl::Texture_2d& tex_nds() noexcept
+	rnd::Texture_2d& tex_nds() noexcept
 	{
 		return _tex_nds;
 	}
@@ -114,22 +114,22 @@ public:
 	// xy components contain linear depth and squared depth values in the directional light's space.
 	// xy components are always positive in spite of depth values are negative in the light's space.
 	// z component contains ambient occlusion factor.
-	cg::rnd::opengl::Texture_2d& tex_shadow_map() noexcept
+	rnd::Texture_2d& tex_shadow_map() noexcept
 	{
 		return _tex_shadow_map;
 	}
 
-	cg::rnd::opengl::Texture_2d& tex_ssao_map() noexcept
+	rnd::Texture_2d& tex_ssao_map() noexcept
 	{
 		return _tex_ssao_map;
 	}
 
-	cg::rnd::opengl::Texture_2d& tex_ssao_map_aux() noexcept
+	rnd::Texture_2d& tex_ssao_map_aux() noexcept
 	{
 		return _tex_ssao_map_aux;
 	}
 
-	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const rnd::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _vertex_attrib_layout;
 	}
@@ -141,22 +141,22 @@ public:
 	}
 
 private:
-	const cg::rnd::opengl::Vertex_attrib_layout _vertex_attrib_layout;
-	cg::rnd::opengl::Sampler _bilinear_sampler;
-	cg::rnd::opengl::Sampler _nearest_sampler;
-	cg::rnd::opengl::Static_vertex_spec _aux_geometry_vertex_spec;
-	cg::rnd::opengl::DE_base_vertex_params _aux_geometry_rect_1x1_params;
+	const rnd::Vertex_attrib_layout _vertex_attrib_layout;
+	rnd::Sampler _bilinear_sampler;
+	rnd::Sampler _nearest_sampler;
+	rnd::Static_vertex_spec _aux_geometry_vertex_spec;
+	rnd::DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
-	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
-	cg::rnd::opengl::Texture_2d _tex_aux_render_target;
-	cg::rnd::opengl::Texture_2d _tex_lighting_ambient_term;
-	cg::rnd::opengl::Texture_2d _tex_lighting_diffuse_term;
-	cg::rnd::opengl::Texture_2d _tex_lighting_specular_term;
-	cg::rnd::opengl::Texture_2d _tex_material_lighting_result;
-	cg::rnd::opengl::Texture_2d _tex_nds;
-	cg::rnd::opengl::Texture_2d _tex_shadow_map;
-	cg::rnd::opengl::Texture_2d _tex_ssao_map;
-	cg::rnd::opengl::Texture_2d _tex_ssao_map_aux; //  the texture is used to filter ssao map
+	rnd::Renderbuffer _aux_depth_renderbuffer;
+	rnd::Texture_2d _tex_aux_render_target;
+	rnd::Texture_2d _tex_lighting_ambient_term;
+	rnd::Texture_2d _tex_lighting_diffuse_term;
+	rnd::Texture_2d _tex_lighting_specular_term;
+	rnd::Texture_2d _tex_material_lighting_result;
+	rnd::Texture_2d _tex_nds;
+	rnd::Texture_2d _tex_shadow_map;
+	rnd::Texture_2d _tex_ssao_map;
+	rnd::Texture_2d _tex_ssao_map_aux; //  the texture is used to filter ssao map
 };
 
 class Gbuffer_pass final {
@@ -185,7 +185,7 @@ public:
 private:
 	const float _clear_value_nds[4] = { 0, 0, std::numeric_limits<float>::lowest(), 0 };
 	const float _clear_value_depth_map = 1.0f;
-	cg::rnd::opengl::Framebuffer _fbo;
+	rnd::Framebuffer _fbo;
 	Gbuffer_pass_shader_program _prog;
 	Gbuffer& _gbuffer;
 };
@@ -212,7 +212,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
 	Gbuffer& _gbuffer;
-	cg::rnd::opengl::Framebuffer _fbo;
+	rnd::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
 };
 
@@ -243,7 +243,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = -cg::float4::unit_xyzw;
 	Gbuffer& _gbuffer;
-	cg::rnd::opengl::Framebuffer _fbo;
+	rnd::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
 };
 
@@ -276,9 +276,9 @@ private:
 	};
 	const float _clear_value_depth = 1.0f;
 	Gbuffer& _gbuffer;
-	cg::rnd::opengl::Framebuffer _fbo;
+	rnd::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
-	cg::rnd::utility::Filter_shader_program _filter_shader_program;
+	rnd::Filter_shader_program _filter_shader_program;
 };
 
 // Ssao pass uses 8 sample rays (sample kernel size = 8) and 8 random normals that are used
@@ -304,11 +304,11 @@ private:
 	const size_t random_normal_count = 8;
 	const cg::float4 _clear_value_ssao_map = cg::float4::zero;
 	Gbuffer& _gbuffer;
-	cg::rnd::opengl::Framebuffer _fbo;
+	rnd::Framebuffer _fbo;
 	Ssao_pass_shader_program _prog;
 	// [0.. 7] sample rays, [8 .. 15] random normals
 	const std::vector<cg::float3> _sample_rays;
-	cg::rnd::utility::Filter_shader_program _filter_shader_program;
+	rnd::Filter_shader_program _filter_shader_program;
 };
 
 class Tone_mapping_pass final {
@@ -334,7 +334,7 @@ private:
 
 struct Renderer_config final {
 
-	cg::rnd::opengl::Vertex_attrib_layout vertex_attrib_layout;
+	rnd::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Interleaved_mesh_data_old rect_1x1_mesh_data;
 	cg::data::Glsl_program_data gbuffer_pass_code;
@@ -361,7 +361,7 @@ public:
 
 	void resize_viewport(const cg::uint2& size) noexcept;
 
-	const cg::rnd::opengl::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const rnd::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _gbuffer.vertex_attrib_layout();
 	}

@@ -3,7 +3,7 @@
 
 #include <array>
 #include "cg/data/shader.h"
-#include "cg/rnd/opengl/opengl.h"
+#include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {
@@ -51,12 +51,12 @@ public:
 	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_smoothness_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_normal_map_location = cg::rnd::opengl::Invalid::uniform_location;
+	rnd::Shader_program _prog;
+	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_model_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_smoothness_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_tex_normal_map_location = rnd::Invalid::uniform_location;
 };
 
 class Lighting_pass_dir_shader_program final {
@@ -76,12 +76,12 @@ public:
 	void use(const Directional_light_params& dl_params) noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_arr_far_pane_coords_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_direction_to_light_vs_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_irradiance_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_ambient_irradiance_up_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_ambient_irradiance_down_location = cg::rnd::opengl::Invalid::uniform_location;
+	rnd::Shader_program _prog;
+	GLint _u_arr_far_pane_coords_location = rnd::Invalid::uniform_location;
+	GLint _u_dlight_direction_to_light_vs_location = rnd::Invalid::uniform_location;
+	GLint _u_dlight_irradiance_location = rnd::Invalid::uniform_location;
+	GLint _u_dlight_ambient_irradiance_up_location = rnd::Invalid::uniform_location;
+	GLint _u_dlight_ambient_irradiance_down_location = rnd::Invalid::uniform_location;
 };
 
 class Material_lighting_pass_shader_program final {
@@ -102,14 +102,14 @@ public:
 		const Directional_light_params& dir_light) noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_diffuse_rgb_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_specular_intensity_location = cg::rnd::opengl::Invalid::uniform_location;
+	rnd::Shader_program _prog;
+	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_dir_light_projection_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_dir_light_view_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_model_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_tex_diffuse_rgb_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_tex_specular_intensity_location = rnd::Invalid::uniform_location;
 };
 
 class Shadow_map_pass_shader_program final {
@@ -129,10 +129,10 @@ public:
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	rnd::Shader_program _prog;
+	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_model_matrix_location = rnd::Invalid::uniform_location;
 };
 
 class Ssao_pass_shader_program final {
@@ -151,9 +151,9 @@ public:
 		size_t sample_ray_count, size_t random_normal_count) noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
-	GLint _u_arr_sample_ray_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_random_normal_location = cg::rnd::opengl::Invalid::uniform_location;
+	rnd::Shader_program _prog;
+	GLint _u_arr_sample_ray_location = rnd::Invalid::uniform_location;
+	GLint _u_arr_random_normal_location = rnd::Invalid::uniform_location;
 };
 
 class Tone_mapping_pass_shader_program final {
@@ -171,7 +171,7 @@ public:
 	void use() noexcept;
 
 private:
-	cg::rnd::opengl::Shader_program _prog;
+	rnd::Shader_program _prog;
 };
 
 } // namespace deferred_lighting

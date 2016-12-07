@@ -144,12 +144,6 @@ inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 }
 
 
-// Generates random vectors within a unit hemisphere.
-// The hemisphere is located at (0, 0, 0) and oriendted along the positive OZ axis.
-std::vector<cg::float3> generate_hemispherical_sample_kernel(size_t sample_count);
-
-std::vector<cg::float3> generate_sphere_normalized_sample_kernel(size_t sample_count);
-
 } // namespace utility
 } // namespace rnd
 } // namespace cg

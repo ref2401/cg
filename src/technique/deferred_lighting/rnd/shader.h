@@ -1,17 +1,16 @@
-#ifndef CG_RND_OPENGL_SHADER_H_
-#define CG_RND_OPENGL_SHADER_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_SHADER_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_SHADER_H_
 
 #include <vector>
 #include "cg/data/shader.h"
 #include "cg/data/mesh_old.h"
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
-#include "cg/rnd/opengl/utility.h"
+#include "technique/deferred_lighting/rnd/utility.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 class Shader final {
 public:
@@ -155,8 +154,7 @@ void set_uniform(GLint location, const T& value) noexcept;
 template<typename T, typename TPtr>
 void set_uniform_array(GLint location, const TPtr* ptr, size_t count) noexcept;
 
-} // namespace opengl
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_RND_OPENGL_SHADER_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_SHADER_H_

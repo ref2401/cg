@@ -1,17 +1,16 @@
-#ifndef CG_RND_OPENGL_TEXTURE_H_
-#define CG_RND_OPENGL_TEXTURE_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_TEXTURE_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_RND_TEXTURE_H_
 
 #include <cassert>
 #include <ostream>
 #include "cg/data/image.h"
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
-#include "cg/rnd/opengl/utility.h"
+#include "technique/deferred_lighting/rnd/utility.h"
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // Mag_filter describes the process of fragment color calculation from a stretched texture.
 enum class Mag_filter : unsigned char {
@@ -181,13 +180,13 @@ public:
 
 	// Creates a texture object with the specified format, size & mipmap level count.
 	// Initially all mipmap levels of the texture are not initialized. 
-	Texture_2d(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+	Texture_2d(Texture_format format, cg::uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	// Creates a texture object with the specified format, size & mipmap level count.
 	// Sets an embedded sampler object params up in accordance with the specified sampler config.
 	// Initially all mipmap levels of the texture are not initialized. 
 	Texture_2d(Texture_format format, const Sampler_config& sampler_config,
-		uint2 size, size_t mipmap_level_count = 1) noexcept;
+		cg::uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	Texture_2d(const Texture_2d&) = delete;
 
@@ -212,7 +211,7 @@ public:
 
 	// Reallocates a new mutable storage for this texture object.
 	// Previous texture's contents will be lost.
-	void reallocate_storage(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+	void reallocate_storage(Texture_format format, cg::uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	// Size of the texture in pixels.
 	cg::uint2 size() const noexcept
@@ -244,13 +243,13 @@ public:
 
 	// Creates a texture object with the specified format, size & mipmap level count.
 	// Initially all mipmap levels of the texture are not initialized. 
-	Texture_2d_immut(Texture_format format, uint2 size, size_t mipmap_level_count = 1) noexcept;
+	Texture_2d_immut(Texture_format format, cg::uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	// Creates a texture object with the specified format, size & mipmap level count.
 	// Sets an embedded sampler object params up in accordance with the specified sampler config.
 	// Initially all mipmap levels of the texture are not initialized. 
 	Texture_2d_immut(Texture_format format, const Sampler_config& sampler_config,
-		uint2 size, size_t mipmap_level_count = 1) noexcept;
+		cg::uint2 size, size_t mipmap_level_count = 1) noexcept;
 
 	// Creates a texture object using the specified image as data source.
 	// The resulting texture will have 1 mipmap level, and size of the texture will be equal to size of the image.
@@ -390,8 +389,7 @@ inline void texture_2d_sub_image(GLuint texture_id, const Texture_2d_sub_image_p
 		sub_img.pixel_format, sub_img.pixel_type, sub_img.pixels);
 }
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
 
-#endif // CG_RND_OPENGL_TEXTURE_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_TEXTURE_H_

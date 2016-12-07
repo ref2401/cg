@@ -1,17 +1,20 @@
-#include "cg/rnd/utility/filter_shader.h"
+#include "technique/deferred_lighting/rnd/filter_shader.h"
 
 #include <cassert>
+#include <functional>
+#include <random>
 #include <utility>
 #include "cg/data/shader.h"
 
-using namespace cg::rnd::opengl;
+using cg::float3;
+using namespace deferred_lighting;
 
 
 namespace {
 
 using cg::data::Glsl_program_data;
 using cg::data::load_glsl_program_data;
-using cg::rnd::utility::Filter_kernel_radius;
+using rnd::Filter_kernel_radius;
 
 Glsl_program_data load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
 {
@@ -40,9 +43,8 @@ Glsl_program_data load_gaussina_filter_source_code(Filter_kernel_radius kernel_r
 } // namespace
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace utility {
 
 // ----- Filter_shader_program -----
 
@@ -57,7 +59,7 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
 
-	_prog = cg::rnd::opengl::Shader_program("filter-shader", src_code);
+	_prog = rnd::Shader_program("filter-shader", src_code);
 	_u_filter_direction_location = _prog.get_uniform_location("u_filter_direction");
 }
 
@@ -99,6 +101,57 @@ void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 }
 
 // ----- funcs -----
+
+std::vector<float3> generate_hemispherical_sample_kernel(size_t sample_count)
+{
+	using cg::lerp;
+	using cg::normalize;
+
+
+	assert(sample_count > 0);
+	auto rnd = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::minstd_rand{});
+
+	std::vector<float3> kernel;
+	kernel.reserve(sample_count);
+
+	for (size_t i = 0; i < sample_count; ++i) {
+		float3 dir = normalize(float3(
+			rnd() * 2.0f - 1.0f,
+			rnd() * 2.0f - 1.0f,
+			rnd())
+		);
+
+		float factor = std::pow(float(i) / sample_count, 2);
+		float scale = lerp(0.1f, 1.0f, factor);
+		kernel.push_back(dir * scale);
+	}
+
+	return kernel;
+}
+
+std::vector<float3> generate_sphere_normalized_sample_kernel(size_t sample_count)
+{
+	using cg::lerp;
+	using cg::normalize;
+
+
+	assert(sample_count > 0);
+	auto rnd = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::minstd_rand{});
+
+	std::vector<float3> kernel;
+	kernel.reserve(sample_count);
+
+	for (size_t i = 0; i < sample_count; ++i) {
+		float3 dir = normalize(float3(
+			rnd() * 2.0f - 1.0f,
+			rnd() * 2.0f - 1.0f,
+			rnd() * 2.0f - 1.0f)
+		);
+		kernel.push_back(dir);
+	}
+
+	return kernel;
+}
 
 std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_kernel_radius kernel_radius) noexcept
 {
@@ -148,6 +201,5 @@ std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_ker
 	return filename;
 }
 
-} // utility
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting

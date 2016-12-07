@@ -1,4 +1,4 @@
-#include "cg/rnd/opengl/shader.h"
+#include "technique/deferred_lighting/rnd/shader.h"
 
 #include <cassert>
 #include <exception>
@@ -11,9 +11,8 @@ using namespace cg;
 using cg::data::Vertex_attribs_old;
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- Shader -----
 
@@ -422,6 +421,5 @@ void set_uniform_array<mat4, mat4>(GLint location, const mat4* ptr, size_t count
 	glUniformMatrix4fv(location, count, false, arr.data());
 }
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting

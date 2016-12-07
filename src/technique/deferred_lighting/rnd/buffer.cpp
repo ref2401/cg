@@ -1,11 +1,10 @@
-#include "cg/rnd/opengl/buffer.h"
+#include "technique/deferred_lighting/rnd/buffer.h"
 
 #include <cassert>
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- Persistent_buffer -----
 
@@ -61,6 +60,5 @@ void Static_buffer::dispose() noexcept
 	_id = Invalid::buffer_id;
 }
 
-} // namespace opengl
-} // namespace rnd
+} // namespace deferred_lighting
 } // namespace cg

@@ -1,4 +1,4 @@
-#include "cg/rnd/opengl/vertex_spec.h"
+#include "technique/deferred_lighting/rnd/vertex_spec.h"
 
 #include "cg/base/base.h"
 
@@ -12,9 +12,8 @@ using cg::data::has_tex_coord;
 using cg::data::is_superset_of;
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- Static_vertex_spec
 
@@ -174,6 +173,5 @@ DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Interleaved_mesh_da
 	return cmd;
 }
 
-} // namepsace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting

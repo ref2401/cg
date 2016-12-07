@@ -1,11 +1,10 @@
-#include "cg/rnd/opengl/utility.h"
+#include "technique/deferred_lighting/rnd/utility.h"
 
 #include <cassert>
 
 
-namespace cg {
+namespace deferred_lighting {
 namespace rnd {
-namespace opengl {
 
 // ----- funcs -----
 
@@ -28,6 +27,5 @@ void wait_for(GLsync sync_obj) noexcept
 }
 
 
-} // namespace opengl
 } // namespace rnd
-} // namespace cg
+} // namespace deferred_lighting
