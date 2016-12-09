@@ -4,9 +4,6 @@
     <ClCompile Include="data\image.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="sys\app.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="sys\win_app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
@@ -46,6 +43,9 @@
     <ClCompile Include="data\mesh_old.cpp">
       <Filter>data</Filter>
     </ClCompile>
+    <ClCompile Include="sys\app_old.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -79,9 +79,6 @@
     </ClInclude>
     <ClInclude Include="base\base.h">
       <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="sys\app.h">
-      <Filter>sys</Filter>
     </ClInclude>
     <ClInclude Include="math\utility.h">
       <Filter>math</Filter>
@@ -124,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="data\mesh_old.h">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\app_old.h">
+      <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

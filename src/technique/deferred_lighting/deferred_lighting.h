@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 #include "cg/math/math.h"
-#include "cg/sys/app.h"
+#include "cg/sys/app_old.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render.h"
 #include "technique/deferred_lighting/rnd/opengl.h"

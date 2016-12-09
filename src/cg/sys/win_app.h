@@ -3,7 +3,7 @@
 
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
-#include "cg/sys/app.h"
+#include "cg/sys/app_old.h"
 #include <windows.h>
 
 

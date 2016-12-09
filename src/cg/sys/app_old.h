@@ -1,5 +1,5 @@
-#ifndef CG_SYS_APP_H_
-#define CG_SYS_APP_H_
+#ifndef CG_SYS_APP_OLD_H_
+#define CG_SYS_APP_OLD_H_
 
 #include <cstdint>
 #include <chrono>
@@ -252,4 +252,4 @@ std::unique_ptr<Application> make_win_application(uint2 wnd_position, uint2 wnd_
 } // namespace sys
 } // namespace cg
 
-#endif // CG_SYS_APP_H_
+#endif // CG_SYS_APP_OLD_H_

@@ -4,7 +4,6 @@
 #include <memory>
 #include <type_traits>
 #include "cg/math/math.h"
-#include "cg/sys/app.h"
 #include "learn_dx11/base/dx11.h"
 #include <windows.h>
 
