@@ -16,9 +16,6 @@
     <ClCompile Include="rnd\opengl\opengl_def.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="rnd\utility\utility_rnd.cpp">
-      <Filter>rnd\utility</Filter>
-    </ClCompile>
     <ClCompile Include="math\vector.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -66,8 +63,8 @@
     <Filter Include="rnd\opengl">
       <UniqueIdentifier>{66ef643f-fc86-46b4-899e-17fbcb9b800f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rnd\utility">
-      <UniqueIdentifier>{ad025c4b-55ed-4ce4-aa29-c56f0b379506}</UniqueIdentifier>
+    <Filter Include="rnd\dx11">
+      <UniqueIdentifier>{73d31390-0538-4332-a83e-b732e1f4f5ce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -101,9 +98,6 @@
     <ClInclude Include="rnd\opengl\opengl_def.h">
       <Filter>rnd\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="rnd\utility\utility.h">
-      <Filter>rnd\utility</Filter>
-    </ClInclude>
     <ClInclude Include="math\vector.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -124,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="sys\app_old.h">
       <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\dx11\dx11.h">
+      <Filter>rnd\dx11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

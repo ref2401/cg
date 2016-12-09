@@ -1,11 +1,11 @@
-#include "cg/rnd/utility/utility.h"
+#include "cg/rnd/dx11/dx11.h"
 
 #include <iostream>
 #include <utility>
 #include "CppUnitTest.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-using cg::rnd::utility::Com_ptr;
+using cg::rnd::dx11::Com_ptr;
 
 
 namespace {

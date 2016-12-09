@@ -1,19 +1,18 @@
-#ifndef CG_RND_UTILITY_UTILITY_H_
-#define CG_RND_UTILITY_UTILITY_H_
+#ifndef CG_RND_DX11_DX11_H_
+#define CG_RND_DX11_DX11_H_
 
-#include <vector>
-#include "cg/math/math.h"
+#include <cstddef>
 
 
 namespace cg {
 namespace rnd {
-namespace utility {
+namespace dx11 {
 
 // Unique_com_ptr is a smart pointer that owns and manages a COM object through a pointer 
 // and disposes of that object when the Unique_com_ptr goes out of scope.
 template<typename T>
 struct Com_ptr final {
-	
+
 	// Commented because unittests use fake COM interface.
 	//static_assert(std::is_base_of<IUnknown, T>::value, "T must be derived from IUnknown.");
 
@@ -29,7 +28,7 @@ struct Com_ptr final {
 	Com_ptr(const Com_ptr&) = delete;
 
 	Com_ptr(Com_ptr&& com_ptr) noexcept :
-		ptr(com_ptr.ptr)
+	ptr(com_ptr.ptr)
 	{
 		com_ptr.ptr = nullptr;
 	}
@@ -143,9 +142,9 @@ inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 	return com_ptr.ptr != nullptr;
 }
 
-
-} // namespace utility
+} // namespace dx11
 } // namespace rnd
 } // namespace cg
 
-#endif // CG_RND_UTILITY_UTILITY_H_
+#endif // CG_RND_DX11_DX11_H_
+

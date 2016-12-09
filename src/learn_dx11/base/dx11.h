@@ -5,7 +5,7 @@
 #include <type_traits>
 #include "cg/data/shader.h"
 #include "cg/math/math.h"
-#include "cg/rnd/utility/utility.h"
+#include "cg/rnd/dx11/dx11.h"
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dcommon.h>
@@ -13,7 +13,7 @@
 #include <DirectXMath.h>
 #include <dxgi.h>
 
-using cg::rnd::utility::Com_ptr;
+using cg::rnd::dx11::Com_ptr;
 using namespace DirectX;
 
 

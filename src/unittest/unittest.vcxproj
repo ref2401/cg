@@ -177,6 +177,7 @@
     <ClCompile Include="math\transform_unittest.cpp" />
     <ClCompile Include="math\utility_unittest_math.cpp" />
     <ClCompile Include="math\vector_unittest.cpp" />
+    <ClCompile Include="rnd\dx11\dx11_unittest.cpp" />
     <ClCompile Include="rnd\opengl_old\shader_unittest_opengl.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -193,7 +194,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="rnd\utility\utility_unittest_rnd.cpp" />
     <ClCompile Include="sys\input_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>

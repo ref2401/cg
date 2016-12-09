@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <numeric>
 #include <memory>
-#include "cg/rnd/utility/utility.h"
 
 using namespace cg;
 using namespace deferred_lighting::rnd;
