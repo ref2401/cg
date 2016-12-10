@@ -139,12 +139,12 @@ Material_library::Material_library()
 
 // ----- Deferred_lighting -----
 
-Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
-	Game(ctx),
+Deferred_lighting::Deferred_lighting(cg::sys::App_context& app_ctx) :
+	Example(app_ctx),
 	//_curr_viewpoint(float3(4, 4, -3.5), float3(0, 1, 0)),
 	_curr_viewpoint(float3(2, 5, 4), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
-	_renderer(make_render_config(_ctx.window().size())),
+	_renderer(make_render_config(_app_ctx.window.viewport_size())),
 	_frame(16)
 {
 
@@ -155,7 +155,7 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	_dir_light.intensity = 2.0f;
 	_dir_light.ambient_intensity = 0.35f;
 	float width = 30.0f;
-	float height = width / _ctx.window().size().aspect_ratio<float>();
+	float height = width / _app_ctx.window.viewport_size().aspect_ratio<float>();
 	float distance_to_light = len(_dir_light.position - _dir_light.target);
 	_dir_light.projection_matrix = orthographic_matrix_opengl(width, height, -1, 1.5f * distance_to_light);
 
@@ -165,15 +165,13 @@ Deferred_lighting::Deferred_lighting(cg::sys::Application_context_i& ctx) :
 	init_renderables();
 }
 
-void Deferred_lighting::begin_render(float blend_factor)
+void Deferred_lighting::begin_render(float interpolation_factor)
 {
-	assert(0.f <= blend_factor && blend_factor <= 1.f);
-
 	_frame.reset(_vertex_spec0);
 
 	_frame.far_plane_coords = _far_plane_coords;
 	_frame.projection_matrix = _projection_matrix;
-	_frame.view_matrix = view_matrix(_prev_viewpoint, _curr_viewpoint, blend_factor);
+	_frame.view_matrix = view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
 	_frame.directional_light = get_directional_light_params(_frame.view_matrix, _dir_light);
 
 	for (const auto& rnd : _rednerable_objects) {
@@ -263,12 +261,12 @@ void Deferred_lighting::init_renderables()
 
 void Deferred_lighting::on_mouse_move()
 {
-	float2 pos_ndc = _ctx.mouse().get_ndc_position(_ctx.window().size());
+	float2 pos_ndc = _app_ctx.mouse.get_ndc_position(_app_ctx.window.viewport_size());
 	float2 offset_ndc = pos_ndc - _prev_mouse_pos_ndc;
 	_prev_mouse_pos_ndc = pos_ndc;
 
 
-	if (!_ctx.mouse().middle_down() || offset_ndc == float2::zero) return;
+	if (!_app_ctx.mouse.middle_down() || offset_ndc == float2::zero) return;
 
 	bool y_offset_satisfies = !approx_equal(offset_ndc.y, 0.f, 0.01f);
 	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, ((y_offset_satisfies) ? 0.01f : 0.001f));
@@ -287,12 +285,16 @@ void Deferred_lighting::on_mouse_move()
 void Deferred_lighting::on_window_resize()
 {
 	update_viewpoint_projection();
-	_renderer.resize_viewport(_ctx.window().size());
+	_renderer.resize_viewport(_app_ctx.window.viewport_size());
 }
 
-void Deferred_lighting::render()
+void Deferred_lighting::render(float interpolation_factor)
 {
+	assert(0.f <= interpolation_factor && interpolation_factor <= 1.f);
+
+	begin_render(interpolation_factor);
 	_renderer.render(_frame);
+	end_render();
 }
 
 void Deferred_lighting::update(float dt)
@@ -328,7 +330,7 @@ void Deferred_lighting::update_viewpoint_projection()
 	float near_z = 0.1f;
 	float far_z = 50;
 	float vert_fov = cg::pi_3;
-	float wh_ratio = _ctx.window().size().aspect_ratio();
+	float wh_ratio = _app_ctx.window.viewport_size().aspect_ratio();
 	_projection_matrix = cg::perspective_matrix_opengl(vert_fov, wh_ratio, near_z, far_z);
 
 	float far_y = far_z * std::tan(vert_fov * 0.5f);

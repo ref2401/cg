@@ -4,17 +4,14 @@
 #include <windows.h>
 #include "cg/base/base.h"
 #include "cg/math/math.h"
-#include "cg/sys/app_old.h"
+#include "cg/sys/app.h"
 #include "technique/deferred_lighting/deferred_lighting.h"
 
-using cg::uint2;
-using cg::sys::Clock;
-using cg::sys::make_win_application;
-
+using cg::sys::Clock_report;
 
 namespace {
 
-std::string get_report_message(const Clock::Clock_report& report)
+std::string get_report_message(const Clock_report& report)
 {
 	std::ostringstream out;
 	out << std::endl << "----- Exec report ----- " << std::endl;
@@ -31,13 +28,19 @@ std::string get_report_message(const Clock::Clock_report& report)
 
 int main(int argc, char* argv[])
 {
-	uint2 wnd_position(90, 50);
-	uint2 wnd_size(960, 540);
+	using cg::uint2;
+	using cg::rnd::Render_api;
+	using cg::sys::Application;
+	using cg::sys::Application_desc;
+
+	Application_desc app_desc;
+	app_desc.rhi_type = Render_api::opengl;
+	app_desc.window_position = uint2(90, 50);
+	app_desc.viewport_size = uint2(960, 540);
 
 	try {
-		auto app = make_win_application(wnd_position, wnd_size);
-		auto game = std::make_unique<deferred_lighting::Deferred_lighting>(*app.get());
-		auto report = app->run(std::move(game));
+		Application app(app_desc);
+		auto report = app.run<deferred_lighting::Deferred_lighting>();
 		OutputDebugString(get_report_message(report).c_str());
 	}
 	catch (std::exception& exc) {

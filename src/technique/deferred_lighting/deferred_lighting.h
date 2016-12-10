@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 #include "cg/math/math.h"
-#include "cg/sys/app_old.h"
+#include "cg/sys/app.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render.h"
 #include "technique/deferred_lighting/rnd/opengl.h"
@@ -97,17 +97,13 @@ private:
 	Material _wooden_box_material;
 };
 
-class Deferred_lighting final : public cg::sys::Game {
+class Deferred_lighting final : public cg::sys::Example {
 public:
 
-	explicit Deferred_lighting(cg::sys::Application_context_i& ctx);
+	explicit Deferred_lighting(cg::sys::App_context& app_ctx);
 
 	~Deferred_lighting() noexcept override = default;
 
-
-	void begin_render(float blend_factor) override;
-
-	void end_render() override;
 
 	void on_mouse_click() override {}
 
@@ -115,11 +111,15 @@ public:
 
 	void on_window_resize() override;
 
-	void render() override;
+	void render(float interpolation_factor) override;
 
 	void update(float dt) override;
 
 private:
+
+	void begin_render(float interpolation_factor);
+
+	void end_render();
 
 	void init_geometry();
 

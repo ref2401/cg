@@ -1,68 +1,32 @@
-#include "cg/sys/win_app.h"
+#include "cg/rnd/opengl/opengl.h"
 
 #include <cassert>
-#include <memory>
-#include <type_traits>
 #include "cg/base/base.h"
+
+
+namespace {
 
 // All the definition was copied from the WGL_ARB_create_context, WGL_ARB_create_context_profile extension.
 // For more details see https://www.opengl.org/registry/specs/ARB/wgl_create_context.txt
-
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
 #define WGL_CONTEXT_LAYER_PLANE_ARB 0x2093
-
 // glcorearb.h: GL_CONTEXT_PROFILE_MASK(0x9126) == WGL_CONTEXT_PROFILE_MASK_ARB.
 // #define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
-
 // glcorearb.h: GL_CONTEXT_FLAGS(0x821E) != WGL_CONTEXT_FLAGS_ARB.
 #define WGL_CONTEXT_FLAGS_ARB 0x2094
-
 //  glcorearb.h: #define GL_CONTEXT_FLAG_DEBUG_BIT (0x00000002) != WGL_CONTEXT_DEBUG_BIT_ARB.
 #define WGL_CONTEXT_DEBUG_BIT_ARB 0x0001
-
 // glcorearb.h: GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT (0x00000001) != WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
 #define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
-
 // glcorearb.h: GL_CONTEXT_CORE_PROFILE_BIT (0x00000001) == WGL_CONTEXT_CORE_PROFILE_BIT_ARB
 // #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
-
 // glcorearb.h: GL_CONTEXT_COMPATIBILITY_PROFILE_BIT (0x00000002) == WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
 // #define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
 
 typedef HGLRC(APIENTRYP PFNWGLCREATECONTEXTATTRIBSARB)(HDC hDC, HGLRC hshareContext, const int *attribList);
 
-namespace {
-
-using cg::uint2;
-using cg::sys::Mouse_buttons;
-
-extern "C" {
-	using Extern_func_ptr_t = void(*);
-}
-
-// Yay! A global. The Win_app ctor sets its value. The Win_app dtor resets it to nullptr.
-// Only window_proc is supposed to use the global. 
-// If any other chunk of code uses it then your PC will burn. Consider yourself warned.
-cg::sys::Win_app* g_win_app = nullptr;
-
-
-Mouse_buttons get_mouse_buttons(WPARAM w_param) noexcept
-{
-	auto buttons = Mouse_buttons::none;
-
-	int btn_state = GET_KEYSTATE_WPARAM(w_param);
-	if ((btn_state & MK_LBUTTON) == MK_LBUTTON) buttons |= Mouse_buttons::left;
-	if ((btn_state & MK_MBUTTON) == MK_MBUTTON) buttons |= Mouse_buttons::middle;
-	if ((btn_state & MK_RBUTTON) == MK_RBUTTON) buttons |= Mouse_buttons::right;
-
-	return buttons;
-}
-
-uint2 get_point(LPARAM l_param) noexcept
-{
-	return uint2(LOWORD(l_param), HIWORD(l_param));
-}
+extern "C" using Extern_func_ptr_t = void(*);
 
 Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 {
@@ -84,74 +48,13 @@ Extern_func_ptr_t load_opengl_func(const char* func_name)
 
 	return f;
 }
-
-LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_param)
-{
-	if (g_win_app == nullptr)
-		return DefWindowProc(hwnd, message, w_param, l_param);
-
-	switch (message) {
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		{
-			g_win_app->enqueue_mouse_button_message(get_mouse_buttons(w_param));
-			return 0;
-		}
-
-		case WM_MOUSEMOVE:
-		{
-			if (!g_win_app->window().focused())
-				return DefWindowProc(hwnd, message, w_param, l_param);
-
-			uint2 p = get_point(l_param);
-
-			if (g_win_app->mouse().is_out()) {
-				g_win_app->enqueue_mouse_enter_message(get_mouse_buttons(w_param), p);
-			}
-			else {
-				g_win_app->enqueue_mouse_move_message(p);
-			}
-
-			TRACKMOUSEEVENT tme{ sizeof(TRACKMOUSEEVENT), TME_LEAVE, g_win_app->hwnd(), 0 };
-			TrackMouseEvent(&tme);
-			return 0;
-		}
-
-		case WM_MOUSELEAVE:
-		{
-			g_win_app->enqueue_mouse_leave_message();
-			return 0;
-		}
-
-
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-
-		case WM_SIZE:
-		{
-			g_win_app->enqueue_window_resize(get_point(l_param));
-			return 0;
-		}
-
-		default:
-			return DefWindowProc(hwnd, message, w_param, l_param);
-	}
 }
 
-} //namespace
-
-
 namespace cg {
-namespace sys {
+namespace rnd {
+namespace opengl {
 
-// ----- Opengl_render_context -----
-
-Opengl_render_context::Opengl_render_context(HWND hwnd) :
+Opengl_rhi_context::Opengl_rhi_context(HWND hwnd) :
 	_hwnd(hwnd)
 {
 	assert(_hwnd);
@@ -162,11 +65,11 @@ Opengl_render_context::Opengl_render_context(HWND hwnd) :
 
 	glGetIntegerv(GL_MAJOR_VERSION, &_version_major);
 	glGetIntegerv(GL_MINOR_VERSION, &_version_minor);
-	ENFORCE(_version_major == 4 && _version_minor == 5, "Opengl version must be 4.5 or greater.");
+	ENFORCE(_version_major == 4 && _version_minor == 5, "OpenGL version must be at least 4.5.");
 	load_opengl_45();
 }
 
-Opengl_render_context::~Opengl_render_context() noexcept
+Opengl_rhi_context::~Opengl_rhi_context() noexcept
 {
 	if (_opengl_dll) {
 		FreeLibrary(_opengl_dll);
@@ -185,7 +88,7 @@ Opengl_render_context::~Opengl_render_context() noexcept
 	}
 }
 
-void Opengl_render_context::inti_context()
+void Opengl_rhi_context::inti_context()
 {
 	_hdc = GetDC(_hwnd);
 	assert(_hdc);
@@ -206,12 +109,13 @@ void Opengl_render_context::inti_context()
 	HGLRC temp_hglrc = wglCreateContext(_hdc);
 	assert(temp_hglrc);
 	wglMakeCurrent(_hdc, temp_hglrc);
-	PFNWGLCREATECONTEXTATTRIBSARB wglCreateContextAttribsARB = static_cast<PFNWGLCREATECONTEXTATTRIBSARB>(load_opengl_func("wglCreateContextAttribsARB"));
-	
+	PFNWGLCREATECONTEXTATTRIBSARB wglCreateContextAttribsARB = 
+		static_cast<PFNWGLCREATECONTEXTATTRIBSARB>(load_opengl_func("wglCreateContextAttribsARB"));
+
 	const int context_attribs[] = {
-		WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 5,
-		GL_CONTEXT_PROFILE_MASK, GL_CONTEXT_CORE_PROFILE_BIT,
+		WGL_CONTEXT_MAJOR_VERSION_ARB,	4,
+		WGL_CONTEXT_MINOR_VERSION_ARB,	5,
+		GL_CONTEXT_PROFILE_MASK,		GL_CONTEXT_CORE_PROFILE_BIT,
 		0
 	};
 
@@ -222,7 +126,7 @@ void Opengl_render_context::inti_context()
 	wglCreateContextAttribsARB = nullptr;
 }
 
-void Opengl_render_context::load_opengl_11() const
+void Opengl_rhi_context::load_opengl_11() const
 {
 	// opengl 1.0
 	glCullFace = static_cast<PFNGLCULLFACEPROC>(load_dll_func(_opengl_dll, "glCullFace"));
@@ -290,7 +194,7 @@ void Opengl_render_context::load_opengl_11() const
 	glIsTexture = static_cast<PFNGLISTEXTUREPROC>(load_dll_func(_opengl_dll, "glIsTexture"));
 }
 
-void Opengl_render_context::load_opengl_45() const
+void Opengl_rhi_context::load_opengl_45() const
 {
 	// opengl 1.2
 	glDrawRangeElements = static_cast<PFNGLDRAWRANGEELEMENTSPROC>(load_opengl_func("glDrawRangeElements"));
@@ -901,183 +805,11 @@ void Opengl_render_context::load_opengl_45() const
 	glTextureBarrier = static_cast<PFNGLTEXTUREBARRIERPROC>(load_opengl_func("glTextureBarrier"));
 }
 
-void Opengl_render_context::swap_color_buffers() noexcept {
+void Opengl_rhi_context::swap_color_buffers() noexcept
+{
 	SwapBuffers(_hdc);
 }
 
-// ----- Win_window -----
-
-Win_window::Win_window(HINSTANCE hinstance, uint2 wnd_position, uint2 wnd_size)
-	: _hinstance(hinstance)
-{
-	assert(_hinstance);
-
-	// register the window's class
-	WNDCLASSEX wnd_class = {};
-	wnd_class.cbSize = sizeof(wnd_class);
-	wnd_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	wnd_class.lpfnWndProc = window_proc;
-	wnd_class.cbClsExtra = 0;
-	wnd_class.cbWndExtra = 0;
-	wnd_class.hInstance = hinstance;
-	wnd_class.hIcon = nullptr;
-	wnd_class.hCursor = LoadCursor(nullptr, IDI_APPLICATION);
-	wnd_class.hbrBackground = nullptr;
-	wnd_class.lpszMenuName = nullptr;
-	wnd_class.lpszClassName = Win_window::wnd_class_name;
-
-	ATOM reg_res = RegisterClassEx(&wnd_class);
-	assert(reg_res != 0);
-
-	// create a window
-	RECT wnd_rect;
-	wnd_rect.left = wnd_position.x;
-	wnd_rect.top = wnd_position.y;
-	wnd_rect.right = wnd_position.x + wnd_size.width;
-	wnd_rect.bottom = wnd_position.y + wnd_size.height;
-	AdjustWindowRectEx(&wnd_rect, WS_OVERLAPPEDWINDOW, false, WS_EX_APPWINDOW);
-
-	_hwnd = CreateWindowEx(WS_EX_APPWINDOW, Win_window::wnd_class_name, "cg project",
-		WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		wnd_rect.left, wnd_rect.top, wnd_rect.right - wnd_rect.left, wnd_rect.bottom - wnd_rect.top,
-		nullptr, nullptr, hinstance, nullptr);
-	assert(_hwnd);
-}
-
-Win_window::~Win_window() noexcept
-{
-	// window
-	if (IsWindow(_hwnd))
-		DestroyWindow(_hwnd);
-	_hwnd = nullptr;
-
-	// window class
-	UnregisterClass(Win_window::wnd_class_name, _hinstance);
-}
-
-bool Win_window::focused() const noexcept
-{
-	return (_hwnd == GetFocus());
-}
-
-std::string Win_window::title() const  
-{
-	char buffer[256];
-	int actual_length = GetWindowText(_hwnd, buffer, std::extent<decltype(buffer)>::value);
-
-	return std::string(buffer, actual_length);
-}
-
-void Win_window::set_title(const char* str) noexcept
-{
-	SetWindowTextA(_hwnd, str);
-}
-
-void Win_window::show() noexcept
-{
-	ShowWindow(_hwnd, SW_SHOW);
-	SetForegroundWindow(_hwnd);
-	SetFocus(_hwnd);
-}
-
-uint2 Win_window::size() const noexcept
-{
-	RECT rect;
-	GetClientRect(_hwnd, &rect);
-	return uint2(rect.right - rect.left, rect.bottom - rect.top);
-}
-
-// ----- Win_app -----
-
-Win_app::Win_app(uint2 wnd_position, uint2 wnd_size) :
-	Application(),
-	_hinstance(GetModuleHandle(nullptr)),
-	_window(_hinstance, wnd_position, wnd_size),
-	_rnd_context(_window.hwnd())
-{
-	g_win_app = this;
-}
-
-Win_app::~Win_app() noexcept
-{
-	g_win_app = nullptr;
-}
-
-bool Win_app::pump_sys_messages() const noexcept
-{
-	MSG msg;
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-		if (msg.message == WM_QUIT)
-			return true;
-
-		TranslateMessage(&msg);
-		DispatchMessageA(&msg);
-	}
-
-	return false;
-}
-
-void Win_app::refresh_device_state() noexcept
-{
-	// mouse buttons
-	auto mb = Mouse_buttons::none;
-	if (HIWORD(GetKeyState(VK_LBUTTON)) == 1) mb |= Mouse_buttons::left;
-	if (HIWORD(GetKeyState(VK_MBUTTON)) == 1) mb |= Mouse_buttons::middle;
-	if (HIWORD(GetKeyState(VK_RBUTTON)) == 1) mb |= Mouse_buttons::right;
-
-	// mouse position & is_out
-	POINT cp;
-	GetCursorPos(&cp);
-	ScreenToClient(_window.hwnd(), &cp);
-	bool is_out = (cp.x < 0) || (static_cast<uint32_t>(cp.x) >= _window.size().width)
-		|| (cp.y < 0) || (static_cast<uint32_t>(cp.y) >= _window.size().height);
-	_mouse.set_is_out(is_out);
-
-	if (!is_out)
-		_mouse.set_position(uint2(cp.x, window().size().height - cp.y - 1));
- }
-
-Clock::Clock_report Win_app::run(std::unique_ptr<Game> game)
-{
-	assert(!_is_running);
-	assert(game);
-
-	_is_running = true;
-	_window.show();
-	refresh_device_state();
-	
-	_rnd_context.swap_color_buffers(); //  what for vsync
-	_clock.restart();
-
-	while (true) {
-		_clock.process_loop_iteration();
-
-		bool terminate = pump_sys_messages();
-		if (terminate) break;
-
-		// simulation
-		while (_clock.has_update_time()) {
-			_clock.process_update_call();
-			process_sys_messages(*game.get());
-			game->update(static_cast<float>(Clock::update_delta_time.count()));
-		}
-
-		// rendering
-		game->begin_render(_clock.get_interpolation_factor());
-		game->render();
-		game->end_render();
-		_rnd_context.swap_color_buffers();
-	}
-
-	return _clock.get_report();
-}
-
-// ----- funcs -----
-
-std::unique_ptr<Application> make_win_application(uint2 wnd_position, uint2 wnd_size)
-{
-	return std::make_unique<Win_app>(wnd_position, wnd_size);
-}
-
-} // sys
+} // namespace opengl
+} // namespace rnd
 } // namespace cg

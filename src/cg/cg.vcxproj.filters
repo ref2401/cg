@@ -4,9 +4,6 @@
     <ClCompile Include="data\image.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="sys\win_app.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="sys\input.cpp">
       <Filter>sys</Filter>
     </ClCompile>
@@ -40,7 +37,13 @@
     <ClCompile Include="data\mesh_old.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="sys\app_old.cpp">
+    <ClCompile Include="sys\app.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\opengl.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="sys\environment.cpp">
       <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,9 +89,6 @@
     <ClInclude Include="data\image.h">
       <Filter>data</Filter>
     </ClInclude>
-    <ClInclude Include="sys\win_app.h">
-      <Filter>sys</Filter>
-    </ClInclude>
     <ClInclude Include="sys\input.h">
       <Filter>sys</Filter>
     </ClInclude>
@@ -116,11 +116,20 @@
     <ClInclude Include="data\mesh_old.h">
       <Filter>data</Filter>
     </ClInclude>
-    <ClInclude Include="sys\app_old.h">
-      <Filter>sys</Filter>
-    </ClInclude>
     <ClInclude Include="rnd\dx11\dx11.h">
       <Filter>rnd\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\rnd.h">
+      <Filter>rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\app.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="sys\environment.h">
+      <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

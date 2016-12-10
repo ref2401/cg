@@ -138,10 +138,11 @@
     <ClCompile Include="math\matrix.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="math\vector.cpp" />
+    <ClCompile Include="rnd\opengl\opengl.cpp" />
     <ClCompile Include="rnd\opengl\opengl_def.cpp" />
-    <ClCompile Include="sys\app_old.cpp" />
+    <ClCompile Include="sys\app.cpp" />
+    <ClCompile Include="sys\environment.cpp" />
     <ClCompile Include="sys\input.cpp" />
-    <ClCompile Include="sys\win_app.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\base.h" />
@@ -158,10 +159,12 @@
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="rnd\dx11\dx11.h" />
     <ClInclude Include="rnd\opengl\glcorearb.h" />
+    <ClInclude Include="rnd\opengl\opengl.h" />
     <ClInclude Include="rnd\opengl\opengl_def.h" />
-    <ClInclude Include="sys\app_old.h" />
+    <ClInclude Include="rnd\rnd.h" />
+    <ClInclude Include="sys\app.h" />
+    <ClInclude Include="sys\environment.h" />
     <ClInclude Include="sys\input.h" />
-    <ClInclude Include="sys\win_app.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
