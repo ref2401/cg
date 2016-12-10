@@ -103,14 +103,6 @@ Application::Application(const Application_desc& desc) :
 	_hinstance(GetModuleHandle(nullptr)),
 	_window(_hinstance, window_proc, desc.window_position, desc.viewport_size)
 {
-
-	if (desc.rhi_type == cg::rnd::Render_api::dx11) {
-		assert(false);
-	}
-	else if (desc.rhi_type == cg::rnd::Render_api::opengl) {
-		_rhi_ctx = std::make_unique<cg::rnd::opengl::Opengl_rhi_context>(_window.hwnd());
-	}
-
 	g_app = this;
 }
 
@@ -260,11 +252,11 @@ void Application::refresh_device_state() noexcept
 		_mouse.set_position(uint2(cp.x, _window.viewport_size().height - cp.y - 1));
 }
 
-Clock_report Application::run_main_loop(Example& example)
+Clock_report Application::run_main_loop(Example& example, cg::rnd::Rhi_context_i& rhi_ctx)
 {
 	_window.show();
 	refresh_device_state();
-	_rhi_ctx->swap_color_buffers(); //  what for vsync
+	rhi_ctx.swap_color_buffers(); //  what for vsync
 	_clock.restart();
 
 	while (true) {
@@ -282,7 +274,7 @@ Clock_report Application::run_main_loop(Example& example)
 
 		// rendering
 		example.render(_clock.get_interpolation_factor());
-		_rhi_ctx->swap_color_buffers();
+		rhi_ctx.swap_color_buffers();
 	}
 
 	return _clock.get_report();

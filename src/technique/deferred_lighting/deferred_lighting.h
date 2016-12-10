@@ -100,12 +100,10 @@ private:
 class Deferred_lighting final : public cg::sys::Example {
 public:
 
-	explicit Deferred_lighting(cg::sys::App_context& app_ctx);
+	explicit Deferred_lighting(const cg::sys::App_context& app_ctx);
 
 	~Deferred_lighting() noexcept override = default;
 
-
-	void on_mouse_click() override {}
 
 	void on_mouse_move() override;
 

@@ -35,6 +35,9 @@
     <ClCompile Include="deferred_lighting\rnd\vertex_spec.cpp">
       <Filter>deferred_lighting\rnd</Filter>
     </ClCompile>
+    <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp">
+      <Filter>fur_simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
@@ -42,6 +45,9 @@
     </Filter>
     <Filter Include="deferred_lighting\rnd">
       <UniqueIdentifier>{1022edf7-189f-48f5-b8c7-286248d61119}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fur_simulation">
+      <UniqueIdentifier>{4f121a48-8c26-4bf5-8298-e187f3d50862}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="deferred_lighting\rnd\vertex_spec.h">
       <Filter>deferred_lighting\rnd</Filter>
+    </ClInclude>
+    <ClInclude Include="fur_simulation\fur_simulation_opengl.h">
+      <Filter>fur_simulation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

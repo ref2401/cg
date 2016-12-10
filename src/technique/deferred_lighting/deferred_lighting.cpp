@@ -139,7 +139,7 @@ Material_library::Material_library()
 
 // ----- Deferred_lighting -----
 
-Deferred_lighting::Deferred_lighting(cg::sys::App_context& app_ctx) :
+Deferred_lighting::Deferred_lighting(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
 	//_curr_viewpoint(float3(4, 4, -3.5), float3(0, 1, 0)),
 	_curr_viewpoint(float3(2, 5, 4), float3(0, 0, 0)),

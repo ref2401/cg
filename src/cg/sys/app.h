@@ -22,16 +22,14 @@ struct Application_desc final {
 
 	// Desired location of the top-left corner of a window.
 	uint2 window_position;
-
-	cg::rnd::Render_api rhi_type = cg::rnd::Render_api::opengl;
 };
 
 class Sys_message_listener_i {
 public:
 
-	virtual void on_mouse_click() = 0;
+	virtual void on_mouse_click() {}
 
-	virtual void on_mouse_move() = 0;
+	virtual void on_mouse_move() {}
 
 	virtual void on_window_resize() = 0;
 
@@ -43,9 +41,7 @@ protected:
 class Example : public virtual Sys_message_listener_i {
 public:
 
-	explicit Example(const App_context& app_ctx) noexcept :
-		_app_ctx(app_ctx)
-	{}
+	explicit Example(const App_context& app_ctx) noexcept : _app_ctx(app_ctx) {}
 
 	Example(const Example&) = delete;
 
@@ -99,7 +95,7 @@ public:
 	}
 
 	template<typename T>
-	Clock_report run();
+	Clock_report run_opengl_example();
 
 private:
 
@@ -135,7 +131,7 @@ private:
 	// Refreshes state of mouse, keyboard etc.
 	void refresh_device_state() noexcept;
 
-	Clock_report run_main_loop(Example& example);
+	Clock_report run_main_loop(Example& example, cg::rnd::Rhi_context_i& rhi_ctx);
 
 
 	HINSTANCE _hinstance = nullptr;
@@ -143,28 +139,21 @@ private:
 	Clock _clock;
 	Mouse _mouse;
 	Window _window;
-	std::unique_ptr<cg::rnd::Rhi_context_i> _rhi_ctx;
 	// sys messages
 	bool _window_resize_message = false;
 	std::vector<Sys_message> _sys_message_queue;
 };
 
 template<typename T>
-Clock_report Application::run()
+Clock_report Application::run_opengl_example()
 {
-	static_assert(std::is_base_of<Example, T>::value, "T must be derived from learn_dx11::Example.");
+	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
 
 	App_context app_ctx(_mouse, _window);
-	std::unique_ptr<Example> example;
+	cg::rnd::opengl::Opengl_rhi_context rhi_ctx(_window.hwnd());
+	T example(app_ctx);
 
-	if (_rhi_ctx->render_api() == cg::rnd::Render_api::dx11) {
-
-	}
-	else if (_rhi_ctx->render_api() == cg::rnd::Render_api::opengl) {
-		example = std::make_unique<T>(app_ctx);
-	}
-
-	return run_main_loop(*example);
+	return run_main_loop(example, rhi_ctx);
 }
 
 } // namespace sys
