@@ -138,6 +138,7 @@
     <ClCompile Include="math\matrix.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="math\vector.cpp" />
+    <ClCompile Include="rnd\opengl\buffer.cpp" />
     <ClCompile Include="rnd\opengl\opengl.cpp" />
     <ClCompile Include="rnd\opengl\opengl_def.cpp" />
     <ClCompile Include="sys\app.cpp" />
@@ -158,9 +159,11 @@
     <ClInclude Include="math\utility.h" />
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="rnd\dx11\dx11.h" />
+    <ClInclude Include="rnd\opengl\buffer.h" />
     <ClInclude Include="rnd\opengl\glcorearb.h" />
     <ClInclude Include="rnd\opengl\opengl.h" />
     <ClInclude Include="rnd\opengl\opengl_def.h" />
+    <ClInclude Include="rnd\opengl\opengl_utility.h" />
     <ClInclude Include="rnd\rnd.h" />
     <ClInclude Include="sys\app.h" />
     <ClInclude Include="sys\environment.h" />

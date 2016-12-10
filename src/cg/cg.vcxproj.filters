@@ -46,6 +46,9 @@
     <ClCompile Include="sys\environment.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\opengl\buffer.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -130,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="sys\environment.h">
       <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\buffer.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl_utility.h">
+      <Filter>rnd\opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

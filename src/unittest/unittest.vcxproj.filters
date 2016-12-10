@@ -52,6 +52,9 @@
     <ClCompile Include="rnd\dx11\dx11_unittest.cpp">
       <Filter>rnd\dx11</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\opengl\buffer_unittest.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -74,6 +77,9 @@
     </Filter>
     <Filter Include="rnd\dx11">
       <UniqueIdentifier>{ddc51c3d-5887-4e15-8058-2ce49e037fa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rnd\opengl">
+      <UniqueIdentifier>{64c66238-2229-4604-80ee-12b4cb5631db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
