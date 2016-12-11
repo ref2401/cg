@@ -12,6 +12,9 @@ namespace opengl {
 // Validates glTexImage/glTexStorage/glTextureStorage 'internalformat' argument value.
 bool is_valid_texture_internal_format(const GLenum& value) noexcept;
 
+// Validates sampler/texture WRAP_{S/T/R} parameter value.
+bool is_valid_texture_wrap_mode(const GLenum& value) noexcept;
+
 } // namespace opengl
 } // namespace rnd
 } // namespace cg

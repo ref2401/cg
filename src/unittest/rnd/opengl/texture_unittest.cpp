@@ -38,6 +38,20 @@ public:
 		Assert::IsFalse(is_valid_texture_internal_format(GL_NONE));
 		Assert::IsFalse(is_valid_texture_internal_format(GL_RED));
 	}
+
+	TEST_METHOD(is_valid_texture_wrap_mode)
+	{
+		using cg::rnd::opengl::is_valid_texture_wrap_mode;
+
+		Assert::IsTrue(is_valid_texture_wrap_mode(GL_REPEAT));
+		Assert::IsTrue(is_valid_texture_wrap_mode(GL_CLAMP_TO_BORDER));
+		Assert::IsTrue(is_valid_texture_wrap_mode(GL_CLAMP_TO_EDGE));
+		Assert::IsTrue(is_valid_texture_wrap_mode(GL_MIRRORED_REPEAT));
+		Assert::IsTrue(is_valid_texture_wrap_mode(GL_MIRROR_CLAMP_TO_EDGE));
+
+		Assert::IsFalse(is_valid_texture_wrap_mode(GL_NONE));
+		Assert::IsFalse(is_valid_texture_wrap_mode(GL_TEXTURE));
+	}
 };
 
 } // namespace unittest
