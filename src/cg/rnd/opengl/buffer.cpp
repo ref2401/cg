@@ -144,6 +144,20 @@ void Buffer_gpu::dispose() noexcept
 
 // ---- funcs -----
 
+void copy(const Buffer_i& src, size_t src_offset,
+	Buffer_i& dest, size_t dest_offset, size_t byte_count) noexcept
+{
+	assert(src.id() != Invalid::buffer_id);
+	assert(dest.id() != Invalid::buffer_id);
+	assert(src.byte_count() >= src_offset + byte_count);
+	assert(dest.byte_count() >= dest_offset + byte_count);
+
+	if (byte_count == 0) return;
+
+	glCopyNamedBufferSubData(src.id(), dest.id(), src_offset, dest_offset, byte_count);
+}
+
+
 } // namespace opengl
 } // namespace rnd
 } // namespace cg

@@ -25,6 +25,7 @@ public:
 private:
 
 	Buffer_dynamic _buffer;
+	Buffer_gpu _buffer_gpu;
 };
 
 } // fur_simulation

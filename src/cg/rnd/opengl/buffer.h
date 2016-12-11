@@ -127,10 +127,26 @@ private:
 	size_t _byte_count = 0;
 };
 
-
 // not implemented
 // Buffer_map (read/write)
 // Buffer_persistent_map (read/write)
+
+// Copies contents of the src buffer to the dest buffer.
+// Params:
+// -	src: Source buffer object.
+// -	src_offset:	The offset, in bytes, within the source buffer object at which data will be read.
+// -	dest: Destination buffer object.
+// -	dest_offset: The offset, in btes, within destination buffer object at which data will be written.
+// -	byte_count:	The size, in bytes, of the data to be copied 
+//					from the source buffer object to the destination buffer object.
+void copy(const Buffer_i& src, size_t src_offset,
+	Buffer_i& dest, size_t dest_offset, size_t byte_count) noexcept;
+
+// Copies contents of the src buffer to the dest buffer.
+inline void copy(const Buffer_i& src, Buffer_i& dest, size_t byte_count) noexcept
+{
+	copy(src, 0, dest, 0, byte_count);
+}
 
 } // namespace opengl
 } // namespace rnd

@@ -49,6 +49,9 @@
     <ClCompile Include="rnd\opengl\buffer.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\opengl\texture.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -138,6 +141,9 @@
       <Filter>rnd\opengl</Filter>
     </ClInclude>
     <ClInclude Include="rnd\opengl\opengl_utility.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\texture.h">
       <Filter>rnd\opengl</Filter>
     </ClInclude>
   </ItemGroup>

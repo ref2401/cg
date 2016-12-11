@@ -141,6 +141,7 @@
     <ClCompile Include="rnd\opengl\buffer.cpp" />
     <ClCompile Include="rnd\opengl\opengl.cpp" />
     <ClCompile Include="rnd\opengl\opengl_def.cpp" />
+    <ClCompile Include="rnd\opengl\texture.cpp" />
     <ClCompile Include="sys\app.cpp" />
     <ClCompile Include="sys\environment.cpp" />
     <ClCompile Include="sys\input.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="rnd\opengl\opengl.h" />
     <ClInclude Include="rnd\opengl\opengl_def.h" />
     <ClInclude Include="rnd\opengl\opengl_utility.h" />
+    <ClInclude Include="rnd\opengl\texture.h" />
     <ClInclude Include="rnd\rnd.h" />
     <ClInclude Include="sys\app.h" />
     <ClInclude Include="sys\environment.h" />
