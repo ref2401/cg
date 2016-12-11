@@ -59,6 +59,7 @@ void Buffer_dynamic::dispose() noexcept
 	if (_id == Invalid::buffer_id) return;
 
 	glDeleteBuffers(1, &_id);
+	_id = Invalid::buffer_id;
 }
 
 void Buffer_dynamic::read(void* dest_ptr) noexcept
@@ -140,6 +141,7 @@ void Buffer_gpu::dispose() noexcept
 	if (_id == Invalid::buffer_id) return;
 
 	glDeleteBuffers(1, &_id);
+	_id = Invalid::buffer_id;
 }
 
 // ---- funcs -----

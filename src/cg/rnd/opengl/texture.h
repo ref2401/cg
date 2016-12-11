@@ -41,6 +41,38 @@ struct Sampler_desc final {
 	GLenum wrap_r = GL_CLAMP_TO_EDGE;
 };
 
+// Incapsulates the sampler state of a texture object.
+class Sampler final {
+public:
+
+	Sampler() noexcept = default;
+
+	explicit Sampler(const Sampler_desc& desc) noexcept;
+
+	Sampler(const Sampler&) = delete;
+
+	Sampler(Sampler&& smp) noexcept;
+
+	~Sampler() noexcept;
+
+
+	Sampler& operator=(const Sampler&) = delete;
+
+	Sampler& operator=(Sampler&& smp) noexcept;
+
+
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::sampler_id;
+};
+
 
 inline bool operator==(const Sampler_desc& lhs, const Sampler_desc& rhs) noexcept
 {

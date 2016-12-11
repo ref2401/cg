@@ -4,6 +4,50 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+// ----- Sampler -----
+
+Sampler::Sampler(const Sampler_desc& desc) noexcept
+{
+	glCreateSamplers(1, &_id);
+	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, desc.min_filter);
+	glSamplerParameteri(_id, GL_TEXTURE_MAG_FILTER, desc.mag_filter);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_S, desc.wrap_s);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_T, desc.wrap_t);
+	glSamplerParameteri(_id, GL_TEXTURE_WRAP_R, desc.wrap_r);
+}
+
+Sampler::Sampler(Sampler&& smp) noexcept :
+	_id(smp._id)
+{
+	smp._id = Invalid::sampler_id;
+}
+
+Sampler::~Sampler() noexcept
+{
+	dispose();
+}
+
+Sampler& Sampler::operator=(Sampler&& smp) noexcept
+{
+	if (this == &smp) return *this;
+
+	dispose();
+	_id = smp._id;
+	smp._id = Invalid::sampler_id;
+
+	return *this;
+}
+
+void Sampler::dispose() noexcept
+{
+	if (_id == Invalid::sampler_id) return;
+
+	glDeleteSamplers(1, &_id);
+	_id = Invalid::sampler_id;
+}
+
+// ----- funcs -----
+
 std::ostream& operator<<(std::ostream& out, const Sampler_desc& desc)
 {
 	out << "Sampler_desc(" << desc.min_filter << ", " << desc.mag_filter << ", " 
