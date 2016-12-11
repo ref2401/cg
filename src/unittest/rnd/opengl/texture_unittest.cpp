@@ -1,18 +1,62 @@
 #include "cg/rnd/opengl/texture.h"
 
 #include "CppUnitTest.h"
+
+using cg::rnd::opengl::Sampler_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-//template<> inline std::wstring ToString<long long>(const long long& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Sampler_desc>(const Sampler_desc& t) { RETURN_WIDE_STRING(t); }
 //template<> inline std::wstring ToString<Com_fake_class>(const Com_fake_class& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {
+
+TEST_CLASS(cg_rnd_opengl_texture_Sampler_desc) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		Sampler_desc desc0;
+		Assert::AreEqual<GLenum>(GL_LINEAR, desc0.min_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR, desc0.mag_filter);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_s);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_t);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_r);
+
+		Sampler_desc desc1(GL_LINEAR_MIPMAP_LINEAR, GL_NEAREST, GL_REPEAT);
+		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_LINEAR, desc1.min_filter);
+		Assert::AreEqual<GLenum>(GL_NEAREST, desc1.mag_filter);
+		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_s);
+		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_t);
+		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_r);
+
+		Sampler_desc desc2(GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR,
+			GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER);
+		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_NEAREST, desc2.min_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR, desc2.mag_filter);
+		Assert::AreEqual<GLenum>(GL_REPEAT, desc2.wrap_s);
+		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, desc2.wrap_t);
+		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER, desc2.wrap_r);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		Sampler_desc desc(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_REPEAT);
+
+		Assert::AreNotEqual(desc, Sampler_desc(GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_REPEAT));
+		Assert::AreNotEqual(desc, Sampler_desc(GL_NEAREST, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_REPEAT));
+		Assert::AreNotEqual(desc, Sampler_desc(GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_REPEAT));
+		Assert::AreNotEqual(desc, Sampler_desc(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_CLAMP_TO_EDGE, GL_REPEAT));
+		Assert::AreNotEqual(desc, Sampler_desc(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE));
+		
+		Assert::AreEqual(desc, Sampler_desc(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_REPEAT));
+	}
+};
 
 TEST_CLASS(cg_rnd_opengl_texture_Funcs) {
 public:

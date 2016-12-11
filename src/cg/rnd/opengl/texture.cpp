@@ -4,6 +4,20 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+std::ostream& operator<<(std::ostream& out, const Sampler_desc& desc)
+{
+	out << "Sampler_desc(" << desc.min_filter << ", " << desc.mag_filter << ", " 
+		<< desc.wrap_s << ", " << desc.wrap_t << ", " << desc.wrap_r << ')';
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc)
+{
+	out << "Sampler_desc(" << desc.min_filter << ", " << desc.mag_filter << ", "
+		<< desc.wrap_s << ", " << desc.wrap_t << ", " << desc.wrap_r << ')';
+	return out;
+}
+
 bool is_valid_texture_internal_format(const GLenum& value) noexcept
 {
 	return (value == GL_R8)
