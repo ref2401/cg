@@ -52,6 +52,9 @@
     <ClCompile Include="rnd\opengl\texture.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\opengl\program.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -144,6 +147,9 @@
       <Filter>rnd\opengl</Filter>
     </ClInclude>
     <ClInclude Include="rnd\opengl\texture.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\program.h">
       <Filter>rnd\opengl</Filter>
     </ClInclude>
   </ItemGroup>
