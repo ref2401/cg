@@ -55,6 +55,9 @@
     <ClCompile Include="rnd\opengl\buffer_unittest.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\opengl\texture_unittest.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
