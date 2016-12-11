@@ -2,6 +2,8 @@
 #define CG_RND_OPENGL_TEXTURE_H_
 
 #include <ostream>
+#include "cg/data/image.h"
+#include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"
 
@@ -92,17 +94,40 @@ std::ostream& operator<<(std::ostream& out, const Sampler_desc& desc);
 
 std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc);
 
+// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
+// Returns GL_NONE if fmt value eqauls to Image_format::none.
+GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
+
+// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
+// based on the specified texture internal format.
+// Returns GL_NONE if internal_format value is not a valid value.
+GLenum get_texture_sub_image_format(GLenum internal_format) noexcept;
+
+// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
+// Returns GL_NONE if fmt value eqauls to Image_format::none.
+GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+
+// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified texture internal format.
+// Returns GL_NONE if internal_format value is not a valid value.
+GLenum get_texture_sub_image_type(GLenum internal_format) noexcept;
+
 // Validates glTexImage/glTexStorage/glTextureStorage 'internalformat' argument value.
-bool is_valid_texture_internal_format(const GLenum& value) noexcept;
+bool is_valid_texture_internal_format(GLenum value) noexcept;
 
 //  Validates sampler/texture GL_TEXTURE_MAG_FILTER parameter value.
-bool is_valid_texture_mag_filter(const GLenum& value) noexcept;
+bool is_valid_texture_mag_filter(GLenum value) noexcept;
 
 //  Validates sampler/texture GL_TEXTURE_MIN_FILTER parameter value.
-bool is_valid_texture_min_filter(const GLenum& value) noexcept;
+bool is_valid_texture_min_filter(GLenum value) noexcept;
 
 // Validates sampler/texture WRAP_{S/T/R} parameter value.
-bool is_valid_texture_wrap_mode(const GLenum& value) noexcept;
+bool is_valid_texture_wrap_mode(GLenum value) noexcept;
+
+void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
+	const cg::data::Image_2d& image) noexcept;
 
 } // namespace opengl
 } // namespace rnd

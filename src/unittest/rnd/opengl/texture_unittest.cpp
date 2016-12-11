@@ -2,6 +2,7 @@
 
 #include "CppUnitTest.h"
 
+using cg::data::Image_format;
 using cg::rnd::opengl::Sampler_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -60,6 +61,62 @@ public:
 
 TEST_CLASS(cg_rnd_opengl_texture_Funcs) {
 public:
+
+	TEST_METHOD(get_texture_sub_image_format)
+	{
+		using cg::rnd::opengl::get_texture_sub_image_format;
+
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(Image_format::none));
+		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(Image_format::red_8));
+		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(Image_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(Image_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_BGR, get_texture_sub_image_format(Image_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_BGRA, get_texture_sub_image_format(Image_format::bgra_8));
+
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(GL_RED));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(GL_TEXTURE_2D));
+		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(GL_R8));
+		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(GL_R32F));
+		Assert::AreEqual<GLenum>(GL_RG, get_texture_sub_image_format(GL_RG8));
+		Assert::AreEqual<GLenum>(GL_RG, get_texture_sub_image_format(GL_RG32F));
+		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(GL_RGB8));
+		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(GL_RGB32F));
+		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(GL_RGBA8));
+		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(GL_RGBA32F));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT, get_texture_sub_image_format(GL_DEPTH_COMPONENT24));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT, get_texture_sub_image_format(GL_DEPTH_COMPONENT32));
+		Assert::AreEqual<GLenum>(GL_DEPTH_COMPONENT, get_texture_sub_image_format(GL_DEPTH_COMPONENT32F));
+		Assert::AreEqual<GLenum>(GL_DEPTH_STENCIL, get_texture_sub_image_format(GL_DEPTH24_STENCIL8));
+		Assert::AreEqual<GLenum>(GL_DEPTH_STENCIL, get_texture_sub_image_format(GL_DEPTH32F_STENCIL8));
+	}
+
+	TEST_METHOD(get_texture_sub_image_type)
+	{
+		using cg::rnd::opengl::get_texture_sub_image_type;
+
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(Image_format::none));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::red_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgra_8));
+
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(GL_RED));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(GL_TEXTURE_2D));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(GL_R8));
+		Assert::AreEqual<GLenum>(GL_FLOAT, get_texture_sub_image_type(GL_R32F));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(GL_RG8));
+		Assert::AreEqual<GLenum>(GL_FLOAT, get_texture_sub_image_type(GL_RG32F));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(GL_RGB8));
+		Assert::AreEqual<GLenum>(GL_FLOAT, get_texture_sub_image_type(GL_RGB32F));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(GL_RGBA8));
+		Assert::AreEqual<GLenum>(GL_FLOAT, get_texture_sub_image_type(GL_RGBA32F));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_INT, get_texture_sub_image_type(GL_DEPTH_COMPONENT24));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_INT, get_texture_sub_image_type(GL_DEPTH_COMPONENT32));
+		Assert::AreEqual<GLenum>(GL_FLOAT, get_texture_sub_image_type(GL_DEPTH_COMPONENT32F));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_INT_24_8, get_texture_sub_image_type(GL_DEPTH24_STENCIL8));
+		Assert::AreEqual<GLenum>(GL_FLOAT_32_UNSIGNED_INT_24_8_REV, get_texture_sub_image_type(GL_DEPTH32F_STENCIL8));
+	}
 
 	TEST_METHOD(is_valid_texture_internal_format)
 	{
