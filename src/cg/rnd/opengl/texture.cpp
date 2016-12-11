@@ -113,6 +113,7 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 {
 	if (this == &tex) return *this;
 
+	dispose();
 	_id = tex._id;
 	_internal_format = tex._internal_format;
 	_mipmap_level_count = tex._mipmap_level_count;
