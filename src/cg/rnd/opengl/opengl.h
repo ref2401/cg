@@ -2,6 +2,7 @@
 #define CG_RND_OPENGL_OPENGL_H_
 
 #include "cg/rnd/rnd.h"
+#include "cg/rnd/opengl/buffer.h"
 #include "cg/rnd/opengl/glcorearb.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include <windows.h>

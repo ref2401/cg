@@ -23,6 +23,8 @@ public:
 	void update(float dt) override;
 
 private:
+
+	Buffer_dynamic _buffer;
 };
 
 } // fur_simulation
