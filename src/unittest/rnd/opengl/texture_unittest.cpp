@@ -39,6 +39,32 @@ public:
 		Assert::IsFalse(is_valid_texture_internal_format(GL_RED));
 	}
 
+	TEST_METHOD(is_valid_texture_mag_filter)
+	{
+		using cg::rnd::opengl::is_valid_texture_mag_filter;
+
+		Assert::IsTrue(is_valid_texture_mag_filter(GL_NEAREST));
+		Assert::IsTrue(is_valid_texture_mag_filter(GL_LINEAR));
+
+		Assert::IsFalse(is_valid_texture_mag_filter(GL_NONE));
+		Assert::IsFalse(is_valid_texture_mag_filter(GL_NEAREST_MIPMAP_NEAREST));
+	}
+
+	TEST_METHOD(is_valid_texture_min_filter)
+	{
+		using cg::rnd::opengl::is_valid_texture_min_filter;
+
+		Assert::IsTrue(is_valid_texture_min_filter(GL_NEAREST));
+		Assert::IsTrue(is_valid_texture_min_filter(GL_LINEAR));
+		Assert::IsTrue(is_valid_texture_min_filter(GL_NEAREST_MIPMAP_NEAREST));
+		Assert::IsTrue(is_valid_texture_min_filter(GL_LINEAR_MIPMAP_NEAREST));
+		Assert::IsTrue(is_valid_texture_min_filter(GL_NEAREST_MIPMAP_LINEAR));
+		Assert::IsTrue(is_valid_texture_min_filter(GL_LINEAR_MIPMAP_LINEAR));
+
+		Assert::IsFalse(is_valid_texture_min_filter(GL_NONE));
+		Assert::IsFalse(is_valid_texture_min_filter(GL_REPEAT));
+	}
+
 	TEST_METHOD(is_valid_texture_wrap_mode)
 	{
 		using cg::rnd::opengl::is_valid_texture_wrap_mode;

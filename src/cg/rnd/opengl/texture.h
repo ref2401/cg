@@ -12,6 +12,12 @@ namespace opengl {
 // Validates glTexImage/glTexStorage/glTextureStorage 'internalformat' argument value.
 bool is_valid_texture_internal_format(const GLenum& value) noexcept;
 
+//  Validates sampler/texture GL_TEXTURE_MAG_FILTER parameter value.
+bool is_valid_texture_mag_filter(const GLenum& value) noexcept;
+
+//  Validates sampler/texture GL_TEXTURE_MIN_FILTER parameter value.
+bool is_valid_texture_min_filter(const GLenum& value) noexcept;
+
 // Validates sampler/texture WRAP_{S/T/R} parameter value.
 bool is_valid_texture_wrap_mode(const GLenum& value) noexcept;
 

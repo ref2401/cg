@@ -21,6 +21,22 @@ bool is_valid_texture_internal_format(const GLenum& value) noexcept
 		|| (value == GL_DEPTH_COMPONENT32F);
 }
 
+bool is_valid_texture_mag_filter(const GLenum& value) noexcept
+{
+	return (value == GL_NEAREST)
+		|| (value == GL_LINEAR);
+}
+
+bool is_valid_texture_min_filter(const GLenum& value) noexcept
+{
+	return (value == GL_NEAREST)
+		|| (value == GL_LINEAR)
+		|| (value == GL_NEAREST_MIPMAP_NEAREST)
+		|| (value == GL_LINEAR_MIPMAP_NEAREST)
+		|| (value == GL_NEAREST_MIPMAP_LINEAR)
+		|| (value == GL_LINEAR_MIPMAP_LINEAR);
+}
+
 bool is_valid_texture_wrap_mode(const GLenum& value) noexcept
 {
 	return (value == GL_REPEAT)
