@@ -11,6 +11,9 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+// Validate glGetProgram 'pname' argument value;
+bool is_valid_program_property(GLenum value) noexcept;
+
 // Validate glGetShader 'pname' argument value.
 bool is_valid_shader_property(GLenum value) noexcept;
 

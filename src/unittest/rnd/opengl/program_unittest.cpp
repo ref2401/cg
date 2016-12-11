@@ -15,6 +15,19 @@ namespace unittest {
 TEST_CLASS(cg_rnd_opengl_program_Funcs) {
 public:
 
+	TEST_METHOD(is_valid_program_property)
+	{
+		using cg::rnd::opengl::is_valid_program_property;
+		
+		Assert::IsTrue(is_valid_program_property(GL_DELETE_STATUS));
+		Assert::IsTrue(is_valid_program_property(GL_INFO_LOG_LENGTH));
+		Assert::IsTrue(is_valid_program_property(GL_LINK_STATUS));
+		Assert::IsTrue(is_valid_program_property(GL_VALIDATE_STATUS));
+
+		Assert::IsFalse(is_valid_program_property(GL_NONE));
+		Assert::IsFalse(is_valid_program_property(GL_COMPILE_STATUS));
+	}
+
 	TEST_METHOD(is_valid_shader_property)
 	{
 		using cg::rnd::opengl::is_valid_shader_property;
