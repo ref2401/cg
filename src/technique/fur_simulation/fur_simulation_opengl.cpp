@@ -1,5 +1,7 @@
 #include "technique/fur_simulation/fur_simulation_opengl.h"
 
+#include "cg/data/image.h"
+
 
 namespace fur_simulation {
 
@@ -18,6 +20,10 @@ Fur_simulation_opengl::Fur_simulation_opengl(const cg::sys::App_context& app_ctx
 	copy(_buffer, 0, _buffer_gpu, 0, _buffer_gpu.byte_count());
 
 	glBindBuffer(GL_ARRAY_BUFFER, _buffer_gpu.id());
+
+	auto image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
+	Sampler_desc desc;
+	_tex = Texture_2d(GL_RGB8, 1, desc, image);
 }
 
 void Fur_simulation_opengl::on_window_resize()

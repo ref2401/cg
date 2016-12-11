@@ -1,5 +1,6 @@
 #include "cg/rnd/opengl/texture.h"
 
+
 using cg::data::Image_format;
 
 
@@ -47,6 +48,108 @@ void Sampler::dispose() noexcept
 
 	glDeleteSamplers(1, &_id);
 	_id = Invalid::sampler_id;
+}
+
+// ----- Texture_2d -----
+
+Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept 
+	: _internal_format(internal_format),
+	_mipmap_level_count(mipmap_level_count),
+	_size(size)
+{
+	assert(is_valid_texture_internal_format(internal_format));
+	assert(mipmap_level_count > 0);
+	assert(greater_than(size, 0));
+
+	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, _size.width, _size.height);
+}
+
+Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count, 
+	const Sampler_desc& sampler_desc, const uint2& size) noexcept 
+	: Texture_2d(internal_format, mipmap_level_count, size)
+{
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_desc.wrap_s);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_desc.wrap_t);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);
+}
+
+Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+	cg::data::Image_2d& image) noexcept
+	: Texture_2d(internal_format, mipmap_level_count, image.size())
+{
+	assert(image.format() != Image_format::none);
+	write(0, uint2::zero, image);
+}
+
+Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+	const Sampler_desc& sampler_desc, cg::data::Image_2d& image) noexcept
+	: Texture_2d(internal_format, mipmap_level_count, sampler_desc, image.size())
+{
+	assert(image.format() != Image_format::none);
+	write(0, uint2::zero, image);
+}
+
+Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
+	_id(tex._id),
+	_internal_format(tex._internal_format),
+	_mipmap_level_count(tex._mipmap_level_count),
+	_size(tex._size)
+{
+	tex._id = Invalid::texture_id;
+	tex._internal_format = GL_NONE;
+	tex._mipmap_level_count = 0;
+	tex._size = uint2::zero;
+}
+
+Texture_2d::~Texture_2d() noexcept
+{
+	dispose();
+}
+
+Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
+{
+	if (this == &tex) return *this;
+
+	_id = tex._id;
+	_internal_format = tex._internal_format;
+	_mipmap_level_count = tex._mipmap_level_count;
+	_size = tex._size;
+
+	tex._id = Invalid::texture_id;
+	tex._internal_format = GL_NONE;
+	tex._mipmap_level_count = 0;
+	tex._size = uint2::zero;
+
+	return *this;
+}
+
+void Texture_2d::dispose() noexcept
+{
+	if (_id == Invalid::texture_id) return;
+
+	glDeleteTextures(1, &_id);
+	_id = Invalid::texture_id;
+	_internal_format = GL_NONE;
+}
+
+void Texture_2d::write(size_t mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept
+{
+	assert(_id != Invalid::texture_id);
+	assert(mipmap_level < _mipmap_level_count);
+	assert(image.format() != Image_format::none);
+	assert(_size.width >= offset.width + image.size().width);
+	assert(_size.height >= offset.height + image.size().height);
+
+	if (image.size() == uint2::zero) return;
+
+	glTextureSubImage2D(_id, mipmap_level, offset.x , offset.y, 
+		image.size().width, image.size().height,
+		get_texture_sub_image_format(image.format()),
+		get_texture_sub_image_type(image.format()),
+		image.data());
 }
 
 // ----- funcs -----
@@ -177,12 +280,12 @@ bool is_valid_texture_wrap_mode(GLenum value) noexcept
 		|| (value == GL_MIRROR_CLAMP_TO_EDGE);
 }
 
-void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
-	const cg::data::Image_2d& image) noexcept
-{
-	assert(tex_id != Invalid::texture_id);
-
-}
+//void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
+//	const cg::data::Image_2d& image) noexcept
+//{
+//	assert(tex_id != Invalid::texture_id);
+//
+//}
 
 } // namespace opengl
 } // namespace rnd

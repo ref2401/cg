@@ -75,6 +75,90 @@ private:
 	GLuint _id = Invalid::sampler_id;
 };
 
+class Texture_2d_i {
+public:
+
+	virtual ~Texture_2d_i() noexcept {}
+
+
+	// Texture's unique id.
+	virtual GLuint id() const noexcept = 0;
+
+	// Sized texel format that is used to store texture data.
+	virtual GLenum internal_format() const noexcept = 0;
+
+	// How many mipmaps the texture has.
+	virtual size_t mipmap_level_count() const noexcept = 0;
+
+	// Texture's size in texels.
+	virtual uint2 size() const noexcept = 0;
+};
+
+class Texture_2d final : public virtual Texture_2d_i {
+public:
+
+	Texture_2d() noexcept = default;
+
+	Texture_2d(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept;
+
+	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
+
+	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+		cg::data::Image_2d& image) noexcept;
+
+	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+		const Sampler_desc& sampler_desc, cg::data::Image_2d& image) noexcept;
+
+	Texture_2d(const Texture_2d&) = delete;
+
+	Texture_2d(Texture_2d&& tex) noexcept;
+
+	~Texture_2d() noexcept;
+
+
+	Texture_2d& operator=(const Texture_2d&) = delete;
+
+	Texture_2d& operator=(Texture_2d&& tex) noexcept;
+
+
+	// Texture's unique id.
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+	// Sized texel format that is used to store texture data.
+	GLenum internal_format() const noexcept override
+	{
+		return _internal_format;
+	}
+
+	// How many mipmaps the texture has.
+	size_t mipmap_level_count() const noexcept override
+	{
+		return _mipmap_level_count;
+	}
+
+	// Texture's size in texels.
+	uint2 size() const noexcept override
+	{
+		return _size;
+	}
+
+
+	void write(size_t mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept;
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::texture_id;
+	GLenum _internal_format = GL_NONE;
+	size_t _mipmap_level_count = 0;
+	uint2 _size;
+};
+
 
 inline bool operator==(const Sampler_desc& lhs, const Sampler_desc& rhs) noexcept
 {
@@ -126,8 +210,6 @@ bool is_valid_texture_min_filter(GLenum value) noexcept;
 // Validates sampler/texture WRAP_{S/T/R} parameter value.
 bool is_valid_texture_wrap_mode(GLenum value) noexcept;
 
-void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
-	const cg::data::Image_2d& image) noexcept;
 
 } // namespace opengl
 } // namespace rnd

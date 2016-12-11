@@ -26,6 +26,7 @@ private:
 
 	Buffer_dynamic _buffer;
 	Buffer_gpu _buffer_gpu;
+	Texture_2d _tex;
 };
 
 } // fur_simulation
