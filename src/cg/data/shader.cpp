@@ -39,7 +39,7 @@ Glsl_program_data load_glsl_program_data(const char* filename)
 	// pixel shader
 	fn.clear();
 	fn.append(filename);
-	fn.append(".pixel.glsl");
+	fn.append(".fragment.glsl");
 	ENFORCE(exists(fn), EXCEPTION_MSG("The specified glsl file '", fn, "' does not exist."));
 	glsl_data.fragment_shader_source_code = load_text(fn);
 
