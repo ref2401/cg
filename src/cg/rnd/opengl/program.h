@@ -25,7 +25,7 @@ public:
 	~Glsl_program() noexcept;
 
 
-	Glsl_program& operator=(const Glsl_program) = delete;
+	Glsl_program& operator=(const Glsl_program&) = delete;
 
 	Glsl_program& operator=(Glsl_program&& prog) noexcept;
 

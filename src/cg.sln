@@ -17,17 +17,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "technique", "technique\tech
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting_shaders", "deferred_lighting_shaders", "{44D5E74A-E773-4AF8-ABF1-9B55CE0135B8}"
 	ProjectSection(SolutionItems) = preProject
-		..\data\deferred_lighting_shaders\gbuffer_pass.pixel.glsl = ..\data\deferred_lighting_shaders\gbuffer_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\gbuffer_pass.fragment.glsl = ..\data\deferred_lighting_shaders\gbuffer_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\gbuffer_pass.vertex.glsl = ..\data\deferred_lighting_shaders\gbuffer_pass.vertex.glsl
-		..\data\deferred_lighting_shaders\lighting_pass_dir.pixel.glsl = ..\data\deferred_lighting_shaders\lighting_pass_dir.pixel.glsl
+		..\data\deferred_lighting_shaders\lighting_pass_dir.fragment.glsl = ..\data\deferred_lighting_shaders\lighting_pass_dir.fragment.glsl
 		..\data\deferred_lighting_shaders\lighting_pass_dir.vertex.glsl = ..\data\deferred_lighting_shaders\lighting_pass_dir.vertex.glsl
-		..\data\deferred_lighting_shaders\material_pass.pixel.glsl = ..\data\deferred_lighting_shaders\material_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\material_pass.fragment.glsl = ..\data\deferred_lighting_shaders\material_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\material_pass.vertex.glsl = ..\data\deferred_lighting_shaders\material_pass.vertex.glsl
-		..\data\deferred_lighting_shaders\shadow_map_pass.pixel.glsl = ..\data\deferred_lighting_shaders\shadow_map_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\shadow_map_pass.fragment.glsl = ..\data\deferred_lighting_shaders\shadow_map_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\shadow_map_pass.vertex.glsl = ..\data\deferred_lighting_shaders\shadow_map_pass.vertex.glsl
-		..\data\deferred_lighting_shaders\ssao_pass.pixel.glsl = ..\data\deferred_lighting_shaders\ssao_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\ssao_pass.fragment.glsl = ..\data\deferred_lighting_shaders\ssao_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\ssao_pass.vertex.glsl = ..\data\deferred_lighting_shaders\ssao_pass.vertex.glsl
-		..\data\deferred_lighting_shaders\tone_mapping_pass.pixel.glsl = ..\data\deferred_lighting_shaders\tone_mapping_pass.pixel.glsl
+		..\data\deferred_lighting_shaders\tone_mapping_pass.fragment.glsl = ..\data\deferred_lighting_shaders\tone_mapping_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\tone_mapping_pass.vertex.glsl = ..\data\deferred_lighting_shaders\tone_mapping_pass.vertex.glsl
 	EndProjectSection
 EndProject
@@ -52,6 +52,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mesh_rnd", "mesh_rnd", "{FC
 		..\data\learn_dx11\mesh_rnd\displacement_mapping.hlsl = ..\data\learn_dx11\mesh_rnd\displacement_mapping.hlsl
 		..\data\learn_dx11\mesh_rnd\static_mesh.hlsl = ..\data\learn_dx11\mesh_rnd\static_mesh.hlsl
 		..\data\learn_dx11\mesh_rnd\vertex_skinning.hlsl = ..\data\learn_dx11\mesh_rnd\vertex_skinning.hlsl
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fur_simulation", "fur_simulation", "{17790165-C1A5-456A-907E-87E4B5D6291A}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\fur_simulation\fur_generation.fragment.glsl = ..\data\fur_simulation\fur_generation.fragment.glsl
+		..\data\fur_simulation\fur_generation.vertex.glsl = ..\data\fur_simulation\fur_generation.vertex.glsl
 	EndProjectSection
 EndProject
 Global
@@ -103,5 +109,6 @@ Global
 		{AF112729-F54C-42ED-B255-96AD38F61B9F} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{8766FCF4-6CDF-423B-8843-3BAA7C3E0180} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{FC5A5AAD-B9BC-4240-82B4-00DA66ABCC2E} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
+		{17790165-C1A5-456A-907E-87E4B5D6291A} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 	EndGlobalSection
 EndGlobal

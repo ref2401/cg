@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	try {
 		Application app(app_desc);
 		//auto report = app.run_opengl_example<deferred_lighting::Deferred_lighting>();
-		auto report = app.run_opengl_example<fur_simulation::Fur_simulation_opengl>();
+		auto report = app.run_opengl_example<fur_simulation::Fur_simulation_opengl_example>();
 		OutputDebugString(get_report_message(report).c_str());
 	}
 	catch (std::exception& exc) {
