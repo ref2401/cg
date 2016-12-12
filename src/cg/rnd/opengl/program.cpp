@@ -3,12 +3,134 @@
 #include <cassert>
 #include <exception>
 #include <string>
+#include <utility>
 #include "cg/base/base.h"
 
 
 namespace cg {
 namespace rnd {
 namespace opengl {
+
+// ----- Glsl_program -----
+
+Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data)
+	: _name(name)
+{
+	assert(!name.empty());
+	assert(prog_data.has_vertex_shader() && prog_data.has_fragment_shader());
+
+	try {
+		Shader vertex_shader(GL_VERTEX_SHADER, prog_data.vertex_shader_source_code);
+		Shader pixel_shader(GL_FRAGMENT_SHADER, prog_data.fragment_shader_source_code);
+
+		_id = glCreateProgram();
+		glAttachShader(_id, vertex_shader.id());
+		glAttachShader(_id, pixel_shader.id());
+		glLinkProgram(_id);
+
+		// once shaders have been linked into a program they are no longer needed.
+		glDetachShader(_id, vertex_shader.id());
+		glDetachShader(_id, pixel_shader.id());
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
+
+		dispose();
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	if (!linked()) {
+		std::string msg_log = log();
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log);
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+
+	glValidateProgram(_id);
+	if (!valid()) {
+		std::string msg_log = log();
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log);
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+}
+
+Glsl_program::Glsl_program(Glsl_program&& prog) noexcept
+	: _id(prog._id),
+	_name(std::move(prog._name))
+{
+	prog._id = Invalid::glsl_program_id;
+}
+
+Glsl_program::~Glsl_program() noexcept
+{
+	dispose();
+}
+
+Glsl_program& Glsl_program::operator=(Glsl_program&& prog) noexcept
+{
+	if (this == &prog) return *this;
+
+	dispose();
+	_id = prog._id;
+	_name = std::move(prog._name);
+
+	prog._id = Invalid::glsl_program_id;
+
+	return *this;
+}
+
+void Glsl_program::dispose() noexcept
+{
+	if (_id == Invalid::glsl_program_id) return;
+
+	glDeleteProgram(_id);
+	_id = Invalid::glsl_program_id;
+	_name.clear();
+}
+
+GLint Glsl_program::get_property(GLenum prop) const noexcept
+{
+	assert(_id != Invalid::glsl_program_id);
+	assert(is_valid_program_property(prop));
+
+	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
+	glGetProgramiv(_id, prop, &v);
+	assert(v != -1);
+
+	return v;
+}
+
+bool Glsl_program::linked() const noexcept
+{
+	assert(_id != Invalid::glsl_program_id);
+	return get_property(GL_LINK_STATUS) != 0;
+}
+
+std::string Glsl_program::log() const noexcept
+{
+	assert(_id != Invalid::glsl_program_id);
+
+	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
+	if (log_size == 0) return {};
+
+	GLsizei actual_size;
+	char* msg_buffer = new char[log_size];
+	glGetProgramInfoLog(_id, log_size, &actual_size, msg_buffer);
+
+	std::string msg(msg_buffer, actual_size);
+	delete[] msg_buffer;
+
+	return msg;
+}
+
+bool Glsl_program::valid() const noexcept
+{
+	assert(_id != Invalid::glsl_program_id);
+	return get_property(GL_VALIDATE_STATUS) != 0;
+}
 
 // ----- Shader -----
 

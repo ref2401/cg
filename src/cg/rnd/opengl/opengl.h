@@ -5,6 +5,7 @@
 #include "cg/rnd/opengl/buffer.h"
 #include "cg/rnd/opengl/glcorearb.h"
 #include "cg/rnd/opengl/opengl_def.h"
+#include "cg/rnd/opengl/program.h"
 #include "cg/rnd/opengl/texture.h"
 #include <windows.h>
 

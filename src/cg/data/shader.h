@@ -118,13 +118,13 @@ inline Glsl_program_data load_glsl_program_data(const std::string& filename)
 }
 
 // Loads the specified glsl shader source code files.
-Glsl_program_data load_glsl_program_data(const char* vertex_filename, const char* pixel_filename);
+Glsl_program_data load_glsl_program_data(const char* vertex_filename, const char* fragment_filename);
 
 // Loads the specified glsl shader source code files.
 inline Glsl_program_data load_glsl_program_data(const std::string& vertex_filename,
-	const std::string& pixel_filename)
+	const std::string& fragment_filename)
 {
-	return load_glsl_program_data(vertex_filename.c_str(), pixel_filename.c_str());
+	return load_glsl_program_data(vertex_filename.c_str(), fragment_filename.c_str());
 }
 
 // Loads the specified hlsl shader source code file.

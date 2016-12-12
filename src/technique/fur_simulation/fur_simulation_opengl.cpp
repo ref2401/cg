@@ -1,6 +1,7 @@
 #include "technique/fur_simulation/fur_simulation_opengl.h"
 
 #include "cg/data/image.h"
+#include "cg/data/shader.h"
 
 
 namespace fur_simulation {
@@ -24,6 +25,9 @@ Fur_simulation_opengl::Fur_simulation_opengl(const cg::sys::App_context& app_ctx
 	auto image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
 	Sampler_desc desc;
 	_tex = Texture_2d(GL_RGB8, 1, desc, image);
+
+	auto glsl = cg::data::load_glsl_program_data("../data/deferred_lighting_shaders/gbuffer_pass");
+	Glsl_program prog("test", glsl);
 }
 
 void Fur_simulation_opengl::on_window_resize()

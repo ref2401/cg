@@ -11,6 +11,57 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+class Glsl_program final {
+public:
+
+	Glsl_program() noexcept = default;
+
+	Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data);
+
+	Glsl_program(const Glsl_program&) = delete;
+
+	Glsl_program(Glsl_program&& prog) noexcept;
+
+	~Glsl_program() noexcept;
+
+
+	Glsl_program& operator=(const Glsl_program) = delete;
+
+	Glsl_program& operator=(Glsl_program&& prog) noexcept;
+
+
+	// Program's unique id.
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+	// Returns true if the last link operation was successful.
+	bool linked() const noexcept;
+
+	// Returns information log for this program. The information log for a program
+	// is modified when the shader is linked or validated. 
+	std::string log() const noexcept;
+
+	// Program's name
+	const std::string& name() const noexcept
+	{
+		return _name;
+	}
+
+	// Returns true if the last validate operation was successful.
+	bool valid() const noexcept;
+
+private:
+
+	void dispose() noexcept;
+
+	GLint get_property(GLenum prop) const noexcept;
+
+	GLuint _id = Invalid::glsl_program_id;
+	std::string _name;
+};
+
 class Shader final {
 public:
 
@@ -57,6 +108,7 @@ private:
 	GLuint _id = Invalid::shader_id;
 	GLenum _type = GL_NONE;
 };
+
 
 // Validate glGetProgram 'pname' argument value;
 bool is_valid_program_property(GLenum value) noexcept;
