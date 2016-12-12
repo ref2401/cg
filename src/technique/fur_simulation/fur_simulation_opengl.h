@@ -38,6 +38,8 @@ public:
 	explicit Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx);
 
 
+	void on_mouse_move() override;
+
 	void on_window_resize() override;
 
 	void render(float interpolation_factor) override;
@@ -52,9 +54,12 @@ private:
 
 
 	Fur_generation_program _glsl_fur_generation;
-
+	// camera
 	mat4 _projection_matrix;
-	mat4 _view_matrix;
+	cg::Viewpoint _curr_viewpoint;
+	cg::Viewpoint _prev_viewpoint;
+	float2 _view_roll_angles;
+	float2 _prev_mouse_pos_ndc;
 	// model data
 	GLuint _vao_id = Invalid::vao_id;
 	Buffer_gpu _vertex_buffer;
