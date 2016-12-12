@@ -103,6 +103,23 @@ GLint Glsl_program::get_property(GLenum prop) const noexcept
 	return v;
 }
 
+GLint Glsl_program::get_uniform_location(const std::string& uniform_name) const
+{
+	return get_uniform_location(uniform_name.c_str());
+}
+
+GLint Glsl_program::get_uniform_location(const char* uniform_name) const
+{
+	assert(_id != Invalid::glsl_program_id);
+	assert(uniform_name);
+
+	GLint location = glGetUniformLocation(_id, uniform_name);
+	ENFORCE(location != Invalid::uniform_location,
+		"Shader program '", _name, "' does not have a uniform called '", uniform_name, "'.");
+
+	return location;
+}
+
 bool Glsl_program::linked() const noexcept
 {
 	assert(_id != Invalid::glsl_program_id);
@@ -259,6 +276,42 @@ bool is_valid_shader_type(GLenum value) noexcept
 {
 	return (value == GL_VERTEX_SHADER)
 		|| (value == GL_FRAGMENT_SHADER);
+}
+
+void set_uniform(GLint location, float val) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform1f(location, val);
+}
+
+void set_uniform(GLint location, const uint2& v) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform2ui(location, v.x, v.y);
+}
+
+void set_uniform(GLint location, const float3& v) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform3f(location, v.x, v.y, v.z);
+}
+
+void set_uniform(GLint location, const mat3& mat) noexcept
+{
+	assert(location != Invalid::uniform_location);
+
+	float arr[9];
+	to_array_column_major_order(mat, arr);
+	glUniformMatrix3fv(location, 1, false, arr);
+}
+
+void set_uniform(GLint location, const mat4& mat) noexcept
+{
+	assert(location != Invalid::uniform_location);
+
+	float arr[16];
+	to_array_column_major_order(mat, arr);
+	glUniformMatrix4fv(location, 1, false, arr);
 }
 
 } // namespace opengl

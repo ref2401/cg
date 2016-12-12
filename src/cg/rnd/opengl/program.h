@@ -30,6 +30,14 @@ public:
 	Glsl_program& operator=(Glsl_program&& prog) noexcept;
 
 
+	// Returns a location value of the specified uniform.
+	// Throws if the uniform name does not belong to this shader program.
+	GLint get_uniform_location(const std::string& uniform_name) const;
+
+	// Returns a location value of the specified uniform.
+	// Throws if the uniform name does not belong to this shader program.
+	GLint get_uniform_location(const char* uniform_name) const;
+
 	// Program's unique id.
 	GLuint id() const noexcept
 	{
@@ -118,6 +126,16 @@ bool is_valid_shader_property(GLenum value) noexcept;
 
 // Validates shader object type value. 
 bool is_valid_shader_type(GLenum value) noexcept;
+
+void set_uniform(GLint location, float val) noexcept;
+
+void set_uniform(GLint location, const uint2& v) noexcept;
+
+void set_uniform(GLint location, const float3& v) noexcept;
+
+void set_uniform(GLint location, const mat3& mat) noexcept;
+
+void set_uniform(GLint location, const mat4& mat) noexcept;
 
 } // namespace opengl
 } // namespace rnd
