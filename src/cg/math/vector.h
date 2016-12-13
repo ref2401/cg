@@ -545,6 +545,8 @@ struct uint3 final {
 
 	explicit uint3(uint32_t v) noexcept : x(v), y(v), z(v) {}
 
+	explicit uint3(const uint2& v, uint32_t z = 0) noexcept : x(v.x), y(v.y), z(z) {}
+
 	uint3(uint32_t x, uint32_t y, uint32_t z) noexcept : x(x), y(y), z(z) {}
 
 

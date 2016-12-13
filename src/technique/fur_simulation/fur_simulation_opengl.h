@@ -51,9 +51,9 @@ private:
 	mat4 _model_matrix;
 	// fur generation
 	float3 _light_dir_ws; // dir to light
-	size_t _layer_count = 16;
+	size_t _layer_count = 0;
 	Texture_2d _tex_diffuse_rgb;
-	std::vector<Texture_2d> _tex_noise_list;
+	Texture_3d _tex_noise;
 };
 
 } // fur_simulation

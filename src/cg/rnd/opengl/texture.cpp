@@ -141,6 +141,7 @@ void Texture_2d::write(size_t mipmap_level, const uint2& offset, const cg::data:
 	assert(_id != Invalid::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
 	assert(image.format() != Image_format::none);
+	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
 	assert(_size.width >= offset.width + image.size().width);
 	assert(_size.height >= offset.height + image.size().height);
 
@@ -148,6 +149,95 @@ void Texture_2d::write(size_t mipmap_level, const uint2& offset, const cg::data:
 
 	glTextureSubImage2D(_id, mipmap_level, offset.x , offset.y, 
 		image.size().width, image.size().height,
+		get_texture_sub_image_format(image.format()),
+		get_texture_sub_image_type(image.format()),
+		image.data());
+}
+
+// ----- Texture_3d -----
+
+Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept
+	: _internal_format(internal_format),
+	_mipmap_level_count(mipmap_level_count),
+	_size(size)
+{
+	assert(is_valid_texture_internal_format(internal_format));
+	assert(mipmap_level_count > 0);
+	assert(greater_than(size, 0));
+
+	glCreateTextures(GL_TEXTURE_3D, 1, &_id);
+	glTextureStorage3D(_id, _mipmap_level_count, _internal_format, 
+		_size.width, _size.height, _size.depth);
+}
+
+Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count,
+	const Sampler_desc& sampler_desc, const uint3& size) noexcept
+	: Texture_3d(internal_format, mipmap_level_count, size)
+{
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_desc.wrap_s);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_desc.wrap_t);
+	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);
+}
+
+Texture_3d::Texture_3d(Texture_3d&& tex) noexcept :
+	_id(tex._id),
+	_internal_format(tex._internal_format),
+	_mipmap_level_count(tex._mipmap_level_count),
+	_size(tex._size)
+{
+	tex._id = Invalid::texture_id;
+	tex._internal_format = GL_NONE;
+	tex._mipmap_level_count = 0;
+	tex._size = uint3::zero;
+}
+
+Texture_3d::~Texture_3d() noexcept
+{
+	dispose();
+}
+
+Texture_3d& Texture_3d::operator=(Texture_3d&& tex) noexcept
+{
+	if (this == &tex) return *this;
+
+	dispose();
+	_id = tex._id;
+	_internal_format = tex._internal_format;
+	_mipmap_level_count = tex._mipmap_level_count;
+	_size = tex._size;
+
+	tex._id = Invalid::texture_id;
+	tex._internal_format = GL_NONE;
+	tex._mipmap_level_count = 0;
+	tex._size = uint3::zero;
+
+	return *this;
+}
+
+void Texture_3d::dispose() noexcept
+{
+	if (_id == Invalid::texture_id) return;
+
+	glDeleteTextures(1, &_id);
+	_id = Invalid::texture_id;
+	_internal_format = GL_NONE;
+}
+
+void Texture_3d::write(size_t mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept
+{
+	assert(_id != Invalid::texture_id);
+	assert(mipmap_level < _mipmap_level_count);
+	assert(image.format() != Image_format::none);
+	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
+	assert(_size.width >= offset.width + image.size().width);
+	assert(_size.height >= offset.height + image.size().height);
+
+	if (image.size() == uint2::zero) return;
+
+	glTextureSubImage3D(_id, mipmap_level, offset.x, offset.y, offset.z,
+		image.size().width, image.size().height, 1,
 		get_texture_sub_image_format(image.format()),
 		get_texture_sub_image_type(image.format()),
 		image.data());

@@ -159,6 +159,83 @@ private:
 	uint2 _size;
 };
 
+class Texture_3d_i {
+public:
+
+	virtual ~Texture_3d_i() noexcept {}
+
+
+	// Texture's unique id.
+	virtual GLuint id() const noexcept = 0;
+
+	// Sized texel format that is used to store texture data.
+	virtual GLenum internal_format() const noexcept = 0;
+
+	// How many mipmaps the texture has.
+	virtual size_t mipmap_level_count() const noexcept = 0;
+
+	// Texture's size in texels.
+	virtual uint3 size() const noexcept = 0;
+};
+
+class Texture_3d final : Texture_3d_i {
+public:
+
+	Texture_3d() noexcept = default;
+
+	Texture_3d(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept;
+
+	Texture_3d(GLenum internal_format, size_t mipmap_level_count,
+		const Sampler_desc& sampler_desc, const uint3& size) noexcept;
+
+	Texture_3d(const Texture_3d&) = delete;
+
+	Texture_3d(Texture_3d&& tex) noexcept;
+
+	~Texture_3d() noexcept;
+
+
+	Texture_3d& operator=(const Texture_3d&) = delete;
+
+	Texture_3d& operator=(Texture_3d&& tex) noexcept;
+
+
+	// Texture's unique id.
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+	// Sized texel format that is used to store texture data.
+	GLenum internal_format() const noexcept override
+	{
+		return _internal_format;
+	}
+
+	// How many mipmaps the texture has.
+	size_t mipmap_level_count() const noexcept override
+	{
+		return _mipmap_level_count;
+	}
+
+	// Texture's size in texels.
+	uint3 size() const noexcept override
+	{
+		return _size;
+	}
+
+	void write(size_t mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept;
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::texture_id;
+	GLenum _internal_format = GL_NONE;
+	size_t _mipmap_level_count = 0;
+	uint3 _size;
+};
+
 
 inline bool operator==(const Sampler_desc& lhs, const Sampler_desc& rhs) noexcept
 {

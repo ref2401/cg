@@ -1420,6 +1420,13 @@ public:
 		Assert::IsTrue((v1.width == 24) && (v1.height == 24) && (v1.depth == 24));
 		Assert::IsTrue((v1.data[0] == 24) && (v1.data[1] == 24) && (v1.data[2] == 24));
 
+		uint2 v2_origin(7, 8);
+		uint3 v2(v2_origin, 9);
+		Assert::IsTrue((v2.x == 7) && (v2.y == 8) && (v2.z == 9));
+		Assert::IsTrue((v2.r == 7) && (v2.g == 8) && (v2.b == 9));
+		Assert::IsTrue((v2.width == 7) && (v2.height == 8) && (v2.depth == 9));
+		Assert::IsTrue((v2.data[0] == 7) && (v2.data[1] == 8) && (v2.data[2] == 9));
+
 		uint3 v4(1, 2, 3);
 		Assert::IsTrue((v4.x == 1) && (v4.y == 2) && (v4.z == 3));
 		Assert::IsTrue((v4.r == 1) && (v4.g == 2) && (v4.b == 3));

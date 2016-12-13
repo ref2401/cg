@@ -23,7 +23,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 
 void Fur_simulation_opengl_example::init_fur_data()
 {
-	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT);
+	const Sampler_desc linear_sampler(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
 	{
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/zebra-diffuse-rgb.tga");
@@ -31,8 +31,12 @@ void Fur_simulation_opengl_example::init_fur_data()
 	}
 
 	std::vector<cg::data::Image_2d> layer_images;
+	_layer_count = 16;
 	layer_images.reserve(_layer_count);
 	layer_images.push_back(cg::data::load_image_tga("../data/fur_simulation/noise-texture.tga"));
+
+	_tex_noise = Texture_3d(GL_R8, 1, linear_sampler, uint3(layer_images.back().size(), 16));
+	_tex_noise.write(0, uint3::zero, layer_images.back());
 
 	for (size_t i = 1; i < _layer_count; ++i) {
 		auto& prev_image = layer_images.back();
@@ -50,11 +54,8 @@ void Fur_simulation_opengl_example::init_fur_data()
 
 			curr_image.data()[bi] = byte;
 		}
-	}
 
-	_tex_noise_list.reserve(_layer_count);
-	for (const auto& noise_image : layer_images) {
-		_tex_noise_list.emplace_back(GL_R8, 1, linear_sampler, noise_image);
+		_tex_noise.write(0, uint3(0, 0, i), curr_image);
 	}
 }
 
@@ -152,7 +153,7 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
 
 	// fur generation
-	const size_t draws_per_layer = 8;
+	const size_t draws_per_layer = 4;
 	const size_t draw_count = draws_per_layer * _layer_count;
 	const float max_lenght = 0.3f;
 	const float position_step = max_lenght / draw_count;
@@ -160,16 +161,12 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	//glDepthMask(false);
+	glBindTextureUnit(1, _tex_noise.id());
 	_glsl_fur_generation_noise.bind(_projection_matrix, view_matrix, _model_matrix, 
 		_light_dir_ws, _layer_count, draws_per_layer, position_step);
-	
 
 	for (size_t i = 0; i < draw_count; ++i) {
 		size_t layer_index = i / draws_per_layer;
-
-		if ((i % draws_per_layer) == 0) {
-			glBindTextureUnit(1, _tex_noise_list[layer_index].id());
-		}
 
 		_glsl_fur_generation_noise.set_draw_indices(layer_index, i);
 		glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
