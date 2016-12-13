@@ -442,7 +442,7 @@ struct ubyte4 {
 	};
 };
 
-struct uint2 {
+struct uint2 final {
 	static const uint2 zero;
 	static const uint2 unit_x;
 	static const uint2 unit_y;
@@ -530,6 +530,88 @@ struct uint2 {
 		struct { uint32_t x, y; };
 		struct { uint32_t width, height; };
 		uint32_t data[2];
+	};
+};
+
+struct uint3 final {
+	static const uint3 unit_x;
+	static const uint3 unit_y;
+	static const uint3 unit_z;
+	static const uint3 unit_xyz;
+	static const uint3 zero;
+
+
+	uint3() noexcept : x(0), y(0), z(0) {}
+
+	explicit uint3(uint32_t v) noexcept : x(v), y(v), z(v) {}
+
+	uint3(uint32_t x, uint32_t y, uint32_t z) noexcept : x(x), y(y), z(z) {}
+
+
+	uint3& operator+=(uint32_t val) noexcept
+	{
+		x += val;
+		y += val;
+		z += val;
+		return *this;
+	}
+
+	uint3& operator+=(const uint3& v) noexcept
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+
+	uint3& operator-=(uint32_t val) noexcept
+	{
+		assert(x >= val);
+		assert(y >= val);
+		assert(z >= val);
+
+		x -= val;
+		y -= val;
+		z -= val;
+		return *this;
+	}
+
+	uint3& operator-=(const uint3& v) noexcept
+	{
+		assert(x >= v.x);
+		assert(y >= v.y);
+		assert(z >= v.z);
+
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		return *this;
+	}
+
+	uint3& operator*=(uint32_t val) noexcept
+	{
+		x *= val;
+		y *= val;
+		z *= val;
+		return *this;
+	}
+
+	uint3& operator/=(uint32_t val) noexcept
+	{
+		assert(val != 0);
+
+		x /= val;
+		y /= val;
+		z /= val;
+		return *this;
+	}
+
+
+	union {
+		struct { uint32_t x, y, z; };
+		struct { uint32_t r, g, b; };
+		struct { uint32_t width, height, depth; };
+		uint32_t data[3];
 	};
 };
 
@@ -697,6 +779,18 @@ inline bool operator!=(const uint2& lhs, const uint2& rhs) noexcept
 	return !(lhs == rhs);
 }
 
+inline bool operator==(const uint3& lhs, const uint3& rhs) noexcept
+{
+	return (lhs.x == rhs.x)
+		&& (lhs.y == rhs.y)
+		&& (lhs.z == rhs.z);
+}
+
+inline bool operator!=(const uint3& lhs, const uint3& rhs) noexcept
+{
+	return !(lhs == rhs);
+}
+
 inline bool operator==(const uint4& lhs, const uint4& rhs) noexcept
 {
 	return (lhs.x == rhs.x)
@@ -788,6 +882,21 @@ inline uint2 operator+(uint32_t val, const uint2& v) noexcept
 inline uint2 operator+(const uint2& lhs, const uint2& rhs) noexcept
 {
 	return uint2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+inline uint3 operator+(const uint3& v, uint32_t val) noexcept
+{
+	return uint3(v.x + val, v.y + val, v.z + val);
+}
+
+inline uint3 operator+(uint32_t val, const uint3& v) noexcept
+{
+	return uint3(v.x + val, v.y + val, v.z + val);
+}
+
+inline uint3 operator+(const uint3& lhs, const uint3& rhs) noexcept
+{
+	return uint3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
 inline uint4 operator+(const uint4& v, uint32_t val) noexcept
@@ -897,11 +1006,35 @@ inline uint2 operator-(uint32_t val, const uint2& v) noexcept
 	return uint2(val - v.x, val - v.y);
 }
 
-inline  uint2 operator-(const uint2& lhs, const uint2& rhs) noexcept
+inline uint2 operator-(const uint2& lhs, const uint2& rhs) noexcept
 {
 	assert(lhs.x >= rhs.x);
 	assert(lhs.y >= rhs.y);
 	return uint2(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+inline uint3 operator-(const uint3& v, uint32_t val) noexcept
+{
+	assert(v.x >= val);
+	assert(v.y >= val);
+	assert(v.z >= val);
+	return uint3(v.x - val, v.y - val, v.z - val);
+}
+
+inline uint3 operator-(uint32_t val, const uint3& v) noexcept
+{
+	assert(val >= v.x);
+	assert(val >= v.y);
+	assert(val >= v.z);
+	return uint3(val - v.x, val - v.y, val - v.z);
+}
+
+inline uint3 operator-(const uint3& lhs, const uint3& rhs) noexcept
+{
+	assert(lhs.x >= rhs.x);
+	assert(lhs.y >= rhs.y);
+	assert(lhs.z >= rhs.z);
+	return uint3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
 inline uint4 operator-(const uint4& v, uint32_t val) noexcept
@@ -1025,6 +1158,16 @@ inline uint2 operator*(uint32_t val, const uint2& v) noexcept
 	return uint2(v.x * val, v.y * val);
 }
 
+inline uint3 operator*(const uint3& v, uint32_t val) noexcept
+{
+	return uint3(v.x * val, v.y * val, v.z * val);
+}
+
+inline uint3 operator*(uint32_t val, const uint3& v) noexcept
+{
+	return uint3(v.x * val, v.y * val, v.z * val);
+}
+
 inline uint4 operator*(const uint4& v, uint32_t val) noexcept
 {
 	return uint4(v.x * val, v.y * val, v.z * val, v.w * val);
@@ -1108,6 +1251,20 @@ inline uint2 operator/(uint32_t val, const uint2& v) noexcept
 	return uint2(val / v.x, val / v.y);
 }
 
+inline uint3 operator/(const uint3& v, uint32_t val) noexcept
+{
+	assert(val != 0);
+	return uint3(v.x / val, v.y / val, v.z / val);
+}
+
+inline uint3 operator/(uint32_t val, const uint3& v) noexcept
+{
+	assert(v.x != 0);
+	assert(v.y != 0);
+	assert(v.z != 0);
+	return uint3(val / v.x, val / v.y, val / v.z);
+}
+
 inline uint4 operator/(const uint4& v, uint32_t val) noexcept
 {
 	assert(val != 0);
@@ -1146,6 +1303,10 @@ std::wostream& operator<<(std::wostream& out, const ubyte4& v);
 std::ostream& operator<<(std::ostream& out, const uint2& v);
 
 std::wostream& operator<<(std::wostream& out, const uint2& v);
+
+std::ostream& operator<<(std::ostream& out, const uint3& v);
+
+std::wostream& operator<<(std::wostream& out, const uint3& v);
 
 std::ostream& operator<<(std::ostream& out, const uint4& v);
 
@@ -1261,6 +1422,12 @@ inline bool greater_than(const ubyte4& v, uint8_t val) noexcept
 inline bool greater_than(const uint2& v, uint32_t val) noexcept
 {
 	return (v.x > val) && (v.y > val);
+}
+
+// Returns true if every component of v is greater than val.
+inline bool greater_than(const uint3& v, uint32_t val) noexcept
+{
+	return (v.x > val) && (v.y > val) && (v.z > val);
 }
 
 // Returns true if every component of v is greater than val.
