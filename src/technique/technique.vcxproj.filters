@@ -38,6 +38,9 @@
     <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp">
       <Filter>fur_simulation</Filter>
     </ClCompile>
+    <ClCompile Include="fur_simulation\glsl_program.cpp">
+      <Filter>fur_simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
@@ -88,6 +91,9 @@
       <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h">
+      <Filter>fur_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="fur_simulation\glsl_program.h">
       <Filter>fur_simulation</Filter>
     </ClInclude>
   </ItemGroup>

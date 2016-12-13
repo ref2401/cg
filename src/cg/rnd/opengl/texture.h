@@ -108,7 +108,7 @@ public:
 		cg::data::Image_2d& image) noexcept;
 
 	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
-		const Sampler_desc& sampler_desc, cg::data::Image_2d& image) noexcept;
+		const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept;
 
 	Texture_2d(const Texture_2d&) = delete;
 

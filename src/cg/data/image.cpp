@@ -101,6 +101,17 @@ Image_2d& Image_2d::operator=(Image_2d&& img) noexcept
 	return *this;
 }
 
+void Image_2d::clear(const ubyte4& color) noexcept
+{
+	assert(_format == Image_format::rgba_8);
+	if (_size == uint2::zero) return;
+
+	size_t byte_count = this->byte_count();
+	for (size_t i = 0; i <byte_count; i += 4) {
+		memcpy(_ptr + i, color.data, 4);
+	}
+}
+
 void Image_2d::dispose() noexcept
 {
 	if (!_ptr) return;

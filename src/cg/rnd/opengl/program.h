@@ -127,6 +127,8 @@ bool is_valid_shader_property(GLenum value) noexcept;
 // Validates shader object type value. 
 bool is_valid_shader_type(GLenum value) noexcept;
 
+void set_uniform(GLint location, unsigned int val) noexcept;
+
 void set_uniform(GLint location, float val) noexcept;
 
 void set_uniform(GLint location, const uint2& v) noexcept;

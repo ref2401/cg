@@ -278,6 +278,12 @@ bool is_valid_shader_type(GLenum value) noexcept
 		|| (value == GL_FRAGMENT_SHADER);
 }
 
+void set_uniform(GLint location, unsigned int val) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform1ui(location, val);
+}
+
 void set_uniform(GLint location, float val) noexcept
 {
 	assert(location != Invalid::uniform_location);

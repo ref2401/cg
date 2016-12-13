@@ -52,6 +52,8 @@ public:
 		return (_size.width * _size.height) * cg::data::byte_count(_format);
 	}
 
+	void clear(const ubyte4& color) noexcept;
+
 	// Returns pointer to the underlying buffer serving as pixel storage.
 	uint8_t* data() noexcept 
 	{
@@ -59,7 +61,7 @@ public:
 	}
 
 	// Returns pointer to the underlying buffer serving as pixel storage.
-	const unsigned char* data() const noexcept
+	const uint8_t* data() const noexcept
 	{
 		return _ptr;
 	}

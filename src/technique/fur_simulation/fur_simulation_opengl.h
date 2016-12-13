@@ -1,36 +1,17 @@
 #ifndef TECHNIQUE_FUR_SIMULATION_FUR_SIMULATION_OPENGL_H_
 #define TECHNIQUE_FUR_SIMULATION_FUR_SIMULATION_OPENGL_H_
 
+#include <vector>
 #include "cg/data/model.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
+#include "technique/fur_simulation/glsl_program.h"
 
 using namespace cg;
 using namespace cg::rnd::opengl;
 
 
 namespace fur_simulation {
-
-class Fur_generation_program final {
-public:
-
-	Fur_generation_program();
-
-	Fur_generation_program(const Fur_generation_program&) = delete;
-
-	Fur_generation_program(Fur_generation_program&&) = delete;
-
-	~Fur_generation_program() noexcept = default;
-
-
-	void bind(const mat4& projection_view_matrix, const mat4& model_matrix) noexcept;
-
-private:
-
-	Glsl_program _program;
-	GLint _g_projection_view_matrix_location = Invalid::uniform_location;
-	GLint _g_model_matrix_location = Invalid::uniform_location;
-};
 
 class Fur_simulation_opengl_example final : public cg::sys::Example {
 public:
@@ -48,12 +29,14 @@ public:
 
 private:
 
+	void init_fur_data();
+
 	void init_model();
 
 	void update_projection_matrix();
 
-
-	Fur_generation_program _glsl_fur_generation;
+	Opaque_model_program _glsl_opaque_model;
+	Fur_generation_noise_program _glsl_fur_generation_noise;
 	// camera
 	mat4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
@@ -66,6 +49,11 @@ private:
 	Buffer_gpu _index_buffer;
 	cg::data::Model_mesh_info _draw_params;
 	mat4 _model_matrix;
+	// fur generation
+	float3 _light_dir_ws; // dir to light
+	size_t _layer_count = 16;
+	Texture_2d _tex_diffuse_rgb;
+	std::vector<Texture_2d> _tex_noise_list;
 };
 
 } // fur_simulation

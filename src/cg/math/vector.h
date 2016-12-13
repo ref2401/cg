@@ -522,7 +522,7 @@ struct uint2 {
 	{
 		static_assert(std::is_integral<TRet>::value || std::is_floating_point<TRet>::value,
 			"TRet type must be an integer or a floating point value.");
-		return static_cast<TRet>(static_cast<TRet>(width) * height);
+		return static_cast<TRet>(static_cast<TRet>(width) * static_cast<TRet>(height));
 	}
 
 

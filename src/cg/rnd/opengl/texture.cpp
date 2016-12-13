@@ -85,7 +85,7 @@ Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
 }
 
 Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
-	const Sampler_desc& sampler_desc, cg::data::Image_2d& image) noexcept
+	const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept
 	: Texture_2d(internal_format, mipmap_level_count, sampler_desc, image.size())
 {
 	assert(image.format() != Image_format::none);
