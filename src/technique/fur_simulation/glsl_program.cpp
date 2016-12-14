@@ -19,11 +19,12 @@ Fur_generation_noise_program::Fur_generation_noise_program()
 	_g_layer_index_location = _program.get_uniform_location("g_layer_index");
 	_g_draw_index_location = _program.get_uniform_location("g_draw_index");
 	_g_position_step_location = _program.get_uniform_location("g_position_step");
+	//_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
 }
 
 void Fur_generation_noise_program::bind(const mat4& projection_matrix, const mat4& view_matrix,
 	const mat4& model_matrix, const float3& light_dir_ws, GLuint layer_count, GLuint draws_per_layer,
-	float position_step) noexcept
+	float position_step, const float3 & view_position_ws) noexcept
 {
 	glUseProgram(_program.id());
 	set_uniform(_g_projection_matrix_location, projection_matrix);
@@ -34,6 +35,7 @@ void Fur_generation_noise_program::bind(const mat4& projection_matrix, const mat
 	set_uniform(_g_layer_count_location, layer_count);
 	set_uniform(_g_draws_per_layer_location, draws_per_layer);
 	set_uniform(_g_position_step_location, position_step);
+	//set_uniform(_g_view_position_ws_location, view_position_ws);
 }
 
 void Fur_generation_noise_program::set_draw_indices(GLuint layer_index, GLuint draw_index) noexcept

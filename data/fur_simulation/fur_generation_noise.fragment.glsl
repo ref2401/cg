@@ -10,6 +10,7 @@ in VS_result{
 	vec3 normal_ws;
 	vec2 tex_coord;
 	float shadow_factor;
+	vec3 view_direction_ws;
 } frag;
 
 
@@ -24,13 +25,17 @@ void main()
 	const vec3 diffuse_rgb = texture(g_tex_diffuse_rgb, frag.tex_coord).rgb;
 
 	float cosTi = max(0, dot(g_light_dir_ws, normalize(frag.normal_ws)));
-	vec3 rgb = diffuse_rgb * cosTi * frag.shadow_factor;
-	rt_color = vec4(rgb, noise);
+	vec3 diffuse_term = diffuse_rgb * cosTi;
+
+	float shadow_factor = frag.shadow_factor;
+	rt_color = vec4(diffuse_term * shadow_factor, noise);
+
+	
 
 	//if (rt_color.x > rt_color.y) {
-	//	rt_color = vec4(noise, noise, noise, 1);
+	//	rt_color = vec4(diffuse_term * shadow_factor, 1);
 	//}
 	//else {
-	//	rt_color = vec4(noise, noise, noise, 1);
+	//	rt_color = vec4(diffuse_term * shadow_factor, 1);
 	//}
 }

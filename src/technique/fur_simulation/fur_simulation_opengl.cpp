@@ -23,7 +23,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 
 void Fur_simulation_opengl_example::init_fur_data()
 {
-	const Sampler_desc linear_sampler(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
+	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
 	{
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/zebra-diffuse-rgb.tga");
@@ -31,9 +31,9 @@ void Fur_simulation_opengl_example::init_fur_data()
 	}
 
 	std::vector<cg::data::Image_2d> layer_images;
-	_layer_count = 16;
+	_layer_count = 10;
 	layer_images.reserve(_layer_count);
-	layer_images.push_back(cg::data::load_image_tga("../data/fur_simulation/noise-texture.tga"));
+	layer_images.push_back(cg::data::load_image_tga("../data/fur_simulation/noise-texture-01.tga"));
 
 	_tex_noise = Texture_3d(GL_R8, 1, linear_sampler, uint3(layer_images.back().size(), 16));
 	_tex_noise.write(0, uint3::zero, layer_images.back());
@@ -140,20 +140,20 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClearColor(0.2f, 0.3f, 0.2f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
-	glBlendEquation(GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX);
 
 
 	glBindTextureUnit(0, _tex_diffuse_rgb.id());
-	// opaque model
-	glDisable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
-	//glDepthMask(true);
-	_glsl_opaque_model.bind(projection_view_matrix, _model_matrix, _light_dir_ws);
-	glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
+	//// opaque model
+	//glDisable(GL_BLEND);
+	//glEnable(GL_CULL_FACE);
+	////glDepthMask(true);
+	//_glsl_opaque_model.bind(projection_view_matrix, _model_matrix, _light_dir_ws);
+	//glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
 
 	// fur generation
-	const size_t draws_per_layer = 4;
+	const size_t draws_per_layer = 6;
 	const size_t draw_count = draws_per_layer * _layer_count;
 	const float max_lenght = 0.3f;
 	const float position_step = max_lenght / draw_count;
@@ -163,7 +163,8 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	//glDepthMask(false);
 	glBindTextureUnit(1, _tex_noise.id());
 	_glsl_fur_generation_noise.bind(_projection_matrix, view_matrix, _model_matrix, 
-		_light_dir_ws, _layer_count, draws_per_layer, position_step);
+		_light_dir_ws, _layer_count, draws_per_layer, position_step, 
+		lerp(_prev_viewpoint.position, _curr_viewpoint.position, interpolation_factor));
 
 	for (size_t i = 0; i < draw_count; ++i) {
 		size_t layer_index = i / draws_per_layer;
