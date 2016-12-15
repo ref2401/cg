@@ -11,14 +11,16 @@ namespace fur_simulation {
 
 struct Vertex {
 	
-	Vertex(const cg::float3& position,
-		const cg::float3& normal, const cg::float2& tex_coord) noexcept;
+	Vertex(const cg::float3& position, const cg::float3& normal, 
+		const cg::float2& tex_coord, const cg::float4& tangent_h,
+		const cg::float3& strand_curr_direction) noexcept;
 
 	cg::float3 position;
 	cg::float3 strand_rest_position;
 	cg::float3 strand_curr_position;
 	cg::float3 normal;
 	cg::float2 tex_coord;
+	cg::float4 tangent_h;
 };
 
 class Model_geometry_data final {
@@ -77,6 +79,11 @@ public:
 		return _tex_coord_byte_offset;
 	}
 
+	size_t tangent_h_byte_offset() const noexcept
+	{
+		return _tangent_h_byte_offset;
+	}
+
 	size_t strand_rest_position_byte_offset() const noexcept
 	{
 		return _strand_rest_position_byte_offset;
@@ -95,6 +102,7 @@ private:
 	size_t _position_byte_offset;
 	size_t _normal_byte_offset;
 	size_t _tex_coord_byte_offset;
+	size_t _tangent_h_byte_offset;
 	size_t _strand_rest_position_byte_offset;
 	size_t _strand_curr_position_byte_offset;
 };

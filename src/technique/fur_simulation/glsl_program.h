@@ -24,6 +24,8 @@ public:
 	void bind(const mat4& projection_matrix, const mat4& view_matrix,
 		const mat4& model_matrix, GLuint shell_count, const float3& light_dir_ws) noexcept;
 
+	void set_params(GLuint index) noexcept;
+
 private:
 
 	Glsl_program _program;

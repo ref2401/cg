@@ -14,6 +14,7 @@ Fur_generation_program::Fur_generation_program()
 	_g_view_matrix_location = _program.get_uniform_location("g_view_matrix");
 	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
 	_g_shell_count_location = _program.get_uniform_location("g_shell_count");
+	_g_shell_index_location = _program.get_uniform_location("g_shell_index");
 	_g_light_dir_ws_locaiton = _program.get_uniform_location("g_light_dir_ws");
 }
 
@@ -26,6 +27,11 @@ void Fur_generation_program::bind(const mat4& projection_matrix, const mat4& vie
 	set_uniform(_g_model_matrix_location, model_matrix);
 	set_uniform(_g_shell_count_location, shell_count);
 	set_uniform(_g_light_dir_ws_locaiton, light_dir_ws);
+}
+
+void Fur_generation_program::set_params(GLuint index) noexcept
+{
+	set_uniform(_g_shell_index_location, index);
 }
 
 // ----- Opaque_model_program -----

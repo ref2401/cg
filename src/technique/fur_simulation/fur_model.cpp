@@ -9,13 +9,15 @@ namespace fur_simulation {
 
 // ----- Vertex -----
 
-Vertex::Vertex(const cg::float3& position,
-	const cg::float3& normal, const cg::float2& tex_coord) noexcept 
+Vertex::Vertex(const cg::float3& position, const cg::float3& normal, 
+	const cg::float2& tex_coord, const cg::float4& tangent_h,
+	const cg::float3& strand_curr_direction) noexcept
 	: position(position),
-	strand_rest_position(position + 0.3f * normal),
-	strand_curr_position(position + 0.3f * normalize(normal + float3(0.3, 0, 0))),
+	strand_rest_position(position + 0.5f * normal),
+	strand_curr_position(position + 0.5f * strand_curr_direction),
 	normal(normal),
-	tex_coord(tex_coord)
+	tex_coord(tex_coord),
+	tangent_h(tangent_h)
 {
 	assert(cg::is_normalized(normal));
 }
@@ -28,13 +30,14 @@ Model_geometry_data::Model_geometry_data(const std::vector<Vertex>& vertices,
 	assert(vertices.size() > 0);
 	assert(indices.size() > 0);
 
-	// pos, rest_pos, curr_pos normal, tex_coord
-	constexpr size_t component_count = 3 + 3 + 3 + 3 + 2;
+	// pos, rest_pos, curr_pos normal, tex_coord + tangent_h
+	constexpr size_t component_count = 3 + 3 + 3 + 3 + 2 + 4;
 	_vertex_byte_count = sizeof(float) * component_count;
 	_position_byte_offset = 0;
 	_normal_byte_offset = sizeof(float) * 3;
 	_tex_coord_byte_offset = _normal_byte_offset + sizeof(float) * 3;
-	_strand_rest_position_byte_offset = _tex_coord_byte_offset + sizeof(float) * 2;
+	_tangent_h_byte_offset = _tex_coord_byte_offset + sizeof(float) * 2;
+	_strand_rest_position_byte_offset = _tangent_h_byte_offset + sizeof(float) * 4;
 	_strand_curr_position_byte_offset = _strand_rest_position_byte_offset + sizeof(float) * 3;
 	
 	_vertex_data = std::vector<float>(vertices.size() * component_count);
@@ -54,6 +57,11 @@ Model_geometry_data::Model_geometry_data(const std::vector<Vertex>& vertices,
 		// tex_coord
 		_vertex_data[data_index++] = vertex.tex_coord.u;
 		_vertex_data[data_index++] = vertex.tex_coord.v;
+		// tangent_h
+		_vertex_data[data_index++] = vertex.tangent_h.x;
+		_vertex_data[data_index++] = vertex.tangent_h.y;
+		_vertex_data[data_index++] = vertex.tangent_h.z;
+		_vertex_data[data_index++] = vertex.tangent_h.w;
 		// strand_rest_position
 		_vertex_data[data_index++] = vertex.strand_rest_position.x;
 		_vertex_data[data_index++] = vertex.strand_rest_position.y;
@@ -74,10 +82,18 @@ Square_model::Square_model()
 	const float3 normal = float3::unit_z;
 
 	_vertices.reserve(4);
-	_vertices.emplace_back(float3(-1, -1, 0), normal, float2::zero); // left-bottom
-	_vertices.emplace_back(float3(1, -1, 0), normal, float2::unit_x); // right-bottom
-	_vertices.emplace_back(float3(1, 1, 0), normal, float2::unit_xy); // right-top
-	_vertices.emplace_back(float3(-1, 1, 0), normal, float2::unit_y); // left-bottom
+	
+	const float tex_coord_factor = 4;
+	// left-bottom
+	_vertices.emplace_back(float3(-1, -1, 0), normal, tex_coord_factor * float2::zero, float4(1, 0, 0, 1), normal);
+	// right-bottom
+	_vertices.emplace_back(float3(1, -1, 0), normal, tex_coord_factor * float2::unit_x, float4(1, 0, 0, 1), normal);
+		//normalize(normal + float3(0.2f, 0, 0)));
+	// right-top
+	_vertices.emplace_back(float3(1, 1, 0), normal, tex_coord_factor * float2::unit_xy, float4(1, 0, 0, 1), normal);
+		//normalize(normal + float3(-0.2f, 0, 0)));
+	// left-bottom
+	_vertices.emplace_back(float3(-1, 1, 0), normal, tex_coord_factor * float2::unit_y, float4(1, 0, 0, 1), normal);
 }
 
 Model_geometry_data Square_model::get_geometry_data() const

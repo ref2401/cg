@@ -25,12 +25,4 @@ void main()
 	vec3 diffuse_term = cosTi * diffuse_rgb;
 
 	rt_color = vec4(diffuse_term * frag.shadow_factor, fur_alpha);
-
-	/*float v = fur_mask * frag.alpha;
-	if (rt_color.x > rt_color.y) {
-		rt_color = vec4(v, v, v, 1);
-	}
-	else {
-		rt_color = vec4(v, v, v, 1);
-	}*/
 }

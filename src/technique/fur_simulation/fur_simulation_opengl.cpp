@@ -74,15 +74,20 @@ void Fur_simulation_opengl_example::init_model()
 	glVertexArrayAttribBinding(_vao_id, 2, vb_binding_index);
 	glVertexArrayAttribFormat(_vao_id, 2, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
 
-	// strand_rest_position
+	// tangent_h
 	glEnableVertexArrayAttrib(_vao_id, 3);
 	glVertexArrayAttribBinding(_vao_id, 3, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 3, 3, GL_FLOAT, false, geometry_data.strand_rest_position_byte_offset());
+	glVertexArrayAttribFormat(_vao_id, 3, 4, GL_FLOAT, false, geometry_data.tangent_h_byte_offset());
 
-	// strand_curr_position
+	// strand_rest_position
 	glEnableVertexArrayAttrib(_vao_id, 4);
 	glVertexArrayAttribBinding(_vao_id, 4, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 4, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
+	glVertexArrayAttribFormat(_vao_id, 4, 3, GL_FLOAT, false, geometry_data.strand_rest_position_byte_offset());
+
+	// strand_curr_position
+	glEnableVertexArrayAttrib(_vao_id, 5);
+	glVertexArrayAttribBinding(_vao_id, 5, vb_binding_index);
+	glVertexArrayAttribFormat(_vao_id, 5, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
 
 	// index buffer
 	_index_buffer = Buffer_gpu(geometry_data.index_data_byte_count(), geometry_data.index_data().data());
@@ -125,7 +130,8 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	mat4 view_matrix = ::view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
 	mat4 projection_view_matrix = _projection_matrix* view_matrix;
 
-	glClearColor(0.2f, 0.3f, 0.2f, 1);
+	const static float3 color = rgb(0x817c6e);
+	glClearColor(color.r, color.g, color.b, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(_vao_id);
@@ -136,7 +142,11 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
 		shell_count, _light_dir_ws);
 
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, shell_count);
+	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, shell_count);
+	for (size_t i = 0; i < shell_count; ++i) {
+		_glsl_fur_generation.set_params(i);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	}
 
 	_prev_viewpoint = _curr_viewpoint;
 }
