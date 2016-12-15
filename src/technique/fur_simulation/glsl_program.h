@@ -9,24 +9,20 @@ using namespace cg::rnd::opengl;
 
 namespace fur_simulation {
 
-class Fur_generation_noise_program final {
+class Fur_generation_program final {
 public:
 
-	Fur_generation_noise_program();
+	Fur_generation_program();
 
-	Fur_generation_noise_program(const Fur_generation_noise_program&) = delete;
+	Fur_generation_program(const Fur_generation_program&) = delete;
 
-	Fur_generation_noise_program(Fur_generation_noise_program&&) = delete;
+	Fur_generation_program(Fur_generation_program&&) = delete;
 
-	~Fur_generation_noise_program() noexcept = default;
+	~Fur_generation_program() noexcept = default;
 
 
 	void bind(const mat4& projection_matrix, const mat4& view_matrix,
-		const mat4& model_matrix, const float3& light_dir_ws,
-		GLuint layer_count, GLuint draws_per_layer,
-		float position_step, const float3 & view_position_ws) noexcept;
-
-	void set_draw_indices(GLuint layer_index, GLuint draw_index) noexcept;
+		const mat4& model_matrix, GLuint shell_count, const float3& light_dir_ws) noexcept;
 
 private:
 
@@ -34,14 +30,9 @@ private:
 	GLint _g_projection_matrix_location = Invalid::uniform_location;
 	GLint _g_view_matrix_location = Invalid::uniform_location;
 	GLint _g_model_matrix_location = Invalid::uniform_location;
-	GLint _g_light_dir_ws_location = Invalid::uniform_location;
-
-	GLint _g_layer_count_location = Invalid::uniform_location;
-	GLint _g_draws_per_layer_location = Invalid::uniform_location;
-	GLint _g_layer_index_location = Invalid::uniform_location;
-	GLint _g_draw_index_location = Invalid::uniform_location;
-	GLint _g_position_step_location = Invalid::uniform_location;
-	GLint _g_view_position_ws_location = Invalid::uniform_location;
+	GLint _g_shell_count_location = Invalid::uniform_location;
+	GLint _g_shell_index_location = Invalid::uniform_location;
+	GLint _g_light_dir_ws_locaiton = Invalid::uniform_location;
 };
 
 class Opaque_model_program final {

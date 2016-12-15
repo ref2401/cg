@@ -7,6 +7,7 @@
 using cg::data::Image_2d;
 using cg::data::Image_format;
 
+
 namespace fur_simulation {
 
 // ----- Fur_simulation_opengl_example -----
@@ -19,6 +20,12 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 {
 	init_model();
 	init_fur_data();
+
+	glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Fur_simulation_opengl_example::init_fur_data()
@@ -26,50 +33,21 @@ void Fur_simulation_opengl_example::init_fur_data()
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
 	{
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/zebra-diffuse-rgb.tga");
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
 		_tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 	}
 
-	std::vector<cg::data::Image_2d> layer_images;
-	_layer_count = 10;
-	layer_images.reserve(_layer_count);
-	layer_images.push_back(cg::data::load_image_tga("../data/fur_simulation/noise-texture-01.tga"));
-
-	_tex_noise = Texture_3d(GL_R8, 1, linear_sampler, uint3(layer_images.back().size(), 16));
-	_tex_noise.write(0, uint3::zero, layer_images.back());
-
-	for (size_t i = 1; i < _layer_count; ++i) {
-		auto& prev_image = layer_images.back();
-		assert(prev_image.format() == Image_format::red_8);
-
-		layer_images.emplace_back(prev_image.format(), prev_image.size());
-		auto& curr_image = layer_images.back();
-
-		uint8_t threshold = uint8_t(std::numeric_limits<uint8_t>::max() * float(i) / _layer_count);
-		for (size_t bi = 0; bi < prev_image.byte_count(); ++bi) {
-			uint8_t byte = prev_image.data()[bi];
-
-			if (byte < threshold)
-				byte = 0;
-
-			curr_image.data()[bi] = byte;
-		}
-
-		_tex_noise.write(0, uint3(0, 0, i), curr_image);
+	{
+		auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
+		_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
 	}
 }
 
 void Fur_simulation_opengl_example::init_model()
 {
-	using Model_geometry_data_t = cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_n_tc>;
+	_model_matrix = scale_matrix<mat4>(float3(2.0f));
+	auto geometry_data = _model.get_geometry_data();
 
-	//_model_matrix = mat4::identity;
-	//auto model_data = cg::data::load_model<Model_geometry_data_t::Format::attribs>("../data/sphere-20x20.obj");
-
-	_model_matrix = rotation_matrix_ox<mat4>(cg::pi_2) * scale_matrix<mat4>(float3(2.0f));
-	//auto model_data = cg::data::load_model<Model_geometry_data_t::Format::attribs>("../data/cube.obj");
-	auto model_data = cg::data::load_model<Model_geometry_data_t::Format::attribs>("../data/rect_2x2.obj");
-	_draw_params = model_data.meshes()[0];
 
 	glCreateVertexArrays(1, &_vao_id);
 	glBindVertexArray(_vao_id);
@@ -77,27 +55,37 @@ void Fur_simulation_opengl_example::init_model()
 	// vertex buffer
 	constexpr GLuint vb_binding_index = 0;
 
-	_vertex_buffer = Buffer_gpu(model_data.vertex_data_byte_count(), model_data.vertex_data().data());
-	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 
-		0, Model_geometry_data_t::Format::vertex_byte_count);
+	_vertex_buffer = Buffer_gpu(geometry_data.vertex_data_byte_count(), geometry_data.vertex_data().data());
+	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 0, 
+		geometry_data.vertex_byte_count());
 
 	// position
 	glEnableVertexArrayAttrib(_vao_id, 0);
 	glVertexArrayAttribBinding(_vao_id, 0, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 0, 3, GL_FLOAT, false, Model_geometry_data_t::Format::position_byte_offset);
+	glVertexArrayAttribFormat(_vao_id, 0, 3, GL_FLOAT, false, geometry_data.position_byte_offset());
 
 	// normal
 	glEnableVertexArrayAttrib(_vao_id, 1);
 	glVertexArrayAttribBinding(_vao_id, 1, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 1, 3, GL_FLOAT, false, Model_geometry_data_t::Format::normal_byte_offset);
+	glVertexArrayAttribFormat(_vao_id, 1, 3, GL_FLOAT, false, geometry_data.normal_byte_offset());
 
 	// tex_coord
 	glEnableVertexArrayAttrib(_vao_id, 2);
 	glVertexArrayAttribBinding(_vao_id, 2, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 2, 2, GL_FLOAT, false, Model_geometry_data_t::Format::tex_coord_byte_offset);
+	glVertexArrayAttribFormat(_vao_id, 2, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
+
+	// strand_rest_position
+	glEnableVertexArrayAttrib(_vao_id, 3);
+	glVertexArrayAttribBinding(_vao_id, 3, vb_binding_index);
+	glVertexArrayAttribFormat(_vao_id, 3, 3, GL_FLOAT, false, geometry_data.strand_rest_position_byte_offset());
+
+	// strand_curr_position
+	glEnableVertexArrayAttrib(_vao_id, 4);
+	glVertexArrayAttribBinding(_vao_id, 4, vb_binding_index);
+	glVertexArrayAttribFormat(_vao_id, 4, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
 
 	// index buffer
-	_index_buffer = Buffer_gpu(model_data.index_data_byte_count(), model_data.index_data().data());
+	_index_buffer = Buffer_gpu(geometry_data.index_data_byte_count(), geometry_data.index_data().data());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.id());
 }
 
@@ -139,39 +127,16 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 
 	glClearColor(0.2f, 0.3f, 0.2f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-	glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX);
 
-
+	glBindVertexArray(_vao_id);
 	glBindTextureUnit(0, _tex_diffuse_rgb.id());
-	//// opaque model
-	//glDisable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
-	////glDepthMask(true);
-	//_glsl_opaque_model.bind(projection_view_matrix, _model_matrix, _light_dir_ws);
-	//glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
+	glBindTextureUnit(1, _tex_fur_mask.id());
 
-	// fur generation
-	const size_t draws_per_layer = 6;
-	const size_t draw_count = draws_per_layer * _layer_count;
-	const float max_lenght = 0.3f;
-	const float position_step = max_lenght / draw_count;
+	constexpr size_t shell_count = 32;
+	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
+		shell_count, _light_dir_ws);
 
-	glEnable(GL_BLEND);
-	glDisable(GL_CULL_FACE);
-	//glDepthMask(false);
-	glBindTextureUnit(1, _tex_noise.id());
-	_glsl_fur_generation_noise.bind(_projection_matrix, view_matrix, _model_matrix, 
-		_light_dir_ws, _layer_count, draws_per_layer, position_step, 
-		lerp(_prev_viewpoint.position, _curr_viewpoint.position, interpolation_factor));
-
-	for (size_t i = 0; i < draw_count; ++i) {
-		size_t layer_index = i / draws_per_layer;
-
-		_glsl_fur_generation_noise.set_draw_indices(layer_index, i);
-		glDrawElements(GL_TRIANGLES, _draw_params.index_count, GL_UNSIGNED_INT, nullptr);
-	}
+	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, shell_count);
 
 	_prev_viewpoint = _curr_viewpoint;
 }

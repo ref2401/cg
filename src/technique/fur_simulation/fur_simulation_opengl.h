@@ -5,6 +5,7 @@
 #include "cg/data/model.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
+#include "technique/fur_simulation/fur_model.h"
 #include "technique/fur_simulation/glsl_program.h"
 
 using namespace cg;
@@ -36,7 +37,7 @@ private:
 	void update_projection_matrix();
 
 	Opaque_model_program _glsl_opaque_model;
-	Fur_generation_noise_program _glsl_fur_generation_noise;
+	Fur_generation_program _glsl_fur_generation;
 	// camera
 	mat4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
@@ -47,13 +48,12 @@ private:
 	GLuint _vao_id = Invalid::vao_id;
 	Buffer_gpu _vertex_buffer;
 	Buffer_gpu _index_buffer;
-	cg::data::Model_mesh_info _draw_params;
+	Square_model _model;
 	mat4 _model_matrix;
-	// fur generation
+	// fur rendering
 	float3 _light_dir_ws; // dir to light
-	size_t _layer_count = 0;
 	Texture_2d _tex_diffuse_rgb;
-	Texture_3d _tex_noise;
+	Texture_2d _tex_fur_mask;
 };
 
 } // fur_simulation
