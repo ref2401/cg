@@ -22,7 +22,8 @@ public:
 
 
 	void bind(const mat4& projection_matrix, const mat4& view_matrix,
-		const mat4& model_matrix, GLuint shell_count, const float3& light_dir_ws) noexcept;
+		const mat4& model_matrix, GLuint shell_count, 
+		const float3& light_dir_ws, const float3& view_position_ws) noexcept;
 
 	void set_params(GLuint index) noexcept;
 
@@ -32,6 +33,7 @@ private:
 	GLint _g_projection_matrix_location = Invalid::uniform_location;
 	GLint _g_view_matrix_location = Invalid::uniform_location;
 	GLint _g_model_matrix_location = Invalid::uniform_location;
+	GLint _g_view_position_ws_location = Invalid::uniform_location;
 	GLint _g_shell_count_location = Invalid::uniform_location;
 	GLint _g_shell_index_location = Invalid::uniform_location;
 	GLint _g_light_dir_ws_locaiton = Invalid::uniform_location;

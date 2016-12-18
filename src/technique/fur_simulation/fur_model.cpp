@@ -13,8 +13,8 @@ Vertex::Vertex(const cg::float3& position, const cg::float3& normal,
 	const cg::float2& tex_coord, const cg::float4& tangent_h,
 	const cg::float3& strand_curr_direction) noexcept
 	: position(position),
-	strand_rest_position(position + 0.5f * normal),
-	strand_curr_position(position + 0.5f * strand_curr_direction),
+	strand_rest_position(position + 1.0f * normal),
+	strand_curr_position(position + 1.0f * strand_curr_direction),
 	normal(normal),
 	tex_coord(tex_coord),
 	tangent_h(tangent_h)
@@ -79,21 +79,27 @@ Model_geometry_data::Model_geometry_data(const std::vector<Vertex>& vertices,
 
 Square_model::Square_model()
 {
-	const float3 normal = float3::unit_z;
+	const float3 origin_normal = float3::unit_z;
+	const float3 normal = origin_normal;
+	//const float3 normal = normalize(origin_normal + float3(-0.4f, 0.0f, 0));
 
 	_vertices.reserve(4);
 	
-	const float tex_coord_factor = 4;
+	const float tex_coord_factor = 2;
 	// left-bottom
 	_vertices.emplace_back(float3(-1, -1, 0), normal, tex_coord_factor * float2::zero, float4(1, 0, 0, 1), normal);
+		//normalize(normal + float3(0.2f, 0, 0)));
 	// right-bottom
 	_vertices.emplace_back(float3(1, -1, 0), normal, tex_coord_factor * float2::unit_x, float4(1, 0, 0, 1), normal);
 		//normalize(normal + float3(0.2f, 0, 0)));
 	// right-top
 	_vertices.emplace_back(float3(1, 1, 0), normal, tex_coord_factor * float2::unit_xy, float4(1, 0, 0, 1), normal);
-		//normalize(normal + float3(-0.2f, 0, 0)));
+		//normalize(normal + float3(0.2f, 0, 0)));
 	// left-bottom
 	_vertices.emplace_back(float3(-1, 1, 0), normal, tex_coord_factor * float2::unit_y, float4(1, 0, 0, 1), normal);
+		//normalize(normal + float3(0.2f, 0, 0)));
+
+	//_vertices.emplace_back(float3::zero, normal, tex_coord_factor * float2::zero, float4(1, 0, 0, 1), normal);
 }
 
 Model_geometry_data Square_model::get_geometry_data() const
