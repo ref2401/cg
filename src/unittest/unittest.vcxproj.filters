@@ -10,9 +10,6 @@
     <ClCompile Include="math\utility_unittest_math.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="sys\input_unittest.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="math\vector_unittest.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="rnd\opengl\program_unittest.cpp">
       <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="sys\input_unittest.cpp">
+      <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

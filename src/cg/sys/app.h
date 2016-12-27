@@ -27,6 +27,8 @@ struct Application_desc final {
 class Sys_message_listener_i {
 public:
 
+	virtual void on_keyboard() {}
+
 	virtual void on_mouse_click() {}
 
 	virtual void on_mouse_move() {}
@@ -72,6 +74,8 @@ public:
 	~Application() noexcept;
 
 
+	void enqueue_keyboard_message(Key key, Key_state state);
+
 	void enqueue_mouse_button_message(const Mouse_buttons& mb);
 
 	void enqueue_mouse_enter_message(const Mouse_buttons& mb, const uint2& p);
@@ -104,6 +108,7 @@ private:
 
 		enum class Type {
 			none,
+			keyboard,
 			mouse_button,
 			mouse_enter,
 			mouse_leave,
@@ -112,6 +117,12 @@ private:
 
 		// type of the system message.
 		Type type = Type::none;
+
+		// Indicates which keyboard's button(key) has been pressed/released
+		Key key = Key::unknown;
+		
+		// Indicates the current state of keyboard's button(key).
+		Key_state key_state = Key_state::up;
 
 		// Indicates which buttons has been pressed. (type == Type::mouse_button).
 		Mouse_buttons mouse_buttons = Mouse_buttons::none;
@@ -137,6 +148,7 @@ private:
 	HINSTANCE _hinstance = nullptr;
 	// app context (app environment)
 	Clock _clock;
+	Keyboard _keyboard;
 	Mouse _mouse;
 	Window _window;
 	// sys messages
@@ -149,7 +161,7 @@ Clock_report Application::run_opengl_example()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
 
-	App_context app_ctx(_mouse, _window);
+	App_context app_ctx(_keyboard, _mouse, _window);
 	cg::rnd::opengl::Opengl_rhi_context rhi_ctx(_window.hwnd());
 	T example(app_ctx);
 

@@ -9,6 +9,16 @@ using namespace cg::rnd::opengl;
 
 namespace fur_simulation {
 
+struct Material final {
+	Texture_2d tex_diffuse_rgb;
+	float shadow_factor_power = 1.0f;
+	float threshold_power = 1.0f;
+	float curl_radius = 0.0f;
+	float curl_frequency = 0.0;
+	float tex_coord_factor = 1.0f;
+	size_t shell_count = 8;
+};
+
 class Fur_generation_program final {
 public:
 
@@ -22,7 +32,7 @@ public:
 
 
 	void bind(const mat4& projection_matrix, const mat4& view_matrix,
-		const mat4& model_matrix, GLuint shell_count, 
+		const mat4& model_matrix, const Material& material,
 		const float3& light_dir_ws, const float3& view_position_ws) noexcept;
 
 	void set_params(GLuint index) noexcept;
@@ -30,13 +40,20 @@ public:
 private:
 
 	Glsl_program _program;
+	// vertex
 	GLint _g_projection_matrix_location = Invalid::uniform_location;
 	GLint _g_view_matrix_location = Invalid::uniform_location;
 	GLint _g_model_matrix_location = Invalid::uniform_location;
 	GLint _g_view_position_ws_location = Invalid::uniform_location;
 	GLint _g_shell_count_location = Invalid::uniform_location;
 	GLint _g_shell_index_location = Invalid::uniform_location;
+	GLint _g_shadow_factor_power_location = Invalid::uniform_location;
+	GLint _g_threshold_power_location = Invalid::uniform_location;
+	GLint _g_curl_radius_location = Invalid::uniform_location;
+	GLint _g_curl_frequency_location = Invalid::uniform_location;
+	// fragment
 	GLint _g_light_dir_ws_locaiton = Invalid::uniform_location;
+	GLint _g_tex_coord_factor_location = Invalid::uniform_location;
 };
 
 class Opaque_model_program final {

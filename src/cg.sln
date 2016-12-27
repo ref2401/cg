@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cg", "cg\cg.vcxproj", "{6F1C7DA3-E163-4BC7-8A59-99661973F995}"
 EndProject
@@ -30,8 +30,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deferred_lighting_shaders",
 		..\data\deferred_lighting_shaders\tone_mapping_pass.fragment.glsl = ..\data\deferred_lighting_shaders\tone_mapping_pass.fragment.glsl
 		..\data\deferred_lighting_shaders\tone_mapping_pass.vertex.glsl = ..\data\deferred_lighting_shaders\tone_mapping_pass.vertex.glsl
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E19C7866-BFA4-4FEE-BD78-A07DE857805B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility_shaders", "utility_shaders", "{AF112729-F54C-42ED-B255-96AD38F61B9F}"
 	ProjectSection(SolutionItems) = preProject

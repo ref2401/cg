@@ -152,10 +152,12 @@ private:
 };
 
 struct App_context final {
-	App_context(const Mouse& mouse, Window& window) noexcept :
-		mouse(mouse), window(window)
+	App_context(const Keyboard& keyboard, const Mouse& mouse, Window& window) noexcept :
+		keyboard(keyboard), mouse(mouse), window(window)
 	{}
 
+	
+	const Keyboard& keyboard;
 	const Mouse& mouse;
 	Window& window;
 };

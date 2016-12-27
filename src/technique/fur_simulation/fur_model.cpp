@@ -85,18 +85,17 @@ Square_model::Square_model()
 
 	_vertices.reserve(4);
 	
-	const float tex_coord_factor = 2;
 	// left-bottom
-	_vertices.emplace_back(float3(-1, -1, 0), normal, tex_coord_factor * float2::zero, float4(1, 0, 0, 1), normal);
+	_vertices.emplace_back(float3(-1, -1, 0), normal, float2::zero, float4(1, 0, 0, 1), normal);
 		//normalize(normal + float3(0.2f, 0, 0)));
 	// right-bottom
-	_vertices.emplace_back(float3(1, -1, 0), normal, tex_coord_factor * float2::unit_x, float4(1, 0, 0, 1), normal);
+	_vertices.emplace_back(float3(1, -1, 0), normal, float2::unit_x, float4(1, 0, 0, 1), normal);
 		//normalize(normal + float3(0.2f, 0, 0)));
 	// right-top
-	_vertices.emplace_back(float3(1, 1, 0), normal, tex_coord_factor * float2::unit_xy, float4(1, 0, 0, 1), normal);
+	_vertices.emplace_back(float3(1, 1, 0), normal, float2::unit_xy, float4(1, 0, 0, 1), normal);
 		//normalize(normal + float3(0.2f, 0, 0)));
 	// left-bottom
-	_vertices.emplace_back(float3(-1, 1, 0), normal, tex_coord_factor * float2::unit_y, float4(1, 0, 0, 1), normal);
+	_vertices.emplace_back(float3(-1, 1, 0), normal, float2::unit_y, float4(1, 0, 0, 1), normal);
 		//normalize(normal + float3(0.2f, 0, 0)));
 
 	//_vertices.emplace_back(float3::zero, normal, tex_coord_factor * float2::zero, float4(1, 0, 0, 1), normal);
