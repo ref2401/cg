@@ -6,6 +6,7 @@
 
 using cg::data::Image_2d;
 using cg::data::Image_format;
+using cg::sys::Key;
 
 
 namespace fur_simulation {
@@ -20,10 +21,11 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 {
 	init_model();
 	init_materials();
+	_curr_material = &_cat_material;
 
 	glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -31,19 +33,52 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 void Fur_simulation_opengl_example::init_materials()
 {
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
-	
+
 	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
 	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
 
 	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_material.shadow_factor_power = 1.1f;
-		_material.threshold_power = 1.0f;
-		_material.curl_radius = 0.01f;
-		_material.curl_frequency = 0.0f;
-		_material.tex_coord_factor = 3.0f;
-		_material.shell_count = 32;
+		_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_cat_material.shadow_factor_power = 1.1f;
+		_cat_material.threshold_power = 1.0f;
+		_cat_material.curl_radius = 0.01f;
+		_cat_material.curl_frequency = 0.0f;
+		_cat_material.tex_coord_factor = 3.0f;
+		_cat_material.shell_count = 32;
+	}
+
+	{ // curly red material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
+		_curly_red_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_curly_red_material.shadow_factor_power = 0.6f;
+		_curly_red_material.threshold_power = 0.6f;
+		_curly_red_material.curl_radius = 0.01f;
+		_curly_red_material.curl_frequency = 4.0f;
+		_curly_red_material.tex_coord_factor = 1.0f;
+		_curly_red_material.shell_count = 32;
+	}
+
+	{ // hair material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
+		_hair_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_hair_material.shadow_factor_power = 2.0f;
+		_hair_material.threshold_power = 0.05f;
+		_hair_material.curl_radius = 0.07f;
+		_hair_material.curl_frequency = 1.0f;
+		_hair_material.tex_coord_factor = 1.0f;
+		_hair_material.shell_count = 32;
+	}
+
+	{ // short material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
+		_short_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_short_material.shadow_factor_power = 4.0f;
+		_short_material.threshold_power = 2.0f;
+		_short_material.curl_radius = 0.0f;
+		_short_material.curl_frequency = 0.0f;
+		_short_material.tex_coord_factor = 1.0f;
+		_short_material.shell_count = 32;
 	}
 }
 
@@ -60,7 +95,7 @@ void Fur_simulation_opengl_example::init_model()
 	constexpr GLuint vb_binding_index = 0;
 
 	_vertex_buffer = Buffer_gpu(geometry_data.vertex_data_byte_count(), geometry_data.vertex_data().data());
-	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 0, 
+	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 0,
 		geometry_data.vertex_byte_count());
 
 	// position
@@ -96,6 +131,22 @@ void Fur_simulation_opengl_example::init_model()
 	// index buffer
 	_index_buffer = Buffer_gpu(geometry_data.index_data_byte_count(), geometry_data.index_data().data());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.id());
+}
+
+void Fur_simulation_opengl_example::on_keyboard()
+{
+	if (_app_ctx.keyboard.is_down(Key::digit_1)) {
+		_curr_material = &_cat_material;
+	}
+	else if(_app_ctx.keyboard.is_down(Key::digit_2)) {
+		_curr_material = &_curly_red_material;
+	}
+	else if (_app_ctx.keyboard.is_down(Key::digit_3)) {
+		_curr_material = &_hair_material;
+	}
+	else if (_app_ctx.keyboard.is_down(Key::digit_4)) {
+		_curr_material = &_short_material;
+	}
 }
 
 void Fur_simulation_opengl_example::on_mouse_move()
@@ -140,14 +191,14 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(_vao_id);
-	glBindTextureUnit(0, _material.tex_diffuse_rgb.id());
+	glBindTextureUnit(0, _curr_material->tex_diffuse_rgb.id());
 	glBindTextureUnit(1, _tex_fur_mask.id());
 
 	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
-		_material, _light_dir_ws, view_position);
+		*_curr_material, _light_dir_ws, view_position);
 
 	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, _material.shell_count);
-	for (size_t i = 0; i < _material.shell_count; ++i) {
+	for (size_t i = 0; i < _curr_material->shell_count; ++i) {
 		_glsl_fur_generation.set_params(i);
 		//glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, nullptr);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

@@ -67,6 +67,18 @@ Opengl_rhi_context::Opengl_rhi_context(HWND hwnd) :
 	glGetIntegerv(GL_MINOR_VERSION, &_version_minor);
 	ENFORCE(_version_major == 4 && _version_minor == 5, "OpenGL version must be at least 4.5.");
 	load_opengl_45();
+
+	GLint extension_count = 0;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &extension_count);
+
+	//std::string extensions;
+	//for (size_t i = 0; i < size_t(extension_count); ++i) {
+	//	const char* ext = reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i));
+	//	extensions.append(ext);
+	//	extensions.append("\n");
+	//}
+
+	//auto ptr = load_opengl_func("eglGetDisplayARB");
 }
 
 Opengl_rhi_context::~Opengl_rhi_context() noexcept
