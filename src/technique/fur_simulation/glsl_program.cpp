@@ -16,11 +16,16 @@ Fur_generation_program::Fur_generation_program()
 	//_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
 	_g_shell_count_location = _program.get_uniform_location("g_shell_count");
 	_g_shell_index_location = _program.get_uniform_location("g_shell_index");
+	_g_shadow_factor_power_location = _program.get_uniform_location("g_shadow_factor_power");
+	_g_threshold_power_location = _program.get_uniform_location("g_threshold_power");
+	_g_curl_radius_location = _program.get_uniform_location("g_curl_radius");
+	_g_curl_frequency_location = _program.get_uniform_location("g_curl_frequency");
 	_g_light_dir_ws_locaiton = _program.get_uniform_location("g_light_dir_ws");
+	_g_tex_coord_factor_location = _program.get_uniform_location("g_tex_coord_factor");
 }
 
 void Fur_generation_program::bind(const mat4& projection_matrix, const mat4& view_matrix,
-	const mat4& model_matrix, GLuint shell_count, 
+	const mat4& model_matrix, const Material& material,
 	const float3& light_dir_ws, const float3& view_position_ws) noexcept
 {
 	glUseProgram(_program.id());
@@ -28,8 +33,14 @@ void Fur_generation_program::bind(const mat4& projection_matrix, const mat4& vie
 	set_uniform(_g_view_matrix_location, view_matrix);
 	//set_uniform(_g_view_position_ws_location, view_position_ws);
 	set_uniform(_g_model_matrix_location, model_matrix);
-	set_uniform(_g_shell_count_location, shell_count);
+	set_uniform(_g_shell_count_location, material.shell_count);
 	set_uniform(_g_light_dir_ws_locaiton, light_dir_ws);
+
+	set_uniform(_g_shadow_factor_power_location, material.shadow_factor_power);
+	set_uniform(_g_threshold_power_location, material.threshold_power);
+	set_uniform(_g_curl_radius_location, material.curl_radius);
+	set_uniform(_g_curl_frequency_location, material.curl_frequency);
+	set_uniform(_g_tex_coord_factor_location, material.tex_coord_factor);
 }
 
 void Fur_generation_program::set_params(GLuint index) noexcept

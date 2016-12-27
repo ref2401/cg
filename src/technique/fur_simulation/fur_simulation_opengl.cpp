@@ -19,7 +19,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	_light_dir_ws(normalize(float3(50, 1, 100.0)))
 {
 	init_model();
-	init_fur_data();
+	init_materials();
 
 	glEnable(GL_BLEND);
 		glBlendEquation(GL_FUNC_ADD);
@@ -28,18 +28,22 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Fur_simulation_opengl_example::init_fur_data()
+void Fur_simulation_opengl_example::init_materials()
 {
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
+	
+	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
+	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
 
-	{
+	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-	}
-
-	{
-		auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
-		_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
+		_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_material.shadow_factor_power = 1.1f;
+		_material.threshold_power = 1.0f;
+		_material.curl_radius = 0.01f;
+		_material.curl_frequency = 0.0f;
+		_material.tex_coord_factor = 3.0f;
+		_material.shell_count = 32;
 	}
 }
 
@@ -136,15 +140,14 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(_vao_id);
-	glBindTextureUnit(0, _tex_diffuse_rgb.id());
+	glBindTextureUnit(0, _material.tex_diffuse_rgb.id());
 	glBindTextureUnit(1, _tex_fur_mask.id());
 
-	constexpr size_t shell_count = 32;
 	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
-		shell_count, _light_dir_ws, view_position);
+		_material, _light_dir_ws, view_position);
 
-	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, shell_count);
-	for (size_t i = 0; i < shell_count; ++i) {
+	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, _material.shell_count);
+	for (size_t i = 0; i < _material.shell_count; ++i) {
 		_glsl_fur_generation.set_params(i);
 		//glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, nullptr);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

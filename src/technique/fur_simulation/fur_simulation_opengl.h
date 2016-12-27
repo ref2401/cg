@@ -30,7 +30,7 @@ public:
 
 private:
 
-	void init_fur_data();
+	void init_materials();
 
 	void init_model();
 
@@ -51,8 +51,8 @@ private:
 	Square_model _model;
 	mat4 _model_matrix;
 	// fur rendering
+	Material _material;
 	float3 _light_dir_ws; // dir to light
-	Texture_2d _tex_diffuse_rgb;
 	Texture_2d _tex_fur_mask;
 };
 

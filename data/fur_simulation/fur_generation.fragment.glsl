@@ -3,6 +3,7 @@
 layout(binding = 0) uniform sampler2D g_tex_diffuse_rgb;
 layout(binding = 1) uniform sampler2D g_tex_fur_mask;
 					uniform vec3 g_light_dir_ws;
+					uniform float g_tex_coord_factor;
 
 in VS_result{
 	vec3 normal_ws;
@@ -21,8 +22,9 @@ void main()
 	// TODO(ref2401): if filter: linear then use textureGather for the tex_noise
 	//const float noise = texture(g_tex_noise, noise_uvw).r;
 	const vec3 n = normalize(frag.normal_ws);
-	const vec3 diffuse_rgb = texture(g_tex_diffuse_rgb, frag.tex_coord).rgb;
-	const float fur_alpha = step(frag.fur_mask_threshold, texture(g_tex_fur_mask, frag.tex_coord).r);
+	const vec2 uv = frag.tex_coord * g_tex_coord_factor;
+	const vec3 diffuse_rgb = texture(g_tex_diffuse_rgb, uv).rgb;
+	const float fur_alpha = step(frag.fur_mask_threshold, texture(g_tex_fur_mask, uv).r);
 
 	// diffuse term
 	float cos_ti = max(0, 0.75 * dot(n, g_light_dir_ws) + 0.25);

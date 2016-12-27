@@ -6,6 +6,10 @@ uniform mat4 g_model_matrix;
 uniform vec3 g_view_position_ws;
 uniform uint g_shell_count;
 uniform uint g_shell_index;
+uniform float g_shadow_factor_power;
+uniform float g_threshold_power;
+uniform float g_curl_radius;
+uniform float g_curl_frequency;
 
 
 layout(location = 0) in vec3 vert_position;
@@ -44,8 +48,8 @@ void main()
 	result.normal_ws = normalize(normal_matrix * vert_normal);
 	result.view_dir_ws = normalize(g_view_position_ws - pos_ws.xyz);
 	result.tex_coord = vert_tex_coord;
-	result.shadow_factor = pow(h, 1.1);
-	result.fur_mask_threshold = pow(h, 1);
+	result.shadow_factor = pow(h, g_shadow_factor_power);
+	result.fur_mask_threshold = pow(h, g_threshold_power);
 }
 
 vec3 calc_bent_position(float h)
@@ -62,12 +66,10 @@ vec3 calc_bent_position(float h)
 vec3 calc_curliness_offset(float h, vec3 tangent, vec3 bitangent)
 {
 	const float pi = 3.1415926535;
-	const float curl_radius = 0.01;
-	const float curl_frequency = 1;
 
-	float angle = 2 * pi * h * curl_frequency;
+	float angle = 2 * pi * h * g_curl_frequency;
 	float cos_a = cos(angle);
 	float sin_a = sin(angle);
 
-	return curl_radius * (cos_a * tangent + sin_a * bitangent);
+	return g_curl_radius * normalize(cos_a * tangent + sin_a * bitangent);
 }
