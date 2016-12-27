@@ -14,7 +14,7 @@ namespace fur_simulation {
 
 Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
-	_curr_viewpoint(float3(0, 0, 5), float3(0, 0, 0)),
+	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	_light_dir_ws(normalize(float3(50, 1, 100.0)))
 {
@@ -139,7 +139,7 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glBindTextureUnit(0, _tex_diffuse_rgb.id());
 	glBindTextureUnit(1, _tex_fur_mask.id());
 
-	constexpr size_t shell_count = 16;
+	constexpr size_t shell_count = 32;
 	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
 		shell_count, _light_dir_ws, view_position);
 

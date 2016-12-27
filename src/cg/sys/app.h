@@ -137,6 +137,7 @@ private:
 	HINSTANCE _hinstance = nullptr;
 	// app context (app environment)
 	Clock _clock;
+	Keyboard _keyboard;
 	Mouse _mouse;
 	Window _window;
 	// sys messages
@@ -149,7 +150,7 @@ Clock_report Application::run_opengl_example()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
 
-	App_context app_ctx(_mouse, _window);
+	App_context app_ctx(_keyboard, _mouse, _window);
 	cg::rnd::opengl::Opengl_rhi_context rhi_ctx(_window.hwnd());
 	T example(app_ctx);
 

@@ -9,6 +9,136 @@
 namespace cg {
 namespace sys {
 
+enum class Key {
+	alt_left,
+	alt_right,
+	// Menu key. Microsoft natural keyboard.
+	apps,
+	arrow_down,
+	arrow_left,
+	arrow_right,
+	arrow_up,
+	backspace,
+	caps_lock,
+	// ",<"
+	comma,
+	ctrl_left,
+	ctrl_right,
+	del,
+	digit_0,
+	digit_1,
+	digit_2,
+	digit_3,
+	digit_4,
+	digit_5,
+	digit_6,
+	digit_7,
+	digit_8,
+	digit_9,
+	end,
+	enter,
+	escape,
+	f1,
+	f2,
+	f3,
+	f4,
+	f5,
+	f6,
+	f7,
+	f8,
+	f9,
+	f10,
+	f11,
+	f12,
+	f13,
+	f14,
+	f15,
+	home,
+	insert,
+	// -_
+	minus,
+	numpad_0,
+	numpad_1,
+	numpad_2,
+	numpad_3,
+	numpad_4,
+	numpad_5,
+	numpad_6,
+	numpad_7,
+	numpad_8,
+	numpad_9,
+	numpad_comma,
+	numpad_devide,
+	num_lock,
+	numpad_minus,
+	numpad_multiply,
+	numpad_plus,
+	page_down,
+	page_up,
+	pause,
+	// .>
+	period,
+	// =+
+	plus,
+	print,
+	prtsrc,
+	// '"
+	quote,
+	// `~
+	quote_back,
+	scroll_lock,
+	// for us ";:"
+	semicolon,
+	shift_left,
+	shift_right,
+	// for us "\|"
+	slash,
+	// "/?"
+	slash_back,
+	space,
+	// "]}"
+	square_bracket_close,
+	// [{
+	square_bracket_open,
+	tab,
+	// Windows key. Microsoft natural keyboard.
+	win_left,
+	// Windows key. Microsoft natural keyboard.
+	win_right,
+	a,
+	b,
+	c,
+	d,
+	e,
+	f,
+	g,
+	h,
+	i,
+	j,
+	k,
+	l,
+	m,
+	n,
+	o,
+	p,
+	q,
+	r,
+	s,
+	t,
+	u,
+	v,
+	w,
+	x,
+	y,
+	z,
+	unknown
+};
+
+enum class Key_state : unsigned char {
+	up,
+	down
+};
+
 // Specifies constants that define which mouse button was pressed.
 enum class Mouse_buttons : unsigned char {
 	none = 0,
@@ -58,6 +188,44 @@ inline Mouse_buttons operator~(Mouse_buttons mb) noexcept
 }
 
 
+class Keyboard final {
+public:
+
+	Keyboard() noexcept;
+
+	Keyboard(const Keyboard&) = delete;
+
+	Keyboard(Keyboard&&) = delete;
+
+
+	Keyboard& operator=(const Keyboard) = delete;
+
+	Keyboard& operator=(Keyboard&&) = delete;
+
+
+	// Indicates whether the specified key is down (pressed).
+	bool is_down(const Key& key) const noexcept 
+	{
+		return (_key_table[static_cast<size_t>(key)] == Key_state::down);
+	}
+
+	// Indicates whether the specified key is up (released).
+	bool is_up(const Key& key) const noexcept 
+	{
+		return (_key_table[static_cast<size_t>(key)] == Key_state::up);
+	}
+
+
+	void set_key_state(const Key& key, const Key_state& state) noexcept
+	{
+		_key_table[static_cast<size_t>(key)] = state;
+	}
+
+private:
+
+	Key_state _key_table[static_cast<size_t>(Key::unknown) + 1];
+};
+
 class Mouse final {
 public:
 
@@ -66,6 +234,11 @@ public:
 	Mouse(const Mouse&) = delete;
 
 	Mouse(Mouse&&) noexcept = delete;
+
+
+	Mouse& operator=(const Mouse&) = delete;
+
+	Mouse& operator=(Mouse&&) = delete;
 
 
 	// The state of all the mouse's buttons.
@@ -131,6 +304,14 @@ private:
 	bool _is_out = true;
 };
 
+
+std::ostream& operator<<(std::ostream& out, const Key& state);
+
+std::wostream& operator<<(std::wostream& out, const Key& state);
+
+std::ostream& operator<<(std::ostream& out, const Key_state& state);
+
+std::wostream& operator<<(std::wostream& out, const Key_state& state);
 
 std::ostream& operator<<(std::ostream& out, const Mouse_buttons& mb);
 
