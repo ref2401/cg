@@ -34,18 +34,32 @@ void Fur_simulation_opengl_example::init_materials()
 {
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
-	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
+	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-01.tga");
 	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
+
+	//{ // cat material
+	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
+	//	_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_cat_material.shadow_factor_power = 1.1f;
+	//	_cat_material.threshold_power = 0.6f;
+	//	_cat_material.curl_radius = 0.01f;
+	//	_cat_material.curl_frequency = 0.0f;
+	//	_cat_material.tex_coord_factor = 2.0f;
+	//	_cat_material.shell_count = 32;
+	//}
 
 	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
+		//auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
 		_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_cat_material.shadow_factor_power = 1.1f;
+		_cat_material.shadow_factor_power = 1.0f;
 		_cat_material.threshold_power = 1.0f;
 		_cat_material.curl_radius = 0.01f;
 		_cat_material.curl_frequency = 0.0f;
-		_cat_material.tex_coord_factor = 3.0f;
-		_cat_material.shell_count = 32;
+		_cat_material.specular_factor = 1.0f;
+		_cat_material.specular_power = 1.0f;
+		_cat_material.tex_coord_factor = 2.0f;
+		_cat_material.shell_count = 8;
 	}
 
 	{ // curly red material
@@ -231,6 +245,13 @@ void Fur_simulation_opengl_example::update(float dt)
 
 		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
 	}
+
+	//static float rot_angle = 0;
+
+	//if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+	//	rot_angle += _view_roll_angles.y;
+	//	_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
+	//}
 
 	_view_roll_angles = float2::zero;
 }

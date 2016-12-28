@@ -21,7 +21,7 @@ layout(location = 5) in vec3 vert_strand_curr_position;
 
 out VS_result {
 	vec3 normal_ws;
-	vec3 tangent_ws;
+	vec3 tip_dir_ws;
 	vec3 view_dir_ws;
 	vec2 tex_coord;
 	float shadow_factor;
@@ -45,7 +45,8 @@ void main()
 	gl_Position = g_projection_matrix * g_view_matrix * pos_ws;
 
 	const mat3 normal_matrix = mat3(g_model_matrix);
-	result.normal_ws = normalize(normal_matrix * vert_normal);
+	result.normal_ws = normal_matrix * vert_normal;
+	result.tip_dir_ws = normal_matrix * (v_pos - vert_position);
 	result.view_dir_ws = normalize(g_view_position_ws - pos_ws.xyz);
 	result.tex_coord = vert_tex_coord;
 	result.shadow_factor = pow(h, g_shadow_factor_power);
@@ -70,5 +71,5 @@ vec3 calc_curliness_offset(float h, vec3 tangent, vec3 bitangent)
 	float cos_a = cos(angle);
 	float sin_a = sin(angle);
 
-	return g_curl_radius * normalize(cos_a * tangent + sin_a * bitangent);
+	return g_curl_radius * (cos_a * tangent + sin_a * bitangent);
 }

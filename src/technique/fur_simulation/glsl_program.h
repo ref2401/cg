@@ -15,6 +15,8 @@ struct Material final {
 	float threshold_power = 1.0f;
 	float curl_radius = 0.0f;
 	float curl_frequency = 0.0;
+	float specular_factor = 0.0;
+	float specular_power = 1.0;
 	float tex_coord_factor = 1.0f;
 	size_t shell_count = 8;
 };
@@ -53,6 +55,8 @@ private:
 	GLint _g_curl_frequency_location = Invalid::uniform_location;
 	// fragment
 	GLint _g_light_dir_ws_locaiton = Invalid::uniform_location;
+	GLint _g_specular_factor_location = Invalid::uniform_location;
+	GLint _g_specular_power_location = Invalid::uniform_location;
 	GLint _g_tex_coord_factor_location = Invalid::uniform_location;
 };
 

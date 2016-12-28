@@ -13,8 +13,8 @@ Vertex::Vertex(const cg::float3& position, const cg::float3& normal,
 	const cg::float2& tex_coord, const cg::float4& tangent_h,
 	const cg::float3& strand_curr_direction) noexcept
 	: position(position),
-	strand_rest_position(position + 1.0f * normal),
-	strand_curr_position(position + 1.0f * strand_curr_direction),
+	strand_rest_position(position + 0.3f * normal),
+	strand_curr_position(position + 0.3f * strand_curr_direction),
 	normal(normal),
 	tex_coord(tex_coord),
 	tangent_h(tangent_h)

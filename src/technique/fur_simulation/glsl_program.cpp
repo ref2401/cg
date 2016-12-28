@@ -13,7 +13,7 @@ Fur_generation_program::Fur_generation_program()
 	_g_projection_matrix_location = _program.get_uniform_location("g_projection_matrix");
 	_g_view_matrix_location = _program.get_uniform_location("g_view_matrix");
 	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
-	//_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
+	_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
 	_g_shell_count_location = _program.get_uniform_location("g_shell_count");
 	_g_shell_index_location = _program.get_uniform_location("g_shell_index");
 	_g_shadow_factor_power_location = _program.get_uniform_location("g_shadow_factor_power");
@@ -21,6 +21,8 @@ Fur_generation_program::Fur_generation_program()
 	_g_curl_radius_location = _program.get_uniform_location("g_curl_radius");
 	_g_curl_frequency_location = _program.get_uniform_location("g_curl_frequency");
 	_g_light_dir_ws_locaiton = _program.get_uniform_location("g_light_dir_ws");
+	_g_specular_factor_location = _program.get_uniform_location("g_specular_factor");
+	_g_specular_power_location = _program.get_uniform_location("g_specular_power");
 	_g_tex_coord_factor_location = _program.get_uniform_location("g_tex_coord_factor");
 }
 
@@ -31,7 +33,7 @@ void Fur_generation_program::bind(const mat4& projection_matrix, const mat4& vie
 	glUseProgram(_program.id());
 	set_uniform(_g_projection_matrix_location, projection_matrix);
 	set_uniform(_g_view_matrix_location, view_matrix);
-	//set_uniform(_g_view_position_ws_location, view_position_ws);
+	set_uniform(_g_view_position_ws_location, view_position_ws);
 	set_uniform(_g_model_matrix_location, model_matrix);
 	set_uniform(_g_shell_count_location, material.shell_count);
 	set_uniform(_g_light_dir_ws_locaiton, light_dir_ws);
@@ -40,6 +42,10 @@ void Fur_generation_program::bind(const mat4& projection_matrix, const mat4& vie
 	set_uniform(_g_threshold_power_location, material.threshold_power);
 	set_uniform(_g_curl_radius_location, material.curl_radius);
 	set_uniform(_g_curl_frequency_location, material.curl_frequency);
+
+	set_uniform(_g_specular_factor_location, material.specular_factor);
+	set_uniform(_g_specular_power_location, material.specular_power);
+
 	set_uniform(_g_tex_coord_factor_location, material.tex_coord_factor);
 }
 
