@@ -34,7 +34,7 @@ void Fur_simulation_opengl_example::init_materials()
 {
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
-	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-01.tga");
+	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
 	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
 
 	//{ // cat material
@@ -59,7 +59,7 @@ void Fur_simulation_opengl_example::init_materials()
 		_cat_material.specular_factor = 1.0f;
 		_cat_material.specular_power = 1.0f;
 		_cat_material.tex_coord_factor = 2.0f;
-		_cat_material.shell_count = 8;
+		_cat_material.shell_count = 40;
 	}
 
 	{ // curly red material
@@ -223,35 +223,35 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 
 void Fur_simulation_opengl_example::update(float dt)
 {
-	if (_view_roll_angles != float2::zero) {
-		float dist = _curr_viewpoint.distance();
-		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
-		ox.y = 0.0f; // ox is always parallel the world's OX.
-		ox = normalize(ox);
+	//if (_view_roll_angles != float2::zero) {
+	//	float dist = _curr_viewpoint.distance();
+	//	float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+	//	ox.y = 0.0f; // ox is always parallel the world's OX.
+	//	ox = normalize(ox);
 
-		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-			quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
-			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+	//	if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+	//		quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
+	//		_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
 
-			ox = rotate(q, ox);
-			ox.y = 0.0f;
-			ox = normalize(ox);
-		}
+	//		ox = rotate(q, ox);
+	//		ox.y = 0.0f;
+	//		ox = normalize(ox);
+	//	}
 
-		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
-			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
-			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
-		}
+	//	if (!approx_equal(_view_roll_angles.x, 0.0f)) {
+	//		quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
+	//		_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+	//	}
 
-		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
-	}
-
-	//static float rot_angle = 0;
-
-	//if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-	//	rot_angle += _view_roll_angles.y;
-	//	_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
+	//	_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
 	//}
+
+	static float rot_angle = 0;
+
+	if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+		rot_angle += _view_roll_angles.y;
+		_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
+	}
 
 	_view_roll_angles = float2::zero;
 }

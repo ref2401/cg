@@ -42,11 +42,11 @@ void main()
 	vec3 rgb = (diffuse_term + specular_term) * diffuse_rgb * frag.shadow_factor;
 	rt_color = vec4(rgb, fur_alpha);
 
-	/*float v = specular_term;
-	if (rt_color.x > rt_color.y) {
-		rt_color = vec4(v, v, v, fur_alpha);
-	}
-	else {
-		rt_color = vec4(v, v, v, fur_alpha);
-	}*/
+	//float v = specular_term;
+	//if (rt_color.x > rt_color.y) {
+	//	rt_color = vec4(v, v, v, fur_alpha);
+	//}
+	//else {
+	//	rt_color = vec4(v, v, v, fur_alpha);
+	//}
 }
