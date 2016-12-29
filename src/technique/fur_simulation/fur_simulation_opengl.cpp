@@ -37,6 +37,7 @@ void Fur_simulation_opengl_example::init_materials()
 	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
 	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
 
+	
 	//{ // cat material
 	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
 	//	_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
@@ -44,22 +45,41 @@ void Fur_simulation_opengl_example::init_materials()
 	//	_cat_material.threshold_power = 0.6f;
 	//	_cat_material.curl_radius = 0.01f;
 	//	_cat_material.curl_frequency = 0.0f;
-	//	_cat_material.tex_coord_factor = 2.0f;
-	//	_cat_material.shell_count = 32;
+	//	_cat_material.tex_coord_factor = 15.0f;
+	//	_cat_material.shell_count = 16;
+	//}
+
+	//{ // curly red material
+	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
+	//	_curly_red_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_curly_red_material.shadow_factor_power = 0.6f;
+	//	_curly_red_material.threshold_power = 0.6f;
+	//	_curly_red_material.curl_radius = 0.2f;
+	//	_curly_red_material.curl_frequency = 4.0f;
+	//	_curly_red_material.tex_coord_factor = 8.0f;
+	//	_curly_red_material.shell_count = 32;
+	//}
+
+	//{ // sheep material
+	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+	//	_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_sheep_material.shadow_factor_power = 1.0f;
+	//	_sheep_material.threshold_power = 1.0f;
+	//	_sheep_material.curl_radius = 0.16f;
+	//	_sheep_material.curl_frequency = 5.0f;
+	//	_sheep_material.tex_coord_factor = 4.0f;
+	//	_sheep_material.shell_count = 32;
 	//}
 
 	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		//auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
 		_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_cat_material.shadow_factor_power = 1.0f;
-		_cat_material.threshold_power = 1.0f;
+		_cat_material.shadow_factor_power = 1.1f;
+		_cat_material.threshold_power = 0.6f;
 		_cat_material.curl_radius = 0.01f;
 		_cat_material.curl_frequency = 0.0f;
-		_cat_material.specular_factor = 1.0f;
-		_cat_material.specular_power = 1.0f;
-		_cat_material.tex_coord_factor = 2.0f;
-		_cat_material.shell_count = 40;
+		_cat_material.tex_coord_factor = 3.0f;
+		_cat_material.shell_count = 32;
 	}
 
 	{ // curly red material
@@ -69,7 +89,7 @@ void Fur_simulation_opengl_example::init_materials()
 		_curly_red_material.threshold_power = 0.6f;
 		_curly_red_material.curl_radius = 0.01f;
 		_curly_red_material.curl_frequency = 4.0f;
-		_curly_red_material.tex_coord_factor = 1.0f;
+		_curly_red_material.tex_coord_factor = 2.0f;
 		_curly_red_material.shell_count = 32;
 	}
 
@@ -84,23 +104,27 @@ void Fur_simulation_opengl_example::init_materials()
 		_hair_material.shell_count = 32;
 	}
 
-	{ // short material
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_short_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_short_material.shadow_factor_power = 4.0f;
-		_short_material.threshold_power = 2.0f;
-		_short_material.curl_radius = 0.0f;
-		_short_material.curl_frequency = 0.0f;
-		_short_material.tex_coord_factor = 1.0f;
-		_short_material.shell_count = 32;
-	}
+	//{ // sheep material
+	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+	//	_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_sheep_material.shadow_factor_power = 1.0f;
+	//	_sheep_material.threshold_power = 1.5f;
+	//	_sheep_material.curl_radius = 0.006f;
+	//	_sheep_material.curl_frequency = 10.0f;
+	//	_sheep_material.tex_coord_factor = 1.0f;
+	//	_sheep_material.shell_count = 32;
+	//}
 }
 
 void Fur_simulation_opengl_example::init_model()
 {
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-	auto geometry_data = _model.get_geometry_data();
 
+	//Square_model model;
+	Arbitrary_model model(0.3f, "../data/sphere-20x20.obj");
+	//Arbitrary_model model(5.0f, "c:/dev/meshes/mod_head_default.obj");
+	auto geometry_data = model.get_geometry_data();
+	_model_index_count = geometry_data.index_data().size();
 
 	glCreateVertexArrays(1, &_vao_id);
 	glBindVertexArray(_vao_id);
@@ -159,7 +183,7 @@ void Fur_simulation_opengl_example::on_keyboard()
 		_curr_material = &_hair_material;
 	}
 	else if (_app_ctx.keyboard.is_down(Key::digit_4)) {
-		_curr_material = &_short_material;
+		_curr_material = &_sheep_material;
 	}
 }
 
@@ -211,11 +235,11 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
 		*_curr_material, _light_dir_ws, view_position);
 
-	//glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, _material.shell_count);
+	//glDrawElementsInstanced(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, 
+	//	nullptr, _curr_material->shell_count);
 	for (size_t i = 0; i < _curr_material->shell_count; ++i) {
 		_glsl_fur_generation.set_params(i);
-		//glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, nullptr);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, nullptr);
 	}
 
 	_prev_viewpoint = _curr_viewpoint;
@@ -223,35 +247,35 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 
 void Fur_simulation_opengl_example::update(float dt)
 {
-	//if (_view_roll_angles != float2::zero) {
-	//	float dist = _curr_viewpoint.distance();
-	//	float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
-	//	ox.y = 0.0f; // ox is always parallel the world's OX.
-	//	ox = normalize(ox);
+	if (_view_roll_angles != float2::zero) {
+		float dist = _curr_viewpoint.distance();
+		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+		ox.y = 0.0f; // ox is always parallel the world's OX.
+		ox = normalize(ox);
 
-	//	if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-	//		quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
-	//		_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+			quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
 
-	//		ox = rotate(q, ox);
-	//		ox.y = 0.0f;
-	//		ox = normalize(ox);
-	//	}
+			ox = rotate(q, ox);
+			ox.y = 0.0f;
+			ox = normalize(ox);
+		}
 
-	//	if (!approx_equal(_view_roll_angles.x, 0.0f)) {
-	//		quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
-	//		_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
-	//	}
+		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
+			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+		}
 
-	//	_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
-	//}
-
-	static float rot_angle = 0;
-
-	if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-		rot_angle += _view_roll_angles.y;
-		_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
+		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
 	}
+
+	//static float rot_angle = 0;
+
+	//if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+	//	rot_angle += _view_roll_angles.y;
+	//	_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
+	//}
 
 	_view_roll_angles = float2::zero;
 }
@@ -259,7 +283,7 @@ void Fur_simulation_opengl_example::update(float dt)
 void Fur_simulation_opengl_example::update_projection_matrix()
 {
 	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
-		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 50.0f);
+		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
 }
 
 } // fur_simulation

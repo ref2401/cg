@@ -69,7 +69,7 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n>& geometry_data,
 
 	Model_geometry_vertex<Vertex_attribs::p_n> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
-		make_cg_vector(mesh->mNormals[vertex_index]));
+		normalize(make_cg_vector(mesh->mNormals[vertex_index])));
 
 	geometry_data.push_back_vertex(vertex);
 }
@@ -82,7 +82,7 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc>& geometry_data,
 
 	Model_geometry_vertex<Vertex_attribs::p_n_tc> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
-		make_cg_vector(mesh->mNormals[vertex_index]),
+		normalize(make_cg_vector(mesh->mNormals[vertex_index])),
 		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv());
 
 	geometry_data.push_back_vertex(vertex);
@@ -109,10 +109,10 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc_ts>& geometry_dat
 
 
 	float3 position = make_cg_vector(mesh->mVertices[vertex_index]);
-	float3 normal = make_cg_vector(mesh->mNormals[vertex_index]);
+	float3 normal = normalize(make_cg_vector(mesh->mNormals[vertex_index]));
 	float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv();
-	float3 tangent = make_cg_vector(mesh->mTangents[vertex_index]);
-	float3 bitangent = make_cg_vector(mesh->mBitangents[vertex_index]);
+	float3 tangent = normalize(make_cg_vector(mesh->mTangents[vertex_index]));
+	float3 bitangent = normalize(make_cg_vector(mesh->mBitangents[vertex_index]));
 	float4 tangent_h = cg::data::compute_tangent_handedness(tangent, bitangent, normal);
 
 	Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> vertex(

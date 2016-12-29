@@ -50,14 +50,14 @@ private:
 	GLuint _vao_id = Invalid::vao_id;
 	Buffer_gpu _vertex_buffer;
 	Buffer_gpu _index_buffer;
-	Square_model _model;
+	size_t _model_index_count;
 	mat4 _model_matrix;
 	// fur rendering
 	Material* _curr_material = nullptr;
 	Material _cat_material;
 	Material _curly_red_material;
 	Material _hair_material;
-	Material _short_material;
+	Material _sheep_material;
 	float3 _light_dir_ws; // dir to light
 	Texture_2d _tex_fur_mask;
 };

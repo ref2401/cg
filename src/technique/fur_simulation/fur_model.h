@@ -4,16 +4,20 @@
 #include <initializer_list>
 #include <vector>
 #include "cg/data/image.h"
+#include "cg/data/model.h"
 #include "cg/math/math.h"
 
 
 namespace fur_simulation {
 
-struct Vertex {
-	
+struct Vertex final {
+	Vertex(const cg::data::Model_geometry_vertex<cg::data::Vertex_attribs::p_n_tc_ts>& vertex,
+		float length, const cg::float3& strand_curr_direction) noexcept;
+
 	Vertex(const cg::float3& position, const cg::float3& normal, 
 		const cg::float2& tex_coord, const cg::float4& tangent_h,
 		const cg::float3& strand_curr_direction) noexcept;
+
 
 	cg::float3 position;
 	cg::float3 strand_rest_position;
@@ -26,7 +30,10 @@ struct Vertex {
 class Model_geometry_data final {
 public:
 
-	Model_geometry_data(const std::vector<Vertex>& vertices, std::initializer_list<uint32_t> indices);
+	Model_geometry_data(const std::vector<Vertex>& vertices, 
+		std::initializer_list<uint32_t> indices);
+
+	Model_geometry_data(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 
 	Model_geometry_data(const Model_geometry_data&) = delete;
 
@@ -96,6 +103,9 @@ public:
 
 private:
 
+	Model_geometry_data(const std::vector<Vertex>& vertices);
+
+
 	std::vector<float> _vertex_data;
 	std::vector<uint32_t> _index_data;
 	size_t _vertex_byte_count;
@@ -105,6 +115,23 @@ private:
 	size_t _tangent_h_byte_offset;
 	size_t _strand_rest_position_byte_offset;
 	size_t _strand_curr_position_byte_offset;
+};
+
+class Arbitrary_model final {
+public:
+
+	Arbitrary_model(float fur_length, const char* filename);
+
+	Arbitrary_model(float fur_length, const std::string& filename) 
+		: Arbitrary_model(fur_length, filename.c_str()) 
+	{}
+
+	Model_geometry_data get_geometry_data() const;
+
+private:
+
+	std::vector<Vertex> _vertices;
+	std::vector<uint32_t> _indices;
 };
 
 class Square_model final {
