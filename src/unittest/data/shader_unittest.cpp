@@ -18,38 +18,38 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		Glsl_compute_data ct0;
-		Assert::IsTrue(ct0.compute_shader_source_code.empty());
+		Glsl_compute_data cd0;
+		Assert::IsTrue(cd0.compute_shader_source_code.empty());
 
 		std::string compute_srt = "abc";
-		Glsl_compute_data ct1(compute_srt);
-		Assert::AreEqual(compute_srt, ct1.compute_shader_source_code);
+		Glsl_compute_data cd1(compute_srt);
+		Assert::AreEqual(compute_srt, cd1.compute_shader_source_code);
 
-		Glsl_compute_data ct2("abc");
-		Assert::AreEqual("abc", ct2.compute_shader_source_code.c_str());
+		Glsl_compute_data cd2("abc");
+		Assert::AreEqual("abc", cd2.compute_shader_source_code.c_str());
 
 		// copy ctor
-		Glsl_compute_data ct_c = ct2;
-		Assert::AreEqual(ct2.compute_shader_source_code, ct_c.compute_shader_source_code);
+		Glsl_compute_data cd_c = cd2;
+		Assert::AreEqual(cd2.compute_shader_source_code, cd_c.compute_shader_source_code);
 
 		// move ctor
-		Glsl_compute_data ct_m = std::move(ct_c);
-		Assert::AreEqual(ct2.compute_shader_source_code, ct_m.compute_shader_source_code);
-		Assert::IsTrue(ct_c.compute_shader_source_code.empty());
+		Glsl_compute_data cd_m = std::move(cd_c);
+		Assert::AreEqual(cd2.compute_shader_source_code, cd_m.compute_shader_source_code);
+		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
 	}
 
 	TEST_METHOD(assignments)
 	{
-		Glsl_compute_data ct("abc");
+		Glsl_compute_data cd("abc");
 
-		Glsl_compute_data ct_c;
-		ct_c = ct;
-		Assert::AreEqual(ct.compute_shader_source_code, ct_c.compute_shader_source_code);
+		Glsl_compute_data cd_c;
+		cd_c = cd;
+		Assert::AreEqual(cd.compute_shader_source_code, cd_c.compute_shader_source_code);
 
-		Glsl_compute_data ct_m;
-		ct_m = std::move(ct_c);
-		Assert::AreEqual(ct.compute_shader_source_code, ct_m.compute_shader_source_code);
-		Assert::IsTrue(ct_c.compute_shader_source_code.empty());
+		Glsl_compute_data cd_m;
+		cd_m = std::move(cd_c);
+		Assert::AreEqual(cd.compute_shader_source_code, cd_m.compute_shader_source_code);
+		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
 	}
 };
 
@@ -205,6 +205,18 @@ public:
 
 TEST_CLASS(cg_data_shader_Funcs) {
 public:
+
+	TEST_METHOD(load_glsl_compute_data)
+	{
+		using cg::data::load_glsl_compute_data;
+		using cg::data::load_text;
+
+		Assert::ExpectException<std::exception&>([] { load_glsl_compute_data("unknown_file"); });
+
+		auto cd = load_glsl_compute_data(Filenames::not_real_compute_glsl);
+		auto expected_compute_source = load_text(Filenames::not_real_compute_glsl);
+		Assert::AreEqual(expected_compute_source, cd.compute_shader_source_code);
+	}
 
 	TEST_METHOD(load_glsl_program_data)
 	{

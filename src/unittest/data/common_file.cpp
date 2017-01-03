@@ -7,6 +7,7 @@ const std::string Filenames::ascii_single_line("../data/unittest/ascii_single_li
 const std::string Filenames::empty_file("../data/unittest/empty_file");
 const std::string Filenames::not_real_glsl_program_name("../data/unittest/not_real");
 const std::string Filenames::not_real_code_hlsl("../data/unittest/not_real_code.hlsl");
+const std::string Filenames::not_real_compute_glsl("../data/unittest/not_real.compute.glsl");
 const std::string Filenames::not_real_vertex_glsl("../data/unittest/not_real.vertex.glsl");
 const std::string Filenames::not_real_fragment_glsl("../data/unittest/not_real.fragment.glsl");
 const std::string Filenames::tga_gayscale_r_compressed_rect_3x2("../data/unittest/tga_gayscale_r_compressed_rect_3x2.tga");

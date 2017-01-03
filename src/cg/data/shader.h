@@ -108,6 +108,13 @@ struct Hlsl_shader_set_data final {
 };
 
 
+Glsl_compute_data load_glsl_compute_data(const char* filename);
+
+inline Glsl_compute_data load_glsl_compute_data(const std::string& filename)
+{
+	return load_glsl_compute_data(filename.c_str());
+}
+
 // Loads all found glsl shader source code files.
 // Each file name is constructed as: filename + .<shader_type> + .glsl
 // Vertex & fragment shaders are required. If vertex or fragment source code file does not exist 

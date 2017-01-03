@@ -12,15 +12,15 @@ using cg::data::load_text;
 namespace cg {
 namespace data {
 
-Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
+Glsl_compute_data load_glsl_compute_data(const char* filename)
 {
-	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));
-	Hlsl_shader_set_data data;
+	ENFORCE(exists(filename),
+		EXCEPTION_MSG("The specified glsl file '", filename, "' does not exist."));
 
-	data.source_code = load_text(filename);
-	data.source_filename = filename;
+	Glsl_compute_data compute_data;
+	compute_data.compute_shader_source_code = load_text(filename);
 
-	return data;
+	return compute_data;
 }
 
 Glsl_program_data load_glsl_program_data(const char* filename)
@@ -59,6 +59,17 @@ Glsl_program_data load_glsl_program_data(const char* vertex_shader_filename, con
 	glsl_data.fragment_shader_source_code = load_text(fragment_shader_filename);
 
 	return glsl_data;
+}
+
+Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
+{
+	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));
+	Hlsl_shader_set_data data;
+
+	data.source_code = load_text(filename);
+	data.source_filename = filename;
+
+	return data;
 }
 
 } // namespace data
