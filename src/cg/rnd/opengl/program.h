@@ -16,6 +16,8 @@ public:
 
 	Glsl_program() noexcept = default;
 
+	Glsl_program(const std::string& name, const cg::data::Glsl_compute_data& compute_data);
+
 	Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data);
 
 	Glsl_program(const Glsl_program&) = delete;
@@ -65,6 +67,8 @@ private:
 	void dispose() noexcept;
 
 	GLint get_property(GLenum prop) const noexcept;
+
+	void validate();
 
 	GLuint _id = Invalid::glsl_program_id;
 	std::string _name;

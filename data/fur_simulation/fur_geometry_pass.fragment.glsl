@@ -23,5 +23,5 @@ void main()
 	float length_ndc = length(diff_ndc);
 
 	rt_geometry = diffuse_rgb;
-	rt_strand_data = vec4(length_ndc, length_ndc, length_ndc, 1);
+	rt_strand_data = vec4(dir_ndc.xy, length_ndc, 1);
 }

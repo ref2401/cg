@@ -48,6 +48,7 @@ public:
 
 		Assert::IsTrue(is_valid_shader_type(GL_VERTEX_SHADER));
 		Assert::IsTrue(is_valid_shader_type(GL_FRAGMENT_SHADER));
+		Assert::IsTrue(is_valid_shader_type(GL_COMPUTE_SHADER));
 
 		Assert::IsFalse(is_valid_shader_type(GL_NONE));
 		Assert::IsFalse(is_valid_shader_type(GL_TEXTURE_2D));

@@ -13,6 +13,30 @@ namespace opengl {
 
 // ----- Glsl_program -----
 
+Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_compute_data& compute_data)
+	: _name(name)
+{
+	assert(!name.empty());
+	assert(!compute_data.compute_shader_source_code.empty());
+
+	try {
+		Shader shader(GL_COMPUTE_SHADER, compute_data.compute_shader_source_code);
+
+		_id = glCreateProgram();
+		glAttachShader(_id, shader.id());
+		glLinkProgram(_id);
+		glDetachShader(_id, shader.id()); // once shaders have been linked into a program they are no longer needed.
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
+
+		dispose();
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+
+	validate();
+}
+
 Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data)
 	: _name(name)
 {
@@ -39,22 +63,7 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 		std::throw_with_nested(std::runtime_error(exc_msg));
 	}
 
-	if (!linked()) {
-		std::string msg_log = log();
-		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log);
-
-		dispose();
-		throw std::runtime_error(exc_msg);
-	}
-
-	glValidateProgram(_id);
-	if (!valid()) {
-		std::string msg_log = log();
-		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log);
-
-		dispose();
-		throw std::runtime_error(exc_msg);
-	}
+	validate();
 }
 
 Glsl_program::Glsl_program(Glsl_program&& prog) noexcept
@@ -149,6 +158,26 @@ bool Glsl_program::valid() const noexcept
 	return get_property(GL_VALIDATE_STATUS) != 0;
 }
 
+void Glsl_program::validate()
+{
+	if (!linked()) {
+		std::string msg_log = log();
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log);
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+
+	glValidateProgram(_id);
+	if (!valid()) {
+		std::string msg_log = log();
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log);
+
+		dispose();
+		throw std::runtime_error(exc_msg);
+	}
+}
+
 // ----- Shader -----
 
 Shader::Shader(GLenum type, const std::string& source_code)
@@ -173,6 +202,10 @@ Shader::Shader(GLenum type, const std::string& source_code)
 
 		case GL_FRAGMENT_SHADER:
 			type_name = "Fragment";
+			break;
+
+		case GL_COMPUTE_SHADER:
+			type_name = "Compute";
 			break;
 	}
 		
@@ -275,7 +308,8 @@ bool is_valid_shader_property(GLenum value) noexcept
 bool is_valid_shader_type(GLenum value) noexcept
 {
 	return (value == GL_VERTEX_SHADER)
-		|| (value == GL_FRAGMENT_SHADER);
+		|| (value == GL_FRAGMENT_SHADER)
+		|| (value == GL_COMPUTE_SHADER);
 }
 
 void set_uniform(GLint location, unsigned int val) noexcept

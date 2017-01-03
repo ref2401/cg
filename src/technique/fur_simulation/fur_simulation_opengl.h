@@ -133,9 +133,32 @@ public:
 private:
 
 	Gbuffer& _gbuffer;
-	Fur_geometry_pass_program _program;
+	Geometry_pass_program _program;
 	Framebuffer _fbo;
 
+};
+
+class Fur_spread_pass final {
+public:
+
+	Fur_spread_pass(Gbuffer& gbuffer);
+
+	Fur_spread_pass(const Fur_spread_pass&) = delete;
+
+	Fur_spread_pass(Fur_spread_pass&&) = delete;
+
+
+	Fur_spread_pass& operator=(const Fur_spread_pass&) = delete;
+
+	Fur_spread_pass& operator=(Fur_spread_pass&&) = delete;
+
+
+	void perform() noexcept;
+
+private:
+
+	Gbuffer& _gbuffer;
+	Fur_spread_pass_program _program;
 };
 
 class Fur_simulation_opengl_example_2 final : public cg::sys::Example {
@@ -185,6 +208,7 @@ private:
 	// render
 	Gbuffer _gbuffer;
 	Geometry_pass _geometry_pass;
+	Fur_spread_pass _fur_spread_pass;
 };
 
 

@@ -342,11 +342,28 @@ void Geometry_pass::end() noexcept
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
 
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT1);
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height, 
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+// ----- Fur_spread_pass -----
+
+Fur_spread_pass::Fur_spread_pass(Gbuffer& gbuffer)
+	: _gbuffer(gbuffer)
+{
+
+}
+
+void Fur_spread_pass::perform() noexcept
+{
+	_program.bind();
+
+	glBindImageTexture(0, _gbuffer.tex_geometry().id(), 0, true, 0, GL_READ_WRITE, GL_RGBA8);
+	glBindImageTexture(1, _gbuffer.tex_strand_data().id(), 0, true, 0, GL_READ_ONLY, GL_RGBA32F);
+	glDispatchCompute(1, 1, 1);
 }
 
 // ----- Fur_simulation_opengl_example_2 -----
@@ -356,7 +373,8 @@ Fur_simulation_opengl_example_2::Fur_simulation_opengl_example_2(const cg::sys::
 	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	_gbuffer(app_ctx.window.viewport_size()),
-	_geometry_pass(_gbuffer)
+	_geometry_pass(_gbuffer),
+	_fur_spread_pass(_gbuffer)
 {
 	init_materials();
 	init_model();
@@ -469,6 +487,8 @@ void Fur_simulation_opengl_example_2::render(float interpolation_factor)
 	_geometry_pass.begin(_projection_matrix, view_matrix, _model_matrix);
 	glDrawElements(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, nullptr);
 	_geometry_pass.end();
+
+	_fur_spread_pass.perform();
 
 	_prev_viewpoint = _curr_viewpoint;
 }
