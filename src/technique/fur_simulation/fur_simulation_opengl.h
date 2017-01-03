@@ -62,6 +62,51 @@ private:
 	Texture_2d _tex_fur_mask;
 };
 
+class Fur_simulation_opengl_example2 final : public cg::sys::Example {
+public:
+
+	explicit Fur_simulation_opengl_example2(const cg::sys::App_context& app_ctx);
+	
+
+	void on_mouse_move() override;
+
+	void on_window_resize() override;
+
+	void render(float interpolation_factor) override;
+
+	void update(float dt) override;
+
+private:
+
+	void update_projection_matrix();
+
+	// camera
+	mat4 _projection_matrix;
+	cg::Viewpoint _curr_viewpoint;
+	cg::Viewpoint _prev_viewpoint;
+	float2 _view_roll_angles;
+	float2 _prev_mouse_pos_ndc;
+};
+
+class Geometry_pass final {
+public:
+
+	Geometry_pass();
+
+	Geometry_pass(const Geometry_pass&) = delete;
+
+	Geometry_pass(Geometry_pass&&) = delete;
+
+
+	Geometry_pass& operator=(const Geometry_pass&) = delete;
+
+	Geometry_pass& operator=(Geometry_pass&&) = delete;
+
+private:
+
+
+};
+
 } // fur_simulation
 
 #endif // TECHNIQUE_FUR_SIMULATION_FUR_SIMULATION_OPENGL_H_

@@ -104,16 +104,16 @@ void Fur_simulation_opengl_example::init_materials()
 		_hair_material.shell_count = 32;
 	}
 
-	//{ // sheep material
-	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-	//	_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-	//	_sheep_material.shadow_factor_power = 1.0f;
-	//	_sheep_material.threshold_power = 1.5f;
-	//	_sheep_material.curl_radius = 0.006f;
-	//	_sheep_material.curl_frequency = 10.0f;
-	//	_sheep_material.tex_coord_factor = 1.0f;
-	//	_sheep_material.shell_count = 32;
-	//}
+	{ // sheep material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+		_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_sheep_material.shadow_factor_power = 1.0f;
+		_sheep_material.threshold_power = 1.5f;
+		_sheep_material.curl_radius = 0.006f;
+		_sheep_material.curl_frequency = 10.0f;
+		_sheep_material.tex_coord_factor = 1.0f;
+		_sheep_material.shell_count = 32;
+	}
 }
 
 void Fur_simulation_opengl_example::init_model()
@@ -281,6 +281,90 @@ void Fur_simulation_opengl_example::update(float dt)
 }
 
 void Fur_simulation_opengl_example::update_projection_matrix()
+{
+	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
+		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
+}
+
+// ----- Fur_simulation_opengl_example2 -----
+
+Fur_simulation_opengl_example2::Fur_simulation_opengl_example2(const cg::sys::App_context& app_ctx)
+	: Example(app_ctx),
+	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
+	_prev_viewpoint(_curr_viewpoint)
+{
+
+}
+
+void Fur_simulation_opengl_example2::on_mouse_move()
+{
+	if (!_app_ctx.mouse.middle_down()) return;
+
+	float2 pos_ndc = _app_ctx.mouse.get_ndc_position(_app_ctx.window.viewport_size());
+	float2 offset_ndc = pos_ndc - _prev_mouse_pos_ndc;
+	if (offset_ndc == float2::zero) return;
+
+	_prev_mouse_pos_ndc = pos_ndc;
+
+	bool y_offset_satisfies = !approx_equal(offset_ndc.y, 0.f, 0.01f);
+	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, ((y_offset_satisfies) ? 0.01f : 0.001f));
+
+	// mouse offset by x means rotation around OY (yaw)
+	if (x_offset_satisfies) {
+		_view_roll_angles.y += (offset_ndc.x > 0.f) ? -pi_64 : pi_64;
+	}
+
+	// mouse offset by x means rotation around OX (pitch)
+	if (y_offset_satisfies) {
+		_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
+	}
+}
+
+void Fur_simulation_opengl_example2::on_window_resize()
+{
+	auto vp_size = _app_ctx.window.viewport_size();
+	glViewport(0, 0, vp_size.width, vp_size.height);
+	update_projection_matrix();
+}
+
+void Fur_simulation_opengl_example2::render(float interpolation_factor)
+{
+	float3 view_position = lerp(_prev_viewpoint.position, _curr_viewpoint.position, interpolation_factor);
+	mat4 view_matrix = ::view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
+	mat4 projection_view_matrix = _projection_matrix* view_matrix;
+
+	_prev_viewpoint = _curr_viewpoint;
+}
+
+void Fur_simulation_opengl_example2::update(float dt)
+{
+	if (_view_roll_angles != float2::zero) {
+		float dist = _curr_viewpoint.distance();
+		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+		ox.y = 0.0f; // ox is always parallel the world's OX.
+		ox = normalize(ox);
+
+		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
+			quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+
+			ox = rotate(q, ox);
+			ox.y = 0.0f;
+			ox = normalize(ox);
+		}
+
+		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
+			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
+			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
+		}
+
+		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
+	}
+
+	_view_roll_angles = float2::zero;
+}
+
+void Fur_simulation_opengl_example2::update_projection_matrix()
 {
 	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
 		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
