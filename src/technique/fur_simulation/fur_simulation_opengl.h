@@ -59,7 +59,16 @@ private:
 	Material _hair_material;
 	Material _sheep_material;
 	float3 _light_dir_ws; // dir to light
-	Texture_2d _tex_fur_mask;
+	Texture_2d_immut _tex_fur_mask;
+};
+
+
+class Fur_render_data final {
+public:
+
+private:
+
+
 };
 
 class Fur_simulation_opengl_example2 final : public cg::sys::Example {
@@ -104,6 +113,7 @@ public:
 
 private:
 
+	Framebuffer _fbo;
 
 };
 

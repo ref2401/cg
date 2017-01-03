@@ -94,32 +94,33 @@ public:
 	virtual uint2 size() const noexcept = 0;
 };
 
-class Texture_2d final : public virtual Texture_2d_i {
+// Texture_2d_immut represents a 2D texture with immutable storage.
+class Texture_2d_immut final : public virtual Texture_2d_i {
 public:
 
-	Texture_2d() noexcept = default;
+	Texture_2d_immut() noexcept = default;
 
-	Texture_2d(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept;
+	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept;
 
-	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
 
-	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 		cg::data::Image_2d& image) noexcept;
 
-	Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 		const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept;
 
-	Texture_2d(const Texture_2d&) = delete;
+	Texture_2d_immut(const Texture_2d_immut&) = delete;
 
-	Texture_2d(Texture_2d&& tex) noexcept;
+	Texture_2d_immut(Texture_2d_immut&& tex) noexcept;
 
-	~Texture_2d() noexcept;
+	~Texture_2d_immut() noexcept;
 
 
-	Texture_2d& operator=(const Texture_2d&) = delete;
+	Texture_2d_immut& operator=(const Texture_2d_immut&) = delete;
 
-	Texture_2d& operator=(Texture_2d&& tex) noexcept;
+	Texture_2d_immut& operator=(Texture_2d_immut&& tex) noexcept;
 
 
 	// Texture's unique id.
@@ -178,26 +179,27 @@ public:
 	virtual uint3 size() const noexcept = 0;
 };
 
-class Texture_3d final : Texture_3d_i {
+// Texture_3d_immut represents a 3D texture with immutable storage.
+class Texture_3d_immut final : Texture_3d_i {
 public:
 
-	Texture_3d() noexcept = default;
+	Texture_3d_immut() noexcept = default;
 
-	Texture_3d(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept;
+	Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept;
 
-	Texture_3d(GLenum internal_format, size_t mipmap_level_count,
+	Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count,
 		const Sampler_desc& sampler_desc, const uint3& size) noexcept;
 
-	Texture_3d(const Texture_3d&) = delete;
+	Texture_3d_immut(const Texture_3d_immut&) = delete;
 
-	Texture_3d(Texture_3d&& tex) noexcept;
+	Texture_3d_immut(Texture_3d_immut&& tex) noexcept;
 
-	~Texture_3d() noexcept;
+	~Texture_3d_immut() noexcept;
 
 
-	Texture_3d& operator=(const Texture_3d&) = delete;
+	Texture_3d_immut& operator=(const Texture_3d_immut&) = delete;
 
-	Texture_3d& operator=(Texture_3d&& tex) noexcept;
+	Texture_3d_immut& operator=(Texture_3d_immut&& tex) noexcept;
 
 
 	// Texture's unique id.

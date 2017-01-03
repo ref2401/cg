@@ -10,7 +10,7 @@ using namespace cg::rnd::opengl;
 namespace fur_simulation {
 
 struct Material final {
-	Texture_2d tex_diffuse_rgb;
+	Texture_2d_immut tex_diffuse_rgb;
 	float shadow_factor_power = 1.0f;
 	float threshold_power = 1.0f;
 	float curl_radius = 0.0f;

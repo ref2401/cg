@@ -3,6 +3,7 @@
 
 #include "cg/rnd/rnd.h"
 #include "cg/rnd/opengl/buffer.h"
+#include "cg/rnd/opengl/fbo.h"
 #include "cg/rnd/opengl/glcorearb.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/program.h"

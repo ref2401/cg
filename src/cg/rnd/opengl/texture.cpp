@@ -50,9 +50,9 @@ void Sampler::dispose() noexcept
 	_id = Invalid::sampler_id;
 }
 
-// ----- Texture_2d -----
+// ----- Texture_2d_immut -----
 
-Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept 
+Texture_2d_immut::Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept
 	: _internal_format(internal_format),
 	_mipmap_level_count(mipmap_level_count),
 	_size(size)
@@ -65,9 +65,9 @@ Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count, const 
 	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, _size.width, _size.height);
 }
 
-Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count, 
+Texture_2d_immut::Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 	const Sampler_desc& sampler_desc, const uint2& size) noexcept 
-	: Texture_2d(internal_format, mipmap_level_count, size)
+	: Texture_2d_immut(internal_format, mipmap_level_count, size)
 {
 	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
@@ -76,23 +76,23 @@ Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);
 }
 
-Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+Texture_2d_immut::Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 	cg::data::Image_2d& image) noexcept
-	: Texture_2d(internal_format, mipmap_level_count, image.size())
+	: Texture_2d_immut(internal_format, mipmap_level_count, image.size())
 {
 	assert(image.format() != Image_format::none);
 	write(0, uint2::zero, image);
 }
 
-Texture_2d::Texture_2d(GLenum internal_format, size_t mipmap_level_count,
+Texture_2d_immut::Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
 	const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept
-	: Texture_2d(internal_format, mipmap_level_count, sampler_desc, image.size())
+	: Texture_2d_immut(internal_format, mipmap_level_count, sampler_desc, image.size())
 {
 	assert(image.format() != Image_format::none);
 	write(0, uint2::zero, image);
 }
 
-Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
+Texture_2d_immut::Texture_2d_immut(Texture_2d_immut&& tex) noexcept :
 	_id(tex._id),
 	_internal_format(tex._internal_format),
 	_mipmap_level_count(tex._mipmap_level_count),
@@ -104,12 +104,12 @@ Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
 	tex._size = uint2::zero;
 }
 
-Texture_2d::~Texture_2d() noexcept
+	Texture_2d_immut::~Texture_2d_immut() noexcept
 {
 	dispose();
 }
 
-Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
+Texture_2d_immut& Texture_2d_immut::operator=(Texture_2d_immut&& tex) noexcept
 {
 	if (this == &tex) return *this;
 
@@ -127,7 +127,7 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 	return *this;
 }
 
-void Texture_2d::dispose() noexcept
+void Texture_2d_immut::dispose() noexcept
 {
 	if (_id == Invalid::texture_id) return;
 
@@ -136,7 +136,7 @@ void Texture_2d::dispose() noexcept
 	_internal_format = GL_NONE;
 }
 
-void Texture_2d::write(size_t mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept
+void Texture_2d_immut::write(size_t mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept
 {
 	assert(_id != Invalid::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
@@ -154,9 +154,9 @@ void Texture_2d::write(size_t mipmap_level, const uint2& offset, const cg::data:
 		image.data());
 }
 
-// ----- Texture_3d -----
+// ----- Texture_3d_immut -----
 
-Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept
+Texture_3d_immut::Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept
 	: _internal_format(internal_format),
 	_mipmap_level_count(mipmap_level_count),
 	_size(size)
@@ -170,9 +170,9 @@ Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count, const 
 		_size.width, _size.height, _size.depth);
 }
 
-Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count,
+Texture_3d_immut::Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count,
 	const Sampler_desc& sampler_desc, const uint3& size) noexcept
-	: Texture_3d(internal_format, mipmap_level_count, size)
+	: Texture_3d_immut(internal_format, mipmap_level_count, size)
 {
 	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
@@ -181,7 +181,7 @@ Texture_3d::Texture_3d(GLenum internal_format, size_t mipmap_level_count,
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);
 }
 
-Texture_3d::Texture_3d(Texture_3d&& tex) noexcept :
+Texture_3d_immut::Texture_3d_immut(Texture_3d_immut&& tex) noexcept :
 	_id(tex._id),
 	_internal_format(tex._internal_format),
 	_mipmap_level_count(tex._mipmap_level_count),
@@ -193,12 +193,12 @@ Texture_3d::Texture_3d(Texture_3d&& tex) noexcept :
 	tex._size = uint3::zero;
 }
 
-Texture_3d::~Texture_3d() noexcept
+Texture_3d_immut::~Texture_3d_immut() noexcept
 {
 	dispose();
 }
 
-Texture_3d& Texture_3d::operator=(Texture_3d&& tex) noexcept
+Texture_3d_immut& Texture_3d_immut::operator=(Texture_3d_immut&& tex) noexcept
 {
 	if (this == &tex) return *this;
 
@@ -216,7 +216,7 @@ Texture_3d& Texture_3d::operator=(Texture_3d&& tex) noexcept
 	return *this;
 }
 
-void Texture_3d::dispose() noexcept
+void Texture_3d_immut::dispose() noexcept
 {
 	if (_id == Invalid::texture_id) return;
 
@@ -225,7 +225,7 @@ void Texture_3d::dispose() noexcept
 	_internal_format = GL_NONE;
 }
 
-void Texture_3d::write(size_t mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept
+void Texture_3d_immut::write(size_t mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept
 {
 	assert(_id != Invalid::texture_id);
 	assert(mipmap_level < _mipmap_level_count);

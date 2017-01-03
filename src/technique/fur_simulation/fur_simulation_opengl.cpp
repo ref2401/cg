@@ -35,12 +35,12 @@ void Fur_simulation_opengl_example::init_materials()
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
 	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
-	_tex_fur_mask = Texture_2d(GL_R8, 1, linear_sampler, image_fur_mask);
+	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, linear_sampler, image_fur_mask);
 
 	
 	//{ // cat material
 	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-	//	_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_cat_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 	//	_cat_material.shadow_factor_power = 1.1f;
 	//	_cat_material.threshold_power = 0.6f;
 	//	_cat_material.curl_radius = 0.01f;
@@ -51,7 +51,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	//{ // curly red material
 	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
-	//	_curly_red_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_curly_red_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 	//	_curly_red_material.shadow_factor_power = 0.6f;
 	//	_curly_red_material.threshold_power = 0.6f;
 	//	_curly_red_material.curl_radius = 0.2f;
@@ -62,7 +62,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	//{ // sheep material
 	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-	//	_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+	//	_sheep_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 	//	_sheep_material.shadow_factor_power = 1.0f;
 	//	_sheep_material.threshold_power = 1.0f;
 	//	_sheep_material.curl_radius = 0.16f;
@@ -73,7 +73,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_cat_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_cat_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 		_cat_material.shadow_factor_power = 1.1f;
 		_cat_material.threshold_power = 0.6f;
 		_cat_material.curl_radius = 0.01f;
@@ -84,7 +84,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	{ // curly red material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
-		_curly_red_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_curly_red_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 		_curly_red_material.shadow_factor_power = 0.6f;
 		_curly_red_material.threshold_power = 0.6f;
 		_curly_red_material.curl_radius = 0.01f;
@@ -95,7 +95,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	{ // hair material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_hair_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_hair_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 		_hair_material.shadow_factor_power = 2.0f;
 		_hair_material.threshold_power = 0.05f;
 		_hair_material.curl_radius = 0.07f;
@@ -106,7 +106,7 @@ void Fur_simulation_opengl_example::init_materials()
 
 	{ // sheep material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-		_sheep_material.tex_diffuse_rgb = Texture_2d(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_sheep_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 		_sheep_material.shadow_factor_power = 1.0f;
 		_sheep_material.threshold_power = 1.5f;
 		_sheep_material.curl_radius = 0.006f;
