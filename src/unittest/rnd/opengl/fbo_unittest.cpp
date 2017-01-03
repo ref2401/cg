@@ -30,7 +30,7 @@ public:
 		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT6));
 		Assert::IsTrue(is_valid_color_attachment(GL_COLOR_ATTACHMENT7));
 
-		Assert::IsFalse(is_valid_color_attachment(GL_RGB));
+		Assert::IsFalse(is_valid_color_attachment(GL_NONE));
 		Assert::IsFalse(is_valid_color_attachment(GL_TEXTURE_2D));
 	}
 };
