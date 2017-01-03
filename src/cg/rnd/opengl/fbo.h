@@ -41,9 +41,6 @@ public:
 		return _internal_format;
 	}
 
-	// Reallocates a new storage for the renderbuffer object.
-	void reallocate_storage(GLenum internal_format, const cg::uint2& size) noexcept;
-
 	//  Size of the renderbuffer in pixels.
 	cg::uint2 size() const noexcept
 	{
@@ -51,12 +48,14 @@ public:
 	}
 
 	// Sets the new size of the renderbuffer. 
-	// Internally calls the reallocate_storage method. 
 	void set_size(const cg::uint2& size) noexcept;
 
 private:
 
 	void dispose() noexcept;
+
+	// Reallocates a new storage for the renderbuffer object.
+	void reallocate_storage(GLenum internal_format, const cg::uint2& size) noexcept;
 
 	GLuint _id = Invalid::renderbuffer_id;
 	GLenum _internal_format = GL_NONE;
@@ -81,13 +80,13 @@ public:
 	Framebuffer& operator=(Framebuffer&& fb) noexcept;
 
 	// Attaches a texture as color attachment.
-	void attach_color_target(GLenum color_attachment, const Texture_2d_i& texture, size_t mipmap_index = 0) noexcept;
+	void attach_color_target(GLenum color_attachment, const Texture_2d_i& texture, GLuint mipmap_index = 0) noexcept;
 
 	// Attaches a renderbuffer as depth atatchment.
 	void attach_depth_target(const Renderbuffer& rnd_buff) noexcept;
 
 	// Attaches a texture as depth attachment.
-	void attach_depth_target(const Texture_2d_i& texture, size_t mipmap_index = 0) noexcept;
+	void attach_depth_target(const Texture_2d_i& texture, GLuint mipmap_index = 0) noexcept;
 
 	// Clears color texture attachment point.
 	void detach_color_target(GLenum color_attachment) noexcept;

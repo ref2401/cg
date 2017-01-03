@@ -60,6 +60,32 @@ private:
 	GLint _g_tex_coord_factor_location = Invalid::uniform_location;
 };
 
+class Fur_geometry_pass_program final {
+public:
+
+	Fur_geometry_pass_program();
+
+	Fur_geometry_pass_program(const Fur_geometry_pass_program&) = delete;
+
+	Fur_geometry_pass_program(Fur_geometry_pass_program&&) = delete;
+
+
+	Fur_geometry_pass_program& operator=(const Fur_geometry_pass_program&) = delete;
+
+	Fur_geometry_pass_program& operator=(Fur_geometry_pass_program&&) = delete;
+
+
+	void bind(const cg::mat4& projection_matrix, const cg::mat4& view_matrix, 
+		const cg::mat4& model_matrix);
+
+private:
+	
+	Glsl_program _program;
+	GLint _g_projection_matrix_location = Invalid::uniform_location;
+	GLint _g_view_matrix_location = Invalid::uniform_location;
+	GLint _g_model_matrix_location = Invalid::uniform_location;
+};
+
 class Opaque_model_program final {
 public:
 

@@ -62,19 +62,95 @@ private:
 	Texture_2d_immut _tex_fur_mask;
 };
 
+// ----- Fur_simulation_opengl_example_2 stuff -----
 
-class Fur_render_data final {
+// Common data shared between passes.
+class Gbuffer final {
 public:
+
+	Gbuffer(const uint2& viewport_size) noexcept;
+
+	Gbuffer(const Gbuffer&) = delete;
+
+	Gbuffer(Gbuffer&&) = delete;
+
+
+	Gbuffer& operator=(const Gbuffer&) = delete;
+
+	Gbuffer* operator=(Gbuffer&&) = delete;
+
+
+	void resize(const uint2& viewport_size) noexcept;
+
+	const Renderbuffer& depth_renderbuffer() const noexcept
+	{
+		return _depth_renderbuffer;
+	}
+
+	const Texture_2d_i& tex_geometry() const noexcept
+	{
+		return _tex_geometry;
+	}
+
+	const Texture_2d_i& tex_strand_data() const noexcept
+	{
+		return _tex_strand_data;
+	}
+
+	uint2 viewport_size() const noexcept
+	{
+		return _viewport_size;
+	}
 
 private:
 
+	uint2 _viewport_size;
+	Texture_2d _tex_geometry;
+	Texture_2d _tex_strand_data;
+	Renderbuffer _depth_renderbuffer;
+};
+
+class Geometry_pass final {
+public:
+
+	Geometry_pass(Gbuffer& fur_render_data);
+
+	Geometry_pass(const Geometry_pass&) = delete;
+
+	Geometry_pass(Geometry_pass&&) = delete;
+
+
+	Geometry_pass& operator=(const Geometry_pass&) = delete;
+
+	Geometry_pass& operator=(Geometry_pass&&) = delete;
+
+
+	void begin(const mat4& projection_matrix, const mat4& view_matrix,
+		const mat4& model_matrix) noexcept;
+
+	void end() noexcept;
+
+private:
+
+	Gbuffer& _gbuffer;
+	Fur_geometry_pass_program _program;
+	Framebuffer _fbo;
 
 };
 
-class Fur_simulation_opengl_example2 final : public cg::sys::Example {
+class Fur_simulation_opengl_example_2 final : public cg::sys::Example {
 public:
 
-	explicit Fur_simulation_opengl_example2(const cg::sys::App_context& app_ctx);
+	explicit Fur_simulation_opengl_example_2(const cg::sys::App_context& app_ctx);
+
+	Fur_simulation_opengl_example_2(const Fur_simulation_opengl_example_2&) = delete;
+
+	Fur_simulation_opengl_example_2(Fur_simulation_opengl_example_2&&) = delete;
+
+
+	Fur_simulation_opengl_example_2& operator=(const Fur_simulation_opengl_example_2&) = delete;
+
+	Fur_simulation_opengl_example_2& operator=(Fur_simulation_opengl_example_2&&) = delete;
 	
 
 	void on_mouse_move() override;
@@ -87,6 +163,10 @@ public:
 
 private:
 
+	void init_materials();
+
+	void init_model();
+
 	void update_projection_matrix();
 
 	// camera
@@ -95,27 +175,19 @@ private:
 	cg::Viewpoint _prev_viewpoint;
 	float2 _view_roll_angles;
 	float2 _prev_mouse_pos_ndc;
+	// model
+	GLuint _vao_id = Invalid::vao_id;
+	Buffer_gpu _vertex_buffer;
+	Buffer_gpu _index_buffer;
+	size_t _model_index_count;
+	mat4 _model_matrix;
+	Texture_2d_immut _tex_diffuse_rgb;
+	// render
+	Gbuffer _gbuffer;
+	Geometry_pass _geometry_pass;
 };
 
-class Geometry_pass final {
-public:
 
-	Geometry_pass();
-
-	Geometry_pass(const Geometry_pass&) = delete;
-
-	Geometry_pass(Geometry_pass&&) = delete;
-
-
-	Geometry_pass& operator=(const Geometry_pass&) = delete;
-
-	Geometry_pass& operator=(Geometry_pass&&) = delete;
-
-private:
-
-	Framebuffer _fbo;
-
-};
 
 } // fur_simulation
 

@@ -135,10 +135,6 @@ public:
 		return _mipmap_level_count;
 	}
 
-	// Reallocates a new mutable storage for this texture object.
-	// Previous texture's contents will be lost.
-	void reallocate_storage(GLenum internal_format, GLuint mipmap_level_count, uint2 size) noexcept;
-
 	// Texture's size in texels.
 	uint2 size() const noexcept override
 	{
@@ -146,12 +142,15 @@ public:
 	}
 
 	// Resizes the texture object. Preserves texture's format and mipmap count.
-	// Internally calls the reallocate_storage method. 
 	void set_size(const uint2& size) noexcept;
 
 private:
 
 	void dispose() noexcept;
+
+	// Reallocates a new mutable storage for this texture object.
+	// Previous texture's contents will be lost.
+	void reallocate_storage(GLenum internal_format, GLuint mipmap_level_count, uint2 size) noexcept;
 
 	GLuint _id = Invalid::texture_id;
 	GLenum _internal_format = GL_NONE;
