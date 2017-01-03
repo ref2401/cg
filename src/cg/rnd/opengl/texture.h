@@ -88,10 +88,75 @@ public:
 	virtual GLenum internal_format() const noexcept = 0;
 
 	// How many mipmaps the texture has.
-	virtual size_t mipmap_level_count() const noexcept = 0;
+	virtual GLuint mipmap_level_count() const noexcept = 0;
 
 	// Texture's size in texels.
 	virtual uint2 size() const noexcept = 0;
+};
+
+// Texture_2d represents a 2D texture with mutable storage.
+class Texture_2d final : public Texture_2d_i {
+public:
+
+	Texture_2d() noexcept = default;
+
+	Texture_2d(GLenum internal_format, GLuint mipmap_level_count, const uint2& size) noexcept;
+
+	Texture_2d(GLenum internal_format, GLuint mipmap_level_count,
+		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
+
+	Texture_2d(const Texture_2d&) = delete;
+
+	Texture_2d(Texture_2d&& tex) noexcept;
+
+	~Texture_2d() noexcept;
+
+
+	Texture_2d& operator=(const Texture_2d&) = delete;
+
+	Texture_2d& operator=(Texture_2d&& tex) noexcept;
+
+
+	// Texture's unique id.
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+	// Sized texel format that is used to store texture data.
+	GLenum internal_format() const noexcept override
+	{
+		return _internal_format;
+	}
+
+	// How many mipmaps the texture has.
+	size_t mipmap_level_count() const noexcept override
+	{
+		return _mipmap_level_count;
+	}
+
+	// Reallocates a new mutable storage for this texture object.
+	// Previous texture's contents will be lost.
+	void reallocate_storage(GLenum internal_format, GLuint mipmap_level_count, uint2 size) noexcept;
+
+	// Texture's size in texels.
+	uint2 size() const noexcept override
+	{
+		return _size;
+	}
+
+	// Resizes the texture object. Preserves texture's format and mipmap count.
+	// Internally calls the reallocate_storage method. 
+	void set_size(const uint2& size) noexcept;
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::texture_id;
+	GLenum _internal_format = GL_NONE;
+	GLuint _mipmap_level_count = 0;
+	uint2 _size;
 };
 
 // Texture_2d_immut represents a 2D texture with immutable storage.
@@ -100,15 +165,15 @@ public:
 
 	Texture_2d_immut() noexcept = default;
 
-	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count, const uint2& size) noexcept;
+	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count, const uint2& size) noexcept;
 
-	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
 		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
 
-	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
 		cg::data::Image_2d& image) noexcept;
 
-	Texture_2d_immut(GLenum internal_format, size_t mipmap_level_count,
+	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
 		const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept;
 
 	Texture_2d_immut(const Texture_2d_immut&) = delete;
@@ -148,7 +213,7 @@ public:
 	}
 
 
-	void write(size_t mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept;
+	void write(GLuint mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept;
 
 private:
 
@@ -156,7 +221,7 @@ private:
 
 	GLuint _id = Invalid::texture_id;
 	GLenum _internal_format = GL_NONE;
-	size_t _mipmap_level_count = 0;
+	GLuint _mipmap_level_count = 0;
 	uint2 _size;
 };
 
@@ -173,7 +238,7 @@ public:
 	virtual GLenum internal_format() const noexcept = 0;
 
 	// How many mipmaps the texture has.
-	virtual size_t mipmap_level_count() const noexcept = 0;
+	virtual GLuint mipmap_level_count() const noexcept = 0;
 
 	// Texture's size in texels.
 	virtual uint3 size() const noexcept = 0;
@@ -185,9 +250,9 @@ public:
 
 	Texture_3d_immut() noexcept = default;
 
-	Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count, const uint3& size) noexcept;
+	Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_count, const uint3& size) noexcept;
 
-	Texture_3d_immut(GLenum internal_format, size_t mipmap_level_count,
+	Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_count,
 		const Sampler_desc& sampler_desc, const uint3& size) noexcept;
 
 	Texture_3d_immut(const Texture_3d_immut&) = delete;
@@ -215,7 +280,7 @@ public:
 	}
 
 	// How many mipmaps the texture has.
-	size_t mipmap_level_count() const noexcept override
+	GLuint mipmap_level_count() const noexcept override
 	{
 		return _mipmap_level_count;
 	}
@@ -226,7 +291,7 @@ public:
 		return _size;
 	}
 
-	void write(size_t mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept;
+	void write(GLuint mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept;
 
 private:
 
@@ -234,7 +299,7 @@ private:
 
 	GLuint _id = Invalid::texture_id;
 	GLenum _internal_format = GL_NONE;
-	size_t _mipmap_level_count = 0;
+	GLuint _mipmap_level_count = 0;
 	uint3 _size;
 };
 
