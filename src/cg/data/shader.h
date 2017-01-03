@@ -8,6 +8,22 @@
 namespace cg {
 namespace data {
 
+struct Glsl_compute_data final {
+
+	Glsl_compute_data() = default;
+
+	Glsl_compute_data(const std::string& compute_shader_source_code)
+		: compute_shader_source_code(compute_shader_source_code)
+	{}
+
+	Glsl_compute_data(const char* compute_shader_source_code)
+		: compute_shader_source_code(compute_shader_source_code)
+	{}
+
+
+	std::string compute_shader_source_code;
+};
+
 // Glsl_program_data struct stores all required params which are used in glsl shader creation process.
 struct Glsl_program_data {
 

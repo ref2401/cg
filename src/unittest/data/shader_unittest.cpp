@@ -5,12 +5,53 @@
 #include "unittest/data/common_file.h"
 #include "CppUnitTest.h"
 
+using cg::data::Glsl_compute_data;
 using cg::data::Glsl_program_data;
 using cg::data::Hlsl_shader_set_data;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace unittest {
+
+TEST_CLASS(cg_data_shader_Glsl_compute_data) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		Glsl_compute_data ct0;
+		Assert::IsTrue(ct0.compute_shader_source_code.empty());
+
+		std::string compute_srt = "abc";
+		Glsl_compute_data ct1(compute_srt);
+		Assert::AreEqual(compute_srt, ct1.compute_shader_source_code);
+
+		Glsl_compute_data ct2("abc");
+		Assert::AreEqual("abc", ct2.compute_shader_source_code.c_str());
+
+		// copy ctor
+		Glsl_compute_data ct_c = ct2;
+		Assert::AreEqual(ct2.compute_shader_source_code, ct_c.compute_shader_source_code);
+
+		// move ctor
+		Glsl_compute_data ct_m = std::move(ct_c);
+		Assert::AreEqual(ct2.compute_shader_source_code, ct_m.compute_shader_source_code);
+		Assert::IsTrue(ct_c.compute_shader_source_code.empty());
+	}
+
+	TEST_METHOD(assignments)
+	{
+		Glsl_compute_data ct("abc");
+
+		Glsl_compute_data ct_c;
+		ct_c = ct;
+		Assert::AreEqual(ct.compute_shader_source_code, ct_c.compute_shader_source_code);
+
+		Glsl_compute_data ct_m;
+		ct_m = std::move(ct_c);
+		Assert::AreEqual(ct.compute_shader_source_code, ct_m.compute_shader_source_code);
+		Assert::IsTrue(ct_c.compute_shader_source_code.empty());
+	}
+};
 
 TEST_CLASS(cg_data_shader_Glsl_program_data) {
 public:
