@@ -128,6 +128,7 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 	assert(_mipmap_level_count == 1); // > 1 not implemented
 
 	glBindTexture(GL_TEXTURE_2D, _id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.f);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internal_format,
@@ -159,6 +160,7 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
 	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, _size.width, _size.height);
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
 Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,

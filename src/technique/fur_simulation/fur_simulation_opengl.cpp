@@ -54,7 +54,7 @@ void Fur_simulation_opengl_example::init_materials()
 	//	_curly_red_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 	//	_curly_red_material.shadow_factor_power = 0.6f;
 	//	_curly_red_material.threshold_power = 0.6f;
-	//	_curly_red_material.curl_radius = 0.2f;
+	//	_curly_red_material.curl_radius = 0.4f;
 	//	_curly_red_material.curl_frequency = 4.0f;
 	//	_curly_red_material.tex_coord_factor = 8.0f;
 	//	_curly_red_material.shell_count = 32;
@@ -290,7 +290,8 @@ void Fur_simulation_opengl_example::update_projection_matrix()
 
 Gbuffer::Gbuffer(const uint2& viewport_size) noexcept
 	: _viewport_size(viewport_size),
-	_tex_geometry(GL_RGB8, 1, viewport_size),
+	_tex_fur(GL_RGBA32F, 1, viewport_size),
+	_tex_geometry(GL_RGBA32F, 1, viewport_size),
 	_tex_strand_data(GL_RGBA32F, 1, viewport_size),
 	_depth_renderbuffer(GL_DEPTH_COMPONENT32F, viewport_size)
 {}
@@ -300,6 +301,7 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 	assert(greater_than(viewport_size, 0));
 
 	_viewport_size = viewport_size;
+	_tex_fur.set_size(viewport_size);
 	_tex_geometry.set_size(viewport_size);
 	_tex_strand_data.set_size(viewport_size);
 	_depth_renderbuffer.set_size(viewport_size);
@@ -341,12 +343,6 @@ void Geometry_pass::end() noexcept
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
-
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height, 
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 // ----- Fur_spread_pass -----
@@ -354,16 +350,49 @@ void Geometry_pass::end() noexcept
 Fur_spread_pass::Fur_spread_pass(Gbuffer& gbuffer)
 	: _gbuffer(gbuffer)
 {
-
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_fur());
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.validate();
 }
 
 void Fur_spread_pass::perform() noexcept
 {
 	_program.bind();
 
-	glBindImageTexture(0, _gbuffer.tex_geometry().id(), 0, true, 0, GL_READ_WRITE, GL_RGBA8);
-	glBindImageTexture(1, _gbuffer.tex_strand_data().id(), 0, true, 0, GL_READ_ONLY, GL_RGBA32F);
-	glDispatchCompute(1, 1, 1);
+	/*glBindImageTexture(0, _gbuffer.tex_geometry().id(), 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindTextureUnit(1, _gbuffer.tex_strand_data().id());
+	glDispatchCompute(_gbuffer.tex_geometry().size().width, _gbuffer.tex_geometry().size().height, 1);
+	glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);*/
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
+	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBindTextureUnit(0, _gbuffer.tex_geometry().id());
+	glBindTextureUnit(1, _gbuffer.tex_strand_data().id());
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+// ----- Final_pass -----
+
+Final_pass::Final_pass(Gbuffer& gbuffer)
+	: _gbuffer(gbuffer)
+{
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_fur());
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.validate();
+}
+
+void Final_pass::perform() noexcept
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
+
+	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 // ----- Fur_simulation_opengl_example_2 -----
@@ -374,7 +403,8 @@ Fur_simulation_opengl_example_2::Fur_simulation_opengl_example_2(const cg::sys::
 	_prev_viewpoint(_curr_viewpoint),
 	_gbuffer(app_ctx.window.viewport_size()),
 	_geometry_pass(_gbuffer),
-	_fur_spread_pass(_gbuffer)
+	_fur_spread_pass(_gbuffer),
+	_final_pass(_gbuffer)
 {
 	init_materials();
 	init_model();
@@ -472,6 +502,7 @@ void Fur_simulation_opengl_example_2::on_window_resize()
 	auto vp_size = _app_ctx.window.viewport_size();
 	update_projection_matrix();
 	_gbuffer.resize(vp_size);
+	glViewport(0, 0, vp_size.width, vp_size.height);
 }
 
 void Fur_simulation_opengl_example_2::render(float interpolation_factor)
@@ -489,6 +520,7 @@ void Fur_simulation_opengl_example_2::render(float interpolation_factor)
 	_geometry_pass.end();
 
 	_fur_spread_pass.perform();
+	_final_pass.perform();
 
 	_prev_viewpoint = _curr_viewpoint;
 }

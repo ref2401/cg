@@ -105,6 +105,7 @@ public:
 
 private:
 
+	Glsl_program _compute_program;
 	Glsl_program _program;
 };
 

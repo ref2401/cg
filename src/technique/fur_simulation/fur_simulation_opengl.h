@@ -87,6 +87,11 @@ public:
 		return _depth_renderbuffer;
 	}
 
+	const Texture_2d_i& tex_fur() const noexcept
+	{
+		return _tex_fur;
+	}
+
 	const Texture_2d_i& tex_geometry() const noexcept
 	{
 		return _tex_geometry;
@@ -105,6 +110,7 @@ public:
 private:
 
 	uint2 _viewport_size;
+	Texture_2d _tex_fur;
 	Texture_2d _tex_geometry;
 	Texture_2d _tex_strand_data;
 	Renderbuffer _depth_renderbuffer;
@@ -158,7 +164,31 @@ public:
 private:
 
 	Gbuffer& _gbuffer;
+	Framebuffer _fbo;
 	Fur_spread_pass_program _program;
+};
+
+class Final_pass final {
+public:
+
+	Final_pass(Gbuffer& gbuffer);
+
+	Final_pass(const Final_pass&) = delete;
+
+	Final_pass(Final_pass&&) = delete;
+
+
+	Final_pass& operator=(const Final_pass&) = delete;
+
+	Final_pass& operator=(Final_pass&&) = delete;
+
+
+	void perform() noexcept;
+
+private:
+
+	Gbuffer& _gbuffer;
+	Framebuffer _fbo;
 };
 
 class Fur_simulation_opengl_example_2 final : public cg::sys::Example {
@@ -209,6 +239,7 @@ private:
 	Gbuffer _gbuffer;
 	Geometry_pass _geometry_pass;
 	Fur_spread_pass _fur_spread_pass;
+	Final_pass _final_pass;
 };
 
 

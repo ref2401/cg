@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fur_simulation", "fur_simul
 		..\data\fur_simulation\fur_geometry_pass.fragment.glsl = ..\data\fur_simulation\fur_geometry_pass.fragment.glsl
 		..\data\fur_simulation\fur_geometry_pass.vertex.glsl = ..\data\fur_simulation\fur_geometry_pass.vertex.glsl
 		..\data\fur_simulation\fur_spread_pass.compute.glsl = ..\data\fur_simulation\fur_spread_pass.compute.glsl
+		..\data\fur_simulation\fur_spread_pass.fragment.glsl = ..\data\fur_simulation\fur_spread_pass.fragment.glsl
+		..\data\fur_simulation\fur_spread_pass.vertex.glsl = ..\data\fur_simulation\fur_spread_pass.vertex.glsl
 		..\data\fur_simulation\opaque_model.fragment.glsl = ..\data\fur_simulation\opaque_model.fragment.glsl
 		..\data\fur_simulation\opaque_model.vertex.glsl = ..\data\fur_simulation\opaque_model.vertex.glsl
 	EndProjectSection

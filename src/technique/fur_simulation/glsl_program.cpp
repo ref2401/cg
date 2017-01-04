@@ -80,12 +80,16 @@ void Fur_generation_program::set_params(GLuint index) noexcept
 
 Fur_spread_pass_program::Fur_spread_pass_program()
 {
-	auto glsl_source = cg::data::load_glsl_compute_data("../data/fur_simulation/fur_spread_pass.compute.glsl");
-	_program = Glsl_program("fur-geometry-pass", glsl_source);
+	//auto glsl_source = cg::data::load_glsl_compute_data("../data/fur_simulation/fur_spread_pass.compute.glsl");
+	//_compute_program = Glsl_program("fur-spread-pass-compute", glsl_source);
+
+	auto glsl_source = cg::data::load_glsl_program_data("../data/fur_simulation/fur_spread_pass");
+	_program = Glsl_program("fur-spread-pass", glsl_source);
 }
 
 void Fur_spread_pass_program::bind() noexcept
 {
+	//glUseProgram(_compute_program.id());
 	glUseProgram(_program.id());
 }
 

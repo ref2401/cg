@@ -3,7 +3,7 @@
 layout(binding = 0) uniform sampler2D tex_diffuse_rgb;
 
 
-layout(location = 0) out vec3 rt_geometry;
+layout(location = 0) out vec4 rt_geometry;
 layout(location = 1) out vec4 rt_strand_data;
 
 in VS_result{
@@ -22,6 +22,6 @@ void main()
 	vec3 dir_ndc = normalize(diff_ndc);
 	float length_ndc = length(diff_ndc);
 
-	rt_geometry = diffuse_rgb;
-	rt_strand_data = vec4(dir_ndc.xy, length_ndc, 1);
+	rt_geometry = vec4(diffuse_rgb, 1);
+	rt_strand_data = vec4(dir_ndc, length_ndc);
 }
