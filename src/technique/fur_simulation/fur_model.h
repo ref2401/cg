@@ -97,6 +97,79 @@ public:
 		return _render_buffer;
 	}
 
+	// p0 is stored in physics_input_buffer
+	size_t p0_byte_offset() const noexcept
+	{
+		return 0;
+	}
+
+	// p1 is stored in physics_input_buffer
+	size_t p1_byte_offset() const noexcept
+	{
+		return p0_byte_offset() + sizeof(float) * 4; // 3 (p0) + 1 (mass)
+	}
+
+	// p2 is stored in physics_output_buffer
+	size_t p2_byte_offset() const noexcept
+	{
+		return 0;
+	}
+
+	// normal is stored in render_buffer
+	size_t normal_byte_offset() const noexcept
+	{
+		return 0;
+	}
+
+	// tex_coord is stored in render_buffer
+	size_t tex_coord_byte_offset() const noexcept
+	{
+		return normal_byte_offset() + sizeof(float) * 3;
+	}
+
+	// tangent_h is strored in render_buffer
+	size_t tangent_h_byte_offset() const noexcept
+	{
+		return tex_coord_byte_offset() + sizeof(float) * 2;
+	}
+
+
+	size_t physics_input_buffer_byte_count() const noexcept
+	{
+		return sizeof(float) * _physics_input_buffer.size();
+	}
+
+	size_t physics_input_buffer_byte_stride() const noexcept
+	{
+		return sizeof(float) * 8; // 3(p0) + 1(mass) + 3(p1) + 1(k)
+	}
+
+	size_t physics_output_buffer_byte_count() const noexcept
+	{
+		return sizeof(float) * _physics_output_buffer.size();
+	}
+
+	size_t physics_output_buffer_byte_stride() const noexcept
+	{
+		return sizeof(float) * 3; // 3(p2)
+	}
+
+	size_t render_buffer_byte_count() const noexcept
+	{
+		return sizeof(float) * _render_buffer.size();
+	}
+	
+	size_t render_buffer_byte_stride() const noexcept
+	{
+		return sizeof(float) * 9; // 3(normal) + 2(tex_coord) + 4(tangent_h)
+	}
+
+	size_t index_buffer_byte_count() const noexcept
+	{
+		return sizeof(uint32_t) * _index_buffer.size();
+	}
+
+
 
 	void push_back_physics_input(const cg::float3& p0, float mass, const cg::float3& p1, float k);
 

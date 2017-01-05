@@ -36,6 +36,17 @@ private:
 
 	void init_model();
 
+	void init_model_11();
+
+	void init_physics_input_buffer(GLuint physics_vao_id, GLuint render_vao_id, 
+		const Model_geometry_data_1& geometry_data);
+
+	void init_physics_output_buffer(GLuint physics_vao_id, GLuint render_vao_id,
+		const Model_geometry_data_1& geometry_data);
+
+	void init_render_buffer(GLuint render_vao_id,
+		const Model_geometry_data_1& geometry_data);
+
 	void update_projection_matrix();
 
 	Opaque_model_program _glsl_opaque_model;
@@ -47,9 +58,15 @@ private:
 	float2 _view_roll_angles;
 	float2 _prev_mouse_pos_ndc;
 	// model data
+	GLuint _physics_vao_id = Invalid::vao_id;
+	GLuint _render_vao_id = Invalid::vao_id;
 	GLuint _vao_id = Invalid::vao_id;
 	Buffer_gpu _vertex_buffer;
 	Buffer_gpu _index_buffer;
+	Buffer_gpu _physics_input_buffer;
+	Buffer_gpu _physics_output_buffer;
+	Buffer_gpu _render_buffer;
+	Model_rnd_params _model_rnd_params;
 	size_t _model_index_count;
 	mat4 _model_matrix;
 	// fur rendering

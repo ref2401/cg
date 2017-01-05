@@ -19,7 +19,8 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	_prev_viewpoint(_curr_viewpoint),
 	_light_dir_ws(normalize(float3(50, 1, 100.0)))
 {
-	init_model();
+	init_model_11();
+	//init_model();
 	init_materials();
 	_curr_material = &_cat_material;
 
@@ -118,10 +119,6 @@ void Fur_simulation_opengl_example::init_materials()
 
 void Fur_simulation_opengl_example::init_model()
 {
-	auto model_data = load_fur_model(0.3f, 1.0f, 1.0f, "../data/sphere-20x20.obj");
-
-	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-
 	//Square_model model;
 	Arbitrary_model model(0.2f, "../data/sphere-20x20.obj");
 	//Arbitrary_model model(5.0f, "c:/dev/meshes/mod_head_default.obj");
@@ -168,9 +165,122 @@ void Fur_simulation_opengl_example::init_model()
 	glVertexArrayAttribBinding(_vao_id, 5, vb_binding_index);
 	glVertexArrayAttribFormat(_vao_id, 5, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
 
+	
+}
+
+void Fur_simulation_opengl_example::init_model_11()
+{
+	_model_matrix = scale_matrix<mat4>(float3(2.0f));
+
+	auto model_data = load_fur_model(0.3f, 1.0f, 1.0f, "../data/sphere-20x20.obj");
+	auto geometry_data = std::move(model_data.first);
+	_model_rnd_params = std::move(model_data.second);
+
+	glCreateVertexArrays(1, &_physics_vao_id);
+	glCreateVertexArrays(1, &_render_vao_id);
+
+	init_physics_input_buffer(_physics_vao_id, _render_vao_id, geometry_data);
+	init_physics_output_buffer(_physics_vao_id, _render_vao_id, geometry_data);
+	init_render_buffer(_render_vao_id, geometry_data);
+
 	// index buffer
-	_index_buffer = Buffer_gpu(geometry_data.index_data_byte_count(), geometry_data.index_data().data());
+	_index_buffer = Buffer_gpu(geometry_data.index_buffer_byte_count(), geometry_data.index_buffer().data());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.id());
+}
+
+void Fur_simulation_opengl_example::init_physics_input_buffer(GLuint physics_vao_id, GLuint render_vao_id, 
+	const Model_geometry_data_1& geometry_data)
+{
+	constexpr GLuint physics_input_binding_index = 0;
+	_physics_input_buffer = Buffer_gpu(
+		geometry_data.physics_input_buffer_byte_count(),
+		geometry_data.physics_input_buffer().data());
+
+	//// physics_vao_id
+	//glBindVertexArray(physics_vao_id);
+	//glVertexArrayVertexBuffer(physics_vao_id, physics_input_binding_index, _physics_input_buffer.id(), 0,
+	//	geometry_data.physics_input_buffer_byte_stride());
+
+	//// p0 + mass
+	//glEnableVertexArrayAttrib(physics_vao_id, 0);
+	//glVertexArrayAttribBinding(physics_vao_id, 0, physics_input_binding_index);
+	//glVertexArrayAttribFormat(physics_vao_id, 0, 4, GL_FLOAT, false, geometry_data.p0_byte_offset());
+
+	//// p1 + k
+	//glEnableVertexArrayAttrib(physics_vao_id, 1);
+	//glVertexArrayAttribBinding(physics_vao_id, 1, physics_input_binding_index);
+	//glVertexArrayAttribFormat(physics_vao_id, 1, 4, GL_FLOAT, false, geometry_data.p0_byte_offset());
+
+
+	// render_vao_id
+	glBindVertexArray(render_vao_id);
+	glVertexArrayVertexBuffer(render_vao_id, physics_input_binding_index, _physics_input_buffer.id(), 0,
+		geometry_data.physics_input_buffer_byte_stride());
+
+	// p0
+	glEnableVertexArrayAttrib(render_vao_id, 0);
+	glVertexArrayAttribBinding(render_vao_id, 0, physics_input_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 0, 3, GL_FLOAT, false, geometry_data.p0_byte_offset());
+
+	// p1
+	glEnableVertexArrayAttrib(render_vao_id, 1);
+	glVertexArrayAttribBinding(render_vao_id, 1, physics_input_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 1, 3, GL_FLOAT, false, geometry_data.p1_byte_offset());
+}
+
+void Fur_simulation_opengl_example::init_physics_output_buffer(GLuint physics_vao_id, GLuint render_vao_id,
+	const Model_geometry_data_1& geometry_data)
+{
+	constexpr GLuint physics_output_binding_index = 1;
+	_physics_output_buffer = Buffer_gpu(
+		geometry_data.physics_output_buffer_byte_count(),
+		geometry_data.physics_output_buffer().data());
+
+	//// physics_vao_id
+	//glBindVertexArray(physics_vao_id);
+	//glVertexArrayVertexBuffer(physics_vao_id, physics_output_binding_index, _physics_output_buffer.id(), 0,
+	//	geometry_data.physics_output_buffer_byte_stride());
+	// transform feedback
+
+
+	// render_vao_id
+	glBindVertexArray(render_vao_id);
+	glVertexArrayVertexBuffer(render_vao_id, physics_output_binding_index, _physics_output_buffer.id(), 0,
+		geometry_data.physics_output_buffer_byte_stride());
+	
+	// p2
+	glEnableVertexArrayAttrib(render_vao_id, 2);
+	glVertexArrayAttribBinding(render_vao_id, 2, physics_output_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 2, 3, GL_FLOAT, false, geometry_data.p2_byte_offset());
+}
+
+void Fur_simulation_opengl_example::init_render_buffer(GLuint render_vao_id,
+	const Model_geometry_data_1& geometry_data)
+{
+	constexpr GLuint render_binding_index = 2;
+	_render_buffer = Buffer_gpu(
+		geometry_data.render_buffer_byte_count(),
+		geometry_data.render_buffer().data());
+
+	// render_vao_id
+	glBindVertexArray(render_vao_id);
+	glVertexArrayVertexBuffer(render_vao_id, render_binding_index, _render_buffer.id(), 0,
+		geometry_data.render_buffer_byte_stride());
+
+	// normal
+	glEnableVertexArrayAttrib(render_vao_id, 3);
+	glVertexArrayAttribBinding(render_vao_id, 3, render_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 3, 3, GL_FLOAT, false, geometry_data.normal_byte_offset());
+
+	// tex_coord
+	glEnableVertexArrayAttrib(render_vao_id, 4);
+	glVertexArrayAttribBinding(render_vao_id, 4, render_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 4, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
+
+	// normal
+	glEnableVertexArrayAttrib(render_vao_id, 5);
+	glVertexArrayAttribBinding(render_vao_id, 5, render_binding_index);
+	glVertexArrayAttribFormat(render_vao_id, 5, 4, GL_FLOAT, false, geometry_data.tangent_h_byte_offset());
 }
 
 void Fur_simulation_opengl_example::on_keyboard()
@@ -230,7 +340,7 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClearColor(color.r, color.g, color.b, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(_vao_id);
+	glBindVertexArray(_render_vao_id);
 	glBindTextureUnit(0, _curr_material->tex_diffuse_rgb.id());
 	glBindTextureUnit(1, _tex_fur_mask.id());
 
@@ -239,12 +349,16 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 
 	//glDrawElementsInstanced(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, 
 	//	nullptr, _curr_material->shell_count);
-	for (size_t i = 0; i < _curr_material->shell_count; ++i) {
-		_glsl_fur_generation.set_params(i);
-		glDrawElements(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, nullptr);
+	for (size_t si = 0; si < _curr_material->shell_count; ++si) {
+		_glsl_fur_generation.set_params(si);
+
+		for (size_t mi = 0; mi < _model_rnd_params.meshes().size(); ++mi) {
+			glDrawElements(GL_TRIANGLES, _model_rnd_params.meshes()[mi].index_count, GL_UNSIGNED_INT, nullptr);
+		}
 	}
 
 	_prev_viewpoint = _curr_viewpoint;
+	glBindVertexArray(_render_vao_id);
 }
 
 void Fur_simulation_opengl_example::update(float dt)

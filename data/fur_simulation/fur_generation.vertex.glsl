@@ -13,11 +13,11 @@ uniform float g_curl_frequency;
 
 
 layout(location = 0) in vec3 vert_position;
-layout(location = 1) in vec3 vert_normal;
-layout(location = 2) in vec2 vert_tex_coord;
-layout(location = 3) in vec4 vert_tangent_h;
-layout(location = 4) in vec3 vert_strand_rest_position;
-layout(location = 5) in vec3 vert_strand_curr_position;
+layout(location = 1) in vec3 vert_strand_rest_position;
+layout(location = 2) in vec3 vert_strand_curr_position;
+layout(location = 3) in vec3 vert_normal;
+layout(location = 4) in vec2 vert_tex_coord;
+layout(location = 5) in vec4 vert_tangent_h;
 
 out VS_result {
 	vec3 normal_ws;

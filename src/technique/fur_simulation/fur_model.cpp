@@ -62,7 +62,8 @@ void Model_rnd_params::push_back_mesh(size_t vertex_count, size_t base_vertex,
 Model_geometry_data_1::Model_geometry_data_1(Model_geometry_data_1&& m) noexcept
 	: _physics_input_buffer(std::move(m._physics_input_buffer)),
 	_physics_output_buffer(std::move(m._physics_output_buffer)),
-	_render_buffer(std::move(m._render_buffer))
+	_render_buffer(std::move(m._render_buffer)),
+	_index_buffer(std::move(m._index_buffer))
 {}
 
 Model_geometry_data_1& Model_geometry_data_1::operator=(Model_geometry_data_1&& m) noexcept
@@ -72,6 +73,7 @@ Model_geometry_data_1& Model_geometry_data_1::operator=(Model_geometry_data_1&& 
 	_physics_input_buffer = std::move(m._physics_input_buffer);
 	_physics_output_buffer = std::move(m._physics_output_buffer);
 	_render_buffer = std::move(m._render_buffer);
+	_index_buffer = std::move(m._index_buffer);
 
 	return *this;
 }
@@ -168,7 +170,6 @@ std::pair<Model_geometry_data_1, Model_rnd_params> load_fur_model(
 	return std::pair<Model_geometry_data_1, Model_rnd_params>(
 		std::move(geometry_data), std::move(rnd_params));
 }
-
 
 // ----- Vertex -----
 
