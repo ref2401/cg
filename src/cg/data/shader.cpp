@@ -32,7 +32,7 @@ Glsl_program_data load_glsl_program_data(const char* filename)
 
 	// vertex shader
 	fn.append(filename);
-	fn.append(".vertex.glsl");;
+	fn.append(".vertex.glsl");
 	ENFORCE(exists(fn), EXCEPTION_MSG("The specified glsl file '", fn, "' does not exist."));
 	glsl_data.vertex_shader_source_code = load_text(fn);
 
@@ -40,8 +40,8 @@ Glsl_program_data load_glsl_program_data(const char* filename)
 	fn.clear();
 	fn.append(filename);
 	fn.append(".fragment.glsl");
-	ENFORCE(exists(fn), EXCEPTION_MSG("The specified glsl file '", fn, "' does not exist."));
-	glsl_data.fragment_shader_source_code = load_text(fn);
+	if (exists(fn)) 
+		glsl_data.fragment_shader_source_code = load_text(fn);
 
 	return glsl_data;
 }
@@ -51,12 +51,14 @@ Glsl_program_data load_glsl_program_data(const char* vertex_shader_filename, con
 	ENFORCE(exists(vertex_shader_filename),
 		EXCEPTION_MSG("The specified glsl file '", vertex_shader_filename, "' does not exist."));
 
-	ENFORCE(exists(fragment_shader_filename),
-		EXCEPTION_MSG("The specified glsl file '", fragment_shader_filename, "' does not exist."));
-
 	Glsl_program_data glsl_data;
 	glsl_data.vertex_shader_source_code = load_text(vertex_shader_filename);
-	glsl_data.fragment_shader_source_code = load_text(fragment_shader_filename);
+
+	if (strlen(fragment_shader_filename) > 0) {
+		ENFORCE(exists(fragment_shader_filename),
+			EXCEPTION_MSG("The specified glsl file '", fragment_shader_filename, "' does not exist."));
+		glsl_data.fragment_shader_source_code = load_text(fragment_shader_filename);
+	}
 
 	return glsl_data;
 }

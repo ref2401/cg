@@ -58,48 +58,43 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		Glsl_program_data dt0;
-		Assert::IsTrue(dt0.vertex_shader_source_code.empty());
-		Assert::IsTrue(dt0.fragment_shader_source_code.empty());
+		Glsl_program_data pd0;
+		Assert::IsTrue(pd0.vertex_shader_source_code.empty());
+		Assert::IsTrue(pd0.fragment_shader_source_code.empty());
 
-		std::string vert_srt = "abc";
-		std::string pixel_str = "123";
-		Glsl_program_data dt1(vert_srt, pixel_str);
-		Assert::AreEqual(vert_srt, dt1.vertex_shader_source_code);
-		Assert::AreEqual(pixel_str, dt1.fragment_shader_source_code);
-
-		Glsl_program_data dt2("abc", "123");
-		Assert::AreEqual("abc", dt2.vertex_shader_source_code.c_str());
-		Assert::AreEqual("123", dt2.fragment_shader_source_code.c_str());
+		pd0.vertex_shader_source_code = "abc";
+		pd0.fragment_shader_source_code = "123";
 
 		// copy ctor
-		Glsl_program_data dt_c = dt2;
-		Assert::AreEqual(dt2.vertex_shader_source_code, dt_c.vertex_shader_source_code);
-		Assert::AreEqual(dt2.fragment_shader_source_code, dt_c.fragment_shader_source_code);
+		Glsl_program_data pd_c = pd0;
+		Assert::AreEqual(pd0.vertex_shader_source_code, pd_c.vertex_shader_source_code);
+		Assert::AreEqual(pd0.fragment_shader_source_code, pd_c.fragment_shader_source_code);
 
 		// move ctor
-		Glsl_program_data dt_m = std::move(dt_c);
-		Assert::AreEqual(dt2.vertex_shader_source_code, dt_m.vertex_shader_source_code);
-		Assert::AreEqual(dt2.fragment_shader_source_code, dt_m.fragment_shader_source_code);
-		Assert::IsTrue(dt_c.vertex_shader_source_code.empty());
-		Assert::IsTrue(dt_c.fragment_shader_source_code.empty());
+		Glsl_program_data pd_m = std::move(pd_c);
+		Assert::AreEqual(pd0.vertex_shader_source_code, pd_m.vertex_shader_source_code);
+		Assert::AreEqual(pd0.fragment_shader_source_code, pd_m.fragment_shader_source_code);
+		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
+		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
 	}
 
 	TEST_METHOD(assignments)
 	{
-		Glsl_program_data dt("abc", "123");
+		Glsl_program_data pd;
+		pd.vertex_shader_source_code = "abc";
+		pd.fragment_shader_source_code = "123";
 
-		Glsl_program_data dt_c;
-		dt_c = dt;
-		Assert::AreEqual(dt.vertex_shader_source_code, dt_c.vertex_shader_source_code);
-		Assert::AreEqual(dt.fragment_shader_source_code, dt_c.fragment_shader_source_code);
+		Glsl_program_data pd_c;
+		pd_c = pd;
+		Assert::AreEqual(pd.vertex_shader_source_code, pd_c.vertex_shader_source_code);
+		Assert::AreEqual(pd.fragment_shader_source_code, pd_c.fragment_shader_source_code);
 
-		Glsl_program_data dt_m;
-		dt_m = std::move(dt_c);
-		Assert::AreEqual(dt.vertex_shader_source_code, dt_m.vertex_shader_source_code);
-		Assert::AreEqual(dt.fragment_shader_source_code, dt_m.fragment_shader_source_code);
-		Assert::IsTrue(dt_c.vertex_shader_source_code.empty());
-		Assert::IsTrue(dt_c.fragment_shader_source_code.empty());
+		Glsl_program_data pd_m;
+		pd_m = std::move(pd_c);
+		Assert::AreEqual(pd.vertex_shader_source_code, pd_m.vertex_shader_source_code);
+		Assert::AreEqual(pd.fragment_shader_source_code, pd_m.fragment_shader_source_code);
+		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
+		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
 	}
 
 	TEST_METHOD(has_xxx_shader)
@@ -225,20 +220,31 @@ public:
 
 		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file"); });
 
+		// vertex & fragment
 		auto expected_vertex_source = load_text(Filenames::not_real_vertex_glsl);
 		auto expected_fragment_source = load_text(Filenames::not_real_fragment_glsl);
-		auto dt0 = load_glsl_program_data(Filenames::not_real_glsl_program_name);
-		Assert::AreEqual(expected_vertex_source, dt0.vertex_shader_source_code);
-		Assert::AreEqual(expected_fragment_source, dt0.fragment_shader_source_code);
+		auto pd0 = load_glsl_program_data(Filenames::not_real_glsl_program_name);
+		Assert::AreEqual(expected_vertex_source, pd0.vertex_shader_source_code);
+		Assert::AreEqual(expected_fragment_source, pd0.fragment_shader_source_code);
+
+		// vertex only
+		auto expected_single_vertex_source = load_text(Filenames::not_real_single_vertex_glsl);
+		auto pd1 = load_glsl_program_data(Filenames::not_real_glsl_single_vertex_program_name);
+		Assert::AreEqual(expected_single_vertex_source, pd1.vertex_shader_source_code);
+		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
 
 		// separate filenames
 		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file0", "unknown_file1"); });
 		Assert::ExpectException<std::exception&>([] { load_glsl_program_data(Filenames::not_real_vertex_glsl, "unknown_file1"); });
 		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file0", Filenames::not_real_fragment_glsl); });
 
-		auto dt1 = load_glsl_program_data(Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl);
-		Assert::AreEqual(expected_vertex_source, dt1.vertex_shader_source_code);
-		Assert::AreEqual(expected_fragment_source, dt1.fragment_shader_source_code);
+		auto pd2 = load_glsl_program_data(Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl);
+		Assert::AreEqual(expected_vertex_source, pd2.vertex_shader_source_code);
+		Assert::AreEqual(expected_fragment_source, pd2.fragment_shader_source_code);
+
+		auto pd3 = load_glsl_program_data(Filenames::not_real_single_vertex_glsl, "");
+		Assert::AreEqual(expected_single_vertex_source, pd3.vertex_shader_source_code);
+		Assert::IsTrue(pd3.fragment_shader_source_code.empty());
 	}
 
 	TEST_METHOD(load_hlsl_shader_set_data)

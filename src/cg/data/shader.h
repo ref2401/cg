@@ -29,14 +29,6 @@ struct Glsl_program_data {
 
 	Glsl_program_data() = default;
 
-	Glsl_program_data(const std::string& vertex_shader_source_code, const std::string& fragment_shader_source_code)
-		: vertex_shader_source_code(vertex_shader_source_code), fragment_shader_source_code(fragment_shader_source_code)
-	{}
-
-	Glsl_program_data(const char* vertex_shader_source_code, const char* fragment_shader_source_code)
-		: vertex_shader_source_code(vertex_shader_source_code), fragment_shader_source_code(fragment_shader_source_code)
-	{}
-
 
 	bool has_vertex_shader() const noexcept
 	{
@@ -117,8 +109,8 @@ inline Glsl_compute_data load_glsl_compute_data(const std::string& filename)
 
 // Loads all found glsl shader source code files.
 // Each file name is constructed as: filename + .<shader_type> + .glsl
-// Vertex & fragment shaders are required. If vertex or fragment source code file does not exist 
-// the function will throw.  Won't throw if tesselation or geometry source code files do not exist.
+// Only vertex shader ia required. If vertex ource code file does not exist the function will throw.  
+// Won't throw if tesselation or geometry source code files do not exist.
 // Example:
 //		load_glsl_program_source(../data/shader/blinn_phong);
 //		The constructed filenames are:
@@ -128,8 +120,8 @@ Glsl_program_data load_glsl_program_data(const char* filename);
 
 // Loads all found glsl shader source code files.
 // Each file name is constructed as: filename + .<shader_type> + .glsl
-// Vertex & fragment shaders are required. If vertex or fragment source code file does not exist 
-// the function will throw.  Won't throw if tesselation or geometry source code files do not exist.
+// Only vertex shader ia required. If vertex ource code file does not exist the function will throw.  
+// Won't throw if tesselation or geometry source code files do not exist.
 // Example:
 //		load_glsl_program_source(../data/shader/blinn_phong);
 //		The constructed filenames are:
@@ -141,9 +133,11 @@ inline Glsl_program_data load_glsl_program_data(const std::string& filename)
 }
 
 // Loads the specified glsl shader source code files.
+// Will not throw if fragment_filename is empty.
 Glsl_program_data load_glsl_program_data(const char* vertex_filename, const char* fragment_filename);
 
 // Loads the specified glsl shader source code files.
+// Will not throw if fragment_filename is empty.
 inline Glsl_program_data load_glsl_program_data(const std::string& vertex_filename,
 	const std::string& fragment_filename)
 {

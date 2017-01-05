@@ -17,9 +17,11 @@ public:
 	static const std::string ascii_single_line;
 	static const std::string empty_file;
 	static const std::string not_real_glsl_program_name;
+	static const std::string not_real_glsl_single_vertex_program_name;
 	static const std::string not_real_code_hlsl;
 	static const std::string not_real_compute_glsl;
 	static const std::string not_real_vertex_glsl;
+	static const std::string not_real_single_vertex_glsl;
 	static const std::string not_real_fragment_glsl;
 	static const std::string tga_gayscale_r_compressed_rect_3x2;
 	static const std::string tga_grayscale_r_square_2x2;
