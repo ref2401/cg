@@ -1,11 +1,174 @@
 #include "technique/fur_simulation/fur_model.h"
 
 #include <cassert>
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 using namespace cg;
+using namespace cg::data;
 
 
 namespace fur_simulation {
+
+// ---- Model_rnd_params -----
+
+Model_rnd_params::Model_rnd_params(float length, float mass, float k, size_t mesh_count) noexcept
+	: _length(length), _mass(mass), _k(k)
+{
+	assert(length >= 0.0f);
+	assert(mass >= 0.0f);
+	assert(k > 0.0f);
+	assert(mesh_count > 0);
+
+	_meshes.reserve(mesh_count);
+}
+
+Model_rnd_params::Model_rnd_params(Model_rnd_params&& m) noexcept
+	: _meshes(std::move(m._meshes)),
+	_length(m._length),
+	_mass(m._mass),
+	_k(m._k)
+{
+	m._length = 0.0f;
+	m._mass = 0.0f;
+	m._k = 1.0f;
+}
+
+Model_rnd_params& Model_rnd_params::operator=(Model_rnd_params&& m) noexcept
+{
+	if (this == &m) return *this;
+
+	_meshes = std::move(m._meshes);
+	_length = m._length;
+	_mass = m._mass;
+	_k = m._k;
+
+	m._length = 0.0f;
+	m._mass = 0.0f;
+	m._k = 1.0f;
+
+	return *this;
+}
+
+void Model_rnd_params::push_back_mesh(size_t vertex_count, size_t base_vertex,
+	size_t index_count, size_t index_offset)
+{
+	_meshes.emplace_back(vertex_count, base_vertex, index_count, index_offset);
+}
+
+// ----- Model_geometry_data -----
+
+Model_geometry_data_1::Model_geometry_data_1(Model_geometry_data_1&& m) noexcept
+	: _physics_input_buffer(std::move(m._physics_input_buffer)),
+	_physics_output_buffer(std::move(m._physics_output_buffer)),
+	_render_buffer(std::move(m._render_buffer))
+{}
+
+Model_geometry_data_1& Model_geometry_data_1::operator=(Model_geometry_data_1&& m) noexcept
+{
+	if (this == &m) return *this;
+
+	_physics_input_buffer = std::move(m._physics_input_buffer);
+	_physics_output_buffer = std::move(m._physics_output_buffer);
+	_render_buffer = std::move(m._render_buffer);
+
+	return *this;
+}
+
+void Model_geometry_data_1::push_back_physics_input(const float3& p0, float mass, const float3& p1, float k)
+{
+	_physics_input_buffer.push_back(p0.x);
+	_physics_input_buffer.push_back(p0.y);
+	_physics_input_buffer.push_back(p0.z);
+	_physics_input_buffer.push_back(mass);
+	_physics_input_buffer.push_back(p1.x);
+	_physics_input_buffer.push_back(p1.y);
+	_physics_input_buffer.push_back(p1.z);
+	_physics_input_buffer.push_back(k);
+}
+
+void Model_geometry_data_1::push_back_physics_output(const float3& p2)
+{
+	_physics_output_buffer.push_back(p2.x);
+	_physics_output_buffer.push_back(p2.y);
+	_physics_output_buffer.push_back(p2.z);
+}
+
+void Model_geometry_data_1::push_back_render(const float3& normal, const float2& tex_coord, const float4& tangent_h)
+{
+	_render_buffer.push_back(normal.x);
+	_render_buffer.push_back(normal.y);
+	_render_buffer.push_back(normal.z);
+	_render_buffer.push_back(tex_coord.x);
+	_render_buffer.push_back(tex_coord.y);
+	_render_buffer.push_back(tangent_h.x);
+	_render_buffer.push_back(tangent_h.y);
+	_render_buffer.push_back(tangent_h.z);
+	_render_buffer.push_back(tangent_h.w);
+}
+
+void Model_geometry_data_1::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
+{
+	_index_buffer.push_back(i0);
+	_index_buffer.push_back(i1);
+	_index_buffer.push_back(i2);
+}
+
+// ----- funcs -----
+
+std::pair<Model_geometry_data_1, Model_rnd_params> load_fur_model(
+	float length, float mass, float k, const char* geometry_filename)
+{
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(geometry_filename, aiProcess_ValidateDataStructure
+		| aiProcess_JoinIdenticalVertices | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+	assert(scene->mNumMeshes > 0);
+
+	Model_geometry_data_1 geometry_data;
+	Model_rnd_params rnd_params(length, mass, k, scene->mNumMeshes);
+
+	size_t base_vertex = 0;
+	size_t index_offset = 0;
+
+	// for each mesh
+	for (size_t mi = 0; mi < scene->mNumMeshes; ++mi) {
+		const aiMesh* mesh = scene->mMeshes[mi];
+
+		rnd_params.push_back_mesh(mesh->mNumVertices, base_vertex, mesh->mNumFaces * 3, index_offset);
+
+		// for each vertex of the mesh
+		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
+			float3 p0(mesh->mVertices[vi].x, mesh->mVertices[vi].y, mesh->mVertices[vi].z);
+			float3 normal = normalize(float3(mesh->mNormals[vi].x, mesh->mNormals[vi].y, mesh->mNormals[vi].z));
+			float2 tex_coord(mesh->mTextureCoords[0][vi].x, mesh->mTextureCoords[0][vi].y);
+			float3 tangent = normalize(float3(mesh->mTangents[vi].x, mesh->mTangents[vi].y, mesh->mTangents[vi].z));
+			float3 bitangent = normalize(float3(mesh->mBitangents[vi].x, mesh->mBitangents[vi].y, mesh->mBitangents[vi].z));
+			
+			float3 p1(p0 + length * normal);
+			float3 p2 = p1;
+			float4 tangent_h = compute_tangent_handedness(tangent, bitangent, normal);
+
+			geometry_data.push_back_physics_input(p0, mass, p1, k);
+			geometry_data.push_back_physics_output(p2);
+			geometry_data.push_back_render(normal, tex_coord, tangent_h);
+		}
+
+		for (size_t fi = 0; fi < mesh->mNumFaces; ++fi) {
+			const aiFace& face = mesh->mFaces[fi];
+			assert(face.mNumIndices == 3);
+
+			geometry_data.push_back_indices(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
+		}
+
+		base_vertex += mesh->mNumVertices;
+		index_offset = mesh->mNumFaces * 3;
+	}
+
+	return std::pair<Model_geometry_data_1, Model_rnd_params>(
+		std::move(geometry_data), std::move(rnd_params));
+}
+
 
 // ----- Vertex -----
 

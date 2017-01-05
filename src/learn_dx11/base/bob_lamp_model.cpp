@@ -238,7 +238,7 @@ void Model_animation::update_bone_matrices(float milliseconds, std::vector<float
 Bob_lamp_md5_model::Bob_lamp_md5_model()
 {
 	Assimp::Importer importer;
-	std::underlying_type_t <aiPostProcessSteps> flags = aiProcess_GenNormals
+	std::underlying_type_t<aiPostProcessSteps> flags = aiProcess_GenNormals
 		| aiProcess_JoinIdenticalVertices | aiProcess_ValidateDataStructure;
 
 	const aiScene* scene = importer.ReadFile("../data/models/bob_lamp/bob_lamp.md5mesh", flags);

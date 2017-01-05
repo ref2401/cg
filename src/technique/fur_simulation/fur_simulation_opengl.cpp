@@ -34,7 +34,7 @@ void Fur_simulation_opengl_example::init_materials()
 {
 	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 
-	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-00.tga");
+	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-03.tga");
 	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, linear_sampler, image_fur_mask);
 
 	
@@ -78,8 +78,8 @@ void Fur_simulation_opengl_example::init_materials()
 		_cat_material.threshold_power = 0.6f;
 		_cat_material.curl_radius = 0.01f;
 		_cat_material.curl_frequency = 0.0f;
-		_cat_material.tex_coord_factor = 3.0f;
-		_cat_material.shell_count = 32;
+		_cat_material.tex_coord_factor = 2.0f;
+		_cat_material.shell_count = 16;
 	}
 
 	{ // curly red material
@@ -89,7 +89,7 @@ void Fur_simulation_opengl_example::init_materials()
 		_curly_red_material.threshold_power = 0.6f;
 		_curly_red_material.curl_radius = 0.01f;
 		_curly_red_material.curl_frequency = 4.0f;
-		_curly_red_material.tex_coord_factor = 2.0f;
+		_curly_red_material.tex_coord_factor = 0.5f;
 		_curly_red_material.shell_count = 32;
 	}
 
@@ -100,7 +100,7 @@ void Fur_simulation_opengl_example::init_materials()
 		_hair_material.threshold_power = 0.05f;
 		_hair_material.curl_radius = 0.07f;
 		_hair_material.curl_frequency = 1.0f;
-		_hair_material.tex_coord_factor = 1.0f;
+		_hair_material.tex_coord_factor = 0.5f;
 		_hair_material.shell_count = 32;
 	}
 
@@ -118,10 +118,12 @@ void Fur_simulation_opengl_example::init_materials()
 
 void Fur_simulation_opengl_example::init_model()
 {
+	auto model_data = load_fur_model(0.3f, 1.0f, 1.0f, "../data/sphere-20x20.obj");
+
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
 
 	//Square_model model;
-	Arbitrary_model model(0.3f, "../data/sphere-20x20.obj");
+	Arbitrary_model model(0.2f, "../data/sphere-20x20.obj");
 	//Arbitrary_model model(5.0f, "c:/dev/meshes/mod_head_default.obj");
 	auto geometry_data = model.get_geometry_data();
 	_model_index_count = geometry_data.index_data().size();
@@ -281,279 +283,6 @@ void Fur_simulation_opengl_example::update(float dt)
 }
 
 void Fur_simulation_opengl_example::update_projection_matrix()
-{
-	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
-		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
-}
-
-// ----- Fur_render_data -----
-
-Gbuffer::Gbuffer(const uint2& viewport_size) noexcept
-	: _viewport_size(viewport_size),
-	_tex_fur(GL_RGBA32F, 1, viewport_size),
-	_tex_geometry(GL_RGBA32F, 1, viewport_size),
-	_tex_strand_data(GL_RGBA32F, 1, viewport_size),
-	_depth_renderbuffer(GL_DEPTH_COMPONENT32F, viewport_size)
-{}
-
-void Gbuffer::resize(const uint2& viewport_size) noexcept
-{
-	assert(greater_than(viewport_size, 0));
-
-	_viewport_size = viewport_size;
-	_tex_fur.set_size(viewport_size);
-	_tex_geometry.set_size(viewport_size);
-	_tex_strand_data.set_size(viewport_size);
-	_depth_renderbuffer.set_size(viewport_size);
-}
-
-// ----- Geometry_pass -----
-
-Geometry_pass::Geometry_pass(Gbuffer& gbuffer)
-	: _gbuffer(gbuffer)
-{
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_geometry());
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_strand_data());
-	_fbo.attach_depth_target(_gbuffer.depth_renderbuffer());
-	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
-}
-
-void Geometry_pass::begin(const mat4& projection_matrix, const mat4& view_matrix,
-	const mat4& model_matrix) noexcept
-{
-	glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-	glEnable(GL_DEPTH_TEST);
-
-
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-	
-	static const float4 clear_color(0, 0, 0, 0);
-	glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	_program.bind(projection_matrix, view_matrix, model_matrix);
-}
-
-void Geometry_pass::end() noexcept
-{
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
-}
-
-// ----- Fur_spread_pass -----
-
-Fur_spread_pass::Fur_spread_pass(Gbuffer& gbuffer)
-	: _gbuffer(gbuffer)
-{
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_fur());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.validate();
-}
-
-void Fur_spread_pass::perform() noexcept
-{
-	_program.bind();
-
-	/*glBindImageTexture(0, _gbuffer.tex_geometry().id(), 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
-	glBindTextureUnit(1, _gbuffer.tex_strand_data().id());
-	glDispatchCompute(_gbuffer.tex_geometry().size().width, _gbuffer.tex_geometry().size().height, 1);
-	glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);*/
-
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glBindTextureUnit(0, _gbuffer.tex_geometry().id());
-	glBindTextureUnit(1, _gbuffer.tex_strand_data().id());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-// ----- Final_pass -----
-
-Final_pass::Final_pass(Gbuffer& gbuffer)
-	: _gbuffer(gbuffer)
-{
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_fur());
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.validate();
-}
-
-void Final_pass::perform() noexcept
-{
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo.id());
-
-	glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
-}
-
-// ----- Fur_simulation_opengl_example_2 -----
-
-Fur_simulation_opengl_example_2::Fur_simulation_opengl_example_2(const cg::sys::App_context& app_ctx)
-	: Example(app_ctx),
-	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
-	_prev_viewpoint(_curr_viewpoint),
-	_gbuffer(app_ctx.window.viewport_size()),
-	_geometry_pass(_gbuffer),
-	_fur_spread_pass(_gbuffer),
-	_final_pass(_gbuffer)
-{
-	init_materials();
-	init_model();
-}
-
-void Fur_simulation_opengl_example_2::init_materials()
-{
-	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
-
-	auto image = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-	_tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image);
-}
-
-void Fur_simulation_opengl_example_2::init_model()
-{
-	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-
-	//Square_model model;
-	Arbitrary_model model(0.3f, "../data/sphere-20x20.obj");
-	//Arbitrary_model model(5.0f, "c:/dev/meshes/mod_head_default.obj");
-	auto geometry_data = model.get_geometry_data();
-	_model_index_count = geometry_data.index_data().size();
-
-	glCreateVertexArrays(1, &_vao_id);
-	glBindVertexArray(_vao_id);
-
-	// vertex buffer
-	constexpr GLuint vb_binding_index = 0;
-
-	_vertex_buffer = Buffer_gpu(geometry_data.vertex_data_byte_count(), geometry_data.vertex_data().data());
-	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 0,
-		geometry_data.vertex_byte_count());
-
-	// position
-	glEnableVertexArrayAttrib(_vao_id, 0);
-	glVertexArrayAttribBinding(_vao_id, 0, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 0, 3, GL_FLOAT, false, geometry_data.position_byte_offset());
-
-	// normal
-	glEnableVertexArrayAttrib(_vao_id, 1);
-	glVertexArrayAttribBinding(_vao_id, 1, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 1, 3, GL_FLOAT, false, geometry_data.normal_byte_offset());
-
-	// tex_coord
-	glEnableVertexArrayAttrib(_vao_id, 2);
-	glVertexArrayAttribBinding(_vao_id, 2, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 2, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
-
-	// tangent_h
-	glEnableVertexArrayAttrib(_vao_id, 3);
-	glVertexArrayAttribBinding(_vao_id, 3, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 3, 4, GL_FLOAT, false, geometry_data.tangent_h_byte_offset());
-
-	// strand_rest_position
-	glEnableVertexArrayAttrib(_vao_id, 4);
-	glVertexArrayAttribBinding(_vao_id, 4, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 4, 3, GL_FLOAT, false, geometry_data.strand_rest_position_byte_offset());
-
-	// strand_curr_position
-	glEnableVertexArrayAttrib(_vao_id, 5);
-	glVertexArrayAttribBinding(_vao_id, 5, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 5, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
-
-	// index buffer
-	_index_buffer = Buffer_gpu(geometry_data.index_data_byte_count(), geometry_data.index_data().data());
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.id());
-}
-
-void Fur_simulation_opengl_example_2::on_mouse_move()
-{
-	if (!_app_ctx.mouse.middle_down()) return;
-
-	float2 pos_ndc = _app_ctx.mouse.get_ndc_position(_app_ctx.window.viewport_size());
-	float2 offset_ndc = pos_ndc - _prev_mouse_pos_ndc;
-	if (offset_ndc == float2::zero) return;
-
-	_prev_mouse_pos_ndc = pos_ndc;
-
-	bool y_offset_satisfies = !approx_equal(offset_ndc.y, 0.f, 0.01f);
-	bool x_offset_satisfies = !approx_equal(offset_ndc.x, 0.f, ((y_offset_satisfies) ? 0.01f : 0.001f));
-
-	// mouse offset by x means rotation around OY (yaw)
-	if (x_offset_satisfies) {
-		_view_roll_angles.y += (offset_ndc.x > 0.f) ? -pi_64 : pi_64;
-	}
-
-	// mouse offset by x means rotation around OX (pitch)
-	if (y_offset_satisfies) {
-		_view_roll_angles.x += (offset_ndc.y > 0.f) ? pi_64 : -pi_64;
-	}
-}
-
-void Fur_simulation_opengl_example_2::on_window_resize()
-{
-	auto vp_size = _app_ctx.window.viewport_size();
-	update_projection_matrix();
-	_gbuffer.resize(vp_size);
-	glViewport(0, 0, vp_size.width, vp_size.height);
-}
-
-void Fur_simulation_opengl_example_2::render(float interpolation_factor)
-{
-	float3 view_position = lerp(_prev_viewpoint.position, _curr_viewpoint.position, interpolation_factor);
-	mat4 view_matrix = ::view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
-	mat4 projection_view_matrix = _projection_matrix* view_matrix;
-
-
-	glBindVertexArray(_vao_id);
-	glBindTextureUnit(0, _tex_diffuse_rgb.id());
-
-	_geometry_pass.begin(_projection_matrix, view_matrix, _model_matrix);
-	glDrawElements(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, nullptr);
-	_geometry_pass.end();
-
-	_fur_spread_pass.perform();
-	_final_pass.perform();
-
-	_prev_viewpoint = _curr_viewpoint;
-}
-
-void Fur_simulation_opengl_example_2::update(float dt)
-{
-	if (_view_roll_angles != float2::zero) {
-		float dist = _curr_viewpoint.distance();
-		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
-		ox.y = 0.0f; // ox is always parallel the world's OX.
-		ox = normalize(ox);
-
-		if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-			quat q = from_axis_angle_rotation(float3::unit_y, _view_roll_angles.y);
-			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
-
-			ox = rotate(q, ox);
-			ox.y = 0.0f;
-			ox = normalize(ox);
-		}
-
-		if (!approx_equal(_view_roll_angles.x, 0.0f)) {
-			quat q = from_axis_angle_rotation(ox, _view_roll_angles.x);
-			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
-		}
-
-		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
-	}
-
-	_view_roll_angles = float2::zero;
-}
-
-void Fur_simulation_opengl_example_2::update_projection_matrix()
 {
 	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
 		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
