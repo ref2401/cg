@@ -37,7 +37,7 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_compute
 	validate();
 }
 
-Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data)
+Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_data)
 	: _name(name)
 {
 	assert(!name.empty());

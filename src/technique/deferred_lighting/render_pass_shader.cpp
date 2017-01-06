@@ -6,7 +6,7 @@ using cg::mat4;
 using cg::float2;
 using cg::float3;
 using cg::uint2;
-using cg::data::Glsl_program_data;
+using cg::data::Glsl_program_desc;
 using deferred_lighting::rnd::set_uniform;
 using deferred_lighting::rnd::set_uniform_array;
 
@@ -15,7 +15,7 @@ namespace deferred_lighting {
 
 // ----- Gbuffer_pass_shader_program -----
 
-Gbuffer_pass_shader_program::Gbuffer_pass_shader_program(const Glsl_program_data& source_code) :
+Gbuffer_pass_shader_program::Gbuffer_pass_shader_program(const Glsl_program_desc& source_code) :
 	_prog("gbuffer-pass-shader", source_code),
 	_u_projection_matrix_location(_prog.get_uniform_location("u_projection_matrix")),
 	_u_view_matrix_location(_prog.get_uniform_location("u_view_matrix")),
@@ -44,7 +44,7 @@ void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4&
 // ----- Lighting_pass_dir_shader_program -----
 
 Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
-	const Glsl_program_data& dir_source_code) :
+	const Glsl_program_desc& dir_source_code) :
 	_prog("lighting-pass-dir-shader", dir_source_code),
 	_u_arr_far_pane_coords_location(_prog.get_uniform_location("u_arr_far_plane_coords")),
 	_u_dlight_direction_to_light_vs_location(_prog.get_uniform_location("u_dlight.direction_to_light_vs")),
@@ -77,7 +77,7 @@ void Lighting_pass_dir_shader_program::use(const Directional_light_params& dl_pa
 
 // ----- Material_lighting_pass -----
 
-Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(const Glsl_program_data& source_code) :
+Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(const Glsl_program_desc& source_code) :
 	_prog("material-pass-shader", source_code),
 	_u_projection_matrix_location(_prog.get_uniform_location("u_projection_matrix")),
 	_u_view_matrix_location(_prog.get_uniform_location("u_view_matrix")),
@@ -105,7 +105,7 @@ void Material_lighting_pass_shader_program::use(const mat4& projection_matrix, c
 
 // ----- Shadow_map_pass_shader_program -----
 
-Shadow_map_pass_shader_program::Shadow_map_pass_shader_program(const Glsl_program_data& source_code) :
+Shadow_map_pass_shader_program::Shadow_map_pass_shader_program(const Glsl_program_desc& source_code) :
 	_prog("shadow-map-pass-shader", source_code),
 	_u_projection_matrix_location(_prog.get_uniform_location("u_projection_matrix")),
 	_u_view_matrix_location(_prog.get_uniform_location("u_view_matrix")),
@@ -126,7 +126,7 @@ void Shadow_map_pass_shader_program::use(const Directional_light_params& dir_lig
 
 // ----- Ssao_pass_shader_program -----
 
-Ssao_pass_shader_program::Ssao_pass_shader_program(const Glsl_program_data& source_code) :
+Ssao_pass_shader_program::Ssao_pass_shader_program(const Glsl_program_desc& source_code) :
 	_prog("ssao-pass-shader", source_code),
 	_u_arr_sample_ray_location(_prog.get_uniform_location("u_arr_sample_ray")),
 	_u_arr_random_normal_location(_prog.get_uniform_location("u_arr_random_normal"))//,
@@ -146,7 +146,7 @@ void Ssao_pass_shader_program::use(const std::vector<float3>& sample_rays_and_no
 
 // ----- Tone_mapping_pass_shader_program -----
 
-Tone_mapping_pass_shader_program::Tone_mapping_pass_shader_program(const cg::data::Glsl_program_data& source_code) :
+Tone_mapping_pass_shader_program::Tone_mapping_pass_shader_program(const cg::data::Glsl_program_desc& source_code) :
 	_prog("tone-mapping-pass-shader", source_code)
 {}
 

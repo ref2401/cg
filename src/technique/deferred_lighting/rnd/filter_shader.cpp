@@ -12,11 +12,11 @@ using namespace deferred_lighting;
 
 namespace {
 
-using cg::data::Glsl_program_data;
+using cg::data::Glsl_program_desc;
 using cg::data::load_glsl_program_data;
 using rnd::Filter_kernel_radius;
 
-Glsl_program_data load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
+Glsl_program_desc load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
 {
 	assert(kernel_radius != Filter_kernel_radius::none);
 
@@ -55,7 +55,7 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 	assert(_filter_type != Filter_type::none);
 	assert(_kernel_radius != Filter_kernel_radius::none);
 
-	cg::data::Glsl_program_data src_code = cg::data::load_glsl_program_data(
+	cg::data::Glsl_program_desc src_code = cg::data::load_glsl_program_data(
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
 

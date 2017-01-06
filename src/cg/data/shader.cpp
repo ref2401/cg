@@ -17,14 +17,14 @@ namespace data {
 
 // ----- Transform_feedback -----
 
-Transform_feedback::Transform_feedback(Transform_feedback&& tf) noexcept
+Transform_feedback_desc::Transform_feedback_desc(Transform_feedback_desc&& tf) noexcept
 	: varying_names(std::move(tf.varying_names)),
 	interleaved_buffer_mode(tf.interleaved_buffer_mode)
 {
 	tf.interleaved_buffer_mode = false;
 }
 
-Transform_feedback& Transform_feedback::operator=(Transform_feedback&& tf) noexcept
+Transform_feedback_desc& Transform_feedback_desc::operator=(Transform_feedback_desc&& tf) noexcept
 {
 	if (this == &tf) return *this;
 
@@ -38,14 +38,14 @@ Transform_feedback& Transform_feedback::operator=(Transform_feedback&& tf) noexc
 
 // ----- funcs -----
 
-bool operator==(const Transform_feedback& l, const Transform_feedback& r) noexcept
+bool operator==(const Transform_feedback_desc& l, const Transform_feedback_desc& r) noexcept
 {
 	return (l.interleaved_buffer_mode == r.interleaved_buffer_mode)
 		&& (l.varying_names.size() == r.varying_names.size())
 		&& std::equal(l.varying_names.cbegin(), l.varying_names.cend(), r.varying_names.cbegin());
 }
 
-std::ostream& operator<<(std::ostream& out, const Transform_feedback& tf)
+std::ostream& operator<<(std::ostream& out, const Transform_feedback_desc& tf)
 {
 	out << "Transform_feedback(" << tf.interleaved_buffer_mode;
 	
@@ -57,7 +57,7 @@ std::ostream& operator<<(std::ostream& out, const Transform_feedback& tf)
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Transform_feedback& tf)
+std::wostream& operator<<(std::wostream& out, const Transform_feedback_desc& tf)
 {
 	std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
 	
@@ -82,12 +82,12 @@ Glsl_compute_data load_glsl_compute_data(const char* filename)
 	return compute_data;
 }
 
-Glsl_program_data load_glsl_program_data(const char* filename)
+Glsl_program_desc load_glsl_program_data(const char* filename)
 {
-	if (!filename) return Glsl_program_data{};
+	if (!filename) return Glsl_program_desc{};
 
 	std::string fn;
-	Glsl_program_data glsl_data;
+	Glsl_program_desc glsl_data;
 
 	// vertex shader
 	fn.append(filename);
@@ -105,12 +105,12 @@ Glsl_program_data load_glsl_program_data(const char* filename)
 	return glsl_data;
 }
 
-Glsl_program_data load_glsl_program_data(const char* vertex_shader_filename, const char* fragment_shader_filename)
+Glsl_program_desc load_glsl_program_data(const char* vertex_shader_filename, const char* fragment_shader_filename)
 {
 	ENFORCE(exists(vertex_shader_filename),
 		EXCEPTION_MSG("The specified glsl file '", vertex_shader_filename, "' does not exist."));
 
-	Glsl_program_data glsl_data;
+	Glsl_program_desc glsl_data;
 	glsl_data.vertex_shader_source_code = load_text(vertex_shader_filename);
 
 	if (strlen(fragment_shader_filename) > 0) {

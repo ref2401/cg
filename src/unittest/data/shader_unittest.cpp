@@ -7,16 +7,16 @@
 #include "CppUnitTest.h"
 
 using cg::data::Glsl_compute_data;
-using cg::data::Glsl_program_data;
+using cg::data::Glsl_program_desc;
 using cg::data::Hlsl_shader_set_data;
-using cg::data::Transform_feedback;
+using cg::data::Transform_feedback_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<Transform_feedback>(const Transform_feedback& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<Transform_feedback_desc>(const Transform_feedback_desc& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
@@ -63,53 +63,65 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_shader_Glsl_program_data) {
+TEST_CLASS(cg_data_shader_Glsl_program_desc) {
 public:
 
 	TEST_METHOD(ctors)
 	{
-		Glsl_program_data pd0;
+		Glsl_program_desc pd0;
 		Assert::IsTrue(pd0.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd0.fragment_shader_source_code.empty());
 
 		pd0.vertex_shader_source_code = "abc";
 		pd0.fragment_shader_source_code = "123";
+		pd0.transform_feedback.varying_names.push_back("out_var_0");
+		pd0.transform_feedback.interleaved_buffer_mode = true;
 
 		// copy ctor
-		Glsl_program_data pd_c = pd0;
+		Glsl_program_desc pd_c = pd0;
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_c.fragment_shader_source_code);
+		Assert::AreEqual(pd0.transform_feedback, pd_c.transform_feedback);
 
 		// move ctor
-		Glsl_program_data pd_m = std::move(pd_c);
+		Glsl_program_desc pd_m = std::move(pd_c);
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_m.fragment_shader_source_code);
+		Assert::AreEqual(pd0.transform_feedback, pd_m.transform_feedback);
 		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
+		Assert::IsTrue(pd_c.transform_feedback.varying_names.empty());
+		Assert::IsFalse(pd_c.transform_feedback.interleaved_buffer_mode);
 	}
 
 	TEST_METHOD(assignments)
 	{
-		Glsl_program_data pd;
+		Glsl_program_desc pd;
 		pd.vertex_shader_source_code = "abc";
 		pd.fragment_shader_source_code = "123";
+		pd.transform_feedback.varying_names.push_back("out_var_0");
+		pd.transform_feedback.interleaved_buffer_mode = true;
 
-		Glsl_program_data pd_c;
+		Glsl_program_desc pd_c;
 		pd_c = pd;
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_c.fragment_shader_source_code);
+		Assert::AreEqual(pd.transform_feedback, pd_c.transform_feedback);
 
-		Glsl_program_data pd_m;
+		Glsl_program_desc pd_m;
 		pd_m = std::move(pd_c);
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_m.fragment_shader_source_code);
+		Assert::AreEqual(pd.transform_feedback, pd_m.transform_feedback);
 		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
+		Assert::IsTrue(pd_c.transform_feedback.varying_names.empty());
+		Assert::IsFalse(pd_c.transform_feedback.interleaved_buffer_mode);
 	}
 
 	TEST_METHOD(has_xxx_shader)
 	{
-		Glsl_program_data hd;
+		Glsl_program_desc hd;
 		Assert::IsFalse(hd.has_vertex_shader());
 		Assert::IsFalse(hd.has_fragment_shader());
 
@@ -208,24 +220,24 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_shader_Transform_feedback) { 
+TEST_CLASS(cg_data_shader_Transform_feedback_desc) { 
 public:
 
 	TEST_METHOD(assignment_operator)
 	{
-		Transform_feedback tf;
+		Transform_feedback_desc tf;
 		tf.varying_names.push_back("out_var_0");
 		tf.varying_names.push_back("out_var_1");
 		tf.interleaved_buffer_mode = true;
 
 		// copy assignment
-		Transform_feedback tf_c;
+		Transform_feedback_desc tf_c;
 		tf_c = tf;
 		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
 		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
 
 		// move assignments
-		Transform_feedback tf_m;
+		Transform_feedback_desc tf_m;
 		tf_m = std::move(tf_c);
 		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
 		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
@@ -235,7 +247,7 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		Transform_feedback tf;
+		Transform_feedback_desc tf;
 		Assert::IsTrue(tf.varying_names.empty());
 		Assert::IsFalse(tf.interleaved_buffer_mode);
 		Assert::IsFalse(tf.is_used());
@@ -245,12 +257,12 @@ public:
 		tf.interleaved_buffer_mode = true;
 
 		// copy ctor
-		Transform_feedback tf_c = tf;
+		Transform_feedback_desc tf_c = tf;
 		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
 		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
 
 		// move ctor
-		Transform_feedback tf_m = std::move(tf_c);
+		Transform_feedback_desc tf_m = std::move(tf_c);
 		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
 		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
 		Assert::IsTrue(tf_c.varying_names.empty());
@@ -259,28 +271,28 @@ public:
 
 	TEST_METHOD(equal_operator)
 	{
-		Transform_feedback tf;
+		Transform_feedback_desc tf;
 		tf.interleaved_buffer_mode = true;
 		tf.varying_names.push_back("out_var_0");
 
 		// interleaved_buffer_mode
-		Transform_feedback tf_0;
+		Transform_feedback_desc tf_0;
 		tf_0.interleaved_buffer_mode = false;
 		tf_0.varying_names.push_back("out_var_0");
 		Assert::AreNotEqual(tf, tf_0);
 
 		// varying_names
-		Transform_feedback tf_1;
+		Transform_feedback_desc tf_1;
 		tf_1.interleaved_buffer_mode = true;
 		Assert::AreNotEqual(tf, tf_1);
 
-		Transform_feedback tf_2;
+		Transform_feedback_desc tf_2;
 		tf_2.interleaved_buffer_mode = true;
 		tf_2.varying_names.push_back("out_var_100");
 		Assert::AreNotEqual(tf, tf_2);
 
 		// same objects
-		Transform_feedback tf_3;
+		Transform_feedback_desc tf_3;
 		tf_3.interleaved_buffer_mode = true;
 		tf_3.varying_names.push_back("out_var_0");
 		Assert::AreEqual(tf, tf_3);
@@ -288,7 +300,7 @@ public:
 
 	TEST_METHOD(is_used_property)
 	{
-		Transform_feedback tf;
+		Transform_feedback_desc tf;
 		Assert::IsTrue(tf.varying_names.empty());
 		Assert::IsFalse(tf.interleaved_buffer_mode);
 		Assert::IsFalse(tf.is_used());

@@ -8,7 +8,7 @@
 using namespace cg;
 using namespace deferred_lighting::rnd;
 using cg::data::Interleaved_mesh_data_old;
-using cg::data::Glsl_program_data;
+using cg::data::Glsl_program_desc;
 
 namespace {
 
@@ -74,7 +74,7 @@ void Gbuffer::resize(const uint2& viewport_size) noexcept
 
 // ----- Gbuffer_pass -----
 
-Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code) :
+Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code) :
 	_prog(source_code),
 	_gbuffer(gbuffer)
 {
@@ -122,7 +122,7 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 
 // ----- Lighting_pass -----
 
-Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& dir_source_code) :
+Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& dir_source_code) :
 	_gbuffer(gbuffer),
 	_dir_prog(dir_source_code)
 {
@@ -162,7 +162,7 @@ void Lighting_pass::perform_directional_light_pass(const std::array<float3, 4>& 
 
 // ----- Material_lighting_pass -----
 
-Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code) :
+Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code)
 {
@@ -234,7 +234,7 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 
 // ----- Shadow_map_pass -----
 
-Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code) :
+Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code),
 	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_03)
@@ -299,7 +299,7 @@ void Shadow_map_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 
 // ----- Ssao_pass -----
 
-Ssao_pass::Ssao_pass(Gbuffer& gbuffer, const Glsl_program_data& source_code) :
+Ssao_pass::Ssao_pass(Gbuffer& gbuffer, const Glsl_program_desc& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code),
 	_sample_rays(generate_sphere_normalized_sample_kernel(sample_ray_count + random_normal_count)),
@@ -364,7 +364,7 @@ void Ssao_pass::filter_ssao_map() noexcept
 
 // ----- Tone_mapping_pass -----
 
-Tone_mapping_pass::Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code) :
+Tone_mapping_pass::Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code) :
 	_gbuffer(gbuffer),
 	_prog(source_code)
 {}

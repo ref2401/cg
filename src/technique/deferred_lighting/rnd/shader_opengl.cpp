@@ -89,7 +89,7 @@ std::string Shader::log() const noexcept
 
 // ----- Shader_program -----
 
-Shader_program::Shader_program(const std::string& name, const cg::data::Glsl_program_data& src)
+Shader_program::Shader_program(const std::string& name, const cg::data::Glsl_program_desc& src)
 	: _name(name)
 {
 	assert(src.vertex_shader_source_code.size() > 0);

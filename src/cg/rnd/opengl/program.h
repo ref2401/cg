@@ -18,7 +18,7 @@ public:
 
 	Glsl_program(const std::string& name, const cg::data::Glsl_compute_data& compute_data);
 
-	Glsl_program(const std::string& name, const cg::data::Glsl_program_data& prog_data);
+	Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_data);
 
 	Glsl_program(const Glsl_program&) = delete;
 

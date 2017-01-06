@@ -162,7 +162,7 @@ private:
 class Gbuffer_pass final {
 public:
 
-	Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code);
+	Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code);
 
 	Gbuffer_pass(const Gbuffer_pass& pass) = delete;
 
@@ -193,7 +193,7 @@ private:
 class Lighting_pass final {
 public:
 
-	Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& dir_source_code);
+	Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& dir_source_code);
 
 	Lighting_pass(const Lighting_pass&) = delete;
 
@@ -219,7 +219,7 @@ private:
 class Material_lighting_pass final {
 public:
 
-	Material_lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code);
+	Material_lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code);
 
 	Material_lighting_pass(const Material_lighting_pass&) = delete;
 
@@ -250,7 +250,7 @@ private:
 class Shadow_map_pass final {
 public:
 
-	Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code);
+	Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code);
 
 	Shadow_map_pass(const Shadow_map_pass&) = delete;
 
@@ -286,7 +286,7 @@ private:
 class Ssao_pass final {
 public:
 
-	Ssao_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code);
+	Ssao_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code);
 
 	Ssao_pass(const Ssao_pass&) = delete;
 
@@ -314,7 +314,7 @@ private:
 class Tone_mapping_pass final {
 public:
 
-	Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_data& source_code);
+	Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& source_code);
 
 	Tone_mapping_pass(const Tone_mapping_pass&) = delete;
 
@@ -337,12 +337,12 @@ struct Renderer_config final {
 	rnd::Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Interleaved_mesh_data_old rect_1x1_mesh_data;
-	cg::data::Glsl_program_data gbuffer_pass_code;
-	cg::data::Glsl_program_data lighting_pass_dir_code;
-	cg::data::Glsl_program_data material_lighting_pass_code;
-	cg::data::Glsl_program_data shadow_map_pass_code;
-	cg::data::Glsl_program_data ssao_pass_code;
-	cg::data::Glsl_program_data tone_mapping_pass_code;
+	cg::data::Glsl_program_desc gbuffer_pass_code;
+	cg::data::Glsl_program_desc lighting_pass_dir_code;
+	cg::data::Glsl_program_desc material_lighting_pass_code;
+	cg::data::Glsl_program_desc shadow_map_pass_code;
+	cg::data::Glsl_program_desc ssao_pass_code;
+	cg::data::Glsl_program_desc tone_mapping_pass_code;
 };
 
 class Renderer final {

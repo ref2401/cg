@@ -10,6 +10,30 @@
 namespace cg {
 namespace data {
 
+struct Transform_feedback_desc final {
+
+	Transform_feedback_desc() noexcept = default;
+
+	Transform_feedback_desc(const Transform_feedback_desc&) = default;
+
+	Transform_feedback_desc(Transform_feedback_desc&& tf) noexcept;
+
+
+	Transform_feedback_desc& operator=(const Transform_feedback_desc&) = default;
+
+	Transform_feedback_desc& operator=(Transform_feedback_desc&& tf) noexcept;
+
+
+	bool is_used() const noexcept
+	{
+		return varying_names.size() > 0;
+	}
+
+
+	std::vector<std::string> varying_names;
+	bool interleaved_buffer_mode = false;
+};
+
 struct Glsl_compute_data final {
 
 	Glsl_compute_data() = default;
@@ -26,8 +50,8 @@ struct Glsl_compute_data final {
 	std::string compute_shader_source_code;
 };
 
-// Glsl_program_data struct stores all required params which are used in glsl shader creation process.
-struct Glsl_program_data {
+// Glsl_program_desc struct stores all required params which are used in glsl shader creation process.
+struct Glsl_program_desc {
 
 	bool has_vertex_shader() const noexcept
 	{
@@ -42,7 +66,7 @@ struct Glsl_program_data {
 
 	std::string vertex_shader_source_code;
 	std::string fragment_shader_source_code;
-	//Transform_feedback transfrom_feedback;
+	Transform_feedback_desc transform_feedback;
 };
 
 // Hlsl_shader_set_data struct stores all required and optional params
@@ -99,41 +123,17 @@ struct Hlsl_shader_set_data final {
 	uint32_t compile_flags = 0;
 };
 
-struct Transform_feedback final {
 
-	Transform_feedback() noexcept = default;
+bool operator==(const Transform_feedback_desc& l, const Transform_feedback_desc& r) noexcept;
 
-	Transform_feedback(const Transform_feedback&) = default;
-
-	Transform_feedback(Transform_feedback&& tf) noexcept;
-
-
-	Transform_feedback& operator=(const Transform_feedback&) = default;
-
-	Transform_feedback& operator=(Transform_feedback&& tf) noexcept;
-
-
-	bool is_used() const noexcept
-	{
-		return varying_names.size() > 0;
-	}
-
-
-	std::vector<std::string> varying_names;
-	bool interleaved_buffer_mode = false;
-};
-
-
-bool operator==(const Transform_feedback& l, const Transform_feedback& r) noexcept;
-
-inline bool operator!=(const Transform_feedback& l, const Transform_feedback& r) noexcept
+inline bool operator!=(const Transform_feedback_desc& l, const Transform_feedback_desc& r) noexcept
 {
 	return !(l == r);
 }
 
-std::ostream& operator<<(std::ostream& out, const Transform_feedback& tf);
+std::ostream& operator<<(std::ostream& out, const Transform_feedback_desc& tf);
 
-std::wostream& operator<<(std::wostream& out, const Transform_feedback& tf);
+std::wostream& operator<<(std::wostream& out, const Transform_feedback_desc& tf);
 
 Glsl_compute_data load_glsl_compute_data(const char* filename);
 
@@ -151,7 +151,7 @@ inline Glsl_compute_data load_glsl_compute_data(const std::string& filename)
 //		The constructed filenames are:
 //		- ../data/shader/blinn_phong.vertex.glsl
 //		- ../data/shader/blinn_phong.pixel.glsl
-Glsl_program_data load_glsl_program_data(const char* filename);
+Glsl_program_desc load_glsl_program_data(const char* filename);
 
 // Loads all found glsl shader source code files.
 // Each file name is constructed as: filename + .<shader_type> + .glsl
@@ -162,18 +162,18 @@ Glsl_program_data load_glsl_program_data(const char* filename);
 //		The constructed filenames are:
 //		- ../data/shader/blinn_phong.vertex.glsl
 //		- ../data/shader/blinn_phong.pixel.glsl
-inline Glsl_program_data load_glsl_program_data(const std::string& filename)
+inline Glsl_program_desc load_glsl_program_data(const std::string& filename)
 {
 	return load_glsl_program_data(filename.c_str());
 }
 
 // Loads the specified glsl shader source code files.
 // Will not throw if fragment_filename is empty.
-Glsl_program_data load_glsl_program_data(const char* vertex_filename, const char* fragment_filename);
+Glsl_program_desc load_glsl_program_data(const char* vertex_filename, const char* fragment_filename);
 
 // Loads the specified glsl shader source code files.
 // Will not throw if fragment_filename is empty.
-inline Glsl_program_data load_glsl_program_data(const std::string& vertex_filename,
+inline Glsl_program_desc load_glsl_program_data(const std::string& vertex_filename,
 	const std::string& fragment_filename)
 {
 	return load_glsl_program_data(vertex_filename.c_str(), fragment_filename.c_str());
