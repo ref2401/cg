@@ -2,6 +2,9 @@
 
 #include <cassert>
 #include <cstring>
+#include <algorithm>
+#include <codecvt>
+#include <locale>
 #include "cg/base/base.h"
 #include "cg/data/file.h"
 
@@ -11,6 +14,62 @@ using cg::data::load_text;
 
 namespace cg {
 namespace data {
+
+// ----- Transform_feedback -----
+
+Transform_feedback::Transform_feedback(Transform_feedback&& tf) noexcept
+	: varying_names(std::move(tf.varying_names)),
+	interleaved_buffer_mode(tf.interleaved_buffer_mode)
+{
+	tf.interleaved_buffer_mode = false;
+}
+
+Transform_feedback& Transform_feedback::operator=(Transform_feedback&& tf) noexcept
+{
+	if (this == &tf) return *this;
+
+	varying_names = std::move(tf.varying_names);
+	interleaved_buffer_mode = tf.interleaved_buffer_mode;
+
+	tf.interleaved_buffer_mode = false;
+
+	return *this;
+}
+
+// ----- funcs -----
+
+bool operator==(const Transform_feedback& l, const Transform_feedback& r) noexcept
+{
+	return (l.interleaved_buffer_mode == r.interleaved_buffer_mode)
+		&& (l.varying_names.size() == r.varying_names.size())
+		&& std::equal(l.varying_names.cbegin(), l.varying_names.cend(), r.varying_names.cbegin());
+}
+
+std::ostream& operator<<(std::ostream& out, const Transform_feedback& tf)
+{
+	out << "Transform_feedback(" << tf.interleaved_buffer_mode;
+	
+	for (const std::string& var_name : tf.varying_names) {
+		out << ", " << var_name;
+	}
+
+	out << ')';
+	return out;
+}
+
+std::wostream& operator<<(std::wostream& out, const Transform_feedback& tf)
+{
+	std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
+	
+	out << "Transform_feedback(" << tf.interleaved_buffer_mode;
+	
+	for (const std::string& var_name : tf.varying_names) {
+		out << ", " << converter.from_bytes(var_name);
+	}
+
+	out << ')';
+	return out;
+}
 
 Glsl_compute_data load_glsl_compute_data(const char* filename)
 {

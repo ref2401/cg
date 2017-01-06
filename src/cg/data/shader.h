@@ -2,7 +2,9 @@
 #define CG_DATA_SHADER_H_
 
 #include <cstdint>
+#include <ostream>
 #include <string>
+#include <vector>
 
 
 namespace cg {
@@ -27,9 +29,6 @@ struct Glsl_compute_data final {
 // Glsl_program_data struct stores all required params which are used in glsl shader creation process.
 struct Glsl_program_data {
 
-	Glsl_program_data() = default;
-
-
 	bool has_vertex_shader() const noexcept
 	{
 		return !vertex_shader_source_code.empty();
@@ -43,9 +42,10 @@ struct Glsl_program_data {
 
 	std::string vertex_shader_source_code;
 	std::string fragment_shader_source_code;
+	//Transform_feedback transfrom_feedback;
 };
 
-// Hlsl5_shader_set_data struct stores all required and optional params
+// Hlsl_shader_set_data struct stores all required and optional params
 // which are used in hlsl shader creation process.
 struct Hlsl_shader_set_data final {
 
@@ -85,7 +85,7 @@ struct Hlsl_shader_set_data final {
 
 	// The name of a function where vertex shader execution begins.
 	std::string vertex_shader_entry_point;
-	
+
 	// The name of a function where hull shader execution begins.
 	std::string hull_shader_entry_point;
 
@@ -99,6 +99,41 @@ struct Hlsl_shader_set_data final {
 	uint32_t compile_flags = 0;
 };
 
+struct Transform_feedback final {
+
+	Transform_feedback() noexcept = default;
+
+	Transform_feedback(const Transform_feedback&) = default;
+
+	Transform_feedback(Transform_feedback&& tf) noexcept;
+
+
+	Transform_feedback& operator=(const Transform_feedback&) = default;
+
+	Transform_feedback& operator=(Transform_feedback&& tf) noexcept;
+
+
+	bool is_used() const noexcept
+	{
+		return varying_names.size() > 0;
+	}
+
+
+	std::vector<std::string> varying_names;
+	bool interleaved_buffer_mode = false;
+};
+
+
+bool operator==(const Transform_feedback& l, const Transform_feedback& r) noexcept;
+
+inline bool operator!=(const Transform_feedback& l, const Transform_feedback& r) noexcept
+{
+	return !(l == r);
+}
+
+std::ostream& operator<<(std::ostream& out, const Transform_feedback& tf);
+
+std::wostream& operator<<(std::wostream& out, const Transform_feedback& tf);
 
 Glsl_compute_data load_glsl_compute_data(const char* filename);
 

@@ -1,5 +1,6 @@
 #include "cg/data/shader.h"
 
+#include <algorithm>
 #include <utility>
 #include "cg/data/file.h"
 #include "unittest/data/common_file.h"
@@ -8,7 +9,16 @@
 using cg::data::Glsl_compute_data;
 using cg::data::Glsl_program_data;
 using cg::data::Hlsl_shader_set_data;
+using cg::data::Transform_feedback;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
+
+template<> inline std::wstring ToString<Transform_feedback>(const Transform_feedback& t) { RETURN_WIDE_STRING(t); }
+
+}}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {
@@ -198,6 +208,99 @@ public:
 	}
 };
 
+TEST_CLASS(cg_data_shader_Transform_feedback) { 
+public:
+
+	TEST_METHOD(assignment_operator)
+	{
+		Transform_feedback tf;
+		tf.varying_names.push_back("out_var_0");
+		tf.varying_names.push_back("out_var_1");
+		tf.interleaved_buffer_mode = true;
+
+		// copy assignment
+		Transform_feedback tf_c;
+		tf_c = tf;
+		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
+		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
+
+		// move assignments
+		Transform_feedback tf_m;
+		tf_m = std::move(tf_c);
+		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
+		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
+		Assert::IsTrue(tf_c.varying_names.empty());
+		Assert::IsFalse(tf_c.interleaved_buffer_mode);
+	}
+
+	TEST_METHOD(ctors)
+	{
+		Transform_feedback tf;
+		Assert::IsTrue(tf.varying_names.empty());
+		Assert::IsFalse(tf.interleaved_buffer_mode);
+		Assert::IsFalse(tf.is_used());
+
+		tf.varying_names.push_back("out_var_0");
+		tf.varying_names.push_back("out_var_1");
+		tf.interleaved_buffer_mode = true;
+
+		// copy ctor
+		Transform_feedback tf_c = tf;
+		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
+		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
+
+		// move ctor
+		Transform_feedback tf_m = std::move(tf_c);
+		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
+		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
+		Assert::IsTrue(tf_c.varying_names.empty());
+		Assert::IsFalse(tf_c.interleaved_buffer_mode);
+	}
+
+	TEST_METHOD(equal_operator)
+	{
+		Transform_feedback tf;
+		tf.interleaved_buffer_mode = true;
+		tf.varying_names.push_back("out_var_0");
+
+		// interleaved_buffer_mode
+		Transform_feedback tf_0;
+		tf_0.interleaved_buffer_mode = false;
+		tf_0.varying_names.push_back("out_var_0");
+		Assert::AreNotEqual(tf, tf_0);
+
+		// varying_names
+		Transform_feedback tf_1;
+		tf_1.interleaved_buffer_mode = true;
+		Assert::AreNotEqual(tf, tf_1);
+
+		Transform_feedback tf_2;
+		tf_2.interleaved_buffer_mode = true;
+		tf_2.varying_names.push_back("out_var_100");
+		Assert::AreNotEqual(tf, tf_2);
+
+		// same objects
+		Transform_feedback tf_3;
+		tf_3.interleaved_buffer_mode = true;
+		tf_3.varying_names.push_back("out_var_0");
+		Assert::AreEqual(tf, tf_3);
+	}
+
+	TEST_METHOD(is_used_property)
+	{
+		Transform_feedback tf;
+		Assert::IsTrue(tf.varying_names.empty());
+		Assert::IsFalse(tf.interleaved_buffer_mode);
+		Assert::IsFalse(tf.is_used());
+
+		tf.varying_names.push_back("out_var_0");
+		Assert::IsTrue(tf.is_used());
+
+		tf.varying_names.clear();
+		Assert::IsFalse(tf.is_used());
+	}
+};
+
 TEST_CLASS(cg_data_shader_Funcs) {
 public:
 
@@ -266,3 +369,4 @@ public:
 };
 
 } // namespace unittest
+
