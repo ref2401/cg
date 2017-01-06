@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <exception>
+#include <iterator>
 #include <string>
 #include <utility>
 #include "cg/base/base.h"
@@ -37,19 +38,37 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_compute
 	validate();
 }
 
-Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_data)
+Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_desc)
 	: _name(name)
 {
 	assert(!name.empty());
-	assert(prog_data.has_vertex_shader() && prog_data.has_fragment_shader());
+	assert(prog_desc.has_vertex_shader());
 
 	try {
-		Shader vertex_shader(GL_VERTEX_SHADER, prog_data.vertex_shader_source_code);
-		Shader pixel_shader(GL_FRAGMENT_SHADER, prog_data.fragment_shader_source_code);
+		Shader vertex_shader(GL_VERTEX_SHADER, prog_desc.vertex_shader_source_code);
+		Shader pixel_shader(GL_FRAGMENT_SHADER, prog_desc.fragment_shader_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, vertex_shader.id());
 		glAttachShader(_id, pixel_shader.id());
+
+		if (prog_desc.transform_feedback.is_used()) {
+			const size_t varying_count = prog_desc.transform_feedback.varying_names.size();
+			const GLenum buffer_mode = (prog_desc.transform_feedback.interleaved_buffer_mode)
+				? (GL_INTERLEAVED_ATTRIBS) : (GL_SEPARATE_ATTRIBS);
+
+			const char** varying_names = new const char*[varying_count];
+			const char** tmp = varying_names;
+			for (const auto& name : prog_desc.transform_feedback.varying_names) {
+				*tmp = name.c_str();
+				tmp = std::next(tmp);
+			}
+			
+			glTransformFeedbackVaryings(_id, varying_count, varying_names, buffer_mode);
+
+			delete[] varying_names;
+		}
+
 		glLinkProgram(_id);
 
 		// once shaders have been linked into a program they are no longer needed.

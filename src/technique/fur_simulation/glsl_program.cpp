@@ -7,8 +7,8 @@ namespace fur_simulation {
 
 Fur_generation_program::Fur_generation_program()
 {
-	auto glsl_source = cg::data::load_glsl_program_desc("../data/fur_simulation/fur_generation");
-	_program = Glsl_program("fur-generation", glsl_source);
+	auto glsl_desc = cg::data::load_glsl_program_desc("../data/fur_simulation/fur_generation");
+	_program = Glsl_program("fur-generation", glsl_desc);
 
 	_g_projection_matrix_location = _program.get_uniform_location("g_projection_matrix");
 	_g_view_matrix_location = _program.get_uniform_location("g_view_matrix");
