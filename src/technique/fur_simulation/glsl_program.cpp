@@ -3,33 +3,11 @@
 
 namespace fur_simulation {
 
-// ----- Geometry_pass_program -----
-
-Geometry_pass_program::Geometry_pass_program()
-{
-	auto glsl_source = cg::data::load_glsl_program_data("../data/fur_simulation/fur_geometry_pass");
-	_program = Glsl_program("fur-geometry-pass", glsl_source);
-
-	_g_projection_matrix_location = _program.get_uniform_location("g_projection_matrix");
-	_g_view_matrix_location = _program.get_uniform_location("g_view_matrix");
-	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
-}
-
-void Geometry_pass_program::bind(const cg::mat4& projection_matrix, const cg::mat4& view_matrix,
-	const cg::mat4& model_matrix)
-{
-	glUseProgram(_program.id());
-
-	set_uniform(_g_projection_matrix_location, projection_matrix);
-	set_uniform(_g_view_matrix_location, view_matrix);
-	set_uniform(_g_model_matrix_location, model_matrix);
-}
-
 // ----- Fur_generation_program -----
 
 Fur_generation_program::Fur_generation_program()
 {
-	auto glsl_source = cg::data::load_glsl_program_data("../data/fur_simulation/fur_generation");
+	auto glsl_source = cg::data::load_glsl_program_desc("../data/fur_simulation/fur_generation");
 	_program = Glsl_program("fur-generation", glsl_source);
 
 	_g_projection_matrix_location = _program.get_uniform_location("g_projection_matrix");
@@ -76,28 +54,11 @@ void Fur_generation_program::set_params(GLuint index) noexcept
 	set_uniform(_g_shell_index_location, index);
 }
 
-// ----- Fur_spread_pass_program -----
-
-Fur_spread_pass_program::Fur_spread_pass_program()
-{
-	//auto glsl_source = cg::data::load_glsl_compute_data("../data/fur_simulation/fur_spread_pass.compute.glsl");
-	//_compute_program = Glsl_program("fur-spread-pass-compute", glsl_source);
-
-	auto glsl_source = cg::data::load_glsl_program_data("../data/fur_simulation/fur_spread_pass");
-	_program = Glsl_program("fur-spread-pass", glsl_source);
-}
-
-void Fur_spread_pass_program::bind() noexcept
-{
-	//glUseProgram(_compute_program.id());
-	glUseProgram(_program.id());
-}
-
 // ----- Opaque_model_program -----
 
 Opaque_model_program::Opaque_model_program()
 {
-	auto glsl_source = cg::data::load_glsl_program_data("../data/fur_simulation/opaque_model");
+	auto glsl_source = cg::data::load_glsl_program_desc("../data/fur_simulation/opaque_model");
 	_program = Glsl_program("opaque-geometry", glsl_source);
 	_g_projection_view_matrix_location = _program.get_uniform_location("g_projection_view_matrix");
 	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");

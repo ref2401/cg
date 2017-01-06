@@ -21,32 +21,6 @@ struct Material final {
 	size_t shell_count = 8;
 };
 
-class Geometry_pass_program final {
-public:
-
-	Geometry_pass_program();
-
-	Geometry_pass_program(const Geometry_pass_program&) = delete;
-
-	Geometry_pass_program(Geometry_pass_program&&) = delete;
-
-
-	Geometry_pass_program& operator=(const Geometry_pass_program&) = delete;
-
-	Geometry_pass_program& operator=(Geometry_pass_program&&) = delete;
-
-
-	void bind(const cg::mat4& projection_matrix, const cg::mat4& view_matrix,
-		const cg::mat4& model_matrix);
-
-private:
-
-	Glsl_program _program;
-	GLint _g_projection_matrix_location = Invalid::uniform_location;
-	GLint _g_view_matrix_location = Invalid::uniform_location;
-	GLint _g_model_matrix_location = Invalid::uniform_location;
-};
-
 class Fur_generation_program final {
 public:
 
@@ -84,29 +58,6 @@ private:
 	GLint _g_specular_factor_location = Invalid::uniform_location;
 	GLint _g_specular_power_location = Invalid::uniform_location;
 	GLint _g_tex_coord_factor_location = Invalid::uniform_location;
-};
-
-class Fur_spread_pass_program final {
-public:
-
-	Fur_spread_pass_program();
-
-	Fur_spread_pass_program(const Fur_spread_pass_program&) = delete;
-
-	Fur_spread_pass_program(Fur_spread_pass_program&&) = delete;
-
-
-	Fur_spread_pass_program& operator=(const Fur_spread_pass_program&) = delete;
-
-	Fur_spread_pass_program& operator=(Fur_spread_pass_program&&) = delete;
-
-
-	void bind() noexcept;
-
-private:
-
-	Glsl_program _compute_program;
-	Glsl_program _program;
 };
 
 class Opaque_model_program final {

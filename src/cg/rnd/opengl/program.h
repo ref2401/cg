@@ -16,7 +16,7 @@ public:
 
 	Glsl_program() noexcept = default;
 
-	Glsl_program(const std::string& name, const cg::data::Glsl_compute_data& compute_data);
+	Glsl_program(const std::string& name, const cg::data::Glsl_compute_desc& compute_data);
 
 	Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_data);
 

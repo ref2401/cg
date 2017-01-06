@@ -1,12 +1,13 @@
 #include "cg/data/shader.h"
 
 #include <algorithm>
+#include <iterator>
 #include <utility>
 #include "cg/data/file.h"
 #include "unittest/data/common_file.h"
 #include "CppUnitTest.h"
 
-using cg::data::Glsl_compute_data;
+using cg::data::Glsl_compute_desc;
 using cg::data::Glsl_program_desc;
 using cg::data::Hlsl_shader_set_data;
 using cg::data::Transform_feedback_desc;
@@ -28,35 +29,35 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		Glsl_compute_data cd0;
+		Glsl_compute_desc cd0;
 		Assert::IsTrue(cd0.compute_shader_source_code.empty());
 
 		std::string compute_srt = "abc";
-		Glsl_compute_data cd1(compute_srt);
+		Glsl_compute_desc cd1(compute_srt);
 		Assert::AreEqual(compute_srt, cd1.compute_shader_source_code);
 
-		Glsl_compute_data cd2("abc");
+		Glsl_compute_desc cd2("abc");
 		Assert::AreEqual("abc", cd2.compute_shader_source_code.c_str());
 
 		// copy ctor
-		Glsl_compute_data cd_c = cd2;
+		Glsl_compute_desc cd_c = cd2;
 		Assert::AreEqual(cd2.compute_shader_source_code, cd_c.compute_shader_source_code);
 
 		// move ctor
-		Glsl_compute_data cd_m = std::move(cd_c);
+		Glsl_compute_desc cd_m = std::move(cd_c);
 		Assert::AreEqual(cd2.compute_shader_source_code, cd_m.compute_shader_source_code);
 		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
 	}
 
 	TEST_METHOD(assignments)
 	{
-		Glsl_compute_data cd("abc");
+		Glsl_compute_desc cd("abc");
 
-		Glsl_compute_data cd_c;
+		Glsl_compute_desc cd_c;
 		cd_c = cd;
 		Assert::AreEqual(cd.compute_shader_source_code, cd_c.compute_shader_source_code);
 
-		Glsl_compute_data cd_m;
+		Glsl_compute_desc cd_m;
 		cd_m = std::move(cd_c);
 		Assert::AreEqual(cd.compute_shader_source_code, cd_m.compute_shader_source_code);
 		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
@@ -316,50 +317,94 @@ public:
 TEST_CLASS(cg_data_shader_Funcs) {
 public:
 
-	TEST_METHOD(load_glsl_compute_data)
+	TEST_METHOD(load_glsl_compute_desc)
 	{
-		using cg::data::load_glsl_compute_data;
+		using cg::data::load_glsl_compute_desc;
 		using cg::data::load_text;
 
-		Assert::ExpectException<std::exception&>([] { load_glsl_compute_data("unknown_file"); });
+		Assert::ExpectException<std::exception&>([] { load_glsl_compute_desc("unknown_file"); });
 
-		auto cd = load_glsl_compute_data(Filenames::not_real_compute_glsl);
+		auto cd = load_glsl_compute_desc(Filenames::not_real_compute_glsl);
 		auto expected_compute_source = load_text(Filenames::not_real_compute_glsl);
 		Assert::AreEqual(expected_compute_source, cd.compute_shader_source_code);
 	}
 
-	TEST_METHOD(load_glsl_program_data)
+	TEST_METHOD(load_glsl_program_desc_single_filename)
 	{
-		using cg::data::load_glsl_program_data;
+		using cg::data::load_glsl_program_desc;
 		using cg::data::load_text;
 
-		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file"); });
+		const auto expected_vertex_source = load_text(Filenames::not_real_vertex_glsl);
+		const auto expected_fragment_source = load_text(Filenames::not_real_fragment_glsl);
+		const auto expected_single_vertex_source = load_text(Filenames::not_real_single_vertex_glsl);
 
-		// vertex & fragment
-		auto expected_vertex_source = load_text(Filenames::not_real_vertex_glsl);
-		auto expected_fragment_source = load_text(Filenames::not_real_fragment_glsl);
-		auto pd0 = load_glsl_program_data(Filenames::not_real_glsl_program_name);
+		Assert::ExpectException<std::exception&>([] { load_glsl_program_desc("unknown_file"); });
+		
+		// without transform feedback
+		auto pd0 = load_glsl_program_desc(Filenames::not_real_glsl_program_name);
 		Assert::AreEqual(expected_vertex_source, pd0.vertex_shader_source_code);
 		Assert::AreEqual(expected_fragment_source, pd0.fragment_shader_source_code);
+		Assert::IsFalse(pd0.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd0.transform_feedback.varying_names.empty());
 
-		// vertex only
-		auto expected_single_vertex_source = load_text(Filenames::not_real_single_vertex_glsl);
-		auto pd1 = load_glsl_program_data(Filenames::not_real_glsl_single_vertex_program_name);
+		// vertex shader only, without transform feedback
+		auto pd1 = load_glsl_program_desc(Filenames::not_real_glsl_single_vertex_program_name);
 		Assert::AreEqual(expected_single_vertex_source, pd1.vertex_shader_source_code);
 		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
+		Assert::IsFalse(pd1.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd1.transform_feedback.varying_names.empty());
+		
+		const char* varying_names[3] = { "out_var_0", "out_var_1", "out_var_2" };
 
-		// separate filenames
-		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file0", "unknown_file1"); });
-		Assert::ExpectException<std::exception&>([] { load_glsl_program_data(Filenames::not_real_vertex_glsl, "unknown_file1"); });
-		Assert::ExpectException<std::exception&>([] { load_glsl_program_data("unknown_file0", Filenames::not_real_fragment_glsl); });
-
-		auto pd2 = load_glsl_program_data(Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl);
+		// with transform feedback
+		auto pd2 = load_glsl_program_desc(Filenames::not_real_glsl_program_name,
+			true, varying_names[0], varying_names[1], varying_names[2]);
 		Assert::AreEqual(expected_vertex_source, pd2.vertex_shader_source_code);
 		Assert::AreEqual(expected_fragment_source, pd2.fragment_shader_source_code);
+		Assert::IsTrue(pd2.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(
+			std::cbegin(varying_names), std::cend(varying_names), 
+			pd2.transform_feedback.varying_names.cbegin()));
+	}
 
-		auto pd3 = load_glsl_program_data(Filenames::not_real_single_vertex_glsl, "");
-		Assert::AreEqual(expected_single_vertex_source, pd3.vertex_shader_source_code);
-		Assert::IsTrue(pd3.fragment_shader_source_code.empty());
+	TEST_METHOD(load_glsl_program_desc_separate_filenames)
+	{
+		using cg::data::load_glsl_program_desc;
+		using cg::data::load_text;
+
+		Assert::ExpectException<std::exception&>([] { load_glsl_program_desc("unknown_file0", "unknown_file1"); });
+		Assert::ExpectException<std::exception&>([] { load_glsl_program_desc(Filenames::not_real_vertex_glsl, "unknown_file1"); });
+		Assert::ExpectException<std::exception&>([] { load_glsl_program_desc("unknown_file0", Filenames::not_real_fragment_glsl); });
+	
+		const auto expected_vertex_source = load_text(Filenames::not_real_vertex_glsl);
+		const auto expected_fragment_source = load_text(Filenames::not_real_fragment_glsl);
+		const auto expected_single_vertex_source = load_text(Filenames::not_real_single_vertex_glsl);
+
+		// without transform feedback
+		auto pd0 = load_glsl_program_desc(Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl);
+		Assert::AreEqual(expected_vertex_source, pd0.vertex_shader_source_code);
+		Assert::AreEqual(expected_fragment_source, pd0.fragment_shader_source_code);
+		Assert::IsFalse(pd0.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd0.transform_feedback.varying_names.empty());
+
+		// vertex shader only without transform feedback
+		auto pd1 = load_glsl_program_desc(Filenames::not_real_single_vertex_glsl.c_str(), "");
+		Assert::AreEqual(expected_single_vertex_source, pd1.vertex_shader_source_code);
+		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
+		Assert::IsFalse(pd1.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd1.transform_feedback.varying_names.empty());
+
+		const char* varying_names[3] = { "out_var_0", "out_var_1", "out_var_2" };
+
+		// with transform feedback
+		auto pd2 = load_glsl_program_desc(Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl,
+			true, varying_names[0], varying_names[1], varying_names[2]);
+		Assert::AreEqual(expected_vertex_source, pd2.vertex_shader_source_code);
+		Assert::AreEqual(expected_fragment_source, pd2.fragment_shader_source_code);
+		Assert::IsTrue(pd2.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(
+			std::cbegin(varying_names), std::cend(varying_names),
+			pd2.transform_feedback.varying_names.cbegin()));
 	}
 
 	TEST_METHOD(load_hlsl_shader_set_data)

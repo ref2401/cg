@@ -1,6 +1,7 @@
 #ifndef CG_DATA_SHADER_H_
 #define CG_DATA_SHADER_H_
 
+#include <cassert>
 #include <cstdint>
 #include <ostream>
 #include <string>
@@ -9,6 +10,22 @@
 
 namespace cg {
 namespace data {
+
+struct Glsl_compute_desc final {
+
+	Glsl_compute_desc() = default;
+
+	Glsl_compute_desc(const std::string& compute_shader_source_code)
+		: compute_shader_source_code(compute_shader_source_code)
+	{}
+
+	Glsl_compute_desc(const char* compute_shader_source_code)
+		: compute_shader_source_code(compute_shader_source_code)
+	{}
+
+
+	std::string compute_shader_source_code;
+};
 
 struct Transform_feedback_desc final {
 
@@ -34,23 +51,8 @@ struct Transform_feedback_desc final {
 	bool interleaved_buffer_mode = false;
 };
 
-struct Glsl_compute_data final {
-
-	Glsl_compute_data() = default;
-
-	Glsl_compute_data(const std::string& compute_shader_source_code)
-		: compute_shader_source_code(compute_shader_source_code)
-	{}
-
-	Glsl_compute_data(const char* compute_shader_source_code)
-		: compute_shader_source_code(compute_shader_source_code)
-	{}
-
-
-	std::string compute_shader_source_code;
-};
-
-// Glsl_program_desc struct stores all required params which are used in glsl shader creation process.
+// Glsl_program_desc struct stores all required params 
+// which are used in glsl shader creation process.
 struct Glsl_program_desc {
 
 	bool has_vertex_shader() const noexcept
@@ -135,12 +137,37 @@ std::ostream& operator<<(std::ostream& out, const Transform_feedback_desc& tf);
 
 std::wostream& operator<<(std::wostream& out, const Transform_feedback_desc& tf);
 
-Glsl_compute_data load_glsl_compute_data(const char* filename);
+Glsl_compute_desc load_glsl_compute_desc(const char* filename);
 
-inline Glsl_compute_data load_glsl_compute_data(const std::string& filename)
+inline Glsl_compute_desc load_glsl_compute_desc(const std::string& filename)
 {
-	return load_glsl_compute_data(filename.c_str());
+	return load_glsl_compute_desc(filename.c_str());
 }
+
+namespace internal {
+
+inline void puch_back_varying_name(const Transform_feedback_desc& tf)
+{
+	return;
+}
+
+template<typename... Args>
+void puch_back_varying_name(Transform_feedback_desc& tf, const char* name, const Args... varying_names)
+{
+	assert(strlen(name) > 0);
+	tf.varying_names.emplace_back(name);
+	puch_back_varying_name(tf, varying_names...);
+}
+
+template<typename... Args>
+void puch_back_varying_name(Transform_feedback_desc& tf, const std::string& name, const Args... varying_names)
+{
+	assert(name.size() > 0);
+	tf.varying_names.push_back(name);
+	puch_back_varying_name(tf, varying_names...);
+}
+
+} // namespace internal
 
 // Loads all found glsl shader source code files.
 // Each file name is constructed as: filename + .<shader_type> + .glsl
@@ -151,32 +178,65 @@ inline Glsl_compute_data load_glsl_compute_data(const std::string& filename)
 //		The constructed filenames are:
 //		- ../data/shader/blinn_phong.vertex.glsl
 //		- ../data/shader/blinn_phong.pixel.glsl
-Glsl_program_desc load_glsl_program_data(const char* filename);
+Glsl_program_desc load_glsl_program_desc(const char* filename);
 
-// Loads all found glsl shader source code files.
-// Each file name is constructed as: filename + .<shader_type> + .glsl
-// Only vertex shader ia required. If vertex ource code file does not exist the function will throw.  
-// Won't throw if tesselation or geometry source code files do not exist.
-// Example:
-//		load_glsl_program_source(../data/shader/blinn_phong);
-//		The constructed filenames are:
-//		- ../data/shader/blinn_phong.vertex.glsl
-//		- ../data/shader/blinn_phong.pixel.glsl
-inline Glsl_program_desc load_glsl_program_data(const std::string& filename)
+// ditto
+inline Glsl_program_desc load_glsl_program_desc(const std::string& filename)
 {
-	return load_glsl_program_data(filename.c_str());
+	return load_glsl_program_desc(filename.c_str());
+}
+
+// ditto
+template<typename... Args>
+Glsl_program_desc load_glsl_program_desc(const char* filename, 
+	bool interleaved_buffer_mode, const Args&... varying_names)
+{
+	Glsl_program_desc desc = load_glsl_program_desc(filename);
+
+	desc.transform_feedback.interleaved_buffer_mode = interleaved_buffer_mode;
+	internal::puch_back_varying_name(desc.transform_feedback, varying_names...);
+
+	return desc;
+}
+
+// ditto
+template<typename... Args>
+inline Glsl_program_desc load_glsl_program_desc(const std::string& filename,
+	bool interleaved_buffer_mode, const Args&... varying_names)
+{
+	return load_glsl_program_desc(filename.c_str(), interleaved_buffer_mode, varying_names...);
 }
 
 // Loads the specified glsl shader source code files.
 // Will not throw if fragment_filename is empty.
-Glsl_program_desc load_glsl_program_data(const char* vertex_filename, const char* fragment_filename);
+Glsl_program_desc load_glsl_program_desc(const char* vertex_filename, const char* fragment_filename);
 
-// Loads the specified glsl shader source code files.
-// Will not throw if fragment_filename is empty.
-inline Glsl_program_desc load_glsl_program_data(const std::string& vertex_filename,
-	const std::string& fragment_filename)
+// ditto
+inline Glsl_program_desc load_glsl_program_desc(const std::string& vertex_filename, const std::string& fragment_filename)
 {
-	return load_glsl_program_data(vertex_filename.c_str(), fragment_filename.c_str());
+	return load_glsl_program_desc(vertex_filename.c_str(), fragment_filename.c_str());
+}
+
+// ditto
+template<typename... Args>
+Glsl_program_desc load_glsl_program_desc(const char* vertex_filename, const char* fragment_filename,
+	bool interleaved_buffer_mode, const Args&... varying_names)
+{
+	Glsl_program_desc desc = load_glsl_program_desc(vertex_filename, fragment_filename);
+
+	desc.transform_feedback.interleaved_buffer_mode = interleaved_buffer_mode;
+	internal::puch_back_varying_name(desc.transform_feedback, varying_names...);
+
+	return desc;
+}
+
+// ditto
+template<typename... Args>
+inline Glsl_program_desc load_glsl_program_desc(const std::string& vertex_filename, const std::string& fragment_filename,
+	bool interleaved_buffer_mode, const Args&... varying_names)
+{
+	return load_glsl_program_desc(vertex_filename.c_str(), fragment_filename.c_str(),
+		interleaved_buffer_mode, varying_names...);
 }
 
 // Loads the specified hlsl shader source code file.
