@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
+    <ClCompile Include="base\container_unittest.cpp" />
     <ClCompile Include="data\common_file.cpp" />
     <ClCompile Include="data\file_unittest.cpp" />
     <ClCompile Include="data\image_unittest.cpp" />

@@ -58,6 +58,9 @@
     <ClCompile Include="rnd\opengl\fbo.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="data\model_assimp.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -157,6 +160,12 @@
     </ClInclude>
     <ClInclude Include="rnd\opengl\fbo.h">
       <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="data\model_assimp.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="base\container.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

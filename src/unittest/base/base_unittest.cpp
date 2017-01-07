@@ -8,7 +8,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace unittest {
 
-TEST_CLASS(cg_base_Base) {
+TEST_CLASS(cg_base_base_Funcs) {
 	
 	TEST_METHOD(concat)
 	{

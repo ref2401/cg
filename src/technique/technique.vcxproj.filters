@@ -38,10 +38,10 @@
     <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp">
       <Filter>fur_simulation</Filter>
     </ClCompile>
-    <ClCompile Include="fur_simulation\glsl_program.cpp">
+    <ClCompile Include="fur_simulation\fur_model.cpp">
       <Filter>fur_simulation</Filter>
     </ClCompile>
-    <ClCompile Include="fur_simulation\fur_model.cpp">
+    <ClCompile Include="fur_simulation\fur_glsl_program.cpp">
       <Filter>fur_simulation</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,10 +96,10 @@
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h">
       <Filter>fur_simulation</Filter>
     </ClInclude>
-    <ClInclude Include="fur_simulation\glsl_program.h">
+    <ClInclude Include="fur_simulation\fur_model.h">
       <Filter>fur_simulation</Filter>
     </ClInclude>
-    <ClInclude Include="fur_simulation\fur_model.h">
+    <ClInclude Include="fur_simulation\fur_glsl_program.h">
       <Filter>fur_simulation</Filter>
     </ClInclude>
   </ItemGroup>

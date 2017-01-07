@@ -6,13 +6,44 @@
 #include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
 #include "technique/fur_simulation/fur_model.h"
-#include "technique/fur_simulation/glsl_program.h"
+#include "technique/fur_simulation/fur_glsl_program.h"
 
-using namespace cg;
 using namespace cg::rnd::opengl;
 
 
 namespace fur_simulation {
+
+class Geometry_buffers final {
+public:
+
+	Geometry_buffers(float strand_lenght, const char* geometry_filename);
+
+	Geometry_buffers(const Geometry_buffers&) = delete;
+
+	Geometry_buffers(Geometry_buffers&&) = delete;
+
+
+	Geometry_buffers& operator=(const Geometry_buffers&) = delete;
+
+	Geometry_buffers& operator=(Geometry_buffers&&) = delete;
+
+
+	const std::vector<cg::data::Model_mesh_info>& meshes() const noexcept
+	{
+		return _meshes;
+	}
+
+private:
+
+	void init_physics_simulation_vao();
+
+	std::vector<cg::data::Model_mesh_info> _meshes;
+	Buffer_gpu _position_buffer;
+	Buffer_gpu _simulation_buffer_0;
+	Buffer_gpu _simulation_buffer_1;
+	Buffer_gpu _model_attribs_buffer;
+	Buffer_gpu _index_buffer;
+};
 
 class Fur_simulation_opengl_example final : public cg::sys::Example {
 public:
@@ -32,51 +63,16 @@ public:
 
 private:
 
-	void init_materials();
-
-	void init_model();
-
-	void init_model_11();
-
-	void init_physics_input_buffer(GLuint physics_vao_id, GLuint render_vao_id, 
-		const Model_geometry_data_1& geometry_data);
-
-	void init_physics_output_buffer(GLuint physics_vao_id, GLuint render_vao_id,
-		const Model_geometry_data_1& geometry_data);
-
-	void init_render_buffer(GLuint render_vao_id,
-		const Model_geometry_data_1& geometry_data);
-
 	void update_projection_matrix();
 
-	Opaque_model_program _glsl_opaque_model;
-	Fur_generation_program _glsl_fur_generation;
 	// camera
-	mat4 _projection_matrix;
+	cg::mat4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
-	float2 _view_roll_angles;
-	float2 _prev_mouse_pos_ndc;
-	// model data
-	GLuint _physics_vao_id = Invalid::vao_id;
-	GLuint _render_vao_id = Invalid::vao_id;
-	GLuint _vao_id = Invalid::vao_id;
-	Buffer_gpu _vertex_buffer;
-	Buffer_gpu _index_buffer;
-	Buffer_gpu _physics_input_buffer;
-	Buffer_gpu _physics_output_buffer;
-	Buffer_gpu _render_buffer;
-	Model_rnd_params _model_rnd_params;
-	size_t _model_index_count;
-	mat4 _model_matrix;
-	// fur rendering
-	Material* _curr_material = nullptr;
-	Material _cat_material;
-	Material _curly_red_material;
-	Material _hair_material;
-	Material _sheep_material;
-	float3 _light_dir_ws; // dir to light
-	Texture_2d_immut _tex_fur_mask;
+	cg::float2 _view_roll_angles;
+	cg::float2 _prev_mouse_pos_ndc;
+	// model
+	Geometry_buffers _geometry_buffers;
 };
 
 } // fur_simulation

@@ -64,6 +64,9 @@
     <ClCompile Include="rnd\opengl\fbo_unittest.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="base\container_unittest.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

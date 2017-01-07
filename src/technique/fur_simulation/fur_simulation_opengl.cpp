@@ -1,9 +1,12 @@
 #include "technique/fur_simulation/fur_simulation_opengl.h"
 
 #include <cassert>
+#include <utility>
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
 
+
+using namespace cg;
 using cg::data::Image_2d;
 using cg::data::Image_format;
 using cg::sys::Key;
@@ -11,19 +14,29 @@ using cg::sys::Key;
 
 namespace fur_simulation {
 
+// ----- Geometry_buffers -----
+
+Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_filename)
+{
+	Model_geometry_data geometry_data(strand_lenght, geometry_filename);
+
+	//_position_buffer = Buffer_gpu();
+	_meshes = std::move(geometry_data.meshes);
+}
+
+void Geometry_buffers::init_physics_simulation_vao()
+{
+
+}
+
 // ----- Fur_simulation_opengl_example -----
 
 Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
 	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
-	_light_dir_ws(normalize(float3(50, 1, 100.0)))
+	_geometry_buffers(0.3f, "../data/sphere-20x20.obj")
 {
-	init_model_11();
-	//init_model();
-	init_materials();
-	_curr_material = &_cat_material;
-
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
@@ -31,261 +44,9 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Fur_simulation_opengl_example::init_materials()
-{
-	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
-
-	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-03.tga");
-	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, linear_sampler, image_fur_mask);
-
-	
-	//{ // cat material
-	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-	//	_cat_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-	//	_cat_material.shadow_factor_power = 1.1f;
-	//	_cat_material.threshold_power = 0.6f;
-	//	_cat_material.curl_radius = 0.01f;
-	//	_cat_material.curl_frequency = 0.0f;
-	//	_cat_material.tex_coord_factor = 15.0f;
-	//	_cat_material.shell_count = 16;
-	//}
-
-	//{ // curly red material
-	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
-	//	_curly_red_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-	//	_curly_red_material.shadow_factor_power = 0.6f;
-	//	_curly_red_material.threshold_power = 0.6f;
-	//	_curly_red_material.curl_radius = 0.4f;
-	//	_curly_red_material.curl_frequency = 4.0f;
-	//	_curly_red_material.tex_coord_factor = 8.0f;
-	//	_curly_red_material.shell_count = 32;
-	//}
-
-	//{ // sheep material
-	//	auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-	//	_sheep_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-	//	_sheep_material.shadow_factor_power = 1.0f;
-	//	_sheep_material.threshold_power = 1.0f;
-	//	_sheep_material.curl_radius = 0.16f;
-	//	_sheep_material.curl_frequency = 5.0f;
-	//	_sheep_material.tex_coord_factor = 4.0f;
-	//	_sheep_material.shell_count = 32;
-	//}
-
-	{ // cat material
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_cat_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_cat_material.shadow_factor_power = 1.1f;
-		_cat_material.threshold_power = 0.6f;
-		_cat_material.curl_radius = 0.01f;
-		_cat_material.curl_frequency = 0.0f;
-		_cat_material.tex_coord_factor = 2.0f;
-		_cat_material.shell_count = 16;
-	}
-
-	{ // curly red material
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
-		_curly_red_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_curly_red_material.shadow_factor_power = 0.6f;
-		_curly_red_material.threshold_power = 0.6f;
-		_curly_red_material.curl_radius = 0.01f;
-		_curly_red_material.curl_frequency = 4.0f;
-		_curly_red_material.tex_coord_factor = 0.5f;
-		_curly_red_material.shell_count = 32;
-	}
-
-	{ // hair material
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_hair_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_hair_material.shadow_factor_power = 2.0f;
-		_hair_material.threshold_power = 0.05f;
-		_hair_material.curl_radius = 0.07f;
-		_hair_material.curl_frequency = 1.0f;
-		_hair_material.tex_coord_factor = 0.5f;
-		_hair_material.shell_count = 32;
-	}
-
-	{ // sheep material
-		auto image_diffuse_rgb = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
-		_sheep_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
-		_sheep_material.shadow_factor_power = 1.0f;
-		_sheep_material.threshold_power = 1.5f;
-		_sheep_material.curl_radius = 0.006f;
-		_sheep_material.curl_frequency = 10.0f;
-		_sheep_material.tex_coord_factor = 1.0f;
-		_sheep_material.shell_count = 32;
-	}
-}
-
-void Fur_simulation_opengl_example::init_model()
-{
-	//Square_model model;
-	Arbitrary_model model(0.2f, "../data/sphere-20x20.obj");
-	//Arbitrary_model model(5.0f, "c:/dev/meshes/mod_head_default.obj");
-	auto geometry_data = model.get_geometry_data();
-	_model_index_count = geometry_data.index_data().size();
-
-	glCreateVertexArrays(1, &_vao_id);
-	glBindVertexArray(_vao_id);
-
-	// vertex buffer
-	constexpr GLuint vb_binding_index = 0;
-
-	_vertex_buffer = Buffer_gpu(geometry_data.vertex_data_byte_count(), geometry_data.vertex_data().data());
-	glVertexArrayVertexBuffer(_vao_id, vb_binding_index, _vertex_buffer.id(), 0,
-		geometry_data.vertex_byte_count());
-
-	// position
-	glEnableVertexArrayAttrib(_vao_id, 0);
-	glVertexArrayAttribBinding(_vao_id, 0, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 0, 3, GL_FLOAT, false, geometry_data.position_byte_offset());
-
-	// normal
-	glEnableVertexArrayAttrib(_vao_id, 1);
-	glVertexArrayAttribBinding(_vao_id, 1, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 1, 3, GL_FLOAT, false, geometry_data.normal_byte_offset());
-
-	// tex_coord
-	glEnableVertexArrayAttrib(_vao_id, 2);
-	glVertexArrayAttribBinding(_vao_id, 2, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 2, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
-
-	// tangent_h
-	glEnableVertexArrayAttrib(_vao_id, 3);
-	glVertexArrayAttribBinding(_vao_id, 3, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 3, 4, GL_FLOAT, false, geometry_data.tangent_h_byte_offset());
-
-	// strand_rest_position
-	glEnableVertexArrayAttrib(_vao_id, 4);
-	glVertexArrayAttribBinding(_vao_id, 4, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 4, 3, GL_FLOAT, false, geometry_data.strand_rest_position_byte_offset());
-
-	// strand_curr_position
-	glEnableVertexArrayAttrib(_vao_id, 5);
-	glVertexArrayAttribBinding(_vao_id, 5, vb_binding_index);
-	glVertexArrayAttribFormat(_vao_id, 5, 3, GL_FLOAT, false, geometry_data.strand_curr_position_byte_offset());
-
-	
-}
-
-void Fur_simulation_opengl_example::init_model_11()
-{
-	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-
-	auto model_data = load_fur_model(0.3f, 1.0f, 1.0f, "../data/sphere-20x20.obj");
-	auto geometry_data = std::move(model_data.first);
-	_model_rnd_params = std::move(model_data.second);
-
-	glCreateVertexArrays(1, &_physics_vao_id);
-	glCreateVertexArrays(1, &_render_vao_id);
-
-	init_physics_input_buffer(_physics_vao_id, _render_vao_id, geometry_data);
-	init_physics_output_buffer(_physics_vao_id, _render_vao_id, geometry_data);
-	init_render_buffer(_render_vao_id, geometry_data);
-
-	// index buffer
-	_index_buffer = Buffer_gpu(geometry_data.index_buffer_byte_count(), geometry_data.index_buffer().data());
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.id());
-}
-
-void Fur_simulation_opengl_example::init_physics_input_buffer(GLuint physics_vao_id, GLuint render_vao_id, 
-	const Model_geometry_data_1& geometry_data)
-{
-	constexpr GLuint physics_input_binding_index = 0;
-	_physics_input_buffer = Buffer_gpu(
-		geometry_data.physics_input_buffer_byte_count(),
-		geometry_data.physics_input_buffer().data());
-
-	//// physics_vao_id
-	//glBindVertexArray(physics_vao_id);
-	//glVertexArrayVertexBuffer(physics_vao_id, physics_input_binding_index, _physics_input_buffer.id(), 0,
-	//	geometry_data.physics_input_buffer_byte_stride());
-
-	//// p0 + mass
-	//glEnableVertexArrayAttrib(physics_vao_id, 0);
-	//glVertexArrayAttribBinding(physics_vao_id, 0, physics_input_binding_index);
-	//glVertexArrayAttribFormat(physics_vao_id, 0, 4, GL_FLOAT, false, geometry_data.p0_byte_offset());
-
-	//// p1 + k
-	//glEnableVertexArrayAttrib(physics_vao_id, 1);
-	//glVertexArrayAttribBinding(physics_vao_id, 1, physics_input_binding_index);
-	//glVertexArrayAttribFormat(physics_vao_id, 1, 4, GL_FLOAT, false, geometry_data.p0_byte_offset());
-
-
-	// render_vao_id
-	glBindVertexArray(render_vao_id);
-	glVertexArrayVertexBuffer(render_vao_id, physics_input_binding_index, _physics_input_buffer.id(), 0,
-		geometry_data.physics_input_buffer_byte_stride());
-
-	// p0
-	glEnableVertexArrayAttrib(render_vao_id, 0);
-	glVertexArrayAttribBinding(render_vao_id, 0, physics_input_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 0, 3, GL_FLOAT, false, geometry_data.p0_byte_offset());
-
-	// p1
-	glEnableVertexArrayAttrib(render_vao_id, 1);
-	glVertexArrayAttribBinding(render_vao_id, 1, physics_input_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 1, 3, GL_FLOAT, false, geometry_data.p1_byte_offset());
-}
-
-void Fur_simulation_opengl_example::init_physics_output_buffer(GLuint physics_vao_id, GLuint render_vao_id,
-	const Model_geometry_data_1& geometry_data)
-{
-	constexpr GLuint physics_output_binding_index = 1;
-	_physics_output_buffer = Buffer_gpu(
-		geometry_data.physics_output_buffer_byte_count(),
-		geometry_data.physics_output_buffer().data());
-
-	//// physics_vao_id
-	//glBindVertexArray(physics_vao_id);
-	//glVertexArrayVertexBuffer(physics_vao_id, physics_output_binding_index, _physics_output_buffer.id(), 0,
-	//	geometry_data.physics_output_buffer_byte_stride());
-	// transform feedback
-
-
-	// render_vao_id
-	glBindVertexArray(render_vao_id);
-	glVertexArrayVertexBuffer(render_vao_id, physics_output_binding_index, _physics_output_buffer.id(), 0,
-		geometry_data.physics_output_buffer_byte_stride());
-	
-	// p2
-	glEnableVertexArrayAttrib(render_vao_id, 2);
-	glVertexArrayAttribBinding(render_vao_id, 2, physics_output_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 2, 3, GL_FLOAT, false, geometry_data.p2_byte_offset());
-}
-
-void Fur_simulation_opengl_example::init_render_buffer(GLuint render_vao_id,
-	const Model_geometry_data_1& geometry_data)
-{
-	constexpr GLuint render_binding_index = 2;
-	_render_buffer = Buffer_gpu(
-		geometry_data.render_buffer_byte_count(),
-		geometry_data.render_buffer().data());
-
-	// render_vao_id
-	glBindVertexArray(render_vao_id);
-	glVertexArrayVertexBuffer(render_vao_id, render_binding_index, _render_buffer.id(), 0,
-		geometry_data.render_buffer_byte_stride());
-
-	// normal
-	glEnableVertexArrayAttrib(render_vao_id, 3);
-	glVertexArrayAttribBinding(render_vao_id, 3, render_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 3, 3, GL_FLOAT, false, geometry_data.normal_byte_offset());
-
-	// tex_coord
-	glEnableVertexArrayAttrib(render_vao_id, 4);
-	glVertexArrayAttribBinding(render_vao_id, 4, render_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 4, 2, GL_FLOAT, false, geometry_data.tex_coord_byte_offset());
-
-	// normal
-	glEnableVertexArrayAttrib(render_vao_id, 5);
-	glVertexArrayAttribBinding(render_vao_id, 5, render_binding_index);
-	glVertexArrayAttribFormat(render_vao_id, 5, 4, GL_FLOAT, false, geometry_data.tangent_h_byte_offset());
-}
-
 void Fur_simulation_opengl_example::on_keyboard()
 {
-	if (_app_ctx.keyboard.is_down(Key::digit_1)) {
+	/*if (_app_ctx.keyboard.is_down(Key::digit_1)) {
 		_curr_material = &_cat_material;
 	}
 	else if(_app_ctx.keyboard.is_down(Key::digit_2)) {
@@ -296,7 +57,7 @@ void Fur_simulation_opengl_example::on_keyboard()
 	}
 	else if (_app_ctx.keyboard.is_down(Key::digit_4)) {
 		_curr_material = &_sheep_material;
-	}
+	}*/
 }
 
 void Fur_simulation_opengl_example::on_mouse_move()
@@ -339,26 +100,6 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	const static float3 color = rgb(0x817c6e);
 	glClearColor(color.r, color.g, color.b, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glBindVertexArray(_render_vao_id);
-	glBindTextureUnit(0, _curr_material->tex_diffuse_rgb.id());
-	glBindTextureUnit(1, _tex_fur_mask.id());
-
-	_glsl_fur_generation.bind(_projection_matrix, view_matrix, _model_matrix,
-		*_curr_material, _light_dir_ws, view_position);
-
-	//glDrawElementsInstanced(GL_TRIANGLES, _model_index_count, GL_UNSIGNED_INT, 
-	//	nullptr, _curr_material->shell_count);
-	for (size_t si = 0; si < _curr_material->shell_count; ++si) {
-		_glsl_fur_generation.set_params(si);
-
-		for (size_t mi = 0; mi < _model_rnd_params.meshes().size(); ++mi) {
-			glDrawElements(GL_TRIANGLES, _model_rnd_params.meshes()[mi].index_count, GL_UNSIGNED_INT, nullptr);
-		}
-	}
-
-	_prev_viewpoint = _curr_viewpoint;
-	glBindVertexArray(_render_vao_id);
 }
 
 void Fur_simulation_opengl_example::update(float dt)

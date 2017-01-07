@@ -1,51 +1,52 @@
 #include "cg/data/model.h"
 
 #include "cg/base/base.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
-
-using cg::float2;
-using cg::float3;
-using cg::float4;
-using Assimp_load_flags = std::underlying_type_t<aiPostProcessSteps>;
-
-constexpr Assimp_load_flags default_load_flags = aiProcess_ValidateDataStructure
-	| aiProcess_JoinIdenticalVertices;
+#include "cg/data/model_assimp.h"
 
 
 namespace {
 
+using cg::float2;
+using cg::float3;
+using cg::float4;
+using cg::data::Assimp_postprocess_flags;
 using cg::data::Model_geometry_data;
 using cg::data::Model_geometry_vertex;
 using cg::data::Vertex_attribs;
+using cg::data::make_cg_vector;
 
-inline float3 make_cg_vector(const aiVector3D& v)
-{
-	return float3(v.x, v.y, v.z);
-}
-
-inline float2 make_cg_vector(const aiVector2D& v)
-{
-	return float2(v.x, v.y);
-}
 
 template<Vertex_attribs attribs>
-Model_geometry_data<attribs> load_model(const char* filename, const Assimp_load_flags& flags)
+Model_geometry_data<attribs> load_model(const char* filename, const Assimp_postprocess_flags& flags)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filename, flags);
+	const aiScene* scene = cg::data::load_model(importer, filename, flags);
+	
+	size_t base_vertex = 0;
+	size_t index_offset = 0;
+	Model_geometry_data<attribs> geometry_data(scene->mNumMeshes);
 
-	if (!scene) {
-		auto exc_msg = EXCEPTION_MSG("Error loading model file ", 
-			filename, ".", importer.GetErrorString());
-		throw std::runtime_error(exc_msg);
+	for (size_t mi = 0; mi < scene->mNumMeshes; ++mi) {
+		const aiMesh* mesh = scene->mMeshes[mi];
+
+		geometry_data.push_back_mesh(mesh->mNumVertices, base_vertex, mesh->mNumFaces * 3, index_offset);
+
+		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
+			process_vertex(geometry_data, mesh, vi);
+		}
+
+		for (size_t fi = 0; fi < mesh->mNumFaces; ++fi) {
+			const aiFace& face = mesh->mFaces[fi];
+			assert(face.mNumIndices == 3);
+
+			geometry_data.push_back_indices(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
+		}
+
+		base_vertex += mesh->mNumVertices;
+		index_offset = mesh->mNumFaces * 3;
 	}
 
-	ENFORCE(scene->mNumMeshes > 0, "File ", filename, " does not contain any meshes.");
-
-	return process_meshes<attribs>(scene);
+	return geometry_data;
 }
 
 void process_vertex(Model_geometry_data<Vertex_attribs::p>& geometry_data,
@@ -121,39 +122,6 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc_ts>& geometry_dat
 	geometry_data.push_back_vertex(vertex);
 }
 
-template<Vertex_attribs attribs>
-Model_geometry_data<attribs> process_meshes(const aiScene* scene)
-{
-	assert(scene);
-	assert(scene->mNumMeshes > 0);
-
-	size_t base_vertex = 0;
-	size_t index_offset = 0;
-	Model_geometry_data<attribs> geometry_data(scene->mNumMeshes);
-
-	for (size_t mi = 0; mi < scene->mNumMeshes; ++mi) {
-		const aiMesh* mesh = scene->mMeshes[mi];
-
-		geometry_data.push_back_mesh(mesh->mNumVertices, base_vertex, mesh->mNumFaces * 3, index_offset);
-
-		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
-			process_vertex(geometry_data, mesh, vi);
-		}
-
-		for (size_t fi = 0; fi < mesh->mNumFaces; ++fi) {
-			const aiFace& face = mesh->mFaces[fi];
-			assert(face.mNumIndices == 3);
-
-			geometry_data.push_back_indices(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
-		}
-
-		base_vertex += mesh->mNumVertices;
-		index_offset = mesh->mNumFaces * 3;
-	}
-
-	return geometry_data;
-}
-
 } // namespace
 
 
@@ -181,35 +149,35 @@ std::wostream& operator<<(std::wostream& o, const Model_mesh_info& mi)
 template<>
 Model_geometry_data<Vertex_attribs::p> load_model<Vertex_attribs::p>(const char* filename)
 {
-	Assimp_load_flags flags = default_load_flags;
+	Assimp_postprocess_flags flags = default_load_flags;
 	return ::load_model<Vertex_attribs::p>(filename, flags);
 }
 
 template<>
 Model_geometry_data<Vertex_attribs::p_n> load_model<Vertex_attribs::p_n>(const char* filename)
 {
-	Assimp_load_flags flags = default_load_flags | aiProcess_GenNormals;
+	Assimp_postprocess_flags flags = default_load_flags | aiProcess_GenNormals;
 	return ::load_model<Vertex_attribs::p_n>(filename, flags);
 }
 
 template<>
 Model_geometry_data<Vertex_attribs::p_n_tc> load_model<Vertex_attribs::p_n_tc>(const char* filename)
 {
-	Assimp_load_flags flags = default_load_flags | aiProcess_GenNormals;
+	Assimp_postprocess_flags flags = default_load_flags | aiProcess_GenNormals;
 	return ::load_model<Vertex_attribs::p_n_tc>(filename, flags);
 }
 
 template<>
 Model_geometry_data<Vertex_attribs::p_tc> load_model<Vertex_attribs::p_tc>(const char* filename)
 {
-	Assimp_load_flags flags = default_load_flags;
+	Assimp_postprocess_flags flags = default_load_flags;
 	return ::load_model<Vertex_attribs::p_tc>(filename, flags);
 }
 
 template<>
 Model_geometry_data<Vertex_attribs::p_n_tc_ts> load_model<Vertex_attribs::p_n_tc_ts>(const char* filename)
 {
-	Assimp_load_flags flags = default_load_flags 
+	Assimp_postprocess_flags flags = default_load_flags 
 		| aiProcess_GenNormals | aiProcess_CalcTangentSpace;
 	return ::load_model<Vertex_attribs::p_n_tc_ts>(filename, flags);
 }

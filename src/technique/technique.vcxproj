@@ -145,7 +145,7 @@
     <ClCompile Include="deferred_lighting\rnd\vertex_spec.cpp" />
     <ClCompile Include="fur_simulation\fur_model.cpp" />
     <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp" />
-    <ClCompile Include="fur_simulation\glsl_program.cpp" />
+    <ClCompile Include="fur_simulation\fur_glsl_program.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,7 +168,7 @@
     <ClInclude Include="deferred_lighting\rnd\vertex_spec.h" />
     <ClInclude Include="fur_simulation\fur_model.h" />
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h" />
-    <ClInclude Include="fur_simulation\glsl_program.h" />
+    <ClInclude Include="fur_simulation\fur_glsl_program.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
