@@ -1,0 +1,30 @@
+#version 450 core
+
+					uniform mat4			g_pvm_matrix;
+layout(binding = 0) uniform samplerBuffer	tbo_p_base;
+layout(binding = 1) uniform samplerBuffer	tbo_p_curr;
+
+
+out VS_result {
+	vec3 rgb;
+	vec3 pos;
+	flat int index;
+	flat int type;
+} result;
+
+void main()
+{
+	const int vertex_index = gl_VertexID / 2;
+	const int vertex_type = gl_VertexID % 2;
+	
+	// TODO(ref2401): optimize branches
+	vec4 p;
+	if (vertex_type == 0) p = texelFetch(tbo_p_base, vertex_index * 2);
+	else if (vertex_type == 1) p = texelFetch(tbo_p_curr, vertex_index * 2);
+
+	gl_Position = g_pvm_matrix * p;
+	result.rgb = vec3(0, 1, 1);
+	result.pos = p.xyz;
+	result.index = vertex_index;
+	result.type = vertex_type;
+}

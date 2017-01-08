@@ -2,8 +2,10 @@
 #define CG_RND_OPENGL_TEXTURE_H_
 
 #include <ostream>
+#include <utility>
 #include "cg/data/image.h"
 #include "cg/math/math.h"
+#include "cg/rnd/opengl/buffer.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"
 
@@ -17,13 +19,13 @@ struct Sampler_desc final {
 	Sampler_desc() noexcept = default;
 
 	Sampler_desc(GLenum min_filter, GLenum mag_filter, GLenum wrap_mode) noexcept :
-		min_filter(min_filter), mag_filter(mag_filter),
+	min_filter(min_filter), mag_filter(mag_filter),
 		wrap_s(wrap_mode), wrap_t(wrap_mode), wrap_r(wrap_mode)
 	{}
 
 	Sampler_desc(GLenum min_filter, GLenum mag_filter,
 		GLenum wrap_s, GLenum wrap_t, GLenum wrap_r) noexcept :
-		min_filter(min_filter), mag_filter(mag_filter), 
+	min_filter(min_filter), mag_filter(mag_filter),
 		wrap_s(wrap_s), wrap_t(wrap_t), wrap_r(wrap_r)
 	{}
 
@@ -302,6 +304,115 @@ private:
 	uint3 _size;
 };
 
+// A texture buffer is a one-dimensional texture whose storage comes from a buffer object.
+template<typename Buffer>
+class Texture_buffer final {
+public:
+
+	static_assert(is_opengl_buffer_v<Buffer>, "Buffer must be of the OpenGL buffer types.");
+
+
+	Texture_buffer() noexcept = default;
+
+	template<typename T>
+	Texture_buffer(GLenum internal_format, const std::vector<T>& vector) noexcept;
+
+	Texture_buffer(GLenum internal_format, size_t byte_count, const void* data_ptr = nullptr) noexcept;
+
+	Texture_buffer(const Texture_buffer&) = delete;
+
+	Texture_buffer(Texture_buffer&& tb) noexcept;
+
+
+	Texture_buffer& operator=(const Texture_buffer&) = delete;
+
+	Texture_buffer& operator=(Texture_buffer&& tb) noexcept;
+
+
+	// Buffer object which represents a data storage.
+	Buffer_i& buffer() noexcept
+	{
+		return _buffer;
+	}
+
+	// Texture's unique id.
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+	// Represent format of the data is store belonging to buffer.
+	GLenum internal_format() const noexcept
+	{
+		return _internal_format;
+	}
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::texture_id;
+	GLenum _internal_format = GL_NONE;
+	Buffer _buffer;
+};
+
+template<typename Buffer>
+template<typename T>
+Texture_buffer<Buffer>::Texture_buffer(GLenum internal_format, 
+	const std::vector<T>& vector) noexcept
+	: Texture_buffer(internal_format, cg::byte_count(vector), vector.data())
+{}
+
+template<typename Buffer>
+Texture_buffer<Buffer>::Texture_buffer(GLenum internal_format,
+	size_t byte_count, const void* data_ptr = nullptr) noexcept
+	: _internal_format(internal_format),
+	_buffer(byte_count, data_ptr)
+{
+	assert(is_valid_texture_buffer_internal_format(internal_format));
+
+	glCreateTextures(GL_TEXTURE_BUFFER, 1, &_id);
+	glTextureBuffer(_id, _internal_format, _buffer.id());
+}
+
+template<typename Buffer>
+Texture_buffer<Buffer>::Texture_buffer(Texture_buffer&& tb) noexcept
+	: _id(tb._id),
+	_internal_format(tb._internal_format),
+	_buffer(std::move(tb._buffer))
+{
+	tb._id = Invalid::texture_id;
+	tb._internal_format = GL_NONE;
+}
+
+template<typename Buffer>
+void Texture_buffer<Buffer>::dispose() noexcept
+{
+	if (_id == Invalid::texture_id) return;
+
+	glDeleteTextures(1, &_id);
+	_id = Invalid::texture_id;
+	_internal_format = GL_NONE;
+	_buffer.~Buffer();
+}
+
+template<typename Buffer>
+Texture_buffer<Buffer>& Texture_buffer<Buffer>::operator=(Texture_buffer&& tb) noexcept
+{
+	if (this == &tb) return *this;
+
+	dispose();
+	
+	_id = tb._id;
+	_internal_format = tb._internal_format;
+	_buffer = std::move(tb._buffer);
+
+	tb._id = Invalid::texture_id;
+	tb._internal_format = GL_NONE;
+
+	return *this;
+}
+
 
 inline bool operator==(const Sampler_desc& lhs, const Sampler_desc& rhs) noexcept
 {
@@ -343,6 +454,9 @@ GLenum get_texture_sub_image_type(GLenum internal_format) noexcept;
 
 // Validates glTexImage/glTexStorage/glTextureStorage 'internalformat' argument value.
 bool is_valid_texture_internal_format(GLenum value) noexcept;
+
+// Validates glTexBuffer/glTextureBuffer 'internalFormat' argument value.
+bool is_valid_texture_buffer_internal_format(GLenum value) noexcept;
 
 //  Validates sampler/texture GL_TEXTURE_MAG_FILTER parameter value.
 bool is_valid_texture_mag_filter(GLenum value) noexcept;

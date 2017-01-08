@@ -444,6 +444,43 @@ bool is_valid_texture_internal_format(GLenum value) noexcept
 		|| (value == GL_DEPTH_COMPONENT32F);
 }
 
+bool is_valid_texture_buffer_internal_format(GLenum value) noexcept
+{
+	return (value == GL_R8)
+		|| (value == GL_R16)
+		|| (value == GL_R16F)
+		|| (value == GL_R32F)
+		|| (value == GL_R8I)
+		|| (value == GL_R16I)
+		|| (value == GL_R32I)
+		|| (value == GL_R8UI)
+		|| (value == GL_R16UI)
+		|| (value == GL_R32UI)
+		|| (value == GL_RG8)
+		|| (value == GL_RG16)
+		|| (value == GL_RG16F)
+		|| (value == GL_RG32F)
+		|| (value == GL_RG8I)
+		|| (value == GL_RG16I)
+		|| (value == GL_RG32I)
+		|| (value == GL_RG8UI)
+		|| (value == GL_RG16UI)
+		|| (value == GL_RG32UI)
+		|| (value == GL_RGB32F)
+		|| (value == GL_RGB32I)
+		|| (value == GL_RGB32UI)
+		|| (value == GL_RGBA8)
+		|| (value == GL_RGBA16)
+		|| (value == GL_RGBA16F)
+		|| (value == GL_RGBA32F)
+		|| (value == GL_RGBA8I)
+		|| (value == GL_RGBA16I)
+		|| (value == GL_RGBA32I)
+		|| (value == GL_RGBA8UI)
+		|| (value == GL_RGBA16UI)
+		|| (value == GL_RGBA32UI);
+}
+
 bool is_valid_texture_mag_filter(GLenum value) noexcept
 {
 	return (value == GL_NEAREST)

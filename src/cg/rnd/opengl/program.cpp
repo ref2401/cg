@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <exception>
-#include <iterator>
 #include <string>
 #include <utility>
 #include "cg/base/base.h"
@@ -21,7 +20,7 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_compute
 	assert(!compute_data.compute_shader_source_code.empty());
 
 	try {
-		Shader shader(GL_COMPUTE_SHADER, compute_data.compute_shader_source_code);
+		Glsl_shader shader(GL_COMPUTE_SHADER, compute_data.compute_shader_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, shader.id());
@@ -45,13 +44,20 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 	assert(prog_desc.has_vertex_shader());
 
 	try {
-		Shader vertex_shader(GL_VERTEX_SHADER, prog_desc.vertex_shader_source_code);
-		Shader pixel_shader(GL_FRAGMENT_SHADER, prog_desc.fragment_shader_source_code);
-
 		_id = glCreateProgram();
-		glAttachShader(_id, vertex_shader.id());
-		glAttachShader(_id, pixel_shader.id());
 
+		// vertex shader
+		Glsl_shader vertex_shader(GL_VERTEX_SHADER, prog_desc.vertex_shader_source_code);
+		glAttachShader(_id, vertex_shader.id());
+
+		// fragment shader
+		Glsl_shader pixel_shader;
+		if (prog_desc.has_fragment_shader()) {
+			pixel_shader = Glsl_shader(GL_FRAGMENT_SHADER, prog_desc.fragment_shader_source_code);
+			glAttachShader(_id, pixel_shader.id());
+		}
+
+		// transform feedback
 		if (prog_desc.transform_feedback.is_used()) {
 			const size_t varying_count = prog_desc.transform_feedback.varying_names.size();
 			const GLenum buffer_mode = (prog_desc.transform_feedback.interleaved_buffer_mode)
@@ -61,7 +67,7 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 			const char** tmp = varying_names;
 			for (const auto& name : prog_desc.transform_feedback.varying_names) {
 				*tmp = name.c_str();
-				tmp = std::next(tmp);
+				++tmp;
 			}
 			
 			glTransformFeedbackVaryings(_id, varying_count, varying_names, buffer_mode);
@@ -73,7 +79,7 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 
 		// once shaders have been linked into a program they are no longer needed.
 		glDetachShader(_id, vertex_shader.id());
-		glDetachShader(_id, pixel_shader.id());
+		if (prog_desc.has_fragment_shader()) glDetachShader(_id, pixel_shader.id());
 	}
 	catch (...) {
 		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
@@ -197,9 +203,9 @@ void Glsl_program::validate()
 	}
 }
 
-// ----- Shader -----
+// ----- Glsl_shader -----
 
-Shader::Shader(GLenum type, const std::string& source_code)
+Glsl_shader::Glsl_shader(GLenum type, const std::string& source_code)
 	: _type(type)
 {
 	assert(is_valid_shader_type(type));
@@ -212,7 +218,7 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	if (compiled()) return; // The compilation succeeded.
 
 
-	// Shader compilation error handling
+	// Glsl_shader compilation error handling
 	const char* type_name = nullptr;
 	switch (_type) {
 		case GL_VERTEX_SHADER: 
@@ -235,7 +241,7 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	throw std::runtime_error(exc_msg);
 }
 
-Shader::Shader(Shader&& shader) noexcept
+Glsl_shader::Glsl_shader(Glsl_shader&& shader) noexcept
 	: _id(shader._id),
 	_type(shader._type)
 {
@@ -243,12 +249,12 @@ Shader::Shader(Shader&& shader) noexcept
 	shader._type = GL_NONE;
 }
 
-Shader::~Shader() noexcept
+Glsl_shader::~Glsl_shader() noexcept
 {
 	dispose();
 }
 
-Shader& Shader::operator=(Shader&& shader) noexcept
+Glsl_shader& Glsl_shader::operator=(Glsl_shader&& shader) noexcept
 {
 	if (this == &shader) return *this;
 
@@ -262,12 +268,12 @@ Shader& Shader::operator=(Shader&& shader) noexcept
 	return *this;
 }
 
-bool Shader::compiled() const noexcept
+bool Glsl_shader::compiled() const noexcept
 {
 	return get_property(GL_COMPILE_STATUS) == 1;
 }
 
-void Shader::dispose() noexcept
+void Glsl_shader::dispose() noexcept
 {
 	if (_id == Invalid::shader_id) return;
 
@@ -276,7 +282,7 @@ void Shader::dispose() noexcept
 	_type = GL_NONE;
 }
 
-GLint Shader::get_property(GLenum prop) const noexcept
+GLint Glsl_shader::get_property(GLenum prop) const noexcept
 {
 	assert(_id != Invalid::shader_id);
 	assert(is_valid_shader_property(prop));
@@ -288,7 +294,7 @@ GLint Shader::get_property(GLenum prop) const noexcept
 	return v;
 }
 
-std::string Shader::log() const noexcept
+std::string Glsl_shader::log() const noexcept
 {
 	assert(_id != Invalid::shader_id);
 
@@ -353,6 +359,12 @@ void set_uniform(GLint location, const float3& v) noexcept
 {
 	assert(location != Invalid::uniform_location);
 	glUniform3f(location, v.x, v.y, v.z);
+}
+
+void set_uniform(GLint location, const float4& v) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform4f(location, v.x, v.y, v.z, v.w);
 }
 
 void set_uniform(GLint location, const mat3& mat) noexcept

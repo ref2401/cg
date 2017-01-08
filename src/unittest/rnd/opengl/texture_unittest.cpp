@@ -140,6 +140,49 @@ public:
 		Assert::IsFalse(is_valid_texture_internal_format(GL_RED));
 	}
 
+	TEST_METHOD(is_valid_texture_buffer_internal_format)
+	{
+		using cg::rnd::opengl::is_valid_texture_buffer_internal_format;
+
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R8));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R16));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R16F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R32F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R8I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R16I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R32I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R8UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R16UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_R32UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG8));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG16));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG16F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG32F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG8I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG16I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG32I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG8UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG16UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RG32UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGB32F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGB32I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGB32UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA8));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA16));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA16F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA32F));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA8I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA16I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA32I));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA8UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA16UI));
+		Assert::IsTrue(is_valid_texture_buffer_internal_format(GL_RGBA32UI));
+
+		Assert::IsFalse(is_valid_texture_buffer_internal_format(GL_RGB));
+		Assert::IsFalse(is_valid_texture_buffer_internal_format(GL_BGRA));
+		Assert::IsFalse(is_valid_texture_buffer_internal_format(GL_DEPTH_COMPONENT32F));
+	}
+
 	TEST_METHOD(is_valid_texture_mag_filter)
 	{
 		using cg::rnd::opengl::is_valid_texture_mag_filter;

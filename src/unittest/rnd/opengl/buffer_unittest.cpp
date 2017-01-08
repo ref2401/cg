@@ -15,7 +15,16 @@ namespace unittest {
 TEST_CLASS(cg_rnd_opengl_buffer_Funcs) {
 public:
 
+	TEST_METHOD(is_opengl_buffer)
+	{
+		using cg::rnd::opengl::is_opengl_buffer;
 
+		Assert::IsTrue(is_opengl_buffer<cg::rnd::opengl::Buffer_dynamic>::value);
+		Assert::IsTrue(is_opengl_buffer<cg::rnd::opengl::Buffer_dynamic>::value);
+
+		Assert::IsFalse(is_opengl_buffer<size_t>::value);
+		Assert::IsFalse(is_opengl_buffer<GLenum>::value);
+	}
 };
 
 } // namespace unittest

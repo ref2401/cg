@@ -54,6 +54,19 @@ Model_geometry_data::Model_geometry_data(float strand_length, const char* geomet
 		base_vertex += mesh->mNumVertices;
 		index_offset = mesh->mNumFaces * 3;
 	}
+
+	layout.position_buffer_byte_stride = sizeof(float) * 6; // p_base, p_rest
+	layout.p_base_byte_offset = 0;
+	layout.p_rest_byte_offset = layout.p_base_byte_offset + sizeof(float) * 3;
+
+	layout.simulation_buffer_byte_stride = sizeof(float) * 6; // p_curr, velocity
+	layout.p_curr_byte_offset = 0;
+	layout.velocity_byte_offset = layout.p_curr_byte_offset + sizeof(float) * 3;
+
+	layout.model_attribs_byte_stride = sizeof(float) * 9; // normal, tex_coord, tangent_h
+	layout.normal_byte_offset = 0;
+	layout.tex_coode_byte_offset = layout.normal_byte_offset + sizeof(float) * 3;
+	layout.tangent_h_byte_offset = layout.tex_coode_byte_offset + sizeof(float) * 2;
 }
 
 void Model_geometry_data::push_back_position_buffer_data(const cg::float3& p_base, const cg::float3& p_rest)

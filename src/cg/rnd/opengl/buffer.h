@@ -1,7 +1,10 @@
 #ifndef CG_RND_OPENGL_BUFFER_H_
 #define CG_RND_OPENGL_BUFFER_H_
 
+#include <array>
+#include <type_traits>
 #include <vector>
+#include "cg/base/container.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"
 
@@ -14,6 +17,7 @@ class Buffer_i {
 public:
 
 	virtual ~Buffer_i() noexcept {}
+
 
 	// Size in bytes of the buffer's data store. 
 	virtual size_t byte_count() const noexcept = 0;
@@ -30,6 +34,11 @@ class Buffer_dynamic final : public virtual Buffer_i {
 public:
 
 	Buffer_dynamic() noexcept;
+
+	template<typename T>
+	explicit Buffer_dynamic(const std::vector<T>& vector) noexcept
+		: Buffer_dynamic(cg::byte_count(vector), vector.data())
+	{}
 
 	explicit Buffer_dynamic(size_t byte_count, const void* data_ptr = nullptr) noexcept;
 
@@ -93,6 +102,11 @@ public:
 
 	Buffer_gpu() noexcept = default;
 
+	template<typename T>
+	explicit Buffer_gpu(const std::vector<T>& vector) noexcept
+		: Buffer_gpu(cg::byte_count(vector), vector.data())
+	{}
+
 	Buffer_gpu(size_t byte_count, const void* data_ptr) noexcept;
 
 	Buffer_gpu(const Buffer_gpu&) = delete;
@@ -131,6 +145,7 @@ private:
 // Buffer_map (read/write)
 // Buffer_persistent_map (read/write)
 
+
 // Copies contents of the src buffer to the dest buffer.
 // Params:
 // -	src: Source buffer object.
@@ -147,6 +162,23 @@ inline void copy(const Buffer_i& src, Buffer_i& dest, size_t byte_count) noexcep
 {
 	copy(src, 0, dest, 0, byte_count);
 }
+
+// If T represents one of the OpenGL buffers, 
+// provides the member constant value equal to true. Otherwise value is false.
+template<typename T, bool 
+	= std::is_same<T, Buffer_dynamic>::value
+	|| std::is_same<T, Buffer_gpu>::value>
+struct is_opengl_buffer;
+
+template<typename T> 
+struct is_opengl_buffer<T, true> final : std::true_type {};
+
+template<typename T>
+struct is_opengl_buffer<T, false> final : std::false_type {};
+
+// ditto
+template<typename T>
+constexpr bool is_opengl_buffer_v = is_opengl_buffer<T>::value;
 
 } // namespace opengl
 } // namespace rnd

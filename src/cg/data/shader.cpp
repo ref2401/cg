@@ -113,7 +113,7 @@ Glsl_program_desc load_glsl_program_desc(const char* vertex_filename, const char
 	Glsl_program_desc glsl_desc;
 	glsl_desc.vertex_shader_source_code = load_text(vertex_filename);
 
-	if (strlen(fragment_filename) > 0) {
+	if (fragment_filename && (strlen(fragment_filename) > 0)) {
 		ENFORCE(exists(fragment_filename),
 			EXCEPTION_MSG("The specified glsl file '", fragment_filename, "' does not exist."));
 		glsl_desc.fragment_shader_source_code = load_text(fragment_filename);

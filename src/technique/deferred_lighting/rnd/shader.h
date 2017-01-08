@@ -12,7 +12,7 @@
 namespace deferred_lighting {
 namespace rnd {
 
-class Shader final {
+class Glsl_shader final {
 public:
 
 	static constexpr GLuint invalid_id = 0;
@@ -20,13 +20,13 @@ public:
 	static constexpr GLenum invalid_type = GL_NONE;
 
 
-	Shader(GLenum type, const std::string& source_code);
+	Glsl_shader(GLenum type, const std::string& source_code);
 
-	Shader(const Shader&) = delete;
+	Glsl_shader(const Glsl_shader&) = delete;
 
-	Shader(Shader&&) = delete;
+	Glsl_shader(Glsl_shader&&) = delete;
 
-	~Shader() noexcept;
+	~Glsl_shader() noexcept;
 
 
 	bool compiled() const noexcept;
@@ -60,9 +60,9 @@ public:
 
 	Shader_program(const std::string& name, const cg::data::Glsl_program_desc& src);
 
-	Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader);
+	Shader_program(const std::string& name, const Glsl_shader& vertex_shader, const Glsl_shader& pixel_shader);
 
-	Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code);
+	Shader_program(const std::string& name, const Glsl_shader& vertex_shader, const std::string& pixel_source_code);
 
 	Shader_program(const Shader_program&) = delete;
 

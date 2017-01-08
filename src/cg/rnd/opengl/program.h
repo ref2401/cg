@@ -74,28 +74,28 @@ private:
 	std::string _name;
 };
 
-class Shader final {
+class Glsl_shader final {
 public:
 
-	Shader() noexcept = default;
+	Glsl_shader() noexcept = default;
 
-	Shader(GLenum type, const std::string& source_code);
+	Glsl_shader(GLenum type, const std::string& source_code);
 
-	Shader(const Shader&) = delete;
+	Glsl_shader(const Glsl_shader&) = delete;
 
-	Shader(Shader&& shader) noexcept;
+	Glsl_shader(Glsl_shader&& shader) noexcept;
 
-	~Shader() noexcept;
+	~Glsl_shader() noexcept;
 
 
-	Shader& operator=(const Shader&) = delete;
+	Glsl_shader& operator=(const Glsl_shader&) = delete;
 
-	Shader& operator=(Shader&& shader) noexcept;
+	Glsl_shader& operator=(Glsl_shader&& shader) noexcept;
 
 	// Returns true if the last compile operation was successful.
 	bool compiled() const noexcept;
 
-	// Shader's unique id.
+	// Glsl_shader's unique id.
 	GLuint id() const noexcept
 	{
 		return _id;
@@ -138,6 +138,8 @@ void set_uniform(GLint location, float val) noexcept;
 void set_uniform(GLint location, const uint2& v) noexcept;
 
 void set_uniform(GLint location, const float3& v) noexcept;
+
+void set_uniform(GLint location, const float4& v) noexcept;
 
 void set_uniform(GLint location, const mat3& mat) noexcept;
 

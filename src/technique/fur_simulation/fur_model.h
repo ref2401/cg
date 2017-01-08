@@ -11,6 +11,22 @@
 
 namespace fur_simulation {
 
+// Describes vertex attribs' offsets and buffers' strides.
+struct Model_geometry_layout final {
+	size_t position_buffer_byte_stride;
+	size_t p_base_byte_offset;
+	size_t p_rest_byte_offset;
+
+	size_t simulation_buffer_byte_stride;
+	size_t p_curr_byte_offset;
+	size_t velocity_byte_offset;
+
+	size_t model_attribs_byte_stride;
+	size_t normal_byte_offset;
+	size_t tex_coode_byte_offset;
+	size_t tangent_h_byte_offset;
+};
+
 // Fur model vertex format:
 // float3 p_base
 // float3 p_rest
@@ -49,6 +65,8 @@ struct Model_geometry_data final {
 
 	// indices
 	std::vector<uint32_t> index_buffer;
+
+	Model_geometry_layout layout;
 
 private:
 

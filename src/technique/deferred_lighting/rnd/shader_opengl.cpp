@@ -14,9 +14,9 @@ using cg::data::Vertex_attribs_old;
 namespace deferred_lighting {
 namespace rnd {
 
-// ----- Shader -----
+// ----- Glsl_shader -----
 
-Shader::Shader(GLenum type, const std::string& source_code)
+Glsl_shader::Glsl_shader(GLenum type, const std::string& source_code)
 	: _type(type)
 {
 	assert(type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER);
@@ -37,17 +37,17 @@ Shader::Shader(GLenum type, const std::string& source_code)
 	}
 }
 
-Shader::~Shader() noexcept
+Glsl_shader::~Glsl_shader() noexcept
 {
 	dispose();
 }
 
-bool Shader::compiled() const noexcept
+bool Glsl_shader::compiled() const noexcept
 {
 	return get_property(GL_COMPILE_STATUS) == 1;
 }
 
-void Shader::dispose() noexcept
+void Glsl_shader::dispose() noexcept
 {
 	if (_id == Invalid::shader_id) return;
 
@@ -55,9 +55,9 @@ void Shader::dispose() noexcept
 	_id = Invalid::shader_id;
 }
 
-GLint Shader::get_property(GLenum prop) const noexcept
+GLint Glsl_shader::get_property(GLenum prop) const noexcept
 {
-	assert(_id != Shader::invalid_id);
+	assert(_id != Glsl_shader::invalid_id);
 	assert(prop == GL_COMPILE_STATUS
 		|| prop == GL_DELETE_STATUS
 		|| prop == GL_INFO_LOG_LENGTH
@@ -71,9 +71,9 @@ GLint Shader::get_property(GLenum prop) const noexcept
 	return v;
 }
 
-std::string Shader::log() const noexcept
+std::string Glsl_shader::log() const noexcept
 {
-	assert(_id != Shader::invalid_id);
+	assert(_id != Glsl_shader::invalid_id);
 
 	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
 	char* msg_buffer = new char[log_size];
@@ -96,8 +96,8 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Glsl_pro
 	assert(src.fragment_shader_source_code.size() > 0);
 
 	try {
-		Shader vertex_shader(GL_VERTEX_SHADER, src.vertex_shader_source_code);
-		Shader pixel_shader(GL_FRAGMENT_SHADER, src.fragment_shader_source_code);
+		Glsl_shader vertex_shader(GL_VERTEX_SHADER, src.vertex_shader_source_code);
+		Glsl_shader pixel_shader(GL_FRAGMENT_SHADER, src.fragment_shader_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, vertex_shader.id());
@@ -133,7 +133,7 @@ Shader_program::Shader_program(const std::string& name, const cg::data::Glsl_pro
 	}
 }
 
-Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const Shader& pixel_shader)
+Shader_program::Shader_program(const std::string& name, const Glsl_shader& vertex_shader, const Glsl_shader& pixel_shader)
 	: _name(name)
 {
 	_id = glCreateProgram();
@@ -159,13 +159,13 @@ Shader_program::Shader_program(const std::string& name, const Shader& vertex_sha
 	}
 }
 
-Shader_program::Shader_program(const std::string& name, const Shader& vertex_shader, const std::string& pixel_source_code)
+Shader_program::Shader_program(const std::string& name, const Glsl_shader& vertex_shader, const std::string& pixel_source_code)
 	: _name(name)
 {
 	assert(pixel_source_code.size() > 0);
 
 	try {
-		Shader pixel_shader(GL_FRAGMENT_SHADER, pixel_source_code);
+		Glsl_shader pixel_shader(GL_FRAGMENT_SHADER, pixel_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, vertex_shader.id());
