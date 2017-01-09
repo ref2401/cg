@@ -21,12 +21,12 @@ Physics_simulation_pass_program::Physics_simulation_pass_program()
 	_g_strand_props = _program.get_uniform_location("g_strand_props");
 }
 
-void Physics_simulation_pass_program::bind(const float3& gravity_ms, const float strand_length) noexcept
+void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, const cg::float4& strand_props) noexcept
 {
 	glUseProgram(_program.id());
 
-	set_uniform(_g_gravity_ms_location, float4(gravity_ms, 1.0f));
-	set_uniform(_g_strand_props, float4(1.0f, 1.0f, 1.0f, 0.1f));
+	set_uniform(_g_gravity_ms_location, gravity_ms);
+	set_uniform(_g_strand_props, strand_props);
 }
 
 // ----- Strand_debug_pass_program -----

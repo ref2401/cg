@@ -34,8 +34,9 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	assert(_vertex_count <= size_t(std::numeric_limits<GLsizei>::max()));
 
 	glCreateVertexArrays(1, &_blank_vao_id);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_simulation_buffer_1.buffer().id());
 	init_physics_simulation_0_vao(geometry.layout);
-	//init_physics_simulation_1_vao(geometry.layout);
+	init_physics_simulation_1_vao(geometry.layout);
 	// index buffer glVetexArrayElementBuffer
 }
 
@@ -45,38 +46,36 @@ void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout
 	constexpr GLuint simulation_buffer_binding_index = 1;
 
 	glCreateVertexArrays(1, &_physics_0_vao_id);
-	glBindVertexArray(_physics_0_vao_id);
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao_id, position_buffer_binding_index, 
 		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
 
-		// p_base
-		glEnableVertexArrayAttrib(_physics_0_vao_id, 0);
-		glVertexArrayAttribBinding(_physics_0_vao_id, 0, position_buffer_binding_index);
-		glVertexArrayAttribFormat(_physics_0_vao_id, 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
 
-		// p_rest
-		glEnableVertexArrayAttrib(_physics_0_vao_id, 1);
-		glVertexArrayAttribBinding(_physics_0_vao_id, 1, position_buffer_binding_index);
-		glVertexArrayAttribFormat(_physics_0_vao_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+	// p_base
+	glEnableVertexArrayAttrib(_physics_0_vao_id, 0);
+	glVertexArrayAttribBinding(_physics_0_vao_id, 0, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_physics_0_vao_id, 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+
+	// p_rest
+	glEnableVertexArrayAttrib(_physics_0_vao_id, 1);
+	glVertexArrayAttribBinding(_physics_0_vao_id, 1, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_physics_0_vao_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
 	
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao_id, simulation_buffer_binding_index,
 		_tbo_simulation_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
 
-		// p_curr
-		glEnableVertexArrayAttrib(_physics_0_vao_id, 2);
-		glVertexArrayAttribBinding(_physics_0_vao_id, 2, simulation_buffer_binding_index);
-		glVertexArrayAttribFormat(_physics_0_vao_id, 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
 
-		// velocity
-		glEnableVertexArrayAttrib(_physics_0_vao_id, 3);
-		glVertexArrayAttribBinding(_physics_0_vao_id, 3, simulation_buffer_binding_index);
-		glVertexArrayAttribFormat(_physics_0_vao_id, 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
+	// p_curr
+	glEnableVertexArrayAttrib(_physics_0_vao_id, 2);
+	glVertexArrayAttribBinding(_physics_0_vao_id, 2, simulation_buffer_binding_index);
+	glVertexArrayAttribFormat(_physics_0_vao_id, 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
 
-	// transform feedback
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_simulation_buffer_1.buffer().id());
+	// velocity
+	glEnableVertexArrayAttrib(_physics_0_vao_id, 3);
+	glVertexArrayAttribBinding(_physics_0_vao_id, 3, simulation_buffer_binding_index);
+	glVertexArrayAttribFormat(_physics_0_vao_id, 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
 }
 
 void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout& layout)
@@ -85,7 +84,6 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 	constexpr GLuint simulation_buffer_binding_index = 1;
 
 	glCreateVertexArrays(1, &_physics_1_vao_id);
-	glBindVertexArray(_physics_1_vao_id);
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_physics_1_vao_id, position_buffer_binding_index,
@@ -101,6 +99,7 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 	glVertexArrayAttribBinding(_physics_1_vao_id, 1, position_buffer_binding_index);
 	glVertexArrayAttribFormat(_physics_1_vao_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
 
+	
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_1_vao_id, simulation_buffer_binding_index,
 		_tbo_simulation_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
@@ -114,9 +113,18 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 	glEnableVertexArrayAttrib(_physics_1_vao_id, 3);
 	glVertexArrayAttribBinding(_physics_1_vao_id, 3, simulation_buffer_binding_index);
 	glVertexArrayAttribFormat(_physics_1_vao_id, 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
+}
 
-	// transform feedback
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_simulation_buffer_0.buffer().id());
+void Geometry_buffers::swap_physics_source_dest_buffers() noexcept
+{ 
+	_read_from_physics_0 = !_read_from_physics_0; 
+
+	// if data is read from #0 then tb points to #1
+	GLuint tf_buffer_id = (_read_from_physics_0)
+		? (_tbo_simulation_buffer_1.buffer().id())
+		: (_tbo_simulation_buffer_0.buffer().id());
+
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tf_buffer_id);
 }
 
 // ----- Physics_simulation_pass -----
@@ -126,26 +134,29 @@ Physics_simulation_pass::Physics_simulation_pass()
 
 }
 
-void Physics_simulation_pass::begin(const float3& graviy_ms, float strand_length) noexcept
+void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
+	const cg::float4& graviy_ms, const cg::float4& strand_props) noexcept
 {
 	glDisable(GL_DEPTH_TEST);
-
-	_program.bind(graviy_ms, strand_length);
 	glEnable(GL_RASTERIZER_DISCARD);
-	glBeginTransformFeedback(GL_POINTS);
-}
 
-void Physics_simulation_pass::end() noexcept
-{
-	glEndTransformFeedback();
-	glDisable(GL_RASTERIZER_DISCARD);
+	glBindVertexArray(geometry_buffers.physics_vao_id());
 	
+	_program.bind(graviy_ms, strand_props);
+	glBeginTransformFeedback(GL_POINTS);
+		glDrawArrays(GL_POINTS, 0, geometry_buffers.vertex_count());
+	glEndTransformFeedback();
+	
+	geometry_buffers.swap_physics_source_dest_buffers();
+	glBindVertexArray(Invalid::vao_id);
+	
+	glDisable(GL_RASTERIZER_DISCARD);
 	glEnable(GL_DEPTH_TEST);
 }
 
 // ----- Strand_debug_pass -----
 
-void Strand_debug_pass::perform(const Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept
+void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -170,6 +181,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	_prev_viewpoint(_curr_viewpoint),
 	// materil
 	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj")
+	//_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/rect_2x2.obj")
 {
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
 
@@ -231,28 +243,25 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	const mat4 pvm_matrix = projection_view_matrix * _model_matrix;
 	_prev_viewpoint = _curr_viewpoint;
 
-	const float3 gravity_ms = mul(inverse(_model_matrix), -float3::unit_y).xyz();
 
-	glBindVertexArray(_geometry_buffers.physics_vao_id());
-	_physics_pass.begin(gravity_ms, 0.3f);
-	glDrawArrays(GL_POINTS, 0, _geometry_buffers.vertex_count());
-	_physics_pass.end();
+	const float4 gravity_ms(
+		normalize(mul(inverse(_model_matrix), -float3::unit_y).xyz()), 0.01f);
+	const float4 strand_props(0.3f, 0.1f, 0.3f, 0.5f);
 
+	_physics_pass.perform(_geometry_buffers, gravity_ms, strand_props);
 
 	const static float3 color = rgb(0x817c6e);
 	glClearColor(color.r, color.g, color.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
-	
+
 	
 	/*glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);*/
-
-	//_geometry_buffers.end_frame();
 }
 
 void Fur_simulation_opengl_example::update(float dt)

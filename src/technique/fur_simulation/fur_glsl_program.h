@@ -36,7 +36,7 @@ public:
 	Physics_simulation_pass_program& operator=(Physics_simulation_pass_program&&) = delete;
 
 
-	void bind(const cg::float3& gravity_ms, float strand_length) noexcept;
+	void bind(const cg::float4& gravity_ms, const cg::float4& strand_props) noexcept;
 
 private:
 

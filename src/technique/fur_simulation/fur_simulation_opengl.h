@@ -64,7 +64,7 @@ public:
 	}
 
 
-	void end_frame() const noexcept { _read_from_physics_0 = !_read_from_physics_0; }
+	void swap_physics_source_dest_buffers() noexcept;
 
 private:
 
@@ -101,9 +101,8 @@ public:
 	Physics_simulation_pass& operator=(Physics_simulation_pass&&) = delete;
 
 
-	void begin(const cg::float3& graviy_ms, float strand_length) noexcept;
-
-	void end() noexcept;
+	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_ms,
+		const cg::float4& strand_props) noexcept;
 
 private:
 
@@ -125,7 +124,7 @@ public:
 	Strand_debug_pass& operator=(Strand_debug_pass&&) = delete;
 
 
-	void perform(const Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept;
+	void perform(Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept;
 
 private:
 

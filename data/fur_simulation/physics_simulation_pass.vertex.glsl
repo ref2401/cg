@@ -17,6 +17,7 @@ layout(location = 3) in vec3 vert_velocity;
 out vec3 tf_p_curr;
 out vec3 tf_velocity;
 
+
 void main()
 {
 	const vec3 deform = vert_p_curr - vert_p_rest;
@@ -28,6 +29,8 @@ void main()
 	const float t = g_gravity_ms.w;
 	const vec3 p_new = vert_p_curr + (vert_velocity * t) + (0.5 * a * t * t);
 
-	tf_p_curr = g_strand_props.x * normalize(p_new - vert_p_base); // strand length preservation
+	tf_p_curr = vert_p_base + g_strand_props.x * normalize(p_new - vert_p_base); // strand length preservation
 	tf_velocity = vert_velocity + a * t;
+
+	//tf_p_curr = p_new - vert_p_base;
 }
