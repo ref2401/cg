@@ -23,7 +23,7 @@ struct Model_geometry_layout final {
 
 	size_t model_attribs_byte_stride;
 	size_t normal_byte_offset;
-	size_t tex_coode_byte_offset;
+	size_t tex_coord_byte_offset;
 	size_t tangent_h_byte_offset;
 };
 
@@ -78,6 +78,29 @@ private:
 		const cg::float2& tex_coord, const cg::float4& tangent_h);
 
 	void push_back_index_buffer_data(uint32_t i0, uint32_t i1, uint32_t i2);
+};
+
+struct Strand_properties final {
+
+	Strand_properties() noexcept = default;
+
+	Strand_properties(float curl_radius, float curl_frequency, float shadow_factor_power,
+		size_t shell_count, float specular_factor, float specular_power,
+		float threshold_power, float fur_mask_uv_factor) noexcept
+		: curl_radius(curl_radius), curl_frequency(curl_frequency), 
+		shadow_factor_power(shadow_factor_power), shell_count(shell_count),
+		specular_factor(specular_factor), specular_power(specular_power),
+		threshold_power(threshold_power), fur_mask_uv_factor(fur_mask_uv_factor)
+	{}
+
+	float curl_radius = 0.0f;
+	float curl_frequency = 0.0;
+	float shadow_factor_power = 1.0f;
+	size_t shell_count = 8;
+	float specular_factor = 0.0;
+	float specular_power = 1.0;
+	float threshold_power = 1.0f;
+	float fur_mask_uv_factor = 1.0f;
 };
 
 } // namespace fur_simulation

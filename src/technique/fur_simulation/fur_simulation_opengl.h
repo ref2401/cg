@@ -1,6 +1,7 @@
 #ifndef TECHNIQUE_FUR_SIMULATION_FUR_SIMULATION_OPENGL_H_
 #define TECHNIQUE_FUR_SIMULATION_FUR_SIMULATION_OPENGL_H_
 
+#include <memory>
 #include <vector>
 #include "cg/data/model.h"
 #include "cg/rnd/opengl/opengl.h"
@@ -45,7 +46,7 @@ public:
 
 	GLuint render_vao_id() const noexcept
 	{
-		return _render_vao_id;
+		return (_read_from_physics_0) ? _render_vao_0_id : _render_vao_1_id;
 	}
 
 	GLsizei vertex_count() const noexcept
@@ -72,6 +73,11 @@ private:
 
 	void init_physics_simulation_1_vao(const Model_geometry_layout& layout);
 
+	void init_render_0_vao(const Model_geometry_layout& layout);
+
+	void init_render_1_vao(const Model_geometry_layout& layout);
+
+
 	std::vector<cg::data::Model_mesh_info> _meshes;
 	Texture_buffer<Buffer_gpu> _tbo_position_buffer;
 	Texture_buffer<Buffer_gpu> _tbo_simulation_buffer_0;
@@ -81,15 +87,90 @@ private:
 	GLuint _blank_vao_id = Invalid::vao_id;
 	GLuint _physics_0_vao_id = Invalid::vao_id;
 	GLuint _physics_1_vao_id = Invalid::vao_id;
-	GLuint _render_vao_id = Invalid::vao_id;
+	GLuint _render_vao_0_id = Invalid::vao_id;
+	GLuint _render_vao_1_id = Invalid::vao_id;
 	size_t _vertex_count = 0;
 	mutable bool _read_from_physics_0 = true;
+};
+
+class Material final {
+public:
+
+	Material(const Texture_2d_i& tex_diffuse_rgb, const Texture_2d_i& tex_fur_mask,
+		const Strand_properties& strand_props) noexcept
+		: _tex_diffuse_rgb(tex_diffuse_rgb), _tex_fur_mask(tex_fur_mask), _strand_props(strand_props)
+	{}
+
+	Material(const Material&) = delete;
+
+	Material(Material&&) = delete;
+
+
+	Material& operator=(const Material) = delete;
+
+	Material& operator=(Material&&) = delete;
+
+
+	const Strand_properties& strand_props() const noexcept
+	{
+		return _strand_props;
+	}
+
+	const Texture_2d_i& tex_diffuse_rgb() const noexcept
+	{
+		return _tex_diffuse_rgb;
+	}
+
+	const Texture_2d_i& tex_fur_mask() const noexcept
+	{
+		return _tex_fur_mask;
+	}
+
+private:
+
+	const Texture_2d_i& _tex_diffuse_rgb;
+	const Texture_2d_i& _tex_fur_mask;
+	Strand_properties _strand_props;
+};
+
+class Material_gallery final {
+public:
+
+	Material_gallery();
+
+	Material_gallery(const Material_gallery&) = delete;
+
+	Material_gallery(Material_gallery&&) = delete;
+
+
+	Material_gallery& operator=(const Material_gallery&) = delete;
+
+	Material_gallery& operator=(Material_gallery&&) = delete;
+
+
+	const Material& cat_material() const noexcept
+	{
+		return *_cat_material;
+	}
+
+	const Material& red_curl_material() const noexcept
+	{
+		return *_red_curl_material;
+	}
+
+private:
+
+	Texture_2d_immut _tex_fur_mask;
+	Texture_2d_immut _tex_car_diffuse_rgb;
+	Texture_2d_immut _tex_red_curl_material;
+	std::unique_ptr<Material> _cat_material;
+	std::unique_ptr<Material> _red_curl_material;
 };
 
 class Physics_simulation_pass final {
 public:
 
-	Physics_simulation_pass();
+	Physics_simulation_pass() = default;
 
 	Physics_simulation_pass(const Physics_simulation_pass&) = delete;
 
@@ -131,6 +212,30 @@ private:
 	Strand_debug_pass_program _program;
 };
 
+class Fur_pass final {
+public:
+
+	Fur_pass() = default;
+
+	Fur_pass(const Fur_pass&) = delete;
+
+	Fur_pass(Fur_pass&&) = delete;
+
+
+	Fur_pass& operator=(const Fur_pass&) = delete;
+
+	Fur_pass& operator=(Fur_pass&&) = delete;
+
+
+	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
+		const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
+		const cg::float3& view_position_ws, const cg::float3& light_dir_ws) noexcept;
+
+private:
+
+	Fur_pass_program _program;
+};
+
 class Fur_simulation_opengl_example final : public cg::sys::Example {
 public:
 	
@@ -158,11 +263,15 @@ private:
 	cg::float2 _view_roll_angles;
 	cg::float2 _prev_mouse_pos_ndc;
 	// model
+	cg::float3 _external_accelerations;
 	cg::mat4 _model_matrix;
+	Material_gallery _material_gallery;
 	Geometry_buffers _geometry_buffers;
+	cg::float3 _dir_to_light_ws;
 	// render
 	Physics_simulation_pass _physics_pass;
 	Strand_debug_pass _strand_debug_pass;
+	Fur_pass _fur_pass;
 };
 
 } // fur_simulation

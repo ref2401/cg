@@ -54,8 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mesh_rnd", "mesh_rnd", "{FC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fur_simulation", "fur_simulation", "{17790165-C1A5-456A-907E-87E4B5D6291A}"
 	ProjectSection(SolutionItems) = preProject
-		..\data\fur_simulation\fur_generation.fragment.glsl = ..\data\fur_simulation\fur_generation.fragment.glsl
-		..\data\fur_simulation\fur_generation.vertex.glsl = ..\data\fur_simulation\fur_generation.vertex.glsl
+		..\data\fur_simulation\fur_pass.fragment.glsl = ..\data\fur_simulation\fur_pass.fragment.glsl
+		..\data\fur_simulation\fur_pass.vertex.glsl = ..\data\fur_simulation\fur_pass.vertex.glsl
 		..\data\fur_simulation\opaque_model.fragment.glsl = ..\data\fur_simulation\opaque_model.fragment.glsl
 		..\data\fur_simulation\opaque_model.vertex.glsl = ..\data\fur_simulation\opaque_model.vertex.glsl
 		..\data\fur_simulation\physics_simulation_pass.vertex.glsl = ..\data\fur_simulation\physics_simulation_pass.vertex.glsl

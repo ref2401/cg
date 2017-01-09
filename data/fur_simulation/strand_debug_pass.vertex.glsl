@@ -15,15 +15,29 @@ out VS_result {
 void main()
 {
 	const int vertex_index = gl_VertexID / 2;
-	const int vertex_type = gl_VertexID % 2;
+	const int vertex_type = gl_VertexID % 4;
 	
 	// TODO(ref2401): optimize branches
 	vec4 p;
-	if (vertex_type == 0) p = texelFetch(tbo_p_base, vertex_index * 2);
-	else if (vertex_type == 1) p = texelFetch(tbo_p_curr, vertex_index * 2);
+	if (vertex_type == 0) {
+		p = texelFetch(tbo_p_base, vertex_index * 2);
+		result.rgb = vec3(1, 0, 1);
+	}
+	else if (vertex_type == 1) {
+		p = texelFetch(tbo_p_base, vertex_index * 2 + 1);
+		result.rgb = vec3(1, 0, 1);
+	}
+	else if (vertex_type == 2) {
+		p = texelFetch(tbo_p_base, vertex_index * 2);
+		result.rgb = vec3(0, 1, 1);
+	}
+	else if (vertex_type == 3) {
+		p = texelFetch(tbo_p_curr, vertex_index * 2);
+		result.rgb = vec3(0, 1, 1);
+	}
 
 	gl_Position = g_pvm_matrix * p;
-	result.rgb = vec3(0, 1, 1);
+	
 	result.pos = p.xyz;
 	result.index = vertex_index;
 	result.type = vertex_type;

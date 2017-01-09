@@ -3,22 +3,56 @@
 
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl.h"
+#include "technique/fur_simulation/fur_model.h"
 
 using namespace cg::rnd::opengl;
 
 
 namespace fur_simulation {
 
-struct Material final {
-	Texture_2d_immut tex_diffuse_rgb;
-	float shadow_factor_power = 1.0f;
-	float threshold_power = 1.0f;
-	float curl_radius = 0.0f;
-	float curl_frequency = 0.0;
-	float specular_factor = 0.0;
-	float specular_power = 1.0;
-	float tex_coord_factor = 1.0f;
-	size_t shell_count = 8;
+//struct Material final {
+//	Texture_2d_immut tex_diffuse_rgb;
+//	float shadow_factor_power = 1.0f;
+//	float threshold_power = 1.0f;
+//	float curl_radius = 0.0f;
+//	float curl_frequency = 0.0;
+//	float specular_factor = 0.0;
+//	float specular_power = 1.0;
+//	float tex_coord_factor = 1.0f;
+//	size_t shell_count = 8;
+//};
+
+class Fur_pass_program final {
+public:
+
+	Fur_pass_program();
+
+	Fur_pass_program(const Fur_pass_program&) = delete;
+
+	Fur_pass_program(Fur_pass_program&&) = delete;
+
+
+	Fur_pass_program& operator=(const Fur_pass_program&) = delete;
+
+	Fur_pass_program& operator=(Fur_pass_program&&) = delete;
+
+
+	void bind(const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
+		const cg::float3& view_position_ws, const Strand_properties& strand_props,
+		const cg::float3& light_dir_ws) const noexcept;
+
+	void set_shell_index(GLuint index) const noexcept;
+
+private:
+
+	Glsl_program _program;
+	GLint _g_pvm_matrix_location = Invalid::uniform_location;
+	GLint _g_model_matrix_location = Invalid::uniform_location;
+	GLint _g_view_position_ws_location = Invalid::uniform_location;
+	GLint _g_strand_props_location = Invalid::uniform_location;
+	GLint _g_shell_index_location = Invalid::uniform_location;
+	GLint _g_light_dir_ws_location = Invalid::uniform_location;
+	GLint _g_fur_mask_uv_factor_location = Invalid::uniform_location;
 };
 
 class Physics_simulation_pass_program final {
@@ -41,7 +75,7 @@ public:
 private:
 
 	Glsl_program _program;
-	GLint _g_gravity_ms_location = Invalid::uniform_location;
+	GLint _g_external_acceleration_ms_location = Invalid::uniform_location;
 	GLint _g_strand_props = Invalid::uniform_location;
 };
 

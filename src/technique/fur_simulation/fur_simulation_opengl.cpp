@@ -37,7 +37,8 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_simulation_buffer_1.buffer().id());
 	init_physics_simulation_0_vao(geometry.layout);
 	init_physics_simulation_1_vao(geometry.layout);
-	// index buffer glVetexArrayElementBuffer
+	init_render_0_vao(geometry.layout);
+	init_render_1_vao(geometry.layout);
 }
 
 void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout& layout)
@@ -51,7 +52,6 @@ void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout
 	glVertexArrayVertexBuffer(_physics_0_vao_id, position_buffer_binding_index, 
 		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
 
-
 	// p_base
 	glEnableVertexArrayAttrib(_physics_0_vao_id, 0);
 	glVertexArrayAttribBinding(_physics_0_vao_id, 0, position_buffer_binding_index);
@@ -62,10 +62,10 @@ void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout
 	glVertexArrayAttribBinding(_physics_0_vao_id, 1, position_buffer_binding_index);
 	glVertexArrayAttribFormat(_physics_0_vao_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
 	
+
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao_id, simulation_buffer_binding_index,
 		_tbo_simulation_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
-
 
 	// p_curr
 	glEnableVertexArrayAttrib(_physics_0_vao_id, 2);
@@ -115,6 +115,120 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 	glVertexArrayAttribFormat(_physics_1_vao_id, 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
 }
 
+void Geometry_buffers::init_render_0_vao(const Model_geometry_layout& layout)
+{
+	constexpr GLuint position_buffer_binding_index = 0;
+	constexpr GLuint simulation_buffer_binding_index = 1;
+	constexpr GLuint model_attribs_buffer_binding_index = 2;
+
+	glCreateVertexArrays(1, &_render_vao_0_id);
+
+	// position_buffer
+	glVertexArrayVertexBuffer(_render_vao_0_id, position_buffer_binding_index,
+		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+
+	// p_base
+	glEnableVertexArrayAttrib(_render_vao_0_id, 0);
+	glVertexArrayAttribBinding(_render_vao_0_id, 0, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+
+	// p_rest
+	glEnableVertexArrayAttrib(_render_vao_0_id, 1);
+	glVertexArrayAttribBinding(_render_vao_0_id, 1, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+
+
+	// simulation_buffer
+	glVertexArrayVertexBuffer(_render_vao_0_id, simulation_buffer_binding_index,
+		_tbo_simulation_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+
+	// p_curr
+	glEnableVertexArrayAttrib(_render_vao_0_id, 2);
+	glVertexArrayAttribBinding(_render_vao_0_id, 2, simulation_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+
+
+	// model_attribs_buffer
+	glVertexArrayVertexBuffer(_render_vao_0_id, model_attribs_buffer_binding_index,
+		_model_attribs_buffer.id(), 0, layout.model_attribs_byte_stride);
+
+	// normal
+	glEnableVertexArrayAttrib(_render_vao_0_id, 3);
+	glVertexArrayAttribBinding(_render_vao_0_id, 3, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 3, 3, GL_FLOAT, false, layout.normal_byte_offset);
+
+	// tex_coord
+	glEnableVertexArrayAttrib(_render_vao_0_id, 4);
+	glVertexArrayAttribBinding(_render_vao_0_id, 4, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 4, 2, GL_FLOAT, false, layout.tex_coord_byte_offset);
+
+	// tangent_h
+	glEnableVertexArrayAttrib(_render_vao_0_id, 5);
+	glVertexArrayAttribBinding(_render_vao_0_id, 5, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_0_id, 5, 4, GL_FLOAT, false, layout.tangent_h_byte_offset);
+
+
+	// index_buffer
+	glVertexArrayElementBuffer(_render_vao_0_id, _index_buffer.id());
+}
+
+void Geometry_buffers::init_render_1_vao(const Model_geometry_layout& layout)
+{
+	constexpr GLuint position_buffer_binding_index = 0;
+	constexpr GLuint simulation_buffer_binding_index = 1;
+	constexpr GLuint model_attribs_buffer_binding_index = 2;
+
+	glCreateVertexArrays(1, &_render_vao_1_id);
+
+	// position_buffer
+	glVertexArrayVertexBuffer(_render_vao_1_id, position_buffer_binding_index,
+		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+
+	// p_base
+	glEnableVertexArrayAttrib(_render_vao_1_id, 0);
+	glVertexArrayAttribBinding(_render_vao_1_id, 0, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+
+	// p_rest
+	glEnableVertexArrayAttrib(_render_vao_1_id, 1);
+	glVertexArrayAttribBinding(_render_vao_1_id, 1, position_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+
+
+	// simulation_buffer
+	glVertexArrayVertexBuffer(_render_vao_1_id, simulation_buffer_binding_index,
+		_tbo_simulation_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+
+	// p_curr
+	glEnableVertexArrayAttrib(_render_vao_1_id, 2);
+	glVertexArrayAttribBinding(_render_vao_1_id, 2, simulation_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+
+
+	// model_attribs_buffer
+	glVertexArrayVertexBuffer(_render_vao_1_id, model_attribs_buffer_binding_index,
+		_model_attribs_buffer.id(), 0, layout.model_attribs_byte_stride);
+
+	// normal
+	glEnableVertexArrayAttrib(_render_vao_1_id, 3);
+	glVertexArrayAttribBinding(_render_vao_1_id, 3, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 3, 3, GL_FLOAT, false, layout.normal_byte_offset);
+
+	// tex_coord
+	glEnableVertexArrayAttrib(_render_vao_1_id, 4);
+	glVertexArrayAttribBinding(_render_vao_1_id, 4, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 4, 2, GL_FLOAT, false, layout.tex_coord_byte_offset);
+
+	// tangent_h
+	glEnableVertexArrayAttrib(_render_vao_1_id, 5);
+	glVertexArrayAttribBinding(_render_vao_1_id, 5, model_attribs_buffer_binding_index);
+	glVertexArrayAttribFormat(_render_vao_1_id, 5, 4, GL_FLOAT, false, layout.tangent_h_byte_offset);
+
+
+	// index_buffer
+	glVertexArrayElementBuffer(_render_vao_1_id, _index_buffer.id());
+}
+
 void Geometry_buffers::swap_physics_source_dest_buffers() noexcept
 { 
 	_read_from_physics_0 = !_read_from_physics_0; 
@@ -127,12 +241,83 @@ void Geometry_buffers::swap_physics_source_dest_buffers() noexcept
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tf_buffer_id);
 }
 
-// ----- Physics_simulation_pass -----
+// ----- Material_gallery -----
 
-Physics_simulation_pass::Physics_simulation_pass() 
+Material_gallery::Material_gallery()
 {
+	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
+	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-03.tga");
+	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, linear_sampler, image_fur_mask);
 
+
+	{ // cat material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
+		_tex_car_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		
+		_cat_material = std::make_unique<Material>(_tex_car_diffuse_rgb, _tex_fur_mask,
+			Strand_properties(
+			/* curl_radius */			0.0f,
+			/* curl_frequency */		0.0,
+			/* shadow_factor_power */	1.1f,
+			/* shell_count */			16,
+			/* specular_factor */		0.0,
+			/* specular_power */		1.0,
+			/* threshold_power */		0.6f,
+			/* fur_mask_uv_factor */	16.0f));
+	}
+
+	{ // red curl material
+		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
+		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+
+		_red_curl_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
+			Strand_properties(
+			/* curl_radius */			0.01f,
+			/* curl_frequency */		4.0,
+			/* shadow_factor_power */	0.6f,
+			/* shell_count */			32,
+			/* specular_factor */		0.0,
+			/* specular_power */		1.0,
+			/* threshold_power */		0.6f,
+			/* fur_mask_uv_factor */	0.5f));
+	}
 }
+
+// ----- Fur_pass -----
+
+void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
+	const mat4& pvm_matrix, const mat4& model_matrix,
+	const float3& view_position_ws, const float3& light_dir_ws) noexcept
+{
+	glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	glBindTextureUnit(0, material.tex_diffuse_rgb().id());
+	glBindTextureUnit(1, material.tex_fur_mask().id());
+	glBindVertexArray(geometry_buffers.render_vao_id());
+
+	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
+
+	for (size_t si = 0; si < material.strand_props().shell_count; ++si) {
+		_program.set_shell_index(si);
+
+		for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
+			glDrawElements(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count, GL_UNSIGNED_INT, nullptr);
+		}
+	}
+
+	glBindTextureUnit(0, Invalid::texture_id);
+	glBindTextureUnit(1, Invalid::texture_id);
+
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+}
+
+// ----- Physics_simulation_pass -----
 
 void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
 	const cg::float4& graviy_ms, const cg::float4& strand_props) noexcept
@@ -165,7 +350,7 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 	glBindVertexArray(geometry_buffers.blank_vao_id());
 	
 	_program.bind(pvm_matrix);
-	glDrawArrays(GL_LINES, 0, 2 * geometry_buffers.vertex_count());
+	glDrawArrays(GL_LINES, 0, 4 * geometry_buffers.vertex_count());
 
 	glDisable(GL_DEPTH_TEST);
 	glBindTextureUnit(0, Invalid::texture_id);
@@ -177,19 +362,30 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 
 Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
-	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
+	_curr_viewpoint(float3(0, 0, 10), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	// materil
-	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj")
-	//_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/rect_2x2.obj")
+	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj"),
+	//_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/rect_2x2.obj"),
+	_dir_to_light_ws(normalize(float3(50, 1, 100.0)))
 {
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
+	//_model_matrix = rotation_matrix_ox<mat4>(pi_2) * scale_matrix<mat4>(float3(2.0f));
 
 	update_projection_matrix();
 }
 
+float3 force;
+
 void Fur_simulation_opengl_example::on_keyboard()
 {
+	if (_app_ctx.keyboard.is_down(Key::f)) {
+		force = 10.0f * normalize(-float3(-1, 0, 1));
+	}
+	else {
+		force = float3::zero;
+	}
+
 	/*if (_app_ctx.keyboard.is_down(Key::digit_1)) {
 		_curr_material = &_cat_material;
 	}
@@ -203,6 +399,7 @@ void Fur_simulation_opengl_example::on_keyboard()
 		_curr_material = &_sheep_material;
 	}*/
 }
+
 
 void Fur_simulation_opengl_example::on_mouse_move()
 {
@@ -244,9 +441,8 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 
 
-	const float4 gravity_ms(
-		normalize(mul(inverse(_model_matrix), -float3::unit_y).xyz()), 0.01f);
-	const float4 strand_props(0.3f, 0.1f, 0.3f, 0.5f);
+	const float4 gravity_ms(mul(inverse(_model_matrix), _external_accelerations).xyz(), 0.01f);
+	const float4 strand_props(0.3f, 0.1f, 0.35f, 0.5f);
 
 	_physics_pass.perform(_geometry_buffers, gravity_ms, strand_props);
 
@@ -255,13 +451,8 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
-
-	
-	/*glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);*/
+	_fur_pass.perform(_geometry_buffers, _material_gallery.red_curl_material(),
+		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
 }
 
 void Fur_simulation_opengl_example::update(float dt)
@@ -297,6 +488,9 @@ void Fur_simulation_opengl_example::update(float dt)
 	//}
 
 	_view_roll_angles = float2::zero;
+
+
+	_external_accelerations = -float3::unit_y + force;
 }
 
 void Fur_simulation_opengl_example::update_projection_matrix()

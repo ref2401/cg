@@ -2,7 +2,7 @@
 
 // xyz: gravity acceleration in model space
 // w: simulation delta time. 
-uniform vec4 g_gravity_ms;
+uniform vec4 g_external_acceleration_ms;
 // x: length
 // y: mass
 // z: stiffness(coefficient of restitution)
@@ -21,12 +21,12 @@ out vec3 tf_velocity;
 void main()
 {
 	const vec3 deform = vert_p_curr - vert_p_rest;
-	const vec3 f_total = g_strand_props.y * g_gravity_ms.xyz
+	const vec3 f_total = g_strand_props.y * g_external_acceleration_ms.xyz
 		- deform * g_strand_props.z
 		- vert_velocity * g_strand_props.w;
 	
 	const vec3 a = f_total / g_strand_props.y;
-	const float t = g_gravity_ms.w;
+	const float t = g_external_acceleration_ms.w;
 	const vec3 p_new = vert_p_curr + (vert_velocity * t) + (0.5 * a * t * t);
 
 	tf_p_curr = vert_p_base + g_strand_props.x * normalize(p_new - vert_p_base); // strand length preservation
