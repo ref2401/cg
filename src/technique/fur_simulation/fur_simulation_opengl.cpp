@@ -256,21 +256,24 @@ Material_gallery::Material_gallery()
 		
 		_cat_material = std::make_unique<Material>(_tex_car_diffuse_rgb, _tex_fur_mask,
 			Strand_properties(
-			/* curl_radius */			0.0f,
-			/* curl_frequency */		0.0,
+			/* curl_radius */			0.01f,
+			/* curl_frequency */		1.0,
 			/* shadow_factor_power */	1.1f,
 			/* shell_count */			16,
 			/* specular_factor */		0.0,
 			/* specular_power */		1.0,
 			/* threshold_power */		0.6f,
-			/* fur_mask_uv_factor */	16.0f));
+			/* fur_mask_uv_factor */	16.0f,
+			/* mass */					0.1f,
+			/* k */						4.0f,
+			/* damping */				0.5f));
 	}
 
 	{ // red curl material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
 		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
 
-		_red_curl_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
+		_curly_red_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
 			Strand_properties(
 			/* curl_radius */			0.01f,
 			/* curl_frequency */		4.0,
@@ -279,7 +282,10 @@ Material_gallery::Material_gallery()
 			/* specular_factor */		0.0,
 			/* specular_power */		1.0,
 			/* threshold_power */		0.6f,
-			/* fur_mask_uv_factor */	0.5f));
+			/* fur_mask_uv_factor */	0.5f,
+			/* mass */					0.1f,
+			/* k */						3.5f,
+			/* damping */				0.5f));
 	}
 }
 
@@ -293,7 +299,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	glBindTextureUnit(0, material.tex_diffuse_rgb().id());
 	glBindTextureUnit(1, material.tex_fur_mask().id());
@@ -301,7 +307,8 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
 
-	for (size_t si = 0; si < material.strand_props().shell_count; ++si) {
+	size_t draw_count = material.strand_props().shell_count;
+	for (size_t si = 0; si < draw_count; ++si) {
 		_program.set_shell_index(si);
 
 		for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
@@ -314,20 +321,20 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 
 	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 }
 
 // ----- Physics_simulation_pass -----
 
 void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
-	const cg::float4& graviy_ms, const cg::float4& strand_props) noexcept
+	const cg::float4& graviy_ms, float strand_length, const Strand_properties& strand_props) noexcept
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	glBindVertexArray(geometry_buffers.physics_vao_id());
 	
-	_program.bind(graviy_ms, strand_props);
+	_program.bind(graviy_ms, float4(strand_length, strand_props.mass, strand_props.k, strand_props.c));
 	glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, geometry_buffers.vertex_count());
 	glEndTransformFeedback();
@@ -362,44 +369,34 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 
 Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
-	_curr_viewpoint(float3(0, 0, 10), float3(0, 0, 0)),
+	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	// materil
 	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj"),
-	//_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/rect_2x2.obj"),
 	_dir_to_light_ws(normalize(float3(50, 1, 100.0)))
 {
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-	//_model_matrix = rotation_matrix_ox<mat4>(pi_2) * scale_matrix<mat4>(float3(2.0f));
 
 	update_projection_matrix();
+	_curr_material = &_material_gallery.cat_material();
 }
-
-float3 force;
 
 void Fur_simulation_opengl_example::on_keyboard()
 {
 	if (_app_ctx.keyboard.is_down(Key::f)) {
-		force = 10.0f * normalize(-float3(-1, 0, 1));
+		_wind_acceleration = 10.0f * normalize(-float3(-1, 0, 1));
 	}
 	else {
-		force = float3::zero;
+		_wind_acceleration = float3::zero;
 	}
 
-	/*if (_app_ctx.keyboard.is_down(Key::digit_1)) {
-		_curr_material = &_cat_material;
+	if (_app_ctx.keyboard.is_down(Key::digit_1)) {
+		_curr_material = &_material_gallery.cat_material();
 	}
 	else if(_app_ctx.keyboard.is_down(Key::digit_2)) {
-		_curr_material = &_curly_red_material;
+		_curr_material = &_material_gallery.curly_red_material();
 	}
-	else if (_app_ctx.keyboard.is_down(Key::digit_3)) {
-		_curr_material = &_hair_material;
-	}
-	else if (_app_ctx.keyboard.is_down(Key::digit_4)) {
-		_curr_material = &_sheep_material;
-	}*/
 }
-
 
 void Fur_simulation_opengl_example::on_mouse_move()
 {
@@ -441,21 +438,26 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 
 
-	const float4 gravity_ms(mul(inverse(_model_matrix), _external_accelerations).xyz(), 0.01f);
-	const float4 strand_props(0.3f, 0.1f, 0.35f, 0.5f);
-
-	_physics_pass.perform(_geometry_buffers, gravity_ms, strand_props);
-
 	const static float3 color = rgb(0x817c6e);
 	glClearColor(color.r, color.g, color.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
-	_fur_pass.perform(_geometry_buffers, _material_gallery.red_curl_material(),
+	_fur_pass.perform(_geometry_buffers, *_curr_material,
 		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
 }
 
 void Fur_simulation_opengl_example::update(float dt)
+{
+	update_curr_viewpoint();
+
+	_external_accelerations = float3(0.0f, -9.81f, 0.0f) + _wind_acceleration;
+	const float4 gravity_ms(mul(inverse(_model_matrix), _external_accelerations).xyz(), dt / 1000.0f);
+
+	_physics_pass.perform(_geometry_buffers, gravity_ms, 0.3f, _curr_material->strand_props());
+}
+
+void Fur_simulation_opengl_example::update_curr_viewpoint()
 {
 	if (_view_roll_angles != float2::zero) {
 		float dist = _curr_viewpoint.distance();
@@ -480,17 +482,7 @@ void Fur_simulation_opengl_example::update(float dt)
 		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
 	}
 
-	//static float rot_angle = 0;
-
-	//if (!approx_equal(_view_roll_angles.y, 0.0f)) {
-	//	rot_angle += _view_roll_angles.y;
-	//	_model_matrix = rotation_matrix_oy<mat4>(rot_angle) * scale_matrix<mat4>(float3(2.0f));
-	//}
-
 	_view_roll_angles = float2::zero;
-
-
-	_external_accelerations = -float3::unit_y + force;
 }
 
 void Fur_simulation_opengl_example::update_projection_matrix()

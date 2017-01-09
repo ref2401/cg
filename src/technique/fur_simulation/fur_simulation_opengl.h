@@ -153,9 +153,9 @@ public:
 		return *_cat_material;
 	}
 
-	const Material& red_curl_material() const noexcept
+	const Material& curly_red_material() const noexcept
 	{
-		return *_red_curl_material;
+		return *_curly_red_material;
 	}
 
 private:
@@ -164,7 +164,7 @@ private:
 	Texture_2d_immut _tex_car_diffuse_rgb;
 	Texture_2d_immut _tex_red_curl_material;
 	std::unique_ptr<Material> _cat_material;
-	std::unique_ptr<Material> _red_curl_material;
+	std::unique_ptr<Material> _curly_red_material;
 };
 
 class Physics_simulation_pass final {
@@ -183,7 +183,7 @@ public:
 
 
 	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_ms,
-		const cg::float4& strand_props) noexcept;
+		float strand_length, const Strand_properties& strand_props) noexcept;
 
 private:
 
@@ -254,6 +254,8 @@ public:
 
 private:
 
+	void update_curr_viewpoint();
+
 	void update_projection_matrix();
 
 	// camera
@@ -264,8 +266,10 @@ private:
 	cg::float2 _prev_mouse_pos_ndc;
 	// model
 	cg::float3 _external_accelerations;
+	cg::float3 _wind_acceleration;
 	cg::mat4 _model_matrix;
 	Material_gallery _material_gallery;
+	const Material* _curr_material = nullptr;
 	Geometry_buffers _geometry_buffers;
 	cg::float3 _dir_to_light_ws;
 	// render

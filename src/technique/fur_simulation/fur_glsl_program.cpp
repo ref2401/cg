@@ -31,7 +31,7 @@ void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
 	glUseProgram(_program.id());
 	set_uniform(_g_pvm_matrix_location, pvm_matrix);
 	set_uniform(_g_model_matrix_location, model_matrix);
-	set_uniform(_g_view_position_ws_location, float4(view_position_ws, strand_props.shell_count));
+	set_uniform(_g_view_position_ws_location, float4(view_position_ws, float(strand_props.shell_count)));
 	set_uniform(_g_strand_props_location, float4(
 		strand_props.curl_radius,
 		strand_props.curl_frequency,

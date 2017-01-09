@@ -37,10 +37,11 @@ void main()
 	const vec3 bitangent = vert_tangent_h.w * cross(vert_normal, tangent);
 	const vec3 v_pos = calc_position(h, tangent, bitangent);
 	
-	const vec4 pos_ws = g_model_matrix * vec4(v_pos, 1);
-	gl_Position = g_pvm_matrix * pos_ws;
+	gl_Position = g_pvm_matrix * vec4(v_pos, 1);
 
 	const mat3 normal_matrix = mat3(g_model_matrix);
+	const vec4 pos_ws = g_model_matrix * vec4(v_pos, 1);
+
 	result.normal_ws = normal_matrix * vert_normal;
 	result.tex_coord = vert_tex_coord;
 	result.shadow_factor = pow(h, g_strand_props.z);
@@ -52,7 +53,7 @@ vec3 calc_position(float h, vec3 tangent, vec3 bitangent)
 	const vec3 p0 = vert_position;
 	const vec3 p1 = vert_strand_rest_position;
 	const vec3 p2 = vert_strand_curr_position;
-	const vec3 bent_pos = pow(one_minus_h, 2) * p0
+	vec3 bent_pos = pow(one_minus_h, 2) * p0
 		+ 2 * h * one_minus_h * p1
 		+ pow(h, 2) * p2;
 
