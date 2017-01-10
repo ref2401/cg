@@ -10,18 +10,6 @@ using namespace cg::rnd::opengl;
 
 namespace fur_simulation {
 
-//struct Material final {
-//	Texture_2d_immut tex_diffuse_rgb;
-//	float shadow_factor_power = 1.0f;
-//	float threshold_power = 1.0f;
-//	float curl_radius = 0.0f;
-//	float curl_frequency = 0.0;
-//	float specular_factor = 0.0;
-//	float specular_power = 1.0;
-//	float tex_coord_factor = 1.0f;
-//	size_t shell_count = 8;
-//};
-
 class Fur_pass_program final {
 public:
 
@@ -52,7 +40,7 @@ private:
 	GLint _g_strand_props_location = Invalid::uniform_location;
 	GLint _g_shell_index_location = Invalid::uniform_location;
 	GLint _g_light_dir_ws_location = Invalid::uniform_location;
-	GLint _g_fur_mask_uv_factor_location = Invalid::uniform_location;
+	GLint _g_fur_mask_uv_factors_location = Invalid::uniform_location;
 };
 
 class Physics_simulation_pass_program final {

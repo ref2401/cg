@@ -1,6 +1,6 @@
 #include "cg/rnd/opengl/texture.h"
 
-
+#include <cassert>
 using cg::data::Image_format;
 
 
@@ -8,13 +8,36 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+// ----- Sampler_desc -----
+
+Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter, GLenum wrap_mode) noexcept
+	: mag_filter(mag_filter), min_filter(min_filter),
+	wrap_s(wrap_mode), wrap_t(wrap_mode), wrap_r(wrap_mode)
+{
+	assert(is_valid_texture_mag_filter(mag_filter));
+	assert(is_valid_texture_min_filter(min_filter));
+	assert(is_valid_texture_wrap_mode(wrap_mode));
+}
+
+Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter,
+	GLenum wrap_s, GLenum wrap_t, GLenum wrap_r) noexcept
+	: mag_filter(mag_filter), min_filter(min_filter),
+	wrap_s(wrap_s), wrap_t(wrap_t), wrap_r(wrap_r)
+{
+	assert(is_valid_texture_mag_filter(mag_filter));
+	assert(is_valid_texture_min_filter(min_filter));
+	assert(is_valid_texture_wrap_mode(wrap_s));
+	assert(is_valid_texture_wrap_mode(wrap_t));
+	assert(is_valid_texture_wrap_mode(wrap_r));
+}
+
 // ----- Sampler -----
 
 Sampler::Sampler(const Sampler_desc& desc) noexcept
 {
 	glCreateSamplers(1, &_id);
-	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, desc.min_filter);
 	glSamplerParameteri(_id, GL_TEXTURE_MAG_FILTER, desc.mag_filter);
+	glSamplerParameteri(_id, GL_TEXTURE_MIN_FILTER, desc.min_filter);
 	glSamplerParameteri(_id, GL_TEXTURE_WRAP_S, desc.wrap_s);
 	glSamplerParameteri(_id, GL_TEXTURE_WRAP_T, desc.wrap_t);
 	glSamplerParameteri(_id, GL_TEXTURE_WRAP_R, desc.wrap_r);
@@ -62,8 +85,8 @@ Texture_2d::Texture_2d(GLenum internal_format, GLuint mipmap_level_count,
 	const Sampler_desc& sampler_desc, const uint2& size) noexcept
 	: Texture_2d(internal_format, mipmap_level_count, size)
 {
-	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_desc.wrap_s);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_desc.wrap_t);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);
@@ -167,8 +190,8 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 	const Sampler_desc& sampler_desc, const uint2& size) noexcept 
 	: Texture_2d_immut(internal_format, mipmap_level_count, size)
 {
-	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, sampler_desc.mag_filter);
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, sampler_desc.min_filter);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_S, sampler_desc.wrap_s);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_T, sampler_desc.wrap_t);
 	glTextureParameteri(_id, GL_TEXTURE_WRAP_R, sampler_desc.wrap_r);

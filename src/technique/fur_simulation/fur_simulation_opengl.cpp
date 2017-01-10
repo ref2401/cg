@@ -245,51 +245,64 @@ void Geometry_buffers::swap_physics_source_dest_buffers() noexcept
 
 Material_gallery::Material_gallery()
 {
-	const Sampler_desc linear_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
+	const Sampler_desc fur_mask_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 	auto image_fur_mask = cg::data::load_image_tga("../data/fur_simulation/noise-texture-03.tga");
-	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, linear_sampler, image_fur_mask);
+	_tex_fur_mask = Texture_2d_immut(GL_R8, 1, fur_mask_sampler, image_fur_mask);
+	glGenerateTextureMipmap(_tex_fur_mask.id());
 
 
+	const Sampler_desc diffuse_rgb_sampler(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
 	{ // cat material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/cat-diffuse-rgb.tga");
-		_tex_car_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_tex_car_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 		
 		_cat_material = std::make_unique<Material>(_tex_car_diffuse_rgb, _tex_fur_mask,
 			Strand_properties(
-			/* curl_radius */			0.01f,
-			/* curl_frequency */		1.0,
-			/* shadow_factor_power */	1.1f,
-			/* shell_count */			16,
-			/* specular_factor */		0.0,
-			/* specular_power */		1.0,
-			/* threshold_power */		0.6f,
-			/* fur_mask_uv_factor */	16.0f,
-			/* mass */					0.1f,
-			/* k */						4.0f,
-			/* damping */				0.5f));
+			/* curl_radius */				0.0f,
+			/* curl_frequency */			0.0,
+			/* shadow_factor_power */		1.1f,
+			/* shell_count */				32,
+			/* specular_factor */			0.0,
+			/* specular_power */			1.0,
+			/* threshold_power */			0.6f,
+			/* fur_mask_uv_min_factor */	1.0f,
+			/* fur_mask_uv_max_factor */	1.0f,
+			/* mass */						0.1f,
+			/* k */							4.0f,
+			/* damping */					0.5f));
 	}
 
-	{ // red curl material
+	{ // curly red material
 		auto image_diffuse_rgb = cg::data::load_image_tga("../data/fur_simulation/red-diffuse-rgb.tga");
-		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, linear_sampler, image_diffuse_rgb);
+		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 
 		_curly_red_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
 			Strand_properties(
-			/* curl_radius */			0.01f,
-			/* curl_frequency */		4.0,
-			/* shadow_factor_power */	0.6f,
-			/* shell_count */			32,
-			/* specular_factor */		0.0,
-			/* specular_power */		1.0,
-			/* threshold_power */		0.6f,
-			/* fur_mask_uv_factor */	0.5f,
-			/* mass */					0.1f,
-			/* k */						3.5f,
-			/* damping */				0.5f));
+			/* curl_radius */				0.01f,
+			/* curl_frequency */			4.0,
+			/* shadow_factor_power */		0.6f,
+			/* shell_count */				32,
+			/* specular_factor */			0.0,
+			/* specular_power */			1.0,
+			/* threshold_power */			0.6f,
+			/* fur_mask_uv_min_factor */	0.5f,
+			/* fur_mask_uv_max_factor */	0.5f,
+			/* mass */						0.1f,
+			/* k */							3.5f,
+			/* damping */					0.5f));
 	}
 }
 
 // ----- Fur_pass -----
+
+Fur_pass::Fur_pass(const uint2& viewport_size)
+{
+	_tex_rt = Texture_2d_immut(GL_RGBA32F, 1, viewport_size);
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _tex_rt);
+	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+	_fbo.validate();
+}
 
 void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
 	const mat4& pvm_matrix, const mat4& model_matrix,
@@ -305,19 +318,31 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	glBindTextureUnit(1, material.tex_fur_mask().id());
 	glBindVertexArray(geometry_buffers.render_vao_id());
 
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
+	//glViewport(0, 0, _tex_rt.size().width, _tex_rt.size().height);
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
 
-	size_t draw_count = material.strand_props().shell_count;
+	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
+			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
+	}
+
+	/*size_t draw_count = material.strand_props().shell_count;
 	for (size_t si = 0; si < draw_count; ++si) {
 		_program.set_shell_index(si);
 
 		for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
 			glDrawElements(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count, GL_UNSIGNED_INT, nullptr);
 		}
-	}
+	}*/
 
 	glBindTextureUnit(0, Invalid::texture_id);
 	glBindTextureUnit(1, Invalid::texture_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	/*glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+		0, 0, _tex_rt.size().width, _tex_rt.size().height,
+		0, 0, _tex_rt.size().width, _tex_rt.size().height,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);*/
 
 	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
@@ -371,9 +396,9 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	Example(app_ctx),
 	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
-	// materil
 	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj"),
-	_dir_to_light_ws(normalize(float3(50, 1, 100.0)))
+	_dir_to_light_ws(normalize(float3(50, 1, 100.0))),
+	_fur_pass(_app_ctx.window.viewport_size())
 {
 	_model_matrix = scale_matrix<mat4>(float3(2.0f));
 
@@ -438,11 +463,12 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 
 
-	const static float3 color = rgb(0x817c6e);
+	static const float3 color = rgb(0x817c6e);
+	//static const float3 color = float3::zero;
 	glClearColor(color.r, color.g, color.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
+	//_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
 	_fur_pass.perform(_geometry_buffers, *_curr_material,
 		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
 }

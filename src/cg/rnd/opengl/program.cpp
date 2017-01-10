@@ -355,6 +355,12 @@ void set_uniform(GLint location, const uint2& v) noexcept
 	glUniform2ui(location, v.x, v.y);
 }
 
+void set_uniform(GLint location, const float2& v) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	glUniform2f(location, v.x, v.y);
+}
+
 void set_uniform(GLint location, const float3& v) noexcept
 {
 	assert(location != Invalid::uniform_location);

@@ -137,6 +137,8 @@ void set_uniform(GLint location, float val) noexcept;
 
 void set_uniform(GLint location, const uint2& v) noexcept;
 
+void set_uniform(GLint location, const float2& v) noexcept;
+
 void set_uniform(GLint location, const float3& v) noexcept;
 
 void set_uniform(GLint location, const float4& v) noexcept;

@@ -23,23 +23,23 @@ public:
 	TEST_METHOD(ctors)
 	{
 		Sampler_desc desc0;
-		Assert::AreEqual<GLenum>(GL_LINEAR, desc0.min_filter);
 		Assert::AreEqual<GLenum>(GL_LINEAR, desc0.mag_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR, desc0.min_filter);
 		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_s);
 		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_t);
 		Assert::AreEqual<GLenum>(GL_CLAMP_TO_EDGE, desc0.wrap_r);
-
-		Sampler_desc desc1(GL_LINEAR_MIPMAP_LINEAR, GL_NEAREST, GL_REPEAT);
-		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_LINEAR, desc1.min_filter);
+		
+		Sampler_desc desc1(GL_NEAREST, GL_LINEAR_MIPMAP_LINEAR, GL_REPEAT);
 		Assert::AreEqual<GLenum>(GL_NEAREST, desc1.mag_filter);
+		Assert::AreEqual<GLenum>(GL_LINEAR_MIPMAP_LINEAR, desc1.min_filter);
 		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_s);
 		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_t);
 		Assert::AreEqual<GLenum>(GL_REPEAT, desc1.wrap_r);
 
-		Sampler_desc desc2(GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR,
+		Sampler_desc desc2(GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST,
 			GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_BORDER);
-		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_NEAREST, desc2.min_filter);
 		Assert::AreEqual<GLenum>(GL_LINEAR, desc2.mag_filter);
+		Assert::AreEqual<GLenum>(GL_NEAREST_MIPMAP_NEAREST, desc2.min_filter);
 		Assert::AreEqual<GLenum>(GL_REPEAT, desc2.wrap_s);
 		Assert::AreEqual<GLenum>(GL_MIRRORED_REPEAT, desc2.wrap_t);
 		Assert::AreEqual<GLenum>(GL_CLAMP_TO_BORDER, desc2.wrap_r);

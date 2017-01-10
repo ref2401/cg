@@ -19,9 +19,9 @@ Fur_pass_program::Fur_pass_program()
 	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
 	_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
 	_g_strand_props_location = _program.get_uniform_location("g_strand_props");
-	_g_shell_index_location = _program.get_uniform_location("g_shell_index");
+	//_g_shell_index_location = _program.get_uniform_location("g_shell_index");
 	_g_light_dir_ws_location = _program.get_uniform_location("g_light_dir_ws");
-	_g_fur_mask_uv_factor_location = _program.get_uniform_location("g_fur_mask_uv_factor");
+	_g_fur_mask_uv_factors_location = _program.get_uniform_location("g_fur_mask_uv_factors");
 }
 
 void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
@@ -39,7 +39,9 @@ void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
 		strand_props.shadow_factor_power
 	));
 	set_uniform(_g_light_dir_ws_location, light_dir_ws);
-	set_uniform(_g_fur_mask_uv_factor_location, strand_props.fur_mask_uv_factor);
+	set_uniform(_g_fur_mask_uv_factors_location, float2(
+		strand_props.fur_mask_uv_min_factor, 
+		strand_props.fur_mask_uv_max_factor));
 }
 
 void Fur_pass_program::set_shell_index(GLuint index) const noexcept

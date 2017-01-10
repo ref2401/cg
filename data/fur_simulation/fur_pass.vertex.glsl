@@ -24,6 +24,7 @@ out VS_result {
 	vec3 normal_ws;
 	vec2 tex_coord;
 	float shadow_factor;
+	float fur_mask_factor;
 	float fur_mask_threshold;
 } result;
 
@@ -32,7 +33,7 @@ vec3 calc_position(float h, vec3 tangent, vec3 bitangent);
 
 void main()
 {
-	const float h = float(g_shell_index + 1) / float(g_view_position_ws.w);
+	const float h = float(gl_InstanceID + 1) / float(g_view_position_ws.w);
 	const vec3 tangent = vert_tangent_h.xyz;
 	const vec3 bitangent = vert_tangent_h.w * cross(vert_normal, tangent);
 	const vec3 v_pos = calc_position(h, tangent, bitangent);
@@ -40,11 +41,14 @@ void main()
 	gl_Position = g_pvm_matrix * vec4(v_pos, 1);
 
 	const mat3 normal_matrix = mat3(g_model_matrix);
-	const vec4 pos_ws = g_model_matrix * vec4(v_pos, 1);
+	const vec3 pos_ws = (g_model_matrix * vec4(v_pos, 1)).xyz;
+	const vec3 norm_ws = normalize(normal_matrix * vert_normal);
+	const vec3 dir_ti_view_ws = normalize(g_view_position_ws.xyz - pos_ws);
 
-	result.normal_ws = normal_matrix * vert_normal;
+	result.normal_ws = norm_ws;
 	result.tex_coord = vert_tex_coord;
 	result.shadow_factor = pow(h, g_strand_props.z);
+	result.fur_mask_factor = max(0, dot(norm_ws, dir_ti_view_ws));
 	result.fur_mask_threshold = pow(h, g_strand_props.w);
 }
 vec3 calc_position(float h, vec3 tangent, vec3 bitangent)

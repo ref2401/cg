@@ -18,22 +18,17 @@ struct Sampler_desc final {
 
 	Sampler_desc() noexcept = default;
 
-	Sampler_desc(GLenum min_filter, GLenum mag_filter, GLenum wrap_mode) noexcept :
-	min_filter(min_filter), mag_filter(mag_filter),
-		wrap_s(wrap_mode), wrap_t(wrap_mode), wrap_r(wrap_mode)
-	{}
+	Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter, GLenum wrap_mode) noexcept;
 
-	Sampler_desc(GLenum min_filter, GLenum mag_filter,
-		GLenum wrap_s, GLenum wrap_t, GLenum wrap_r) noexcept :
-	min_filter(min_filter), mag_filter(mag_filter),
-		wrap_s(wrap_s), wrap_t(wrap_t), wrap_r(wrap_r)
-	{}
+	Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter,
+		GLenum wrap_s, GLenum wrap_t, GLenum wrap_r) noexcept;
 
-	// Minifying filter is used whenever the pixel being textured maps to an area greater than one texture's texel. 
-	GLenum min_filter = GL_LINEAR;
 
 	// Magnification filter is used when the pixel being textured maps to an area less than or equal to one texture's texel.
 	GLenum mag_filter = GL_LINEAR;
+
+	// Minifying filter is used whenever the pixel being textured maps to an area greater than one texture's texel. 
+	GLenum min_filter = GL_LINEAR;
 
 	// Wrap mod for texture coordinate u. It's called 'u' sometimes.
 	GLenum wrap_s = GL_CLAMP_TO_EDGE;
