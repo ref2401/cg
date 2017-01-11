@@ -14,7 +14,7 @@ out VS_result {
 
 void main()
 {
-	const int vertex_index = gl_VertexID / 2;
+	const int vertex_index = gl_VertexID / 4;
 	const int vertex_type = gl_VertexID % 4;
 	
 	// TODO(ref2401): optimize branches

@@ -59,7 +59,7 @@ public:
 
 	virtual void render(float interpolation_factor) = 0;
 
-	virtual void update(float dt) = 0;
+	virtual void update(float dt_msec) = 0;
 
 protected:
 

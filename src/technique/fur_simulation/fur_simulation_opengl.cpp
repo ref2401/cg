@@ -288,7 +288,7 @@ Material_gallery::Material_gallery()
 			/* fur_mask_uv_min_factor */	0.5f,
 			/* fur_mask_uv_max_factor */	0.5f,
 			/* mass */						0.1f,
-			/* k */							3.5f,
+			/* k */							5.5f,
 			/* damping */					0.5f));
 	}
 }
@@ -312,7 +312,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 	glEnable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	glBindTextureUnit(0, material.tex_diffuse_rgb().id());
 	glBindTextureUnit(1, material.tex_fur_mask().id());
@@ -323,8 +323,10 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
 
 	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
+		//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
+		//	GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
-			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
+			GL_UNSIGNED_INT, nullptr, 2, geometry_buffers.meshes()[mi].base_vertex);
 	}
 
 	/*size_t draw_count = material.strand_props().shell_count;
@@ -396,12 +398,12 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	Example(app_ctx),
 	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
+	_model_transform(float3::zero, float3(2.0f)),
+	//_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/rect_2x2.obj"),
 	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj"),
 	_dir_to_light_ws(normalize(float3(50, 1, 100.0))),
 	_fur_pass(_app_ctx.window.viewport_size())
 {
-	_model_matrix = scale_matrix<mat4>(float3(2.0f));
-
 	update_projection_matrix();
 	_curr_material = &_material_gallery.cat_material();
 }
@@ -409,10 +411,23 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 void Fur_simulation_opengl_example::on_keyboard()
 {
 	if (_app_ctx.keyboard.is_down(Key::f)) {
-		_wind_acceleration = 10.0f * normalize(-float3(-1, 0, 1));
+		_wind_acceleration = 10.0f * normalize(-float3(0, 1, -1));
 	}
 	else {
 		_wind_acceleration = float3::zero;
+	}
+
+	float3 movement_direction;
+	if (_app_ctx.keyboard.is_down(Key::arrow_up))		movement_direction += float3::unit_y;
+	if (_app_ctx.keyboard.is_down(Key::arrow_down))		movement_direction -= float3::unit_y;
+	if (_app_ctx.keyboard.is_down(Key::arrow_left))		movement_direction -= float3::unit_x;
+	if (_app_ctx.keyboard.is_down(Key::arrow_right))	movement_direction += float3::unit_x;
+	_movement_acceleration = 5.0f * normalize(movement_direction);
+
+	if (_app_ctx.keyboard.is_down(Key::space)) {
+		_movement_speed = float3::zero;
+		_movement_acceleration = float3::zero;
+		_model_transform.position = float3::zero;
 	}
 
 	if (_app_ctx.keyboard.is_down(Key::digit_1)) {
@@ -468,19 +483,30 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	glClearColor(color.r, color.g, color.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
 	_fur_pass.perform(_geometry_buffers, *_curr_material,
 		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
+	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
 }
 
-void Fur_simulation_opengl_example::update(float dt)
+void Fur_simulation_opengl_example::update(float dt_msec)
 {
+	const float dt = dt_msec / 1000.0f;
 	update_curr_viewpoint();
 
-	_external_accelerations = float3(0.0f, -9.81f, 0.0f) + _wind_acceleration;
-	const float4 gravity_ms(mul(inverse(_model_matrix), _external_accelerations).xyz(), dt / 1000.0f);
+	_movement_speed += _movement_acceleration * dt;
+	_model_transform.position += 0.008f * _movement_speed;
+	_model_matrix = trs_matrix(_model_transform.position, quat::identity, _model_transform.scale);
 
-	_physics_pass.perform(_geometry_buffers, gravity_ms, 0.3f, _curr_material->strand_props());
+	//for (size_t i = 0; i < 50; ++i) {
+
+		const float3 external_accelerations = 
+			/*float3(0.0f, -9.81f, 0.0f) 
+			+ */_wind_acceleration
+			- _movement_acceleration;
+		const float4 gravity_ms(mul(inverse(_model_matrix), external_accelerations).xyz(), dt);
+
+		_physics_pass.perform(_geometry_buffers, gravity_ms, 0.3f, _curr_material->strand_props());
+	//}
 }
 
 void Fur_simulation_opengl_example::update_curr_viewpoint()

@@ -252,9 +252,20 @@ public:
 
 	void render(float interpolation_factor) override;
 
-	void update(float dt) override;
+	void update(float dt_msec) override;
 
 private:
+
+	struct Model_transform {
+		Model_transform() noexcept = default;
+
+		Model_transform(const cg::float3& position, const cg::float3& scale) noexcept
+			: position(position), scale(scale)
+		{}
+			
+		cg::float3 position;
+		cg::float3 scale;
+	};
 
 	void update_curr_viewpoint();
 
@@ -267,7 +278,9 @@ private:
 	cg::float2 _view_roll_angles;
 	cg::float2 _prev_mouse_pos_ndc;
 	// model
-	cg::float3 _external_accelerations;
+	Model_transform _model_transform;
+	cg::float3 _movement_speed;
+	cg::float3 _movement_acceleration;
 	cg::float3 _wind_acceleration;
 	cg::mat4 _model_matrix;
 	Material_gallery _material_gallery;

@@ -29,8 +29,13 @@ void main()
 	const float t = g_external_acceleration_ms.w;
 	const vec3 p_new = vert_p_curr + (vert_velocity * t) + (0.5 * a * t * t);
 
-	tf_p_curr = vert_p_base + g_strand_props.x * normalize(p_new - vert_p_base); // strand length preservation
+	const vec3 dir_to_rest = normalize(vert_p_rest - vert_p_base);
+	const vec3 dir_to_new_unorm = p_new - vert_p_base;
+	//if (length(dir_to_new_unorm) > g_strand_props.x)
+		tf_p_curr = vert_p_base + g_strand_props.x * normalize(dir_to_new_unorm); // strand length preservation
+
 	tf_velocity = vert_velocity + a * t;
 
-	//tf_p_curr = p_new - vert_p_base;
+	//tf_p_curr = vec3(length(dir_to_new_unorm), g_strand_props.x, 0);
+	//tf_velocity = a;
 }
