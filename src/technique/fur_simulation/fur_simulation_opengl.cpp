@@ -354,14 +354,16 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 // ----- Physics_simulation_pass -----
 
 void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
-	const cg::float4& graviy_ms, float strand_length, const Strand_properties& strand_props) noexcept
+	const cg::float4& graviy_accel_ms, const cg::float3& angular_accel_ms,
+	float strand_length, const Strand_properties& strand_props) noexcept
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	glBindVertexArray(geometry_buffers.physics_vao_id());
+	_program.bind(graviy_accel_ms, angular_accel_ms, 
+		float4(strand_length, strand_props.mass, strand_props.k, strand_props.c));
 	
-	_program.bind(graviy_ms, float4(strand_length, strand_props.mass, strand_props.k, strand_props.c));
 	glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, geometry_buffers.vertex_count());
 	glEndTransformFeedback();
@@ -417,11 +419,15 @@ void Fur_simulation_opengl_example::on_keyboard()
 		_wind_acceleration = float3::zero;
 	}
 
+	if (_app_ctx.keyboard.is_down(Key::r)) {
+		_rotation_angle += pi_2;
+	}
+	
 	float3 movement_direction;
-	if (_app_ctx.keyboard.is_down(Key::arrow_up))		movement_direction += float3::unit_y;
-	if (_app_ctx.keyboard.is_down(Key::arrow_down))		movement_direction -= float3::unit_y;
-	if (_app_ctx.keyboard.is_down(Key::arrow_left))		movement_direction -= float3::unit_x;
-	if (_app_ctx.keyboard.is_down(Key::arrow_right))	movement_direction += float3::unit_x;
+	if (_app_ctx.keyboard.is_down(Key::w))	movement_direction += float3::unit_y;
+	if (_app_ctx.keyboard.is_down(Key::s))	movement_direction -= float3::unit_y;
+	if (_app_ctx.keyboard.is_down(Key::a))	movement_direction -= float3::unit_x;
+	if (_app_ctx.keyboard.is_down(Key::d))	movement_direction += float3::unit_x;
 	_movement_acceleration = 5.0f * normalize(movement_direction);
 
 	if (_app_ctx.keyboard.is_down(Key::space)) {
@@ -495,17 +501,16 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 
 	_movement_speed += _movement_acceleration * dt;
 	_model_transform.position += 0.008f * _movement_speed;
-	_model_matrix = trs_matrix(_model_transform.position, quat::identity, _model_transform.scale);
+	_model_matrix = trs_matrix(_model_transform.position, 
+		from_axis_angle_rotation(_rotation_axis, 0.01f * _rotation_angle), _model_transform.scale);
 
-	//for (size_t i = 0; i < 50; ++i) {
+	const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
+	const mat4 inv_model_matrix = inverse(_model_matrix);
+	const float4 gravity_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
+	const float3 angular_ms(mul(inv_model_matrix, _rotation_angle * _rotation_axis).xyz());
 
-		const float3 external_accelerations = 
-			/*float3(0.0f, -9.81f, 0.0f) 
-			+ */_wind_acceleration
-			- _movement_acceleration;
-		const float4 gravity_ms(mul(inverse(_model_matrix), external_accelerations).xyz(), dt);
-
-		_physics_pass.perform(_geometry_buffers, gravity_ms, 0.3f, _curr_material->strand_props());
+	_physics_pass.perform(_geometry_buffers, gravity_ms, angular_ms,
+		0.3f, _curr_material->strand_props());
 	//}
 }
 

@@ -33,7 +33,7 @@ quat from_axis_angle_rotation(const float3& axis, float angle) noexcept
 {
 	assert(is_normalized(axis));
 
-	if (approx_equal(angle, 0.f)) return quat::identity; // no angle, no rotation
+	if (approx_equal(angle, 0.0f)) return quat::identity; // no angle, no rotation
 
 	float half_angle = angle * 0.5f;
 	float c = std::cos(half_angle);

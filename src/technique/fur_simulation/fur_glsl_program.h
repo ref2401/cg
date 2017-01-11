@@ -58,12 +58,14 @@ public:
 	Physics_simulation_pass_program& operator=(Physics_simulation_pass_program&&) = delete;
 
 
-	void bind(const cg::float4& gravity_ms, const cg::float4& strand_props) noexcept;
+	void bind(const cg::float4& gravity_ms, const cg::float3& angular_acceleration_ms, 
+		const cg::float4& strand_props) noexcept;
 
 private:
 
 	Glsl_program _program;
-	GLint _g_external_acceleration_ms_location = Invalid::uniform_location;
+	GLint _g_angular_accel_ms_location = Invalid::uniform_location;
+	GLint _g_external_accel_ms_location = Invalid::uniform_location;
 	GLint _g_strand_props = Invalid::uniform_location;
 };
 

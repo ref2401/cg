@@ -182,8 +182,9 @@ public:
 	Physics_simulation_pass& operator=(Physics_simulation_pass&&) = delete;
 
 
-	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_ms,
-		float strand_length, const Strand_properties& strand_props) noexcept;
+	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_accel_ms,
+		const cg::float3& angular_accel_ms, float strand_length, 
+		const Strand_properties& strand_props) noexcept;
 
 private:
 
@@ -281,6 +282,8 @@ private:
 	Model_transform _model_transform;
 	cg::float3 _movement_speed;
 	cg::float3 _movement_acceleration;
+	cg::float3 _rotation_axis = cg::float3(0.0f, 1.0f, 0.0f);
+	float _rotation_angle = 0.0f;
 	cg::float3 _wind_acceleration;
 	cg::mat4 _model_matrix;
 	Material_gallery _material_gallery;

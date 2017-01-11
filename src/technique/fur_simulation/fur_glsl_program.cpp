@@ -58,15 +58,18 @@ Physics_simulation_pass_program::Physics_simulation_pass_program()
 		true, "tf_p_curr", "tf_velocity");
 
 	_program = Glsl_program("physics-simulation-pass", program_desc);
-	_g_external_acceleration_ms_location = _program.get_uniform_location("g_external_acceleration_ms");
+	_g_external_accel_ms_location = _program.get_uniform_location("g_external_acceleration_ms");
+	_g_angular_accel_ms_location = _program.get_uniform_location("g_angular_acceleration_ms");
 	_g_strand_props = _program.get_uniform_location("g_strand_props");
 }
 
-void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, const cg::float4& strand_props) noexcept
+void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, 
+	const cg::float3& angular_acceleration_ms, const cg::float4& strand_props) noexcept
 {
 	glUseProgram(_program.id());
 
-	set_uniform(_g_external_acceleration_ms_location, gravity_ms);
+	set_uniform(_g_external_accel_ms_location, gravity_ms);
+	set_uniform(_g_angular_accel_ms_location, angular_acceleration_ms);
 	set_uniform(_g_strand_props, strand_props);
 }
 

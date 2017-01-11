@@ -1,6 +1,8 @@
 #version 450 core
 
-// xyz: gravity acceleration in model space
+// xyz: angular acceleration in the model space.
+uniform vec3 g_angular_acceleration_ms;
+// xyz: gravity acceleration in the model space.
 // w: simulation delta time. 
 uniform vec4 g_external_acceleration_ms;
 // x: length
@@ -20,8 +22,13 @@ out vec3 tf_velocity;
 
 void main()
 {
+	// spring deformation
 	const vec3 deform = vert_p_curr - vert_p_rest;
-	const vec3 f_total = g_strand_props.y * g_external_acceleration_ms.xyz
+	// angular acceleration to linear acceleration
+	const vec3 r = (g_strand_props.x) * normalize(vert_p_curr - vert_p_base);
+	const vec3 linear_acceleration_ms = cross(g_angular_acceleration_ms, r);
+
+	const vec3 f_total = g_strand_props.y * (g_external_acceleration_ms.xyz + linear_acceleration_ms)
 		- deform * g_strand_props.z
 		- vert_velocity * g_strand_props.w;
 	
