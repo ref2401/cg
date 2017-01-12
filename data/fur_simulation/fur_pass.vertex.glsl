@@ -43,12 +43,12 @@ void main()
 	const mat3 normal_matrix = mat3(g_model_matrix);
 	const vec3 pos_ws = (g_model_matrix * vec4(v_pos, 1)).xyz;
 	const vec3 norm_ws = normalize(normal_matrix * vert_normal);
-	const vec3 dir_ti_view_ws = normalize(g_view_position_ws.xyz - pos_ws);
+	const vec3 dir_to_view_ws = normalize(g_view_position_ws.xyz - pos_ws);
 
 	result.normal_ws = norm_ws;
 	result.tex_coord = vert_tex_coord;
 	result.shadow_factor = pow(h, g_strand_props.z);
-	result.fur_mask_factor = max(0, dot(norm_ws, dir_ti_view_ws));
+	result.fur_mask_factor = max(0, dot(norm_ws, dir_to_view_ws));
 	result.fur_mask_threshold = pow(h, g_strand_props.w);
 }
 vec3 calc_position(float h, vec3 tangent, vec3 bitangent)

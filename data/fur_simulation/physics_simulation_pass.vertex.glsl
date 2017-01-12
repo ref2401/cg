@@ -34,16 +34,27 @@ void main()
 	
 	const vec3 a = f_total / g_strand_props.y;
 	const float t = g_external_acceleration_ms.w;
-	const vec3 p_new = vert_p_curr + (vert_velocity * t) + (0.5 * a * t * t);
+	vec3 p_new = vert_p_curr + (vert_velocity * t) + (0.5 * a * t * t);
 
 	const vec3 dir_to_rest = normalize(vert_p_rest - vert_p_base);
 	const vec3 dir_to_new_unorm = p_new - vert_p_base;
+	const vec3 dir_to_new = normalize(dir_to_new_unorm);
+	float strand_len_actual = length(dir_to_new_unorm);
 	
-	tf_p_curr = p_new;
 	// strand length contstraint
-	if (length(dir_to_new_unorm) > g_strand_props.x)
-		tf_p_curr = vert_p_base + g_strand_props.x * normalize(dir_to_new_unorm);
+	if (strand_len_actual > g_strand_props.x) {
+		p_new = vert_p_base + g_strand_props.x * dir_to_new;
+		strand_len_actual = g_strand_props.x;
+	}
 
+	// strand & surface collision
+	// p is angle between dir_to_rest and dir_to_new
+	const float cos_p = dot(dir_to_new, dir_to_rest);
+	if (cos_p < 0.1) {
+		p_new = vert_p_curr;
+	}
+
+	tf_p_curr = p_new;
 	tf_velocity = vert_velocity + a * t;
-	tf_debug_slot = vec4(linear_velocity_ms, 24);
+	tf_debug_slot = vec4(cos_p, 0, 0, 0);
 }

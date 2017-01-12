@@ -23,8 +23,8 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	Model_geometry_data geometry(strand_lenght, geometry_filename);
 
 	_tbo_position_buffer = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.position_buffer);
-	_tbo_simulation_buffer_0 = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.simulation_buffer);
-	_tbo_simulation_buffer_1 = Texture_buffer<Buffer_gpu>(GL_RGB32F, byte_count(geometry.simulation_buffer), nullptr);
+	_tbo_physics_buffer_0 = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.simulation_buffer);
+	_tbo_physics_buffer_1 = Texture_buffer<Buffer_gpu>(GL_RGB32F, byte_count(geometry.simulation_buffer), nullptr);
 	_model_attribs_buffer = Buffer_gpu(geometry.model_attribs_buffer);
 	_index_buffer = Buffer_gpu(geometry.index_buffer);
 	_meshes = std::move(geometry.meshes);
@@ -34,7 +34,7 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	assert(_vertex_count <= size_t(std::numeric_limits<GLsizei>::max()));
 
 	glCreateVertexArrays(1, &_blank_vao_id);
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_simulation_buffer_1.buffer().id());
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_physics_buffer_1.buffer().id());
 	init_physics_simulation_0_vao(geometry.layout);
 	init_physics_simulation_1_vao(geometry.layout);
 	init_render_0_vao(geometry.layout);
@@ -69,7 +69,7 @@ void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao_id, simulation_buffer_binding_index,
-		_tbo_simulation_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
 
 	// p_curr
 	glEnableVertexArrayAttrib(_physics_0_vao_id, 2);
@@ -106,7 +106,7 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 	
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_1_vao_id, simulation_buffer_binding_index,
-		_tbo_simulation_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
 
 	// p_curr
 	glEnableVertexArrayAttrib(_physics_1_vao_id, 2);
@@ -144,7 +144,7 @@ void Geometry_buffers::init_render_0_vao(const Model_geometry_layout& layout)
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_render_vao_0_id, simulation_buffer_binding_index,
-		_tbo_simulation_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
 
 	// p_curr
 	glEnableVertexArrayAttrib(_render_vao_0_id, 2);
@@ -201,7 +201,7 @@ void Geometry_buffers::init_render_1_vao(const Model_geometry_layout& layout)
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_render_vao_1_id, simulation_buffer_binding_index,
-		_tbo_simulation_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
 
 	// p_curr
 	glEnableVertexArrayAttrib(_render_vao_1_id, 2);
@@ -239,8 +239,8 @@ void Geometry_buffers::swap_physics_source_dest_buffers() noexcept
 
 	// if data is read from #0 then tb points to #1
 	GLuint tf_buffer_id = (_read_from_physics_0) 
-		? _tbo_simulation_buffer_1.buffer().id()
-		: _tbo_simulation_buffer_0.buffer().id();
+		? _tbo_physics_buffer_1.buffer().id()
+		: _tbo_physics_buffer_0.buffer().id();
 
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tf_buffer_id);
 }
@@ -322,6 +322,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	glBindTextureUnit(1, material.tex_fur_mask().id());
 	glBindVertexArray(geometry_buffers.render_vao_id());
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
 	//glViewport(0, 0, _tex_rt.size().width, _tex_rt.size().height);
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
@@ -332,6 +333,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 		//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
 		//	GL_UNSIGNED_INT, nullptr, 2, geometry_buffers.meshes()[mi].base_vertex);
 	}
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	/*size_t draw_count = material.strand_props().shell_count;
 	for (size_t si = 0; si < draw_count; ++si) {
@@ -368,6 +370,7 @@ void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers,
 	_program.bind(graviy_accel_ms, angular_accel_ms,
 		float4(strand_length, strand_props.mass, strand_props.k, strand_props.c));
 
+
 	glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, geometry_buffers.vertex_count());
 	glEndTransformFeedback();
@@ -386,7 +389,7 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 	glEnable(GL_DEPTH_TEST);
 
 	glBindTextureUnit(0, geometry_buffers.tbo_position_buffer().id());
-	glBindTextureUnit(1, geometry_buffers.tbo_simulation_buffer().id());
+	glBindTextureUnit(1, geometry_buffers.tbo_physics_buffer().id());
 	glBindTextureUnit(2, geometry_buffers.tbo_debug_slot_buffer().id());
 	glBindVertexArray(geometry_buffers.blank_vao_id());
 	
@@ -427,7 +430,7 @@ void Fur_simulation_opengl_example::on_keyboard()
 
 	if (_app_ctx.keyboard.is_down(Key::r)) {
 		_model_transform.rotation_angle_total += pi_8;
-		_model_transform.rotation_angle = 5.6 * pi_8;
+		_model_transform.rotation_angle = 5.6f * pi_8;
 	}
 	else {
 		_model_transform.rotation_angle = 0.0f;
@@ -501,7 +504,7 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 
 	_fur_pass.perform(_geometry_buffers, *_curr_material,
 		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
-	_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
+	//_strand_debug_pass.perform(_geometry_buffers, pvm_matrix);
 }
 
 void Fur_simulation_opengl_example::update(float dt_msec)
@@ -513,19 +516,16 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 	_movement_speed += _movement_acceleration * dt;
 	_model_transform.position += 0.008f * _movement_speed;
 	_model_matrix = trs_matrix(_model_transform.position,
-		//quat::identity,
 		from_axis_angle_rotation(_model_transform.rotation_axis, 0.1f * _model_transform.rotation_angle_total),
 		_model_transform.scale);
 
-	//for (size_t i = 0; i < 50; ++i) {
-		const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
-		const mat4 inv_model_matrix = inverse(_model_matrix);
-		const float4 gravity_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
-		const float3 angular_ms(mul(inv_model_matrix, -angular_velocity).xyz());
+	const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
+	const mat4 inv_model_matrix = inverse(_model_matrix);
+	const float4 gravity_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
+	const float3 angular_ms(mul(inv_model_matrix, -angular_velocity).xyz());
 
-		_physics_pass.perform(_geometry_buffers, gravity_ms, angular_ms,
-			0.3f, _curr_material->strand_props());
-	//}
+	_physics_pass.perform(_geometry_buffers, gravity_ms, angular_ms,
+		0.3f, _curr_material->strand_props());
 }
 
 void Fur_simulation_opengl_example::update_curr_viewpoint()

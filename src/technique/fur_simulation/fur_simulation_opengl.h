@@ -64,9 +64,9 @@ public:
 		return _tbo_position_buffer;
 	}
 
-	const Texture_buffer<Buffer_gpu>& tbo_simulation_buffer() const noexcept
+	const Texture_buffer<Buffer_gpu>& tbo_physics_buffer() const noexcept
 	{
-		return (_read_from_physics_0) ? _tbo_simulation_buffer_0 : _tbo_simulation_buffer_1;
+		return (_read_from_physics_0) ? _tbo_physics_buffer_0 : _tbo_physics_buffer_1;
 	}
 
 
@@ -85,8 +85,8 @@ private:
 
 	std::vector<cg::data::Model_mesh_info> _meshes;
 	Texture_buffer<Buffer_gpu> _tbo_position_buffer;
-	Texture_buffer<Buffer_gpu> _tbo_simulation_buffer_0;
-	Texture_buffer<Buffer_gpu> _tbo_simulation_buffer_1;
+	Texture_buffer<Buffer_gpu> _tbo_physics_buffer_0;
+	Texture_buffer<Buffer_gpu> _tbo_physics_buffer_1;
 	Texture_buffer<Buffer_gpu> _tbo_debug_slot;
 	Buffer_gpu _model_attribs_buffer;
 	Buffer_gpu _index_buffer;
