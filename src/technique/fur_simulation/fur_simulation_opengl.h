@@ -54,6 +54,11 @@ public:
 		return _vertex_count;
 	}
 
+	const Texture_buffer<Buffer_gpu>& tbo_debug_slot_buffer() const noexcept
+	{
+		return _tbo_debug_slot;
+	}
+
 	const Texture_buffer<Buffer_gpu>& tbo_position_buffer() const noexcept
 	{
 		return _tbo_position_buffer;
@@ -82,6 +87,7 @@ private:
 	Texture_buffer<Buffer_gpu> _tbo_position_buffer;
 	Texture_buffer<Buffer_gpu> _tbo_simulation_buffer_0;
 	Texture_buffer<Buffer_gpu> _tbo_simulation_buffer_1;
+	Texture_buffer<Buffer_gpu> _tbo_debug_slot;
 	Buffer_gpu _model_attribs_buffer;
 	Buffer_gpu _index_buffer;
 	GLuint _blank_vao_id = Invalid::vao_id;
@@ -183,7 +189,7 @@ public:
 
 
 	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_accel_ms,
-		const cg::float3& angular_accel_ms, float strand_length, 
+		const cg::float3& angular_velocity_ms, float strand_length, 
 		const Strand_properties& strand_props) noexcept;
 
 private:
@@ -260,11 +266,15 @@ private:
 	struct Model_transform {
 		Model_transform() noexcept = default;
 
-		Model_transform(const cg::float3& position, const cg::float3& scale) noexcept
-			: position(position), scale(scale)
+		Model_transform(const cg::float3& position, const cg::float3& rotation_axis,
+			const cg::float3& scale) noexcept
+			: position(position), rotation_axis(rotation_axis), scale(scale)
 		{}
 			
 		cg::float3 position;
+		cg::float3 rotation_axis;
+		float rotation_angle_total = 0.0f;
+		float rotation_angle = 0.0f;
 		cg::float3 scale;
 	};
 
@@ -282,9 +292,7 @@ private:
 	Model_transform _model_transform;
 	cg::float3 _movement_speed;
 	cg::float3 _movement_acceleration;
-	cg::float3 _rotation_axis = cg::float3(0.0f, 1.0f, 0.0f);
-	float _rotation_angle = 0.0f;
-	cg::float3 _wind_acceleration;
+	//cg::float3 _wind_acceleration;
 	cg::mat4 _model_matrix;
 	Material_gallery _material_gallery;
 	const Material* _curr_material = nullptr;

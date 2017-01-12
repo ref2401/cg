@@ -1,7 +1,7 @@
 #version 450 core
 
-// xyz: angular acceleration in the model space.
-uniform vec3 g_angular_acceleration_ms;
+// xyz: angular velocity in the model space.
+uniform vec3 g_angular_velocity_ms;
 // xyz: gravity acceleration in the model space.
 // w: simulation delta time. 
 uniform vec4 g_external_acceleration_ms;
@@ -18,7 +18,7 @@ layout(location = 3) in vec3 vert_velocity;
 
 out vec3 tf_p_curr;
 out vec3 tf_velocity;
-
+out vec4 tf_debug_slot;
 
 void main()
 {
@@ -26,11 +26,11 @@ void main()
 	const vec3 deform = vert_p_curr - vert_p_rest;
 	// angular acceleration to linear acceleration
 	const vec3 r = (g_strand_props.x) * normalize(vert_p_curr - vert_p_base);
-	const vec3 linear_acceleration_ms = cross(g_angular_acceleration_ms, r);
+	const vec3 linear_velocity_ms = cross(g_angular_velocity_ms, r);
 
-	const vec3 f_total = g_strand_props.y * (g_external_acceleration_ms.xyz + linear_acceleration_ms)
+	const vec3 f_total = g_strand_props.y * (g_external_acceleration_ms.xyz)
 		- deform * g_strand_props.z
-		- vert_velocity * g_strand_props.w;
+		+ (linear_velocity_ms - vert_velocity) * g_strand_props.w;
 	
 	const vec3 a = f_total / g_strand_props.y;
 	const float t = g_external_acceleration_ms.w;
@@ -38,11 +38,12 @@ void main()
 
 	const vec3 dir_to_rest = normalize(vert_p_rest - vert_p_base);
 	const vec3 dir_to_new_unorm = p_new - vert_p_base;
-	//if (length(dir_to_new_unorm) > g_strand_props.x)
-		tf_p_curr = vert_p_base + g_strand_props.x * normalize(dir_to_new_unorm); // strand length preservation
+	
+	tf_p_curr = p_new;
+	// strand length contstraint
+	if (length(dir_to_new_unorm) > g_strand_props.x)
+		tf_p_curr = vert_p_base + g_strand_props.x * normalize(dir_to_new_unorm);
 
 	tf_velocity = vert_velocity + a * t;
-
-	//tf_p_curr = vec3(length(dir_to_new_unorm), g_strand_props.x, 0);
-	//tf_velocity = a;
+	tf_debug_slot = vec4(linear_velocity_ms, 24);
 }

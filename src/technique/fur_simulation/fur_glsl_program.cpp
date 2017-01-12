@@ -55,21 +55,21 @@ Physics_simulation_pass_program::Physics_simulation_pass_program()
 {
 	auto program_desc = load_glsl_program_desc(
 		"../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr,
-		true, "tf_p_curr", "tf_velocity");
+		true, "tf_p_curr", "tf_velocity", "gl_NextBuffer", "tf_debug_slot");
 
 	_program = Glsl_program("physics-simulation-pass", program_desc);
+	_g_angular_velocity_ms_location = _program.get_uniform_location("g_angular_velocity_ms");
 	_g_external_accel_ms_location = _program.get_uniform_location("g_external_acceleration_ms");
-	_g_angular_accel_ms_location = _program.get_uniform_location("g_angular_acceleration_ms");
 	_g_strand_props = _program.get_uniform_location("g_strand_props");
 }
 
 void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, 
-	const cg::float3& angular_acceleration_ms, const cg::float4& strand_props) noexcept
+	const cg::float3& angular_velocity_ms, const cg::float4& strand_props) noexcept
 {
 	glUseProgram(_program.id());
 
+	set_uniform(_g_angular_velocity_ms_location, angular_velocity_ms);
 	set_uniform(_g_external_accel_ms_location, gravity_ms);
-	set_uniform(_g_angular_accel_ms_location, angular_acceleration_ms);
 	set_uniform(_g_strand_props, strand_props);
 }
 
