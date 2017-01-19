@@ -188,7 +188,7 @@ public:
 	Physics_simulation_pass& operator=(Physics_simulation_pass&&) = delete;
 
 
-	void perform(Geometry_buffers& geometry_buffers, const cg::float4& graviy_accel_ms,
+	void perform(Geometry_buffers& geometry_buffers, const cg::float4& extern_accel_ms,
 		const cg::float3& angular_velocity_ms, float strand_length, 
 		const Strand_properties& strand_props) noexcept;
 

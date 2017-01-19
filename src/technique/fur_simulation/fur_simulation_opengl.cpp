@@ -360,14 +360,14 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 // ----- Physics_simulation_pass -----
 
 void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
-	const cg::float4& graviy_accel_ms, const cg::float3& angular_accel_ms,
+	const cg::float4& extern_accel_ms, const cg::float3& angular_accel_ms,
 	float strand_length, const Strand_properties& strand_props) noexcept
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	glBindVertexArray(geometry_buffers.physics_vao_id());
-	_program.bind(graviy_accel_ms, angular_accel_ms,
+	_program.bind(extern_accel_ms, angular_accel_ms,
 		float4(strand_length, strand_props.mass, strand_props.k, strand_props.c));
 
 
@@ -411,7 +411,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	_prev_viewpoint(_curr_viewpoint),
 	_model_transform(float3::zero, normalize(float3(0, 1, 0)), float3(2.0f)),
 	//_geometry_buffers(0.3f, "../data/rect_2x2.obj"),
-	_geometry_buffers(0.3f /*material.strand_lenght*/, "../data/sphere-20x20.obj"),
+	_geometry_buffers(0.3f, "../data/sphere-20x20.obj"),
 	_dir_to_light_ws(normalize(float3(50, 1, 100.0))),
 	_fur_pass(_app_ctx.window.viewport_size())
 {
@@ -521,10 +521,10 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 
 	const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
 	const mat4 inv_model_matrix = inverse(_model_matrix);
-	const float4 gravity_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
+	const float4 extern_accel_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
 	const float3 angular_ms(mul(inv_model_matrix, -angular_velocity).xyz());
 
-	_physics_pass.perform(_geometry_buffers, gravity_ms, angular_ms,
+	_physics_pass.perform(_geometry_buffers, extern_accel_ms, angular_ms,
 		0.3f, _curr_material->strand_props());
 }
 

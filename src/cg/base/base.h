@@ -27,7 +27,7 @@ namespace cg {
 
 namespace internal {
 
-inline void accumulate_exception_messge_impl(std::string& dest, const std::exception& exc)
+inline void accumulate_exception_message_impl(std::string& dest, const std::exception& exc)
 {
 	dest.append("- ");
 	dest.append(exc.what());
@@ -37,7 +37,7 @@ inline void accumulate_exception_messge_impl(std::string& dest, const std::excep
 		std::rethrow_if_nested(exc);
 	}
 	catch (const std::exception& nested_exc) {
-		accumulate_exception_messge_impl(dest, nested_exc);
+		accumulate_exception_message_impl(dest, nested_exc);
 	}
 	catch (...) {
 		assert(false); // hell no!
@@ -86,7 +86,7 @@ inline std::string concat(const Args&... args)
 inline std::string get_exception_message(const std::exception& exc)
 {
 	std::string msg;
-	cg::internal::accumulate_exception_messge_impl(msg, exc);
+	cg::internal::accumulate_exception_message_impl(msg, exc);
 	return msg;
 }
 

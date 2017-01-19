@@ -1,16 +1,17 @@
 #version 450 core
 
+const float pi = 3.1415926535;
+
 uniform mat4 g_pvm_matrix;
 uniform mat4 g_model_matrix;
-// xyz: g_view_position_ws
+// xyz: view_position_ws
 // w: shell_count
 uniform vec4 g_view_position_ws;
-// x: g_curl_radius
-// y: g_curl_frequency
-// z: g_threshold_power
-// w: g_shadow_factor_power
+// x: curl_radius
+// y: curl_frequency
+// z: threshold_power
+// w: shadow_factor_power
 uniform vec4 g_strand_props;
-uniform uint g_shell_index;
 
 layout(location = 0) in vec3 vert_position;
 layout(location = 1) in vec3 vert_strand_rest_position;
@@ -24,7 +25,7 @@ out VS_result {
 	vec3 normal_ws;
 	vec2 tex_coord;
 	float shadow_factor;
-	float fur_mask_factor;
+	float fur_alpha_factor;
 	float fur_mask_threshold;
 } result;
 
@@ -48,9 +49,10 @@ void main()
 	result.normal_ws = norm_ws;
 	result.tex_coord = vert_tex_coord;
 	result.shadow_factor = pow(h, g_strand_props.z);
-	result.fur_mask_factor = max(0, dot(norm_ws, dir_to_view_ws));
+	result.fur_alpha_factor = max(0, dot(norm_ws, dir_to_view_ws));
 	result.fur_mask_threshold = pow(h, g_strand_props.w);
 }
+
 vec3 calc_position(float h, vec3 tangent, vec3 bitangent)
 {
 	const float one_minus_h = 1 - h;
@@ -61,7 +63,6 @@ vec3 calc_position(float h, vec3 tangent, vec3 bitangent)
 		+ 2 * h * one_minus_h * p1
 		+ pow(h, 2) * p2;
 
-	const float pi = 3.1415926535;
 	float angle = 2 * pi * h * g_strand_props.y;
 	float cos_a = cos(angle);
 	float sin_a = sin(angle);

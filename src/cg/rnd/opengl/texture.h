@@ -18,9 +18,9 @@ struct Sampler_desc final {
 
 	Sampler_desc() noexcept = default;
 
-	Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter, GLenum wrap_mode) noexcept;
+	Sampler_desc(GLenum mag_filter, GLenum min_filter, GLenum wrap_mode) noexcept;
 
-	Sampler_desc::Sampler_desc(GLenum mag_filter, GLenum min_filter,
+	Sampler_desc(GLenum mag_filter, GLenum min_filter,
 		GLenum wrap_s, GLenum wrap_t, GLenum wrap_r) noexcept;
 
 
@@ -427,22 +427,22 @@ std::ostream& operator<<(std::ostream& out, const Sampler_desc& desc);
 
 std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc);
 
-// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
 
-// Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
+// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
 // based on the specified texture internal format.
 // Returns GL_NONE if internal_format value is not a valid value.
 GLenum get_texture_sub_image_format(GLenum internal_format) noexcept;
 
-// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
 // Returns GL_NONE if fmt value eqauls to Image_format::none.
 GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
 
-// Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified texture internal format.
 // Returns GL_NONE if internal_format value is not a valid value.
 GLenum get_texture_sub_image_type(GLenum internal_format) noexcept;

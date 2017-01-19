@@ -25,7 +25,7 @@ void main()
 	// spring deformation
 	const vec3 deform = vert_p_curr - vert_p_rest;
 	// angular acceleration to linear acceleration
-	const vec3 r = (g_strand_props.x) * normalize(vert_p_curr - vert_p_base);
+	const vec3 r = g_strand_props.x * normalize(vert_p_curr - vert_p_base);
 	const vec3 linear_velocity_ms = cross(g_angular_velocity_ms, r);
 
 	const vec3 f_total = g_strand_props.y * (g_external_acceleration_ms.xyz)

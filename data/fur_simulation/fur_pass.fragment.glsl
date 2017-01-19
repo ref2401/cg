@@ -11,7 +11,7 @@ in VS_result{
 	vec3 normal_ws;
 	vec2 tex_coord;
 	float shadow_factor;
-	float fur_mask_factor;
+	float fur_alpha_factor;
 	float fur_mask_threshold;
 } frag;
 
@@ -24,11 +24,11 @@ void main()
 	const vec3 diffuse_rgb = texture(g_tex_diffuse_rgb, frag.tex_coord).rgb;
 	
 	vec2 uv_fur_mask = frag.tex_coord * g_fur_mask_uv_factors.x;
-	if (frag.fur_mask_factor > 0.2)
+	if (frag.fur_alpha_factor > 0.2)
 		uv_fur_mask = frag.tex_coord * g_fur_mask_uv_factors.y;
 
 	const float noise = texture(g_tex_fur_mask, uv_fur_mask).r;
-	const float fur_alpha = frag.fur_mask_factor * noise * step(frag.fur_mask_threshold, noise);
+	const float fur_alpha = frag.fur_alpha_factor * noise * step(frag.fur_mask_threshold, noise);
 	
 	// lighting
 	const vec3 n = normalize(frag.normal_ws);
