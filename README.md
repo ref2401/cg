@@ -1,6 +1,6 @@
 Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11.
 
-## Clone, init & build
+## Clone, init & build (x86 only)
 Required tools
 - DirectX SDK (install it before Visual Studio)
 - Visual Studio Community 2015
