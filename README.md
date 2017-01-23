@@ -2,13 +2,13 @@ Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11
 
 ## Clone, init & build
 Required tools
+- DirectX SDK (install it before Visual Studio)
 - Visual Studio Community 2015
-- DirectX SDK
 - CMake
+- Git
+- Make sure that cmake, git & devenv commands are available from command line.
 
-Clone the repository as usual and then execute init.cmd script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```.
-
-Only Debug mode works at the moment. The reason is that extern/Assimp does not build under Release mode. Also the projects is tested only under x86 (Win32) platform.
+Clone the repository as usual and then execute `init.cmd` script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```.
 
 ## Techniques (new ones go first)
 1. [Learn DirectX 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) (DirectX 11)
