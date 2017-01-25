@@ -28,9 +28,6 @@
     <ClCompile Include="data\file.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="data\image_file_tga.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="data\model.cpp">
       <Filter>data</Filter>
     </ClCompile>

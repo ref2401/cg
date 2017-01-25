@@ -345,7 +345,7 @@ std::ostream& operator<<(std::ostream& out, const Texture_format& fmt);
 std::wostream& operator<<(std::wostream& out, const Texture_format& fmt);
 
 // Inferes an appropriate texture format based on the specified image format.
-Texture_format get_texture_format(cg::data::Image_format fmt) noexcept;
+Texture_format get_texture_format(cg::data::Pixel_format fmt) noexcept;
 
 // Converts the specified texture format into OpenGL internal texture format.
 GLenum get_texture_internal_format(Texture_format fmt) noexcept;
@@ -358,8 +358,8 @@ GLenum get_texture_min_filter(Min_filter filter) noexcept;
 
 // Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum get_texture_sub_image_format(cg::data::Pixel_format fmt) noexcept;
 
 // Inferes an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
 // based on the specified texture format.
@@ -368,8 +368,8 @@ GLenum get_texture_sub_image_format(Texture_format fmt) noexcept;
 
 // Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum get_texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
 
 // Inferes an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified texture format.

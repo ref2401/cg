@@ -167,9 +167,6 @@ public:
 		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
 
 	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
-		cg::data::Image_2d& image) noexcept;
-
-	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
 		const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept;
 
 	Texture_2d_immut(const Texture_2d_immut&) = delete;
@@ -429,8 +426,8 @@ std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc);
 
 // Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum get_texture_sub_image_format(cg::data::Image_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum get_texture_sub_image_format(cg::data::Pixel_format fmt) noexcept;
 
 // Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
 // based on the specified texture internal format.
@@ -439,8 +436,8 @@ GLenum get_texture_sub_image_format(GLenum internal_format) noexcept;
 
 // Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Image_format::none.
-GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum get_texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
 
 // Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified texture internal format.

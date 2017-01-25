@@ -2,7 +2,7 @@
 
 #include "CppUnitTest.h"
 
-using cg::data::Image_format;
+using cg::data::Pixel_format;
 using cg::rnd::opengl::Sampler_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -66,12 +66,12 @@ public:
 	{
 		using cg::rnd::opengl::get_texture_sub_image_format;
 
-		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(Image_format::none));
-		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(Image_format::red_8));
-		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(Image_format::rgb_8));
-		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(Image_format::rgba_8));
-		Assert::AreEqual<GLenum>(GL_BGR, get_texture_sub_image_format(Image_format::bgr_8));
-		Assert::AreEqual<GLenum>(GL_BGRA, get_texture_sub_image_format(Image_format::bgra_8));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(Pixel_format::none));
+		Assert::AreEqual<GLenum>(GL_RED, get_texture_sub_image_format(Pixel_format::red_8));
+		Assert::AreEqual<GLenum>(GL_RGB, get_texture_sub_image_format(Pixel_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_RGBA, get_texture_sub_image_format(Pixel_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_BGR, get_texture_sub_image_format(Pixel_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_BGRA, get_texture_sub_image_format(Pixel_format::bgra_8));
 
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(GL_RED));
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_format(GL_TEXTURE_2D));
@@ -94,12 +94,12 @@ public:
 	{
 		using cg::rnd::opengl::get_texture_sub_image_type;
 
-		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(Image_format::none));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::red_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgb_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::rgba_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgr_8));
-		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Image_format::bgra_8));
+		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(Pixel_format::none));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Pixel_format::red_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Pixel_format::rgb_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Pixel_format::rgba_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Pixel_format::bgr_8));
+		Assert::AreEqual<GLenum>(GL_UNSIGNED_BYTE, get_texture_sub_image_type(Pixel_format::bgra_8));
 
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(GL_RED));
 		Assert::AreEqual<GLenum>(GL_NONE, get_texture_sub_image_type(GL_TEXTURE_2D));

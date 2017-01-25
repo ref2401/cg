@@ -1,7 +1,7 @@
 #include "cg/rnd/opengl/texture.h"
 
 #include <cassert>
-using cg::data::Image_format;
+using cg::data::Pixel_format;
 
 
 namespace cg {
@@ -198,18 +198,10 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 }
 
 Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
-	cg::data::Image_2d& image) noexcept
-	: Texture_2d_immut(internal_format, mipmap_level_count, image.size())
-{
-	assert(image.format() != Image_format::none);
-	write(0, uint2::zero, image);
-}
-
-Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
 	const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept
 	: Texture_2d_immut(internal_format, mipmap_level_count, sampler_desc, image.size())
 {
-	assert(image.format() != Image_format::none);
+	assert(image.pixel_format() != Pixel_format::none);
 	write(0, uint2::zero, image);
 }
 
@@ -261,17 +253,17 @@ void Texture_2d_immut::write(GLuint mipmap_level, const uint2& offset, const cg:
 {
 	assert(_id != Invalid::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
-	assert(image.format() != Image_format::none);
+	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
 	assert(_size.width >= offset.width + image.size().width);
 	assert(_size.height >= offset.height + image.size().height);
 
 	if (image.size() == uint2::zero) return;
 
-	glTextureSubImage2D(_id, mipmap_level, offset.x , offset.y, 
+	glTextureSubImage2D(_id, mipmap_level, offset.x, offset.y,
 		image.size().width, image.size().height,
-		get_texture_sub_image_format(image.format()),
-		get_texture_sub_image_type(image.format()),
+		get_texture_sub_image_format(image.pixel_format()),
+		get_texture_sub_image_type(image.pixel_format()),
 		image.data());
 }
 
@@ -350,7 +342,7 @@ void Texture_3d_immut::write(GLuint mipmap_level, const uint3& offset, const cg:
 {
 	assert(_id != Invalid::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
-	assert(image.format() != Image_format::none);
+	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
 	assert(_size.width >= offset.width + image.size().width);
 	assert(_size.height >= offset.height + image.size().height);
@@ -359,8 +351,8 @@ void Texture_3d_immut::write(GLuint mipmap_level, const uint3& offset, const cg:
 
 	glTextureSubImage3D(_id, mipmap_level, offset.x, offset.y, offset.z,
 		image.size().width, image.size().height, 1,
-		get_texture_sub_image_format(image.format()),
-		get_texture_sub_image_type(image.format()),
+		get_texture_sub_image_format(image.pixel_format()),
+		get_texture_sub_image_type(image.pixel_format()),
 		image.data());
 }
 
@@ -380,17 +372,17 @@ std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc)
 	return out;
 }
 
-GLenum get_texture_sub_image_format(Image_format fmt) noexcept
+GLenum get_texture_sub_image_format(Pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Image_format::none: return GL_NONE;
+		case Pixel_format::none: return GL_NONE;
 
-		case Image_format::red_8: return GL_RED;
-		case Image_format::rgb_8: return GL_RGB;
-		case Image_format::rgba_8: return GL_RGBA;
-		case Image_format::bgr_8: return GL_BGR;
-		case Image_format::bgra_8: return GL_BGRA;
+		case Pixel_format::red_8: return GL_RED;
+		case Pixel_format::rgb_8: return GL_RGB;
+		case Pixel_format::rgba_8: return GL_RGBA;
+		case Pixel_format::bgr_8: return GL_BGR;
+		case Pixel_format::bgra_8: return GL_BGRA;
 	}
 }
 
@@ -415,17 +407,17 @@ GLenum get_texture_sub_image_format(GLenum internal_format) noexcept
 	}
 }
 
-GLenum get_texture_sub_image_type(Image_format fmt) noexcept
+GLenum get_texture_sub_image_type(Pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Image_format::none: return GL_NONE;
+		case Pixel_format::none: return GL_NONE;
 
-		case Image_format::red_8: return GL_UNSIGNED_BYTE;
-		case Image_format::rgb_8: return GL_UNSIGNED_BYTE;
-		case Image_format::rgba_8: return GL_UNSIGNED_BYTE;
-		case Image_format::bgr_8: return GL_UNSIGNED_BYTE;
-		case Image_format::bgra_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::bgr_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::bgra_8: return GL_UNSIGNED_BYTE;
 	}
 }
 

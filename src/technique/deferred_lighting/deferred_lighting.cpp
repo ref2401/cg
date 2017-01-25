@@ -10,6 +10,7 @@
 #include "cg/data/shader.h"
 
 
+using cg::data::Image_2d;
 using cg::data::Vertex_attribs_old;
 using namespace cg;
 using namespace deferred_lighting::rnd;
@@ -82,12 +83,12 @@ Material_library::Material_library()
 	Sampler_config bilinear_repeat(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::repeat);
 
 
-	auto material_default_normal_map = cg::data::load_image_tga("../data/common_data/material-default-normal-map.tga");
-	auto specular_intensity_0_18_image = cg::data::load_image_tga("../data/common_data/material-specular-intensity-0.18f.tga");
-	auto specular_intensity_1_00_image = cg::data::load_image_tga("../data/common_data/material-specular-intensity-1.00f.tga");
+	Image_2d material_default_normal_map("../data/common_data/material-default-normal-map.tga");
+	Image_2d specular_intensity_0_18_image("../data/common_data/material-specular-intensity-0.18f.tga");
+	Image_2d specular_intensity_1_00_image("../data/common_data/material-specular-intensity-1.00f.tga");
 
 	{ // default material
-		auto diffuse_rgb_image = cg::data::load_image_tga("../data/common_data/material-default-diffuse-rgb.tga");
+		Image_2d diffuse_rgb_image("../data/common_data/material-default-diffuse-rgb.tga");
 
 		_default_material.smoothness = 10.0f;
 		_default_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -96,9 +97,9 @@ Material_library::Material_library()
 	}
 
 	{ // brick wall
-		auto diffuse_rgb_image = cg::data::load_image_tga("../data/bricks-red-diffuse-rgb.tga");
-		auto normal_map_image = cg::data::load_image_tga("../data/bricks-red-normal-map.tga");
-		auto specular_image = cg::data::load_image_tga("../data/bricks-red-specular-intensity.tga");
+		Image_2d diffuse_rgb_image("../data/bricks-red-diffuse-rgb.tga");
+		Image_2d normal_map_image("../data/bricks-red-normal-map.tga");
+		Image_2d specular_image("../data/bricks-red-specular-intensity.tga");
 
 		_brick_wall_material.smoothness = 5.0f;
 		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -107,7 +108,7 @@ Material_library::Material_library()
 	}
 
 	{ // chess board
-		auto diffuse_rgb_image = cg::data::load_image_tga("../data/chess-board-diffuse-rgb.tga");
+		Image_2d diffuse_rgb_image("../data/chess-board-diffuse-rgb.tga");
 
 		_chess_board_material.smoothness = 1.0f;
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
@@ -116,8 +117,8 @@ Material_library::Material_library()
 	}
 
 	{ // teapot material
-		auto diffuse_rgb_image = cg::data::load_image_tga("../data/teapot-diffuse-rgb.tga");
-		auto normal_map_image = cg::data::load_image_tga("../data/teapot-normal-map.tga");
+		Image_2d diffuse_rgb_image("../data/teapot-diffuse-rgb.tga");
+		Image_2d normal_map_image("../data/teapot-normal-map.tga");
 
 		_teapot_material.smoothness = 10.0f;
 		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -126,9 +127,9 @@ Material_library::Material_library()
 	}
 
 	{ // wooden box
-		auto diffuse_rgb_image = cg::data::load_image_tga("../data/wooden-box-diffuse-rgb.tga");
-		auto normal_map_image = cg::data::load_image_tga("../data/wooden-box-normal-map.tga");
-		auto specular_image = cg::data::load_image_tga("../data/wooden-box-specular-intensity.tga");
+		Image_2d diffuse_rgb_image("../data/wooden-box-diffuse-rgb.tga");
+		Image_2d normal_map_image("../data/wooden-box-normal-map.tga");
+		Image_2d specular_image("../data/wooden-box-specular-intensity.tga");
 
 		_wooden_box_material.smoothness = 4.0f;
 		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);

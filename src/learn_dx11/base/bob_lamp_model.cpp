@@ -259,20 +259,19 @@ Bob_lamp_md5_model::Bob_lamp_md5_model()
 
 void Bob_lamp_md5_model::init_images()
 {
-	using cg::data::Image_format;
-	using cg::data::Load_image_params;
+	using cg::data::Pixel_format;
 
-	const Load_image_params load_params[6] = {
-		{ "../data/models/bob_lamp/bob_body.tga", Image_format::bgra_8, false },
-		{ "../data/models/bob_lamp/bob_head.tga", Image_format::bgra_8, false },
-		{ "../data/models/bob_lamp/bob_helmet.tga", Image_format::bgra_8, false },
-		{ "../data/models/bob_lamp/lantern.tga", Image_format::bgra_8, false },
-		{ "../data/models/bob_lamp/lantern_top.tga", Image_format::bgra_8, false },
-		{ "../data/models/bob_lamp/bob_body.tga", Image_format::bgra_8, false }
+	const char* image_filenames[6] = {
+		"../data/models/bob_lamp/bob_body.tga",
+		"../data/models/bob_lamp/bob_head.tga",
+		"../data/models/bob_lamp/bob_helmet.tga",
+		"../data/models/bob_lamp/lantern.tga",
+		"../data/models/bob_lamp/lantern_top.tga",
+		"../data/models/bob_lamp/bob_body.tga"
 	};
 
-	for (size_t i = 0; i < std::extent<decltype(load_params)>::value; ++i) {
-		_mesh_draw_params[i].diffuse_rgb_image = cg::data::load_image_tga(load_params[i]);
+	for (size_t i = 0; i < std::extent<decltype(image_filenames)>::value; ++i) {
+		_mesh_draw_params[i].diffuse_rgb_image = cg::data::Image_2d(image_filenames[i], 4, true);
 	}
 }
 

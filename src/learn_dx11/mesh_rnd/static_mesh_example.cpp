@@ -11,6 +11,7 @@ using cg::float3;
 using cg::float4;
 using cg::mat4;
 using cg::uint2;
+using cg::data::Image_2d;
 using cg::data::Vertex_attribs;
 
 
@@ -87,8 +88,7 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_material()
 {
-	cg::data::Load_image_params lip("../data/bricks-red-diffuse-rgb.tga", cg::data::Image_format::bgra_8, false);
-	auto image = cg::data::load_image_tga(lip);
+	Image_2d image("../data/bricks-red-diffuse-rgb.tga", 4);
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};
@@ -96,7 +96,7 @@ void Static_mesh_example::init_material()
 	tex_desc.Height = image.size().height;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
-	tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+	tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	tex_desc.SampleDesc.Count = 1;
 	tex_desc.SampleDesc.Quality = 0;
 	tex_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -104,7 +104,7 @@ void Static_mesh_example::init_material()
 	
 	D3D11_SUBRESOURCE_DATA data = {};
 	data.pSysMem = image.data();
-	data.SysMemPitch = image.size().width * cg::data::byte_count(image.format());
+	data.SysMemPitch = image.size().width * cg::data::byte_count(image.pixel_format());
 	data.SysMemSlicePitch = image.byte_count();
 
 	HRESULT hr = _device->CreateTexture2D(&tex_desc, &data, &_tex_diffuse_rgb.ptr);

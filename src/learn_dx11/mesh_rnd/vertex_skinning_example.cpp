@@ -122,7 +122,7 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		tex_desc.Height = image.size().height;
 		tex_desc.MipLevels = 1;
 		tex_desc.ArraySize = 1;
-		tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		tex_desc.SampleDesc.Count = 1;
 		tex_desc.SampleDesc.Quality = 0;
 		tex_desc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -130,7 +130,7 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		
 		D3D11_SUBRESOURCE_DATA tex_data = {};
 		tex_data.pSysMem = image.data();
-		tex_data.SysMemPitch = image.size().width * byte_count(image.format());
+		tex_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
 		tex_data.SysMemSlicePitch = image.byte_count();
 
 		HRESULT hr = _device->CreateTexture2D(&tex_desc, &tex_data, 

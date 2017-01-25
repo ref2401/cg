@@ -3,7 +3,7 @@
 using cg::uint2;
 using cg::greater_than;
 using cg::data::Image_2d;
-using cg::data::Image_format;
+using cg::data::Pixel_format;
 
 
 namespace deferred_lighting {
@@ -69,8 +69,8 @@ void Sampler::dispose() noexcept
 
 Texture_2d_sub_image_params::Texture_2d_sub_image_params(size_t mipmap_index, cg::uint2 offset, const Image_2d& image) noexcept :
 	mipmap_index(mipmap_index), offset(offset), size(image.size()),
-	pixel_format(get_texture_sub_image_format(image.format())),
-	pixel_type(get_texture_sub_image_type(image.format())),
+	pixel_format(get_texture_sub_image_format(image.pixel_format())),
+	pixel_type(get_texture_sub_image_type(image.pixel_format())),
 	pixels(static_cast<const void*>(image.data()))
 {
 	assert(greater_than(size, 0));
@@ -211,7 +211,7 @@ Texture_2d_immut::Texture_2d_immut(Texture_format format, const cg::data::Image_
 	_format(format)
 {
 	assert(format != Texture_format::none);
-	assert(image.format() != Image_format::none);
+	assert(image.pixel_format() != Pixel_format::none);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
 	glTextureStorage2D(_id, 1, get_texture_internal_format(format), image.size().width, image.size().height);
@@ -589,17 +589,17 @@ std::wostream& operator<<(std::wostream& out, const Texture_format& fmt)
 	return out;
 }
 
-Texture_format get_texture_format(cg::data::Image_format fmt) noexcept
+Texture_format get_texture_format(cg::data::Pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Image_format::none: return Texture_format::none;
+		case Pixel_format::none: return Texture_format::none;
 
-		case Image_format::red_8: return Texture_format::red_8;
-		case Image_format::rgb_8: return Texture_format::rgb_8;
-		case Image_format::rgba_8: return Texture_format::rgba_8;
-		case Image_format::bgr_8: return Texture_format::rgb_8;
-		case Image_format::bgra_8: return Texture_format::rgba_8;
+		case Pixel_format::red_8: return Texture_format::red_8;
+		case Pixel_format::rgb_8: return Texture_format::rgb_8;
+		case Pixel_format::rgba_8: return Texture_format::rgba_8;
+		case Pixel_format::bgr_8: return Texture_format::rgb_8;
+		case Pixel_format::bgra_8: return Texture_format::rgba_8;
 	}
 }
 
@@ -651,17 +651,17 @@ GLenum get_texture_min_filter(Min_filter filter) noexcept
 	return GL_NONE;
 }
 
-GLenum get_texture_sub_image_format(Image_format fmt) noexcept
+GLenum get_texture_sub_image_format(Pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Image_format::none: return GL_NONE;
+		case Pixel_format::none: return GL_NONE;
 
-		case Image_format::red_8: return GL_RED;
-		case Image_format::rgb_8: return GL_RGB;
-		case Image_format::rgba_8: return GL_RGBA;
-		case Image_format::bgr_8: return GL_BGR;
-		case Image_format::bgra_8: return GL_BGRA;
+		case Pixel_format::red_8: return GL_RED;
+		case Pixel_format::rgb_8: return GL_RGB;
+		case Pixel_format::rgba_8: return GL_RGBA;
+		case Pixel_format::bgr_8: return GL_BGR;
+		case Pixel_format::bgra_8: return GL_BGRA;
 	}
 }
 
@@ -687,17 +687,17 @@ GLenum get_texture_sub_image_format(Texture_format fmt) noexcept
 	}
 }
 
-GLenum get_texture_sub_image_type(cg::data::Image_format fmt) noexcept
+GLenum get_texture_sub_image_type(cg::data::Pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Image_format::none: return GL_NONE;
+		case Pixel_format::none: return GL_NONE;
 
-		case Image_format::red_8: return GL_UNSIGNED_BYTE;
-		case Image_format::rgb_8: return GL_UNSIGNED_BYTE;
-		case Image_format::rgba_8: return GL_UNSIGNED_BYTE;
-		case Image_format::bgr_8: return GL_UNSIGNED_BYTE;
-		case Image_format::bgra_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::bgr_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::bgra_8: return GL_UNSIGNED_BYTE;
 	}
 }
 
