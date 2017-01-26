@@ -34,7 +34,7 @@ TEST_CLASS(cg_base_base_Funcs) {
 		}
 
 		{ // 123
-			std::string s = concat(char_123);
+			std::string s = concat(123);
 			Assert::AreEqual(char_123, s.c_str());
 			Assert::IsTrue(char_123 != s.c_str());
 		}

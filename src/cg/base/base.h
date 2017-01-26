@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <exception>
+#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -14,7 +15,7 @@
 // Example:
 // std::string msg = EXCEPTION_MSG("blah-blah")		<- compile time error
 // std::string msg = EXCEPTION_MSG("blah-blah");	<- ok.
-#define EXCEPTION_MSG(...) cg::concat(__FILE__, '(', std::to_string(__LINE__), "): ", __VA_ARGS__)
+#define EXCEPTION_MSG(...) cg::concat(__FILE__, '(', __LINE__, "): ", __VA_ARGS__)
 
 // Enforces that the given expression is true.
 // If the expression evaluates to false then std::runtime_error is thrown.
@@ -44,30 +45,14 @@ inline void accumulate_exception_message_impl(std::string& dest, const std::exce
 	}
 }
 
-inline std::string concat_impl(std::string& dest)
-{
-	return dest;
-}
+inline void concat_impl(std::ostringstream& string_stream)
+{}
 
-template<typename... Args>
-std::string concat_impl(std::string& dest, const char& c, const Args&... args)
+template<typename T, typename... Args>
+void concat_impl(std::ostringstream& string_stream, const T& obj, const Args&... args)
 {
-	dest.push_back(c);
-	return concat_impl(dest, args...);
-}
-
-template<typename... Args>
-std::string concat_impl(std::string& dest, const std::string& str, const Args&... args)
-{
-	dest.append(str);
-	return concat_impl(dest, args...);
-}
-
-template<typename... Args>
-std::string concat_impl(std::string& dest, const char* str, const Args&... args)
-{
-	dest.append(str);
-	return concat_impl(dest, args...);
+	string_stream << obj;
+	concat_impl(string_stream, args...);
 }
 
 } // namespace internal
@@ -77,8 +62,9 @@ std::string concat_impl(std::string& dest, const char* str, const Args&... args)
 template<typename... Args>
 inline std::string concat(const Args&... args)
 {
-	std::string dest;
-	return cg::internal::concat_impl(dest, args...);
+	std::ostringstream string_stream;
+	cg::internal::concat_impl(string_stream, args...);
+	return string_stream.str();
 }
 
 // Constructs exception message string considering all the nested exceptions.
