@@ -1,4 +1,4 @@
-cbuffer Model : register(cb0) {
+cbuffer Model : register(b0) {
 	float4x4 g_model_matrix	: packoffset(c0);
 };
 
@@ -104,7 +104,7 @@ HS_result hs_main(InputPatch<VS_result, 3> patch,
 
 // ----- Domain Shader -----
 
-cbuffer Projection_view : register(cb0) {
+cbuffer Projection_view : register(b0) {
 	float4x4 g_projection_view_matrix	: packoffset(c0);
 };
 

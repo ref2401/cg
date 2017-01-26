@@ -1,9 +1,9 @@
-cbuffer Scene : register(cb0) {
+cbuffer Scene : register(b0) {
 	float4x4 g_projection_matrix	: packoffset(c0);
 	float4x4 g_view_matrix			: packoffset(c4);
 };
 
-cbuffer Model : register(cb1) {
+cbuffer Model : register(b1) {
 	float4x4 g_model_matrix			: packoffset(c0);
 };
 

@@ -252,13 +252,13 @@ Material_gallery::Material_gallery()
 	const Sampler_desc fur_mask_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 	
 	{ // fur mask
-		Image_2d image_fur_mask("../data/fur_simulation/noise-texture-03.tga");
+		Image_2d image_fur_mask("../data/fur_simulation/noise-texture-03.png");
 		_tex_fur_mask = Texture_2d_immut(GL_R8, 1, fur_mask_sampler, image_fur_mask);
 	}
 
 	const Sampler_desc diffuse_rgb_sampler(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
 	{ // cat material
-		Image_2d image_diffuse_rgb("../data/fur_simulation/cat-diffuse-rgb.tga");
+		Image_2d image_diffuse_rgb("../data/fur_simulation/cat-diffuse-rgb.png");
 		_tex_car_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 		
 		_cat_material = std::make_unique<Material>(_tex_car_diffuse_rgb, _tex_fur_mask,
@@ -278,7 +278,7 @@ Material_gallery::Material_gallery()
 	}
 
 	{ // curly red material
-		Image_2d image_diffuse_rgb("../data/fur_simulation/red-diffuse-rgb.tga");
+		Image_2d image_diffuse_rgb("../data/fur_simulation/red-diffuse-rgb.png");
 		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 
 		_curly_red_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,

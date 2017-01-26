@@ -83,12 +83,12 @@ Material_library::Material_library()
 	Sampler_config bilinear_repeat(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::repeat);
 
 
-	Image_2d material_default_normal_map("../data/common_data/material-default-normal-map.tga");
-	Image_2d specular_intensity_0_18_image("../data/common_data/material-specular-intensity-0.18f.tga");
-	Image_2d specular_intensity_1_00_image("../data/common_data/material-specular-intensity-1.00f.tga");
+	Image_2d material_default_normal_map("../data/common_data/material-default-normal-map.png");
+	Image_2d specular_intensity_0_18_image("../data/common_data/material-specular-intensity-0.18f.png");
+	Image_2d specular_intensity_1_00_image("../data/common_data/material-specular-intensity-1.00f.png");
 
 	{ // default material
-		Image_2d diffuse_rgb_image("../data/common_data/material-default-diffuse-rgb.tga");
+		Image_2d diffuse_rgb_image("../data/common_data/material-default-diffuse-rgb.png");
 
 		_default_material.smoothness = 10.0f;
 		_default_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -97,9 +97,9 @@ Material_library::Material_library()
 	}
 
 	{ // brick wall
-		Image_2d diffuse_rgb_image("../data/bricks-red-diffuse-rgb.tga");
-		Image_2d normal_map_image("../data/bricks-red-normal-map.tga");
-		Image_2d specular_image("../data/bricks-red-specular-intensity.tga");
+		Image_2d diffuse_rgb_image("../data/bricks-red-diffuse-rgb.png");
+		Image_2d normal_map_image("../data/bricks-red-normal-map.png");
+		Image_2d specular_image("../data/bricks-red-specular-intensity.png");
 
 		_brick_wall_material.smoothness = 5.0f;
 		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -108,7 +108,7 @@ Material_library::Material_library()
 	}
 
 	{ // chess board
-		Image_2d diffuse_rgb_image("../data/chess-board-diffuse-rgb.tga");
+		Image_2d diffuse_rgb_image("../data/chess-board-diffuse-rgb.png");
 
 		_chess_board_material.smoothness = 1.0f;
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
@@ -117,8 +117,8 @@ Material_library::Material_library()
 	}
 
 	{ // teapot material
-		Image_2d diffuse_rgb_image("../data/teapot-diffuse-rgb.tga");
-		Image_2d normal_map_image("../data/teapot-normal-map.tga");
+		Image_2d diffuse_rgb_image("../data/teapot-diffuse-rgb.png");
+		Image_2d normal_map_image("../data/teapot-normal-map.png");
 
 		_teapot_material.smoothness = 10.0f;
 		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -127,9 +127,9 @@ Material_library::Material_library()
 	}
 
 	{ // wooden box
-		Image_2d diffuse_rgb_image("../data/wooden-box-diffuse-rgb.tga");
-		Image_2d normal_map_image("../data/wooden-box-normal-map.tga");
-		Image_2d specular_image("../data/wooden-box-specular-intensity.tga");
+		Image_2d diffuse_rgb_image("../data/wooden-box-diffuse-rgb.png");
+		Image_2d normal_map_image("../data/wooden-box-normal-map.png");
+		Image_2d specular_image("../data/wooden-box-specular-intensity.png");
 
 		_wooden_box_material.smoothness = 4.0f;
 		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);

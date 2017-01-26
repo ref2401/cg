@@ -88,7 +88,7 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_material()
 {
-	Image_2d image("../data/bricks-red-diffuse-rgb.tga", 4);
+	Image_2d image("../data/bricks-red-diffuse-rgb.png", 4);
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};

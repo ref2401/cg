@@ -262,12 +262,12 @@ void Bob_lamp_md5_model::init_images()
 	using cg::data::Pixel_format;
 
 	const char* image_filenames[6] = {
-		"../data/models/bob_lamp/bob_body.tga",
-		"../data/models/bob_lamp/bob_head.tga",
-		"../data/models/bob_lamp/bob_helmet.tga",
-		"../data/models/bob_lamp/lantern.tga",
-		"../data/models/bob_lamp/lantern_top.tga",
-		"../data/models/bob_lamp/bob_body.tga"
+		"../data/models/bob_lamp/bob_body.png",
+		"../data/models/bob_lamp/bob_head.png",
+		"../data/models/bob_lamp/bob_helmet.png",
+		"../data/models/bob_lamp/lantern.png",
+		"../data/models/bob_lamp/lantern_top.png",
+		"../data/models/bob_lamp/bob_body.png"
 	};
 
 	for (size_t i = 0; i < std::extent<decltype(image_filenames)>::value; ++i) {
