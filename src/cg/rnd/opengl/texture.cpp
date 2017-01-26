@@ -379,10 +379,9 @@ GLenum get_texture_sub_image_format(Pixel_format fmt) noexcept
 		case Pixel_format::none: return GL_NONE;
 
 		case Pixel_format::red_8: return GL_RED;
+		case Pixel_format::rg_8: return GL_RG;
 		case Pixel_format::rgb_8: return GL_RGB;
 		case Pixel_format::rgba_8: return GL_RGBA;
-		case Pixel_format::bgr_8: return GL_BGR;
-		case Pixel_format::bgra_8: return GL_BGRA;
 	}
 }
 
@@ -414,10 +413,9 @@ GLenum get_texture_sub_image_type(Pixel_format fmt) noexcept
 		case Pixel_format::none: return GL_NONE;
 
 		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rg_8: return GL_UNSIGNED_BYTE;
 		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
 		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::bgr_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::bgra_8: return GL_UNSIGNED_BYTE;
 	}
 }
 

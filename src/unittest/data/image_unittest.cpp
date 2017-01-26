@@ -39,10 +39,9 @@ public:
 
 		Assert::AreEqual<size_t>(0, byte_count(Pixel_format::none));
 		Assert::AreEqual<size_t>(1, byte_count(Pixel_format::red_8));
+		Assert::AreEqual<size_t>(2, byte_count(Pixel_format::rg_8));
 		Assert::AreEqual<size_t>(3, byte_count(Pixel_format::rgb_8));
 		Assert::AreEqual<size_t>(4, byte_count(Pixel_format::rgba_8));
-		Assert::AreEqual<size_t>(3, byte_count(Pixel_format::bgr_8));
-		Assert::AreEqual<size_t>(4, byte_count(Pixel_format::bgra_8));
 	}
 
 	TEST_METHOD(channel_count)
@@ -51,12 +50,9 @@ public:
 
 		Assert::AreEqual<size_t>(0, channel_count(Pixel_format::none));
 		Assert::AreEqual<size_t>(1, channel_count(Pixel_format::red_8));
-
+		Assert::AreEqual<size_t>(2, channel_count(Pixel_format::rg_8));
 		Assert::AreEqual<size_t>(3, channel_count(Pixel_format::rgb_8));
-		Assert::AreEqual<size_t>(3, channel_count(Pixel_format::bgr_8));
-
 		Assert::AreEqual<size_t>(4, channel_count(Pixel_format::rgba_8));
-		Assert::AreEqual<size_t>(4, channel_count(Pixel_format::bgra_8));
 	}
 };
 

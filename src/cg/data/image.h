@@ -14,11 +14,9 @@ enum class Pixel_format :unsigned char {
 	none = 0,
 
 	red_8,
+	rg_8,
 	rgb_8,
-	rgba_8,
-
-	bgr_8,
-	bgra_8
+	rgba_8
 };
 
 // Returns the number of bytes occupied by one pixel of the specified format.

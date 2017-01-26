@@ -37,7 +37,7 @@ Image_2d::Image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 	uint8_t cc = (channel_count) ? channel_count : uint8_t(actual_channel_count);
 	switch (cc) {
 		case 1: _pixel_format = Pixel_format::red_8; break;
-		//case 2: _pixel_format = Pixel_format::rg_8; break;
+		case 2: _pixel_format = Pixel_format::rg_8; break;
 		case 3: _pixel_format = Pixel_format::rgb_8; break;
 		case 4: _pixel_format = Pixel_format::rgba_8; break;
 	}
@@ -103,20 +103,16 @@ std::ostream& operator<<(std::ostream& out, const Pixel_format& fmt)
 			out << "red_8";
 			break;
 
+		case Pixel_format::rg_8:
+			out << "rg_8";
+			break;
+
 		case Pixel_format::rgb_8:
 			out << "rgb_8";
 			break;
 
 		case Pixel_format::rgba_8:
 			out << "rgba_8";
-			break;
-
-		case Pixel_format::bgr_8:
-			out << "bgr_8";
-			break;
-
-		case Pixel_format::bgra_8:
-			out << "bgra_8";
 			break;
 	}
 
@@ -136,20 +132,16 @@ std::wostream& operator<<(std::wostream& out, const Pixel_format& fmt)
 			out << "red_8";
 			break;
 
+		case Pixel_format::rg_8:
+			out << "rg_8";
+			break;
+
 		case Pixel_format::rgb_8:
 			out << "rgb_8";
 			break;
 
 		case Pixel_format::rgba_8:
 			out << "rgba_8";
-			break;
-
-		case Pixel_format::bgr_8:
-			out << "bgr_8";
-			break;
-
-		case Pixel_format::bgra_8:
-			out << "bgra_8";
 			break;
 	}
 
@@ -162,10 +154,9 @@ size_t byte_count(const Pixel_format& fmt) noexcept
 		default:
 		case Pixel_format::none: return 0;
 		case Pixel_format::red_8: return 1;
+		case Pixel_format::rg_8: return 2;
 		case Pixel_format::rgb_8: return 3;
 		case Pixel_format::rgba_8: return 4;
-		case Pixel_format::bgr_8: return 3;
-		case Pixel_format::bgra_8: return 4;
 	}
 }
 
@@ -177,13 +168,14 @@ size_t channel_count(const Pixel_format& fmt) noexcept
 		
 		case Pixel_format::red_8: 
 			return 1;
+
+		case Pixel_format::rg_8:
+			return 2;
 		
 		case Pixel_format::rgb_8:
-		case Pixel_format::bgr_8: 
 			return 3;
 
 		case Pixel_format::rgba_8:
-		case Pixel_format::bgra_8:
 			return 4;
 	}
 }
