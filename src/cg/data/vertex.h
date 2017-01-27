@@ -144,6 +144,20 @@ std::pair<cg::float3, cg::float3> compute_tangent_bitangent(
 cg::float4 compute_tangent_handedness(const cg::float3& tangent,
 	const cg::float3& bitangent, const cg::float3& normal) noexcept;
 
+constexpr bool has_normal(Vertex_attribs attribs) noexcept
+{
+	return !(attribs == Vertex_attribs::p || attribs == Vertex_attribs::p_tc);
+}
+
+constexpr bool has_tangent_space(Vertex_attribs attribs) noexcept
+{
+	return attribs == Vertex_attribs::p_n_tc_ts;
+}
+
+constexpr bool has_tex_coord(Vertex_attribs attribs) noexcept
+{
+	return !(attribs == Vertex_attribs::p || attribs == Vertex_attribs::p_n);
+}
 
 } // namespace data
 } // namespace cg

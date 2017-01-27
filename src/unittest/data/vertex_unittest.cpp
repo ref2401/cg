@@ -154,6 +154,33 @@ public:
 		Assert::AreEqual(float4(float3::unit_x, -1.0f), th1);
 	}
 
+	TEST_METHOD(has_vertex_attribs)
+	{
+		using cg::data::has_normal;
+		using cg::data::has_tangent_space;
+		using cg::data::has_tex_coord;
+
+		Assert::IsFalse(has_normal(Vertex_attribs::p));
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::p));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::p));
+
+		Assert::IsTrue(has_normal(Vertex_attribs::p_n));
+		Assert::IsFalse(has_tex_coord(Vertex_attribs::p_n));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_n));
+
+		Assert::IsFalse(has_normal(Vertex_attribs::p_tc));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_tc));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_tc));
+
+		Assert::IsTrue(has_normal(Vertex_attribs::p_n_tc));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_n_tc));
+		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_n_tc));
+
+		Assert::IsTrue(has_normal(Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(has_tangent_space(Vertex_attribs::p_n_tc_ts));
+	}
+
 };
 
 } // namespace unittest

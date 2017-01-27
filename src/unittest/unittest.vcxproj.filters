@@ -34,18 +34,6 @@
     <ClCompile Include="data\model_unittest.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="rnd\opengl_old\shader_unittest_opengl.cpp">
-      <Filter>rnd\opengl_old</Filter>
-    </ClCompile>
-    <ClCompile Include="rnd\opengl_old\texture_unittest.cpp">
-      <Filter>rnd\opengl_old</Filter>
-    </ClCompile>
-    <ClCompile Include="rnd\opengl_old\utility_unittest_opengl.cpp">
-      <Filter>rnd\opengl_old</Filter>
-    </ClCompile>
-    <ClCompile Include="rnd\opengl_old\vertex_spec_unittest.cpp">
-      <Filter>rnd\opengl_old</Filter>
-    </ClCompile>
     <ClCompile Include="rnd\dx11\dx11_unittest.cpp">
       <Filter>rnd\dx11</Filter>
     </ClCompile>
@@ -83,9 +71,6 @@
     </Filter>
     <Filter Include="rnd">
       <UniqueIdentifier>{8605e44c-d5cd-4adc-900e-b744c6554d44}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="rnd\opengl_old">
-      <UniqueIdentifier>{2fa68817-8fc3-4252-8fc6-7b9800d5e867}</UniqueIdentifier>
     </Filter>
     <Filter Include="rnd\dx11">
       <UniqueIdentifier>{ddc51c3d-5887-4e15-8058-2ce49e037fa7}</UniqueIdentifier>
