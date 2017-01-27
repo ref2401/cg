@@ -5,7 +5,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include "cg/data/mesh_old.h"
 #include "cg/data/shader.h"
 #include "unittest/data/common_file.h"
 

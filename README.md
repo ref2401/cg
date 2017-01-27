@@ -21,10 +21,4 @@ Clone the repository as usual and then execute `init.cmd` script. The script cre
 
 ## Notes
 1. [Want to Implement List](https://github.com/ref2401/cg/wiki#wanna-implement)
-2. [Todo List](https://github.com/ref2401/cg/wiki#todo)
-
-Due to refactoring `cg/data/mesh` and `cg/file/file_mesh` contain both old and new implementations of the `interleaved mesh data` concept and wavefront(.obj) file loading functions. Classes and funcs with suffix `_old` will be in the code base for a while for the sake of backward compatibility. 
-
-After the [learn direct x 11](https://github.com/ref2401/cg/wiki/Learn-DirectX-11) project is done:
-- `cg/rnd/opengl` module will be refactored.
-- `Shader_program_source_code` & `load_shader_program_source` will be deleted from the code base.
+2. [Todo List](https://github.com/ref2401/cg/wiki#todo) 

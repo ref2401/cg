@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "cg/data/shader.h"
-#include "cg/data/mesh_old.h"
 #include "cg/math/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "technique/deferred_lighting/rnd/utility.h"

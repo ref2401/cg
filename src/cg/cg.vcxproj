@@ -135,7 +135,6 @@
   <ItemGroup>
     <ClCompile Include="data\file.cpp" />
     <ClCompile Include="data\image.cpp" />
-    <ClCompile Include="data\mesh_old.cpp" />
     <ClCompile Include="data\model.cpp" />
     <ClCompile Include="data\model_assimp.cpp" />
     <ClCompile Include="data\shader.cpp" />
@@ -158,7 +157,6 @@
     <ClInclude Include="base\container.h" />
     <ClInclude Include="data\file.h" />
     <ClInclude Include="data\image.h" />
-    <ClInclude Include="data\mesh_old.h" />
     <ClInclude Include="data\model.h" />
     <ClInclude Include="data\model_assimp.h" />
     <ClInclude Include="data\shader.h" />

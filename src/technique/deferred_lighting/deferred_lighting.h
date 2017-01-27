@@ -141,8 +141,7 @@ private:
 	rnd::Static_vertex_spec _vertex_spec0;
 	rnd::DE_cmd _cmd_cube;
 	rnd::DE_cmd _cmd_rect_2x2_repeat;
-	rnd::DE_cmd _cmd_teapot_base;
-	rnd::DE_cmd _cmd_teapot_top;
+	rnd::DE_cmd _cmd_teapot;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;

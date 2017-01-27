@@ -126,6 +126,27 @@ struct Vertex_interleaved_format<Vertex_attribs::p_tc> {
 		+ tex_coord_byte_count;
 };
 
+struct Vertex_interleaved_format_desc final {
+	Vertex_interleaved_format_desc() noexcept = default;
+
+	Vertex_interleaved_format_desc(Vertex_attribs attribs) noexcept;
+
+	Vertex_attribs attribs = Vertex_attribs::p;
+	size_t position_component_count = 0;
+	size_t position_byte_count = 0;
+	size_t position_byte_offset = 0;
+	size_t normal_component_count = 0;
+	size_t normal_byte_count = 0;
+	size_t normal_byte_offset = 0;
+	size_t tex_coord_component_count = 0;
+	size_t tex_coord_byte_count = 0;
+	size_t tex_coord_byte_offset = 0;
+	size_t tangent_space_component_count = 0;
+	size_t tangent_space_byte_count = 0;
+	size_t tangent_space_byte_offset = 0;
+	size_t vertex_component_count = 0;
+	size_t vertex_byte_count = 0;
+};
 
 std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs);
 

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "cg/data/mesh_old.h"
+#include "cg/data/model.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "technique/deferred_lighting/rnd/buffer.h"
 #include "technique/deferred_lighting/rnd/shader.h"
@@ -172,8 +172,8 @@ public:
 
 	Static_vertex_spec() noexcept = default;
 
-	Static_vertex_spec(cg::data::Interleaved_vertex_format_old format, GLuint vao_id, 
-		GLuint vertex_buffer_id, GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
+	Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_id, 
+		GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
 
 	Static_vertex_spec(const Static_vertex_spec&) = delete;
 
@@ -184,11 +184,6 @@ public:
 
 	Static_vertex_spec& operator=(Static_vertex_spec&& spec) noexcept;
 
-
-	cg::data::Interleaved_vertex_format_old format() const noexcept
-	{
-		return _format;
-	}
 
 	const Static_buffer& index_buffer() const noexcept
 	{
@@ -214,7 +209,6 @@ private:
 	void dispose() noexcept;
 
 	GLuint _vao_id = Invalid::vao_id;
-	cg::data::Interleaved_vertex_format_old _format;
 	Static_buffer _vertex_buffer;
 	GLuint _vertex_buffer_binding_index = 0;
 	Static_buffer _index_buffer;
@@ -232,7 +226,8 @@ public:
 	// Params:
 	// -	attribs: Describes required vertex attributes.
 	// -	vertex_bytes_limit: The memory threshold for the vertex buffer.
-	void begin(cg::data::Vertex_attribs_old attribs, size_t vertex_limit_bytes);
+	template<cg::data::Vertex_attribs attribs>
+	void begin(size_t vertex_limit_bytes);
 
 	// Ends the building process and returns a Static_vertex_spec object 
 	// that manages internal OpenGL resources.
@@ -246,19 +241,54 @@ public:
 		return _vao_id != Invalid::vao_id;
 	}
 
-	DE_cmd push_back(const cg::data::Interleaved_mesh_data_old& mesh_data);
+	template<cg::data::Vertex_attribs attribs>
+	DE_cmd push_back(const cg::data::Model_geometry_data<attribs>& mesh_data);
 
 private:
-	std::vector<float> _vertex_data;
+
+	std::vector<uint8_t> _vertex_data;
 	std::vector<uint32_t> _index_data;
 	// The following fields are related to the vertex specification building process.
 	// The fields are reset every begin() call
+	cg::data::Vertex_interleaved_format_desc _format_desc;
 	GLuint _vao_id = Invalid::vao_id;
-	cg::data::Interleaved_vertex_format_old _format;
 	size_t _vertex_limit_bytes;
 	size_t _offset_indices;
 	size_t _base_vertex;
 };
+
+template<cg::data::Vertex_attribs attribs>
+void Static_vertex_spec_builder::begin(size_t vertex_limit_bytes)
+{
+	_format_desc = cg::data::Vertex_interleaved_format_desc(attribs);
+	_vertex_limit_bytes = vertex_limit_bytes;
+	_vertex_data.reserve(_vertex_limit_bytes);
+	_offset_indices = 0;
+	_base_vertex = 0;
+
+	glCreateVertexArrays(1, &_vao_id);
+}
+
+template<cg::data::Vertex_attribs attribs>
+DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Model_geometry_data<attribs>& geometry_data)
+{
+	assert(building_process());
+	assert(geometry_data.mesh_count() == 1); // not implemented
+
+	_vertex_data.insert(_vertex_data.cend(), 
+		geometry_data.vertex_data().cbegin(),
+		geometry_data.vertex_data().cend());
+	_index_data.insert(_index_data.cend(), 
+		geometry_data.index_data().cbegin(), 
+		geometry_data.index_data().cend());
+
+	const auto& mesh_info = geometry_data.meshes()[0];
+	DE_cmd cmd(_vao_id, mesh_info.index_count, _offset_indices, _base_vertex);
+	_offset_indices += mesh_info.index_count;
+	_base_vertex += mesh_info.vertex_count;
+
+	return cmd;
+}
 
 
 inline bool operator==(const DE_cmd& lhs, const DE_cmd& rhs) noexcept

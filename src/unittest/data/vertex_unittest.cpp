@@ -8,6 +8,7 @@ using cg::float3;
 using cg::float4;
 using cg::data::Vertex_attribs;
 using cg::data::Vertex_interleaved_format;
+using cg::data::Vertex_interleaved_format_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -114,6 +115,74 @@ public:
 
 		Assert::AreEqual(size_t(12), Fmt::vertex_component_count);
 		Assert::AreEqual(12 * sizeof(float), Fmt::vertex_byte_count);
+	}
+};
+
+TEST_CLASS(cg_data_vertex_Vertex_interleaved_format_dest) {
+public:
+
+	TEST_METHOD(ctors)
+	{
+		using Format_p = Vertex_interleaved_format<Vertex_attribs::p>;
+		Vertex_interleaved_format_desc format_p(Format_p::attribs);
+		Assert::AreEqual(Format_p::position_component_count,	format_p.position_component_count);
+		Assert::AreEqual(Format_p::position_byte_count,			format_p.position_byte_count);
+		Assert::AreEqual(Format_p::position_byte_offset,		format_p.position_byte_offset);
+		Assert::AreEqual(Format_p::vertex_component_count,		format_p.vertex_component_count);
+		Assert::AreEqual(Format_p::vertex_byte_count,			format_p.vertex_byte_count);
+
+		using Format_p_n = Vertex_interleaved_format<Vertex_attribs::p_n>;
+		Vertex_interleaved_format_desc format_p_n(Format_p_n::attribs);
+		Assert::AreEqual(Format_p_n::position_component_count,	format_p_n.position_component_count);
+		Assert::AreEqual(Format_p_n::position_byte_count,		format_p_n.position_byte_count);
+		Assert::AreEqual(Format_p_n::position_byte_offset,		format_p_n.position_byte_offset);
+		Assert::AreEqual(Format_p_n::normal_component_count,	format_p_n.normal_component_count);
+		Assert::AreEqual(Format_p_n::normal_byte_count,			format_p_n.normal_byte_count);
+		Assert::AreEqual(Format_p_n::normal_byte_offset,		format_p_n.normal_byte_offset);
+		Assert::AreEqual(Format_p_n::vertex_component_count,	format_p_n.vertex_component_count);
+		Assert::AreEqual(Format_p_n::vertex_byte_count,			format_p_n.vertex_byte_count);
+
+		using Format_p_n_tc = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
+		Vertex_interleaved_format_desc format_p_n_tc(Format_p_n_tc::attribs);
+		Assert::AreEqual(Format_p_n_tc::position_component_count,	format_p_n_tc.position_component_count);
+		Assert::AreEqual(Format_p_n_tc::position_byte_count,		format_p_n_tc.position_byte_count);
+		Assert::AreEqual(Format_p_n_tc::position_byte_offset,		format_p_n_tc.position_byte_offset);
+		Assert::AreEqual(Format_p_n_tc::normal_component_count,		format_p_n_tc.normal_component_count);
+		Assert::AreEqual(Format_p_n_tc::normal_byte_count,			format_p_n_tc.normal_byte_count);
+		Assert::AreEqual(Format_p_n_tc::normal_byte_offset,			format_p_n_tc.normal_byte_offset);
+		Assert::AreEqual(Format_p_n_tc::tex_coord_component_count,	format_p_n_tc.tex_coord_component_count);
+		Assert::AreEqual(Format_p_n_tc::tex_coord_byte_count,		format_p_n_tc.tex_coord_byte_count);
+		Assert::AreEqual(Format_p_n_tc::tex_coord_byte_offset,		format_p_n_tc.tex_coord_byte_offset);
+		Assert::AreEqual(Format_p_n_tc::vertex_component_count,		format_p_n_tc.vertex_component_count);
+		Assert::AreEqual(Format_p_n_tc::vertex_byte_count,			format_p_n_tc.vertex_byte_count);
+
+		using Format_p_tc = Vertex_interleaved_format<Vertex_attribs::p_tc>;
+		Vertex_interleaved_format_desc format_p_tc(Format_p_tc::attribs);
+		Assert::AreEqual(Format_p_tc::position_component_count,		format_p_tc.position_component_count);
+		Assert::AreEqual(Format_p_tc::position_byte_count,			format_p_tc.position_byte_count);
+		Assert::AreEqual(Format_p_tc::position_byte_offset,			format_p_tc.position_byte_offset);
+		Assert::AreEqual(Format_p_tc::tex_coord_component_count,	format_p_tc.tex_coord_component_count);
+		Assert::AreEqual(Format_p_tc::tex_coord_byte_count,			format_p_tc.tex_coord_byte_count);
+		Assert::AreEqual(Format_p_tc::tex_coord_byte_offset,		format_p_tc.tex_coord_byte_offset);
+		Assert::AreEqual(Format_p_tc::vertex_component_count,		format_p_tc.vertex_component_count);
+		Assert::AreEqual(Format_p_tc::vertex_byte_count,			format_p_tc.vertex_byte_count);
+
+		using Format_p_n_tc_ts = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+		Vertex_interleaved_format_desc format_p_n_tc_ts(Format_p_n_tc_ts::attribs);
+		Assert::AreEqual(Format_p_n_tc_ts::position_component_count,		format_p_n_tc_ts.position_component_count);
+		Assert::AreEqual(Format_p_n_tc_ts::position_byte_count,				format_p_n_tc_ts.position_byte_count);
+		Assert::AreEqual(Format_p_n_tc_ts::position_byte_offset,			format_p_n_tc_ts.position_byte_offset);
+		Assert::AreEqual(Format_p_n_tc_ts::normal_component_count,			format_p_n_tc_ts.normal_component_count);
+		Assert::AreEqual(Format_p_n_tc_ts::normal_byte_count,				format_p_n_tc_ts.normal_byte_count);
+		Assert::AreEqual(Format_p_n_tc_ts::normal_byte_offset,				format_p_n_tc_ts.normal_byte_offset);
+		Assert::AreEqual(Format_p_n_tc_ts::tex_coord_component_count,		format_p_n_tc_ts.tex_coord_component_count);
+		Assert::AreEqual(Format_p_n_tc_ts::tex_coord_byte_count,			format_p_n_tc_ts.tex_coord_byte_count);
+		Assert::AreEqual(Format_p_n_tc_ts::tex_coord_byte_offset,			format_p_n_tc_ts.tex_coord_byte_offset);
+		Assert::AreEqual(Format_p_n_tc_ts::tangent_space_component_count,	format_p_n_tc_ts.tangent_space_component_count);
+		Assert::AreEqual(Format_p_n_tc_ts::tangent_space_byte_count,		format_p_n_tc_ts.tangent_space_byte_count);
+		Assert::AreEqual(Format_p_n_tc_ts::tangent_space_byte_offset,		format_p_n_tc_ts.tangent_space_byte_offset);
+		Assert::AreEqual(Format_p_n_tc_ts::vertex_component_count,			format_p_n_tc_ts.vertex_component_count);
+		Assert::AreEqual(Format_p_n_tc_ts::vertex_byte_count,				format_p_n_tc_ts.vertex_byte_count);
 	}
 };
 

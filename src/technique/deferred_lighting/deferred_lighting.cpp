@@ -6,12 +6,12 @@
 #include <utility>
 #include "cg/base/base.h"
 #include "cg/data/image.h"
-#include "cg/data/mesh_old.h"
+#include "cg/data/model.h"
 #include "cg/data/shader.h"
 
 
 using cg::data::Image_2d;
-using cg::data::Vertex_attribs_old;
+using cg::data::Vertex_attribs;
 using namespace cg;
 using namespace deferred_lighting::rnd;
 
@@ -37,12 +37,13 @@ Directional_light_params get_directional_light_params(const mat4& view_matrix, c
 
 Renderer_config make_render_config(uint2 viewport_size)
 {
+	using cg::data::Vertex_attribs;
 	using cg::kilobytes;
 
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::data::load_mesh_wavefront_old("../data/common_data/rect-1x1.obj", Vertex_attribs_old::vertex_p_tc);
+	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../data/common_data/rect-1x1.obj");
 	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/lighting_pass_dir");
 	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/shadow_map_pass");
@@ -190,35 +191,28 @@ void Deferred_lighting::end_render()
 
 void Deferred_lighting::init_geometry()
 {
+	using cg::data::load_model;
+
 	struct Load_info {
-		Load_info(const char* filename, DE_cmd* cmd, 
-			size_t approx_vertex_count = 0, size_t approx_index_count = 0) noexcept :
-			filename(filename), cmd(cmd), 
-			approx_vertex_count(approx_vertex_count), 
-			approx_index_count(approx_index_count)
+		Load_info(const char* filename, DE_cmd* cmd) noexcept 
+			: filename(filename), cmd(cmd) 
 		{}
 
 		const char* filename;
 		DE_cmd* cmd;
-		size_t approx_vertex_count;
-		size_t approx_index_count;
 	};
 
-	auto vertex_attribs = Vertex_attribs_old::vertex_ts;
-	std::vector<Load_info> load_info_list = {
-		Load_info("../data/teapot_base.obj", &_cmd_teapot_base, 36456, 36456),
-		Load_info("../data/teapot_top.obj", &_cmd_teapot_top, 10656, 10656),
+	Load_info load_info_list[3] = {
+		Load_info("../data/models/teapot.obj", &_cmd_teapot),
 		Load_info("../data/cube.obj", &_cmd_cube),
 		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};
 
-	_vs_builder.begin(vertex_attribs, megabytes(4));
+	_vs_builder.begin<Vertex_attribs::p_n_tc_ts>(megabytes(4));
 
-	for (auto& load_info : load_info_list) {
-		auto mesh_data = cg::data::load_mesh_wavefront_old(load_info.filename, 
-			vertex_attribs, load_info.approx_vertex_count, load_info.approx_index_count);
-		
-		*load_info.cmd = _vs_builder.push_back(mesh_data);
+	for (size_t i = 0; i < std::extent<decltype(load_info_list)>::value; ++i) {
+		auto geometry_data = load_model<Vertex_attribs::p_n_tc_ts>(load_info_list[i].filename);
+		*load_info_list[i].cmd = _vs_builder.push_back(geometry_data);
 	}
 
 	_vertex_spec0 = _vs_builder.end(_renderer.vertex_attrib_layout());
@@ -229,11 +223,7 @@ void Deferred_lighting::init_renderables()
 	_rednerable_objects.reserve(16);
 
 	// teapot
-	_rednerable_objects.emplace_back(_cmd_teapot_top,
-		ts_matrix(float3(0, 0.965f, 0), float3(0.03f)),
-		_material_library.teapot_material());
-
-	_rednerable_objects.emplace_back(_cmd_teapot_base,
+	_rednerable_objects.emplace_back(_cmd_teapot,
 		ts_matrix(float3(0, 0.965f, 0), float3(0.03f)),
 		_material_library.teapot_material());
 

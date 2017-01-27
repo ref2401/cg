@@ -8,7 +8,6 @@
 #include "cg/rnd/opengl/opengl_def.h"
 
 using namespace cg;
-using cg::data::Vertex_attribs_old;
 
 
 namespace deferred_lighting {

@@ -4,6 +4,75 @@
 namespace cg {
 namespace data {
 
+// ----- Vertex_interleaved_format_desc -----
+
+Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs attribs) noexcept
+	: attribs(attribs)
+{
+	using Format_p = Vertex_interleaved_format<Vertex_attribs::p>;
+	using Format_p_n = Vertex_interleaved_format<Vertex_attribs::p_n>;
+	using Format_p_n_tc = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
+	using Format_p_tc = Vertex_interleaved_format<Vertex_attribs::p_tc>;
+	using Format_p_n_tc_ts = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+
+	if (attribs == Vertex_attribs::p) {
+		position_component_count =		Format_p::position_component_count;
+		position_byte_count =			Format_p::position_byte_count;
+		position_byte_offset =			Format_p::position_byte_offset;
+		vertex_component_count =		Format_p::vertex_component_count;
+		vertex_byte_count =				Format_p::vertex_byte_count;
+	}
+	else if (attribs == Vertex_attribs::p_n) {
+		position_component_count =		Format_p_n::position_component_count;
+		position_byte_count =			Format_p_n::position_byte_count;
+		position_byte_offset =			Format_p_n::position_byte_offset;
+		normal_component_count =		Format_p_n::normal_component_count;
+		normal_byte_count =				Format_p_n::normal_byte_count;
+		normal_byte_offset =			Format_p_n::normal_byte_offset;
+		vertex_component_count =		Format_p_n::vertex_component_count;
+		vertex_byte_count =				Format_p_n::vertex_byte_count;
+	}
+	else if (attribs == Vertex_attribs::p_n_tc) {
+		position_component_count =		Format_p_n_tc::position_component_count;
+		position_byte_count =			Format_p_n_tc::position_byte_count;
+		position_byte_offset =			Format_p_n_tc::position_byte_offset;
+		normal_component_count =		Format_p_n_tc::normal_component_count;
+		normal_byte_count =				Format_p_n_tc::normal_byte_count;
+		normal_byte_offset =			Format_p_n_tc::normal_byte_offset;
+		tex_coord_component_count =		Format_p_n_tc::tex_coord_component_count;
+		tex_coord_byte_count =			Format_p_n_tc::tex_coord_byte_count;
+		tex_coord_byte_offset =			Format_p_n_tc::tex_coord_byte_offset;
+		vertex_component_count =		Format_p_n_tc::vertex_component_count;
+		vertex_byte_count =				Format_p_n_tc::vertex_byte_count;
+	}
+	else if (attribs == Vertex_attribs::p_tc) {
+		position_component_count =		Format_p_tc::position_component_count;
+		position_byte_count =			Format_p_tc::position_byte_count;
+		position_byte_offset =			Format_p_tc::position_byte_offset;
+		tex_coord_component_count =		Format_p_tc::tex_coord_component_count;
+		tex_coord_byte_count =			Format_p_tc::tex_coord_byte_count;
+		tex_coord_byte_offset =			Format_p_tc::tex_coord_byte_offset;
+		vertex_component_count =		Format_p_tc::vertex_component_count;
+		vertex_byte_count =				Format_p_tc::vertex_byte_count;
+	}
+	else if (attribs == Vertex_attribs::p_n_tc_ts) {
+		position_component_count =		Format_p_n_tc_ts::position_component_count;
+		position_byte_count =			Format_p_n_tc_ts::position_byte_count;
+		position_byte_offset =			Format_p_n_tc_ts::position_byte_offset;
+		normal_component_count =		Format_p_n_tc_ts::normal_component_count;
+		normal_byte_count =				Format_p_n_tc_ts::normal_byte_count;
+		normal_byte_offset =			Format_p_n_tc_ts::normal_byte_offset;
+		tex_coord_component_count =		Format_p_n_tc_ts::tex_coord_component_count;
+		tex_coord_byte_count =			Format_p_n_tc_ts::tex_coord_byte_count;
+		tex_coord_byte_offset =			Format_p_n_tc_ts::tex_coord_byte_offset;
+		tangent_space_component_count = Format_p_n_tc_ts::tangent_space_component_count;
+		tangent_space_byte_count =		Format_p_n_tc_ts::tangent_space_byte_count;
+		tangent_space_byte_offset =		Format_p_n_tc_ts::tangent_space_byte_offset;
+		vertex_component_count =		Format_p_n_tc_ts::vertex_component_count;
+		vertex_byte_count =				Format_p_n_tc_ts::vertex_byte_count;
+	}
+}
+
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)

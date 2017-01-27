@@ -31,9 +31,6 @@
     <ClCompile Include="data\model.cpp">
       <Filter>data</Filter>
     </ClCompile>
-    <ClCompile Include="data\mesh_old.cpp">
-      <Filter>data</Filter>
-    </ClCompile>
     <ClCompile Include="sys\app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
@@ -123,9 +120,6 @@
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="data\model.h">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="data\mesh_old.h">
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="rnd\dx11\dx11.h">
