@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
 	using cg::sys::Application;
 	using cg::sys::Application_desc;
 
+
 	Application_desc app_desc;
 	app_desc.window_position = uint2(90, 50);
 	app_desc.viewport_size = uint2(960, 540);

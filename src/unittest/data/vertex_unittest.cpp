@@ -181,6 +181,41 @@ public:
 		Assert::IsTrue(has_tangent_space(Vertex_attribs::p_n_tc_ts));
 	}
 
+	TEST_METHOD(is_superset_of)
+	{
+		using cg::data::is_superset_of;
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p, Vertex_attribs::p));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n_tc_ts));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n_tc_ts));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n_tc_ts));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_tc));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n_tc_ts));
+
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_tc));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n_tc));
+		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n_tc_ts));
+	}
+
 };
 
 } // namespace unittest

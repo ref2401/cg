@@ -14,7 +14,6 @@
 namespace cg {
 namespace data {
 
-//
 template<Vertex_attribs attribs>
 struct Model_geometry_vertex;
 
@@ -154,24 +153,9 @@ public:
 		return _meshes.size();
 	}
 
-	const std::vector<Model_mesh_info>& meshes() const noexcept
-	{
-		return _meshes;
-	}
-
 	size_t vertex_count() const noexcept
 	{
 		return _vertex_data.size() / Format::vertex_byte_count;
-	}
-
-	const std::vector<unsigned char>& vertex_data() const noexcept
-	{
-		return _vertex_data;
-	}
-
-	size_t vertex_data_byte_count() const noexcept
-	{
-		return _vertex_data.size();
 	}
 
 	size_t index_count() const noexcept
@@ -179,9 +163,24 @@ public:
 		return _index_data.size();
 	}
 
+	const std::vector<Model_mesh_info>& meshes() const noexcept
+	{
+		return _meshes;
+	}
+
+	const std::vector<unsigned char>& vertex_data() const noexcept
+	{
+		return _vertex_data;
+	}
+
 	const std::vector<uint32_t>& index_data() const noexcept
 	{
 		return _index_data;
+	}
+
+	size_t vertex_data_byte_count() const noexcept
+	{
+		return _vertex_data.size();
 	}
 
 	size_t index_data_byte_count() const noexcept

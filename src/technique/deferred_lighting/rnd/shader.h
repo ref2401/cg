@@ -122,8 +122,6 @@ struct Vertex_attrib_layout {
 	{}
 
 
-	cg::data::Vertex_attribs_old attribs() const noexcept;
-
 	GLint position_location = Invalid::vertex_attrib_location;
 	GLint normal_location = Invalid::vertex_attrib_location;
 	GLint tex_coord_location = Invalid::vertex_attrib_location;

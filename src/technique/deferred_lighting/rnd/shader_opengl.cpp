@@ -292,27 +292,6 @@ bool Shader_program::valid() const noexcept
 	return get_property(GL_VALIDATE_STATUS) != 0;
 }
 
-// ----- Vertex_attrib_layout
-
-Vertex_attribs_old Vertex_attrib_layout::attribs() const noexcept
-{
-	auto attr = Vertex_attribs_old::none;
-
-	if (position_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs_old::position;
-
-	if (normal_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs_old::normal;
-
-	if (tex_coord_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs_old::tex_coord;
-
-	if (tangent_h_location != Invalid::vertex_attrib_location)
-		attr |= Vertex_attribs_old::tangent_space;
-
-	return attr;
-}
-
 // ----- funcs -----
 
 template<>

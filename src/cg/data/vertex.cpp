@@ -105,6 +105,26 @@ float4 compute_tangent_handedness(const float3& tangent,
 
 	return float4(t, h);
 }
+
+
+bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset) noexcept
+{
+	switch (superset) {
+		default: assert(false); return false;
+
+		case Vertex_attribs::p:			return subset == Vertex_attribs::p;
+
+		case Vertex_attribs::p_n:		return subset == Vertex_attribs::p
+											|| subset == Vertex_attribs::p_n;
+
+		case Vertex_attribs::p_tc:		return subset == Vertex_attribs::p
+											|| subset == Vertex_attribs::p_tc;
+
+		case Vertex_attribs::p_n_tc:	return subset != Vertex_attribs::p_n_tc_ts;
+
+		case Vertex_attribs::p_n_tc_ts: return true;
+	}
+}
 	
 } // namespace data
 } // namespace cg

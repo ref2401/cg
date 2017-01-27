@@ -159,6 +159,8 @@ constexpr bool has_tex_coord(Vertex_attribs attribs) noexcept
 	return !(attribs == Vertex_attribs::p || attribs == Vertex_attribs::p_n);
 }
 
+bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset) noexcept;
+
 } // namespace data
 } // namespace cg
 

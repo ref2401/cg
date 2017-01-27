@@ -102,7 +102,6 @@ void Static_vertex_spec_builder::begin(Vertex_attribs_old attribs, size_t vertex
 Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& attrib_layout, bool unbind_vao)
 {
 	assert(building_process());
-	assert(is_superset_of(attrib_layout.attribs(), _format.attribs));
 	
 	GLuint ids[2]; // vertex_buffer_id, index_buffer_id;
 	glCreateBuffers(2, ids);
