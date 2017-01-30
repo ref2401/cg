@@ -17,9 +17,6 @@
     <ClCompile Include="deferred_lighting\rnd\buffer.cpp">
       <Filter>deferred_lighting\rnd</Filter>
     </ClCompile>
-    <ClCompile Include="deferred_lighting\rnd\filter_shader.cpp">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClCompile>
     <ClCompile Include="deferred_lighting\rnd\framebuffer.cpp">
       <Filter>deferred_lighting\rnd</Filter>
     </ClCompile>
@@ -39,6 +36,9 @@
       <Filter>fur_simulation</Filter>
     </ClCompile>
     <ClCompile Include="deferred_lighting\vertex_spec.cpp">
+      <Filter>deferred_lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_lighting\filter_shader.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,9 +69,6 @@
     <ClInclude Include="deferred_lighting\rnd\buffer.h">
       <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\filter_shader.h">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClInclude>
     <ClInclude Include="deferred_lighting\rnd\framebuffer.h">
       <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
@@ -94,6 +91,9 @@
       <Filter>fur_simulation</Filter>
     </ClInclude>
     <ClInclude Include="deferred_lighting\vertex_spec.h">
+      <Filter>deferred_lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_lighting\filter_shader.h">
       <Filter>deferred_lighting</Filter>
     </ClInclude>
   </ItemGroup>

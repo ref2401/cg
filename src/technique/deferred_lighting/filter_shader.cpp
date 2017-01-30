@@ -1,4 +1,4 @@
-#include "technique/deferred_lighting/rnd/filter_shader.h"
+#include "technique/deferred_lighting/filter_shader.h"
 
 #include <cassert>
 #include <functional>
@@ -14,7 +14,7 @@ namespace {
 
 using cg::data::Glsl_program_desc;
 using cg::data::load_glsl_program_desc;
-using rnd::Filter_kernel_radius;
+using deferred_lighting::Filter_kernel_radius;
 
 Glsl_program_desc load_gaussina_filter_source_code(Filter_kernel_radius kernel_radius)
 {
@@ -44,7 +44,6 @@ Glsl_program_desc load_gaussina_filter_source_code(Filter_kernel_radius kernel_r
 
 
 namespace deferred_lighting {
-namespace rnd {
 
 // ----- Filter_shader_program -----
 
@@ -71,7 +70,7 @@ Filter_shader_program::Filter_shader_program(Filter_shader_program&& sp) noexcep
 {
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = Invalid::uniform_location;
+	sp._u_filter_direction_location = rnd::Invalid::uniform_location;
 }
 
 Filter_shader_program& Filter_shader_program::operator=(
@@ -86,7 +85,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = Invalid::uniform_location;
+	sp._u_filter_direction_location = rnd::Invalid::uniform_location;
 
 	return *this;
 }
@@ -94,7 +93,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 {
 	assert(_kernel_radius != Filter_kernel_radius::none);
-	assert(_prog.id() != Invalid::shader_program_id);
+	assert(_prog.id() != rnd::Invalid::shader_program_id);
 
 	glUseProgram(_prog.id());
 	cg::rnd::opengl::set_uniform(_u_filter_direction_location, direction);
@@ -201,5 +200,4 @@ std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_ker
 	return filename;
 }
 
-} // namespace rnd
 } // namespace deferred_lighting

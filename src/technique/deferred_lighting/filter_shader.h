@@ -1,12 +1,11 @@
-#ifndef TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_
-#define TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_
+#ifndef TECHNIQUE_DEFERRED_LIGHTING_FILTER_SHADER_H_
+#define TECHNIQUE_DEFERRED_LIGHTING_FILTER_SHADER_H_
 
 #include "cg/math/math.h"
 #include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {
-namespace rnd {
 
 enum class Filter_type {
 	none,
@@ -60,7 +59,7 @@ private:
 	Filter_type _filter_type = Filter_type::none;
 	Filter_kernel_radius _kernel_radius = Filter_kernel_radius::none;
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_filter_direction_location = Invalid::uniform_location;
+	GLint _u_filter_direction_location = rnd::Invalid::uniform_location;
 };
 
 
@@ -72,7 +71,6 @@ std::vector<cg::float3> generate_sphere_normalized_sample_kernel(size_t sample_c
 
 std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_kernel_radius kernel_radius) noexcept;
 
-} // namespace rnd
 } // namespace deferred_lighting
 
-#endif // TECHNIQUE_DEFERRED_LIGHTING_RND_FILTER_SHADER_H_
+#endif // TECHNIQUE_DEFERRED_LIGHTING_FILTER_SHADER_H_

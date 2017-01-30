@@ -8,10 +8,10 @@
 #include "cg/math/math.h"
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
+#include "technique/deferred_lighting/filter_shader.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 #include "technique/deferred_lighting/rnd/opengl.h"
-#include "technique/deferred_lighting/rnd/filter_shader.h"
 
 
 namespace deferred_lighting {
@@ -278,7 +278,7 @@ private:
 	Gbuffer& _gbuffer;
 	rnd::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
-	rnd::Filter_shader_program _filter_shader_program;
+	Filter_shader_program _filter_shader_program;
 };
 
 // Ssao pass uses 8 sample rays (sample kernel size = 8) and 8 random normals that are used
@@ -308,7 +308,7 @@ private:
 	Ssao_pass_shader_program _prog;
 	// [0.. 7] sample rays, [8 .. 15] random normals
 	const std::vector<cg::float3> _sample_rays;
-	rnd::Filter_shader_program _filter_shader_program;
+	Filter_shader_program _filter_shader_program;
 };
 
 class Tone_mapping_pass final {
