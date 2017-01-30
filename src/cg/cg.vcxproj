@@ -146,6 +146,7 @@
     <ClCompile Include="rnd\opengl\fbo.cpp" />
     <ClCompile Include="rnd\opengl\opengl.cpp" />
     <ClCompile Include="rnd\opengl\opengl_def.cpp" />
+    <ClCompile Include="rnd\opengl\opengl_utility.cpp" />
     <ClCompile Include="rnd\opengl\program.cpp" />
     <ClCompile Include="rnd\opengl\texture.cpp" />
     <ClCompile Include="sys\app.cpp" />

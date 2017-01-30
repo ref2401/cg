@@ -8,10 +8,10 @@
 #include "cg/math/math.h"
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/filter_shader.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
-#include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {

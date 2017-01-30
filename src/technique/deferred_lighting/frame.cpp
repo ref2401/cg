@@ -5,16 +5,16 @@
 #include <numeric>
 
 using namespace cg;
-using namespace deferred_lighting::rnd;
+using namespace cg::rnd::opengl;
 
 
 namespace {
 
-Static_buffer make_draw_index_buffer(size_t draw_call_count)
+Buffer_gpu make_draw_index_buffer(size_t draw_call_count)
 {
 	std::vector<GLuint> draw_indices(draw_call_count);
 	std::iota(draw_indices.begin(), draw_indices.end(), 0);
-	return Static_buffer(draw_indices.data(), draw_call_count);
+	return Buffer_gpu(draw_indices);
 }
 
 } // namespace

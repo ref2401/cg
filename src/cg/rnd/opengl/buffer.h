@@ -202,10 +202,11 @@ size_t Buffer_persistent_map::write(size_t offset, const T* ptr, size_t count) n
 	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
 	if (count == 0) return offset;
 
-	size_t ret_offset = offset + sizeof(T) * count;
+	const size_t data_byte_count = sizeof(T) * count;
+	const size_t ret_offset = offset + data_byte_count;
 	assert(ret_offset <= _byte_count);
 
-	std::memcpy(_ptr + offset, ptr, sizeof(T) * count);
+	std::memcpy(reinterpret_cast<unsigned char*>(_ptr) + offset, ptr, data_byte_count);
 	return ret_offset;
 }
 
@@ -326,7 +327,7 @@ size_t Buffer_partitioned<Buffer_type>::write(size_t rel_offset, const T* ptr, s
 	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
 	if (count == 0) return rel_offset;
 
-	size_t ret_offset = rel_offset + sizeof(T) * count;
+	const size_t ret_offset = rel_offset + sizeof(T) * count;
 	assert(ret_offset <= _partition_byte_count);
 
 	_buffer.write<T>(_partition_offset + rel_offset, ptr, count);

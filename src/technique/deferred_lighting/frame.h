@@ -3,9 +3,9 @@
 
 #include <array>
 #include "cg/math/math.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 #include "technique/deferred_lighting/vertex_spec.h"
-#include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {
@@ -175,12 +175,12 @@ private:
 	// batch_size equals to 13 because the 'material_pass.pixel.glsl' shader imposes the most severe restriction.
 	const size_t _batch_size = 13;
 	std::array<GLsync, 3> _sync_objects;
-	rnd::Partitioned_buffer<rnd::Persistent_buffer> _draw_indirect_buffer;
-	rnd::Static_buffer _draw_index_buffer;  // simulates gl_DrawID
+	cg::rnd::opengl::Buffer_partitioned<cg::rnd::opengl::Buffer_persistent_map> _draw_indirect_buffer;
+	cg::rnd::opengl::Buffer_gpu _draw_index_buffer;  // simulates gl_DrawID
 	size_t _offset_draw_indirect = 0;
 
 	// future Frame_packet stuff:
-	GLuint _vao_id = rnd::Invalid::vao_id;
+	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
 	std::vector<float> _uniform_array_smoothness;

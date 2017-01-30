@@ -4,10 +4,10 @@
 #include <array>
 #include <vector>
 #include "cg/math/math.h"
+#include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/frame.h"
 #include "technique/deferred_lighting/render.h"
-#include "technique/deferred_lighting/rnd/opengl.h"
 
 
 namespace deferred_lighting {

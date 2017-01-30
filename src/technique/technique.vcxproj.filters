@@ -14,12 +14,6 @@
     <ClCompile Include="deferred_lighting\render_pass_shader.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
-    <ClCompile Include="deferred_lighting\rnd\buffer.cpp">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClCompile>
-    <ClCompile Include="deferred_lighting\rnd\utility.cpp">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClCompile>
     <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp">
       <Filter>fur_simulation</Filter>
     </ClCompile>
@@ -40,9 +34,6 @@
     <Filter Include="deferred_lighting">
       <UniqueIdentifier>{e1edcfa4-828c-4e85-a079-5fc90649716a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="deferred_lighting\rnd">
-      <UniqueIdentifier>{1022edf7-189f-48f5-b8c7-286248d61119}</UniqueIdentifier>
-    </Filter>
     <Filter Include="fur_simulation">
       <UniqueIdentifier>{4f121a48-8c26-4bf5-8298-e187f3d50862}</UniqueIdentifier>
     </Filter>
@@ -59,15 +50,6 @@
     </ClInclude>
     <ClInclude Include="deferred_lighting\render_pass_shader.h">
       <Filter>deferred_lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\buffer.h">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\opengl.h">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\utility.h">
-      <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h">
       <Filter>fur_simulation</Filter>

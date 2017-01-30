@@ -1,10 +1,11 @@
-#include "technique/deferred_lighting/rnd/utility.h"
+#include "cg/rnd/opengl/opengl_utility.h"
 
 #include <cassert>
 
 
-namespace deferred_lighting {
+namespace cg {
 namespace rnd {
+namespace opengl {
 
 // ----- funcs -----
 
@@ -19,13 +20,13 @@ void wait_for(GLsync sync_obj) noexcept
 	while (true) {
 		GLenum status = glClientWaitSync(sync_obj, wait_flags, wait_timeout);
 		if (status == GL_CONDITION_SATISFIED || status == GL_ALREADY_SIGNALED) break;
-		
+
 		assert(status != GL_WAIT_FAILED);
 		wait_flags = GL_SYNC_FLUSH_COMMANDS_BIT;
 		wait_timeout = 1'000'000; // 1 milisecond in nanoseconds
 	}
 }
 
-
+} // namespace opengl
 } // namespace rnd
-} // namespace deferred_lighting
+} // namespace cg

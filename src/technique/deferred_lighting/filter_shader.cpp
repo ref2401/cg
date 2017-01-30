@@ -70,7 +70,7 @@ Filter_shader_program::Filter_shader_program(Filter_shader_program&& sp) noexcep
 {
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = rnd::Invalid::uniform_location;
+	sp._u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
 }
 
 Filter_shader_program& Filter_shader_program::operator=(
@@ -85,7 +85,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = rnd::Invalid::uniform_location;
+	sp._u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
 
 	return *this;
 }
@@ -93,7 +93,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 {
 	assert(_kernel_radius != Filter_kernel_radius::none);
-	assert(_prog.id() != rnd::Invalid::shader_program_id);
+	assert(_prog.id() != cg::rnd::opengl::Invalid::glsl_program_id);
 
 	glUseProgram(_prog.id());
 	cg::rnd::opengl::set_uniform(_u_filter_direction_location, direction);

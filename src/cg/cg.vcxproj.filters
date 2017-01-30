@@ -10,9 +10,6 @@
     <ClCompile Include="math\transform.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="rnd\opengl\opengl_def.cpp">
-      <Filter>rnd\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="math\vector.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -34,26 +31,32 @@
     <ClCompile Include="sys\app.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="rnd\opengl\opengl.cpp">
-      <Filter>rnd\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="sys\environment.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="data\model_assimp.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
     <ClCompile Include="rnd\opengl\buffer.cpp">
-      <Filter>rnd\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="rnd\opengl\texture.cpp">
-      <Filter>rnd\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="rnd\opengl\program.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
     <ClCompile Include="rnd\opengl\fbo.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="data\model_assimp.cpp">
-      <Filter>data</Filter>
+    <ClCompile Include="rnd\opengl\opengl.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\opengl_def.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\opengl_utility.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\program.cpp">
+      <Filter>rnd\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\opengl\texture.cpp">
+      <Filter>rnd\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,11 +75,11 @@
     <Filter Include="rnd">
       <UniqueIdentifier>{7b214224-e4a9-4b7f-a05d-9bbab53c65be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rnd\opengl">
-      <UniqueIdentifier>{66ef643f-fc86-46b4-899e-17fbcb9b800f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="rnd\dx11">
       <UniqueIdentifier>{73d31390-0538-4332-a83e-b732e1f4f5ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rnd\opengl">
+      <UniqueIdentifier>{235db236-0c59-468b-9f02-6635d26dfe06}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -100,12 +103,6 @@
     </ClInclude>
     <ClInclude Include="sys\input.h">
       <Filter>sys</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\glcorearb.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\opengl_def.h">
-      <Filter>rnd\opengl</Filter>
     </ClInclude>
     <ClInclude Include="math\vector.h">
       <Filter>math</Filter>
@@ -131,32 +128,38 @@
     <ClInclude Include="sys\app.h">
       <Filter>sys</Filter>
     </ClInclude>
-    <ClInclude Include="rnd\opengl\opengl.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="sys\environment.h">
       <Filter>sys</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\buffer.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\opengl_utility.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\texture.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\program.h">
-      <Filter>rnd\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="rnd\opengl\fbo.h">
-      <Filter>rnd\opengl</Filter>
     </ClInclude>
     <ClInclude Include="data\model_assimp.h">
       <Filter>data</Filter>
     </ClInclude>
     <ClInclude Include="base\container.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\buffer.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\fbo.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\glcorearb.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl_def.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\opengl_utility.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\program.h">
+      <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="rnd\opengl\texture.h">
+      <Filter>rnd\opengl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

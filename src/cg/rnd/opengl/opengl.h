@@ -8,6 +8,7 @@
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/program.h"
 #include "cg/rnd/opengl/texture.h"
+#include "cg/rnd/opengl/opengl_utility.h"
 #include <windows.h>
 
 
@@ -55,6 +56,7 @@ private:
 	int _version_major = 0;
 	int _version_minor = 0;
 };
+
 
 } // namespace opengl
 } // namespace rnd

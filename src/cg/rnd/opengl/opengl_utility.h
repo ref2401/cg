@@ -22,6 +22,11 @@ public:
 	static constexpr GLint vertex_attrib_location = -1;
 };
 
+
+// Puts the current thread into a spinlock, while sync_obj is not completed.
+// if sync_obj is nullptr then the func returns immediately.
+void wait_for(GLsync sync_obj) noexcept;
+
 } // namespace opengl
 } // namespace rnd
 } // namespace cg

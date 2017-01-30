@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 #include "cg/data/model.h"
-#include "technique/deferred_lighting/rnd/opengl.h"
+#include "cg/rnd/opengl/opengl.h"
 
 
 namespace deferred_lighting {
@@ -89,7 +89,7 @@ public:
 		: _vao_id(vao_id), _index_count(index_count), _offset_indices(offset_indices),
 		_base_vertex(base_vertex), _instance_count(instance_count), _base_instance(base_instance)
 	{
-		assert(_vao_id != rnd::Invalid::vao_id);
+		assert(_vao_id != cg::rnd::opengl::Invalid::vao_id);
 	}
 
 
@@ -153,7 +153,8 @@ public:
 	friend std::wostream& operator<<(std::wostream& out, const DE_cmd& cmd);
 
 private:
-	GLuint _vao_id = rnd::Invalid::vao_id;
+
+	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
 	size_t _index_count = 0;
 	size_t _offset_indices = 0;
 	size_t _base_vertex = 0;
@@ -174,10 +175,10 @@ struct Vertex_attrib_layout {
 	{}
 
 
-	GLint position_location = rnd::Invalid::vertex_attrib_location;
-	GLint normal_location = rnd::Invalid::vertex_attrib_location;
-	GLint tex_coord_location = rnd::Invalid::vertex_attrib_location;
-	GLint tangent_h_location = rnd::Invalid::vertex_attrib_location;
+	GLint position_location = cg::rnd::opengl::Invalid::vertex_attrib_location;
+	GLint normal_location = cg::rnd::opengl::Invalid::vertex_attrib_location;
+	GLint tex_coord_location = cg::rnd::opengl::Invalid::vertex_attrib_location;
+	GLint tangent_h_location = cg::rnd::opengl::Invalid::vertex_attrib_location;
 };
 
 // ...
@@ -187,8 +188,9 @@ public:
 
 	Static_vertex_spec() noexcept = default;
 
-	Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_id, 
-		GLuint vertex_buffer_binding_index, GLuint index_buffer_id) noexcept;
+	Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_binding_index,
+		cg::rnd::opengl::Buffer_gpu vertex_buffer, 
+		cg::rnd::opengl::Buffer_gpu index_buffer) noexcept;
 
 	Static_vertex_spec(const Static_vertex_spec&) = delete;
 
@@ -200,19 +202,9 @@ public:
 	Static_vertex_spec& operator=(Static_vertex_spec&& spec) noexcept;
 
 
-	const rnd::Static_buffer& index_buffer() const noexcept
-	{
-		return _index_buffer;
-	}
-
 	GLuint vao_id() const noexcept
 	{
 		return _vao_id;
-	}
-
-	const rnd::Static_buffer& vertex_buffer() const noexcept
-	{
-		return _vertex_buffer;
 	}
 
 	GLuint vertex_buffer_binding_index() const noexcept
@@ -223,10 +215,10 @@ public:
 private:
 	void dispose() noexcept;
 
-	GLuint _vao_id = rnd::Invalid::vao_id;
-	rnd::Static_buffer _vertex_buffer;
+	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
 	GLuint _vertex_buffer_binding_index = 0;
-	rnd::Static_buffer _index_buffer;
+	cg::rnd::opengl::Buffer_gpu _vertex_buffer;
+	cg::rnd::opengl::Buffer_gpu _index_buffer;
 };
 
 class Static_vertex_spec_builder final {
@@ -253,7 +245,7 @@ public:
 	// The process is considered started between begin() and end() calls.
 	bool building_process() const noexcept
 	{
-		return _vao_id != rnd::Invalid::vao_id;
+		return _vao_id != cg::rnd::opengl::Invalid::vao_id;
 	}
 
 	template<cg::data::Vertex_attribs attribs>
@@ -266,7 +258,7 @@ private:
 	// The following fields are related to the vertex specification building process.
 	// The fields are reset every begin() call
 	cg::data::Vertex_interleaved_format_desc _format_desc;
-	GLuint _vao_id = rnd::Invalid::vao_id;
+	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
 	size_t _vertex_limit_bytes;
 	size_t _offset_indices;
 	size_t _base_vertex;
