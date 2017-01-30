@@ -17,12 +17,6 @@
     <ClCompile Include="deferred_lighting\rnd\buffer.cpp">
       <Filter>deferred_lighting\rnd</Filter>
     </ClCompile>
-    <ClCompile Include="deferred_lighting\rnd\framebuffer.cpp">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClCompile>
-    <ClCompile Include="deferred_lighting\rnd\texture.cpp">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClCompile>
     <ClCompile Include="deferred_lighting\rnd\utility.cpp">
       <Filter>deferred_lighting\rnd</Filter>
     </ClCompile>
@@ -69,13 +63,7 @@
     <ClInclude Include="deferred_lighting\rnd\buffer.h">
       <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\framebuffer.h">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClInclude>
     <ClInclude Include="deferred_lighting\rnd\opengl.h">
-      <Filter>deferred_lighting\rnd</Filter>
-    </ClInclude>
-    <ClInclude Include="deferred_lighting\rnd\texture.h">
       <Filter>deferred_lighting\rnd</Filter>
     </ClInclude>
     <ClInclude Include="deferred_lighting\rnd\utility.h">

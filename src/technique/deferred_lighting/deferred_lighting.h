@@ -16,17 +16,17 @@ struct Material final {
 	Material() noexcept = default;
 
 	Material(float smoothness,
-		rnd::Texture_2d_immut tex_diffuse_rgb,
-		rnd::Texture_2d_immut tex_normal_map,
-		rnd::Texture_2d_immut tex_specular_intensity) noexcept;
+		cg::rnd::opengl::Texture_2d_immut tex_diffuse_rgb,
+		cg::rnd::opengl::Texture_2d_immut tex_normal_map,
+		cg::rnd::opengl::Texture_2d_immut tex_specular_intensity) noexcept;
 
 	~Material() noexcept = default;
 
 
 	float smoothness = 0.f;
-	rnd::Texture_2d_immut tex_diffuse_rgb;
-	rnd::Texture_2d_immut tex_normal_map;
-	rnd::Texture_2d_immut tex_specular_intensity;
+	cg::rnd::opengl::Texture_2d_immut tex_diffuse_rgb;
+	cg::rnd::opengl::Texture_2d_immut tex_normal_map;
+	cg::rnd::opengl::Texture_2d_immut tex_specular_intensity;
 };
 
 // Provides a predefined set of Material_instance objects.
@@ -82,7 +82,7 @@ private:
 	// Constructs Material_instance object from the specified material objecj.
 	// tex_specular_intensity is used instead of material.tex_specular_intensity.
 	Material_instance get_material_instance_specular_intensity(const Material& material,
-		const rnd::Texture_2d_immut& tex_specular_intensity_override) const noexcept
+		const cg::rnd::opengl::Texture_2d_immut& tex_specular_intensity_override) const noexcept
 	{
 		return Material_instance(material.smoothness,
 			material.tex_diffuse_rgb.id(),

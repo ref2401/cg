@@ -139,8 +139,6 @@
     <ClCompile Include="deferred_lighting\render.cpp" />
     <ClCompile Include="deferred_lighting\render_pass_shader.cpp" />
     <ClCompile Include="deferred_lighting\rnd\buffer.cpp" />
-    <ClCompile Include="deferred_lighting\rnd\framebuffer.cpp" />
-    <ClCompile Include="deferred_lighting\rnd\texture.cpp" />
     <ClCompile Include="deferred_lighting\rnd\utility.cpp" />
     <ClCompile Include="deferred_lighting\vertex_spec.cpp" />
     <ClCompile Include="fur_simulation\fur_model.cpp" />
@@ -160,9 +158,7 @@
     <ClInclude Include="deferred_lighting\render.h" />
     <ClInclude Include="deferred_lighting\render_pass_shader.h" />
     <ClInclude Include="deferred_lighting\rnd\buffer.h" />
-    <ClInclude Include="deferred_lighting\rnd\framebuffer.h" />
     <ClInclude Include="deferred_lighting\rnd\opengl.h" />
-    <ClInclude Include="deferred_lighting\rnd\texture.h" />
     <ClInclude Include="deferred_lighting\rnd\utility.h" />
     <ClInclude Include="deferred_lighting\vertex_spec.h" />
     <ClInclude Include="fur_simulation\fur_model.h" />

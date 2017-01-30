@@ -32,7 +32,7 @@ public:
 
 	// Auxiliary depth32f buffer that can be used in an rendering pass.
 	// The renderbuffer is used in shadow_map_pass for depth test.
-	rnd::Renderbuffer& aux_depth_renderbuffer() noexcept
+	cg::rnd::opengl::Renderbuffer& aux_depth_renderbuffer() noexcept
 	{
 		return _aux_depth_renderbuffer;
 	}
@@ -51,13 +51,13 @@ public:
 	}
 	
 	// Default bilinear sampler (clamp_to_edge).
-	const rnd::Sampler& bilinear_sampler() const noexcept
+	const cg::rnd::opengl::Sampler& bilinear_sampler() const noexcept
 	{
 		return _bilinear_sampler;
 	}
 
 	// Default nearest sampler (clamp_to_edge).
-	const rnd::Sampler& nearest_sampler() const noexcept
+	const cg::rnd::opengl::Sampler& nearest_sampler() const noexcept
 	{
 		return _nearest_sampler;
 	}
@@ -68,28 +68,28 @@ public:
 	// Auxiliary texture that can be used by any render pass.
 	// The texture is not supposed to transfer rendering results from pass to pass.
 	// At the begining of every pass assume that texture's contents is undefined.
-	rnd::Texture_2d& tex_aux_render_target() noexcept
+	cg::rnd::opengl::Texture_2d& tex_aux_render_target() noexcept
 	{
 		return _tex_aux_render_target;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain ambient radiance.
-	rnd::Texture_2d& tex_lighting_ambient_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_ambient_term() noexcept
 	{
 		return _tex_lighting_ambient_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain diffuse radiance.
-	rnd::Texture_2d& tex_lighting_diffuse_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_diffuse_term() noexcept
 	{
 		return _tex_lighting_diffuse_term;
 	}
 
 	// Lighting_pass's render target texture.
 	// xyz components contain specular radiance.
-	rnd::Texture_2d& tex_lighting_specular_term() noexcept
+	cg::rnd::opengl::Texture_2d& tex_lighting_specular_term() noexcept
 	{
 		return _tex_lighting_specular_term;
 	}
@@ -97,7 +97,7 @@ public:
 	// Material_lighting_pass's render target texture.
 	// xyz components contain fully lit material color.
 	// The computations are made in HDR.
-	rnd::Texture_2d& tex_material_lighting_result() noexcept
+	cg::rnd::opengl::Texture_2d& tex_material_lighting_result() noexcept
 	{
 		return _tex_material_lighting_result;
 	}
@@ -105,7 +105,7 @@ public:
 	// Gbuffer_pass's render target texture.
 	// xyz components contain normal in the view space.
 	// w component contains material.smoothness parameter.
-	rnd::Texture_2d& tex_nds() noexcept
+	cg::rnd::opengl::Texture_2d& tex_nds() noexcept
 	{
 		return _tex_nds;
 	}
@@ -114,17 +114,17 @@ public:
 	// xy components contain linear depth and squared depth values in the directional light's space.
 	// xy components are always positive in spite of depth values are negative in the light's space.
 	// z component contains ambient occlusion factor.
-	rnd::Texture_2d& tex_shadow_map() noexcept
+	cg::rnd::opengl::Texture_2d& tex_shadow_map() noexcept
 	{
 		return _tex_shadow_map;
 	}
 
-	rnd::Texture_2d& tex_ssao_map() noexcept
+	cg::rnd::opengl::Texture_2d& tex_ssao_map() noexcept
 	{
 		return _tex_ssao_map;
 	}
 
-	rnd::Texture_2d& tex_ssao_map_aux() noexcept
+	cg::rnd::opengl::Texture_2d& tex_ssao_map_aux() noexcept
 	{
 		return _tex_ssao_map_aux;
 	}
@@ -142,21 +142,21 @@ public:
 
 private:
 	const Vertex_attrib_layout _vertex_attrib_layout;
-	rnd::Sampler _bilinear_sampler;
-	rnd::Sampler _nearest_sampler;
+	cg::rnd::opengl::Sampler _bilinear_sampler;
+	cg::rnd::opengl::Sampler _nearest_sampler;
 	Static_vertex_spec _aux_geometry_vertex_spec;
 	DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
-	rnd::Renderbuffer _aux_depth_renderbuffer;
-	rnd::Texture_2d _tex_aux_render_target;
-	rnd::Texture_2d _tex_lighting_ambient_term;
-	rnd::Texture_2d _tex_lighting_diffuse_term;
-	rnd::Texture_2d _tex_lighting_specular_term;
-	rnd::Texture_2d _tex_material_lighting_result;
-	rnd::Texture_2d _tex_nds;
-	rnd::Texture_2d _tex_shadow_map;
-	rnd::Texture_2d _tex_ssao_map;
-	rnd::Texture_2d _tex_ssao_map_aux; //  the texture is used to filter ssao map
+	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
+	cg::rnd::opengl::Texture_2d _tex_aux_render_target;
+	cg::rnd::opengl::Texture_2d _tex_lighting_ambient_term;
+	cg::rnd::opengl::Texture_2d _tex_lighting_diffuse_term;
+	cg::rnd::opengl::Texture_2d _tex_lighting_specular_term;
+	cg::rnd::opengl::Texture_2d _tex_material_lighting_result;
+	cg::rnd::opengl::Texture_2d _tex_nds;
+	cg::rnd::opengl::Texture_2d _tex_shadow_map;
+	cg::rnd::opengl::Texture_2d _tex_ssao_map;
+	cg::rnd::opengl::Texture_2d _tex_ssao_map_aux; //  the texture is used to filter ssao map
 };
 
 class Gbuffer_pass final {
@@ -185,7 +185,7 @@ public:
 private:
 	const float _clear_value_nds[4] = { 0, 0, std::numeric_limits<float>::lowest(), 0 };
 	const float _clear_value_depth_map = 1.0f;
-	rnd::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Gbuffer_pass_shader_program _prog;
 	Gbuffer& _gbuffer;
 };
@@ -212,7 +212,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = cg::float4::zero;
 	Gbuffer& _gbuffer;
-	rnd::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
 };
 
@@ -243,7 +243,7 @@ public:
 private:
 	const cg::float4 _clear_value_color = -cg::float4::unit_xyzw;
 	Gbuffer& _gbuffer;
-	rnd::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
 };
 
@@ -276,7 +276,7 @@ private:
 	};
 	const float _clear_value_depth = 1.0f;
 	Gbuffer& _gbuffer;
-	rnd::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Shadow_map_pass_shader_program _prog;
 	Filter_shader_program _filter_shader_program;
 };
@@ -304,7 +304,7 @@ private:
 	const size_t random_normal_count = 8;
 	const cg::float4 _clear_value_ssao_map = cg::float4::zero;
 	Gbuffer& _gbuffer;
-	rnd::Framebuffer _fbo;
+	cg::rnd::opengl::Framebuffer _fbo;
 	Ssao_pass_shader_program _prog;
 	// [0.. 7] sample rays, [8 .. 15] random normals
 	const std::vector<cg::float3> _sample_rays;

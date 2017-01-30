@@ -6,7 +6,7 @@
 #include <memory>
 
 using namespace cg;
-using namespace deferred_lighting::rnd;
+using namespace cg::rnd::opengl;
 using cg::data::Model_geometry_data;
 using cg::data::Glsl_program_desc;
 using cg::data::Vertex_attribs;
@@ -33,19 +33,19 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	const Vertex_attrib_layout& vertex_attrib_layout,
 	const Model_geometry_data<Vertex_attribs::p_tc>& rect_1x1_mesh_data) :
 	_vertex_attrib_layout(vertex_attrib_layout),
-	_bilinear_sampler(Sampler_config(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge)),
-	_nearest_sampler(Sampler_config(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge)),
+	_bilinear_sampler(Sampler_desc(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE)),
+	_nearest_sampler(Sampler_desc(GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE)),
 	_viewport_size(viewport_size),
-	_aux_depth_renderbuffer(Texture_format::depth_32f, viewport_size),
-	_tex_aux_render_target(Texture_format::rgba_32f, viewport_size),
-	_tex_lighting_ambient_term(Texture_format::rgb_32f, viewport_size),
-	_tex_lighting_diffuse_term(Texture_format::rgb_32f, viewport_size),
-	_tex_lighting_specular_term(Texture_format::rgb_32f, viewport_size),
-	_tex_material_lighting_result(Texture_format::rgb_32f, viewport_size),
-	_tex_nds(Texture_format::rgba_32f, viewport_size),
-	_tex_shadow_map(Texture_format::rg_32f, viewport_size),
-	_tex_ssao_map(Texture_format::red_32f, get_scaled_viewport_size(viewport_size, 0.5f)),
-	_tex_ssao_map_aux(Texture_format::red_32f, get_scaled_viewport_size(viewport_size, 0.5f))
+	_aux_depth_renderbuffer(GL_DEPTH_COMPONENT32F, viewport_size),
+	_tex_aux_render_target(GL_RGBA32F, 1, viewport_size),
+	_tex_lighting_ambient_term(GL_RGB32F, 1, viewport_size),
+	_tex_lighting_diffuse_term(GL_RGB32F, 1, viewport_size),
+	_tex_lighting_specular_term(GL_RGB32F, 1, viewport_size),
+	_tex_material_lighting_result(GL_RGB32F, 1 ,viewport_size),
+	_tex_nds(GL_RGBA32F, 1, viewport_size),
+	_tex_shadow_map(GL_RG32F, 1, viewport_size),
+	_tex_ssao_map(GL_R32F, 1, get_scaled_viewport_size(viewport_size, 0.5f)),
+	_tex_ssao_map_aux(GL_R32F, 1, get_scaled_viewport_size(viewport_size, 0.5f))
 {
 	Static_vertex_spec_builder vs_builder(8, 8);
 	vs_builder.begin<Vertex_attribs::p_tc>(kilobytes(1));
@@ -79,8 +79,8 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& 
 	_prog(source_code),
 	_gbuffer(gbuffer)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_nds());
-	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_nds());
+	_fbo.attach_depth_target(_gbuffer.aux_depth_renderbuffer());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
@@ -127,9 +127,9 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc
 	_gbuffer(gbuffer),
 	_dir_prog(dir_source_code)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT2, _gbuffer.tex_lighting_specular_term());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT2, _gbuffer.tex_lighting_specular_term());
 	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
@@ -167,7 +167,7 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 	_gbuffer(gbuffer),
 	_prog(source_code)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_material_lighting_result());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_material_lighting_result());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
@@ -240,9 +240,9 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_
 	_prog(source_code),
 	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_03)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
-	_fbo.attach_depth_renderbuffer(_gbuffer.aux_depth_renderbuffer());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
+	_fbo.attach_depth_target(_gbuffer.aux_depth_renderbuffer());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();
@@ -306,8 +306,8 @@ Ssao_pass::Ssao_pass(Gbuffer& gbuffer, const Glsl_program_desc& source_code) :
 	_sample_rays(generate_sphere_normalized_sample_kernel(sample_ray_count + random_normal_count)),
 	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_05)
 {
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT0, _gbuffer.tex_ssao_map());
-	_fbo.attach_color_texture(GL_COLOR_ATTACHMENT1, _gbuffer.tex_ssao_map_aux());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_ssao_map());
+	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_ssao_map_aux());
 	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
 	_fbo.set_read_buffer(GL_NONE);
 	_fbo.validate();

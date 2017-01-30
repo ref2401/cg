@@ -3,9 +3,9 @@
 
 #include "cg/rnd/opengl/opengl_def.h"
 #include "technique/deferred_lighting/rnd/buffer.h"
-#include "technique/deferred_lighting/rnd/framebuffer.h"
+#include "cg/rnd/opengl/fbo.h"
 #include "cg/rnd/opengl/program.h"
-#include "technique/deferred_lighting/rnd/texture.h"
+#include "cg/rnd/opengl/texture.h"
 #include "technique/deferred_lighting/rnd/utility.h"
 
 

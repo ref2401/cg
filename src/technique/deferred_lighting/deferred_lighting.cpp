@@ -13,7 +13,7 @@
 using cg::data::Image_2d;
 using cg::data::Vertex_attribs;
 using namespace cg;
-using namespace deferred_lighting::rnd;
+using namespace cg::rnd::opengl;
 
 
 namespace {
@@ -79,10 +79,10 @@ Material::Material(float smoothness, Texture_2d_immut tex_diffuse_rgb,
 
 Material_library::Material_library()
 {
-	Sampler_config nearest_clamp_to_edge(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::clamp_to_edge);
-	Sampler_config nearest_repeat(Min_filter::nearest, Mag_filter::nearest, Wrap_mode::repeat);
-	Sampler_config bilinear_clamp_to_edge(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::clamp_to_edge);
-	Sampler_config bilinear_repeat(Min_filter::bilinear, Mag_filter::bilinear, Wrap_mode::repeat);
+	Sampler_desc nearest_clamp_to_edge(GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE);
+	Sampler_desc nearest_repeat(GL_NEAREST, GL_NEAREST, GL_REPEAT);
+	Sampler_desc bilinear_clamp_to_edge(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
+	Sampler_desc bilinear_repeat(GL_LINEAR, GL_LINEAR, GL_REPEAT);
 
 
 	Image_2d material_default_normal_map("../data/common_data/material-default-normal-map.png");
@@ -93,9 +93,9 @@ Material_library::Material_library()
 		Image_2d diffuse_rgb_image("../data/common_data/material-default-diffuse-rgb.png");
 
 		_default_material.smoothness = 10.0f;
-		_default_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
-		_default_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, material_default_normal_map);
-		_default_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, nearest_clamp_to_edge, specular_intensity_1_00_image);
+		_default_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, diffuse_rgb_image);
+		_default_material.tex_normal_map = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, material_default_normal_map);
+		_default_material.tex_specular_intensity = Texture_2d_immut(GL_R8, 1, nearest_clamp_to_edge, specular_intensity_1_00_image);
 	}
 
 	{ // brick wall
@@ -104,18 +104,18 @@ Material_library::Material_library()
 		Image_2d specular_image("../data/bricks-red-specular-intensity.png");
 
 		_brick_wall_material.smoothness = 5.0f;
-		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
-		_brick_wall_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
-		_brick_wall_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
+		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_clamp_to_edge, diffuse_rgb_image);
+		_brick_wall_material.tex_normal_map = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, normal_map_image);
+		_brick_wall_material.tex_specular_intensity = Texture_2d_immut(GL_R8, 1, bilinear_clamp_to_edge, specular_image);
 	}
 
 	{ // chess board
 		Image_2d diffuse_rgb_image("../data/chess-board-diffuse-rgb.png");
 
 		_chess_board_material.smoothness = 1.0f;
-		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_repeat, diffuse_rgb_image);
-		_chess_board_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_repeat, material_default_normal_map);
-		_chess_board_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_repeat, specular_intensity_0_18_image);
+		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_repeat, diffuse_rgb_image);
+		_chess_board_material.tex_normal_map = Texture_2d_immut(GL_RGB8, 1, nearest_repeat, material_default_normal_map);
+		_chess_board_material.tex_specular_intensity = Texture_2d_immut(GL_R8, 1, bilinear_repeat, specular_intensity_0_18_image);
 	}
 
 	{ // teapot material
@@ -123,9 +123,9 @@ Material_library::Material_library()
 		Image_2d normal_map_image("../data/teapot-normal-map.png");
 
 		_teapot_material.smoothness = 10.0f;
-		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, diffuse_rgb_image);
-		_teapot_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, normal_map_image);
-		_teapot_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, nearest_clamp_to_edge, specular_intensity_1_00_image);
+		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, diffuse_rgb_image);
+		_teapot_material.tex_normal_map = Texture_2d_immut(GL_RGB8, 1, bilinear_clamp_to_edge, normal_map_image);
+		_teapot_material.tex_specular_intensity = Texture_2d_immut(GL_R8, 1, nearest_clamp_to_edge, specular_intensity_1_00_image);
 	}
 
 	{ // wooden box
@@ -134,9 +134,9 @@ Material_library::Material_library()
 		Image_2d specular_image("../data/wooden-box-specular-intensity.png");
 
 		_wooden_box_material.smoothness = 4.0f;
-		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(Texture_format::rgb_8, bilinear_clamp_to_edge, diffuse_rgb_image);
-		_wooden_box_material.tex_normal_map = Texture_2d_immut(Texture_format::rgb_8, nearest_clamp_to_edge, normal_map_image);
-		_wooden_box_material.tex_specular_intensity = Texture_2d_immut(Texture_format::red_8, bilinear_clamp_to_edge, specular_image);
+		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_clamp_to_edge, diffuse_rgb_image);
+		_wooden_box_material.tex_normal_map = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, normal_map_image);
+		_wooden_box_material.tex_specular_intensity = Texture_2d_immut(GL_R8, 1, bilinear_clamp_to_edge, specular_image);
 	}
 }
 
