@@ -20,7 +20,7 @@ class Gbuffer final {
 public:
 
 	Gbuffer(const cg::uint2& viewport_size,
-		const rnd::Vertex_attrib_layout& vertex_attrib_layout,
+		const Vertex_attrib_layout& vertex_attrib_layout,
 		const cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc>& rect_1x1_mesh_data);
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
@@ -38,7 +38,7 @@ public:
 	}
 
 	// Rect 1x1 (a square) is usually used to perform a full screen pass.
-	const rnd::DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
+	const DE_base_vertex_params& aux_geometry_rect_1x1_params() const noexcept
 	{
 		return _aux_geometry_rect_1x1_params;
 	}
@@ -129,7 +129,7 @@ public:
 		return _tex_ssao_map_aux;
 	}
 
-	const rnd::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _vertex_attrib_layout;
 	}
@@ -141,11 +141,11 @@ public:
 	}
 
 private:
-	const rnd::Vertex_attrib_layout _vertex_attrib_layout;
+	const Vertex_attrib_layout _vertex_attrib_layout;
 	rnd::Sampler _bilinear_sampler;
 	rnd::Sampler _nearest_sampler;
-	rnd::Static_vertex_spec _aux_geometry_vertex_spec;
-	rnd::DE_base_vertex_params _aux_geometry_rect_1x1_params;
+	Static_vertex_spec _aux_geometry_vertex_spec;
+	DE_base_vertex_params _aux_geometry_rect_1x1_params;
 	cg::uint2 _viewport_size;
 	rnd::Renderbuffer _aux_depth_renderbuffer;
 	rnd::Texture_2d _tex_aux_render_target;
@@ -334,7 +334,7 @@ private:
 
 struct Renderer_config final {
 
-	rnd::Vertex_attrib_layout vertex_attrib_layout;
+	Vertex_attrib_layout vertex_attrib_layout;
 	cg::uint2 viewport_size;
 	cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc> rect_1x1_mesh_data;
 	cg::data::Glsl_program_desc gbuffer_pass_code;
@@ -361,7 +361,7 @@ public:
 
 	void resize_viewport(const cg::uint2& size) noexcept;
 
-	const rnd::Vertex_attrib_layout& vertex_attrib_layout() const noexcept
+	const Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{
 		return _gbuffer.vertex_attrib_layout();
 	}

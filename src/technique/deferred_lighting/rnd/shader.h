@@ -108,26 +108,6 @@ private:
 	std::string _name;
 };
 
-// Desribis attribute indices within a particular shader.
-// If a location equals to Invalid_id::vertex_attrib_location it means that there is no such attribute is the shader.
-struct Vertex_attrib_layout {
-
-	Vertex_attrib_layout() noexcept = default;
-
-	Vertex_attrib_layout(GLint position_location, GLint normal_location,
-		GLint tex_coord_location, GLint tangent_h_location) noexcept
-		: position_location(position_location), normal_location(normal_location),
-		tex_coord_location(tex_coord_location), tangent_h_location(tangent_h_location)
-	{}
-
-
-	GLint position_location = Invalid::vertex_attrib_location;
-	GLint normal_location = Invalid::vertex_attrib_location;
-	GLint tex_coord_location = Invalid::vertex_attrib_location;
-	GLint tangent_h_location = Invalid::vertex_attrib_location;
-};
-
-
 // Sets a uniform variable value.
 // Params:
 // -	location: Uniform location in the currently used shader program.

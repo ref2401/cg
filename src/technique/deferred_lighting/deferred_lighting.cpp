@@ -21,6 +21,7 @@ namespace {
 using deferred_lighting::Directional_light;
 using deferred_lighting::Directional_light_params;
 using deferred_lighting::Renderer_config;
+using deferred_lighting::Vertex_attrib_layout;
 
 
 Directional_light_params get_directional_light_params(const mat4& view_matrix, const Directional_light& dir_light) noexcept

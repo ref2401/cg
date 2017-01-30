@@ -137,11 +137,11 @@ private:
 	Renderer _renderer;
 	Frame _frame;
 	// scene data
-	rnd::Static_vertex_spec_builder _vs_builder;
-	rnd::Static_vertex_spec _vertex_spec0;
-	rnd::DE_cmd _cmd_cube;
-	rnd::DE_cmd _cmd_rect_2x2_repeat;
-	rnd::DE_cmd _cmd_teapot;
+	Static_vertex_spec_builder _vs_builder;
+	Static_vertex_spec _vertex_spec0;
+	DE_cmd _cmd_cube;
+	DE_cmd _cmd_rect_2x2_repeat;
+	DE_cmd _cmd_teapot;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
 	cg::float2 _view_roll_angles;

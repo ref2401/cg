@@ -4,6 +4,7 @@
 #include <array>
 #include "cg/math/math.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
+#include "technique/deferred_lighting/vertex_spec.h"
 #include "technique/deferred_lighting/rnd/opengl.h"
 
 
@@ -60,9 +61,9 @@ struct Material_instance final {
 
 struct Renderable final {
 
-	Renderable(const rnd::DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
+	Renderable(const DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
 
-	rnd::DE_cmd cmd;
+	DE_cmd cmd;
 	cg::mat4 model_matrix;
 	Material_instance material;
 };
@@ -109,7 +110,7 @@ public:
 
 	void push_back_renderable(const Renderable& rnd);
 
-	void reset(const rnd::Static_vertex_spec& vertex_spec) noexcept;
+	void reset(const Static_vertex_spec& vertex_spec) noexcept;
 
 
 	// frame packet stuff:

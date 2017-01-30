@@ -7,7 +7,6 @@
 #include "technique/deferred_lighting/rnd/shader.h"
 #include "technique/deferred_lighting/rnd/texture.h"
 #include "technique/deferred_lighting/rnd/utility.h"
-#include "technique/deferred_lighting/rnd/vertex_spec.h"
 
 
 #endif // TECHNIQUE_DEFERRED_LIGHTING_RND_OPENGL_H_
