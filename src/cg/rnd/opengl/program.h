@@ -147,6 +147,18 @@ void set_uniform(GLint location, const mat3& mat) noexcept;
 
 void set_uniform(GLint location, const mat4& mat) noexcept;
 
+void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexcept;
+
+void set_uniform_array_float(GLint location, const float* ptr, size_t count) noexcept;
+
+void set_uniform_array_float3(GLint location, const float* ptr, size_t count) noexcept;
+
+void set_uniform_arrya_mat3(GLint location, const mat3* ptr, size_t count);
+
+void set_uniform_arrya_mat4(GLint location, const mat4* ptr, size_t count);
+
+void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept;
+
 } // namespace opengl
 } // namespace rnd
 } // namespace cg

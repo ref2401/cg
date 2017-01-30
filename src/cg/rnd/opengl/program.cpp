@@ -391,6 +391,66 @@ void set_uniform(GLint location, const mat4& mat) noexcept
 	glUniformMatrix4fv(location, 1, false, arr);
 }
 
+void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniform1iv(location, count, ptr);
+}
+
+void set_uniform_array_float(GLint location, const float* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniform1fv(location, count, ptr);
+}
+
+void set_uniform_array_float3(GLint location, const float* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniform3fv(location, count, ptr);
+}
+
+void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count)
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	constexpr size_t component_count = 9; // each mat3 has exactly 9 components
+
+	std::vector<float> arr(count * component_count);
+	for (size_t i = 0; i < count; ++i)
+		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
+
+	glUniformMatrix3fv(location, count, false, arr.data());
+}
+
+void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count)
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	constexpr size_t component_count = 16; // each mat4 has exactly 16 components
+	
+	std::vector<float> arr(count * component_count);
+	for (size_t i = 0; i < count; ++i)
+		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
+
+	glUniformMatrix4fv(location, count, false, arr.data());
+}
+
+void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept
+{
+	assert(location != Invalid::uniform_location);
+	assert(count > 0);
+
+	glUniformMatrix4fv(location, count, false, ptr);
+}
+
 } // namespace opengl
 } // namespace rnd
 } // namespace cg
