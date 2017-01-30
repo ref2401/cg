@@ -1,6 +1,7 @@
 #ifndef CG_RND_OPENGL_BUFFER_H_
 #define CG_RND_OPENGL_BUFFER_H_
 
+#include <cassert>
 #include <array>
 #include <type_traits>
 #include <vector>
@@ -141,10 +142,71 @@ private:
 	size_t _byte_count = 0;
 };
 
-// not implemented
-// Buffer_map (read/write)
-// Buffer_persistent_map (read/write)
+// Persistent_buffer represents opengl buffer object that is mapped once during the constructuon
+// and is used in vertex streaming process.
+// Implementation notes: Persistent_buffer allow write data on the CPU side only.
+class Buffer_persistent_map final : public virtual Buffer_i {
+public:
 
+	Buffer_persistent_map() noexcept = default;
+
+	Buffer_persistent_map(size_t byte_count) noexcept;
+
+	Buffer_persistent_map(const Buffer_persistent_map& buff) = delete;
+
+	Buffer_persistent_map(Buffer_persistent_map&& buff) noexcept;
+
+	~Buffer_persistent_map() noexcept;
+
+
+	Buffer_persistent_map& operator=(const Buffer_persistent_map&) = delete;
+
+	Buffer_persistent_map& operator=(Buffer_persistent_map&& buffer) noexcept;
+
+
+	// How many bytes are allocated for this buffer object on the GPU.
+	size_t byte_count() const noexcept override
+	{
+		return _byte_count;
+	}
+
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+	// Writes a sequence of objects of type T into the buffer.
+	// Params:
+	// -	offset: Byte offset from the beginig of the buffer.
+	// -	ptr: Pointer to the first object of type T in the sequence.
+	// -	count: How many objects are in the sequence pointed by ptr.
+	//		If count is 0 the method returns immediately.
+	// Returns:	offset + sizeof(T) * count.
+	//			Byte offset into the buffer that can be used for subsequent writes.	
+	template<typename T>
+	size_t write(size_t offset, const T* ptr, size_t count = 1) noexcept;
+
+private:
+
+	void dispose() noexcept;
+
+	GLuint _id = Invalid::buffer_id;
+	size_t _byte_count = 0;
+	void* _ptr = nullptr;
+};
+
+template<typename T>
+size_t Buffer_persistent_map::write(size_t offset, const T* ptr, size_t count) noexcept
+{
+	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
+	if (count == 0) return offset;
+
+	size_t ret_offset = offset + sizeof(T) * count;
+	assert(ret_offset <= _byte_count);
+
+	std::memcpy(_ptr + offset, ptr, sizeof(T) * count);
+	return ret_offset;
+}
 
 // Copies contents of the src buffer to the dest buffer.
 // Params:

@@ -1,6 +1,5 @@
 #include "cg/rnd/opengl/buffer.h"
 
-#include <cassert>
 
 namespace cg {
 namespace rnd {
@@ -142,6 +141,64 @@ void Buffer_gpu::dispose() noexcept
 
 	glDeleteBuffers(1, &_id);
 	_id = Invalid::buffer_id;
+}
+
+// ----- Buffer_persistent-----
+
+Buffer_persistent_map::Buffer_persistent_map(size_t byte_count) noexcept
+	: _byte_count(byte_count)
+{
+	assert(byte_count > 0);
+
+	constexpr GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+	glCreateBuffers(1, &_id);
+	glNamedBufferStorage(_id, _byte_count, nullptr, flags);
+	_ptr = glMapNamedBufferRange(_id, 0, _byte_count, flags);
+}
+
+Buffer_persistent_map::Buffer_persistent_map(Buffer_persistent_map&& buffer) noexcept
+	: _id(buffer._id),
+	_byte_count(buffer._byte_count),
+	_ptr(buffer._ptr)
+{
+	buffer._id = Invalid::buffer_id;
+	buffer._byte_count = 0;
+	buffer._ptr = nullptr;
+}
+
+Buffer_persistent_map::~Buffer_persistent_map() noexcept
+{
+	dispose();
+}
+
+Buffer_persistent_map& Buffer_persistent_map::operator=(Buffer_persistent_map&& buffer) noexcept
+{
+	if (this == &buffer) return *this;
+
+	dispose();
+	
+	_id = buffer._id;
+	_byte_count = buffer._byte_count;
+	_ptr = buffer._ptr;
+
+	buffer._id = Invalid::buffer_id;
+	buffer._byte_count = 0;
+	buffer._ptr = nullptr;
+
+	return *this;
+}
+
+void Buffer_persistent_map::dispose() noexcept
+{
+	if (_id == Invalid::buffer_id) return;
+
+	glUnmapNamedBuffer(_id);
+	glDeleteBuffers(1, &_id);
+
+	_byte_count = 0;
+	_id = Invalid::buffer_id;
+	_ptr = nullptr;
 }
 
 // ---- funcs -----
