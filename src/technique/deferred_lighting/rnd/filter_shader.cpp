@@ -59,7 +59,7 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
 
-	_prog = rnd::Shader_program("filter-shader", src_code);
+	_prog = cg::rnd::opengl::Glsl_program("filter-shader", src_code);
 	_u_filter_direction_location = _prog.get_uniform_location("u_filter_direction");
 }
 
@@ -97,7 +97,7 @@ void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 	assert(_prog.id() != Invalid::shader_program_id);
 
 	glUseProgram(_prog.id());
-	set_uniform(_u_filter_direction_location, direction);
+	cg::rnd::opengl::set_uniform(_u_filter_direction_location, direction);
 }
 
 // ----- funcs -----

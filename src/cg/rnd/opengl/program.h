@@ -153,9 +153,9 @@ void set_uniform_array_float(GLint location, const float* ptr, size_t count) noe
 
 void set_uniform_array_float3(GLint location, const float* ptr, size_t count) noexcept;
 
-void set_uniform_arrya_mat3(GLint location, const mat3* ptr, size_t count);
+void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count);
 
-void set_uniform_arrya_mat4(GLint location, const mat4* ptr, size_t count);
+void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count);
 
 void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept;
 

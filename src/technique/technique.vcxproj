@@ -140,7 +140,6 @@
     <ClCompile Include="deferred_lighting\rnd\buffer.cpp" />
     <ClCompile Include="deferred_lighting\rnd\filter_shader.cpp" />
     <ClCompile Include="deferred_lighting\rnd\framebuffer.cpp" />
-    <ClCompile Include="deferred_lighting\rnd\shader_opengl.cpp" />
     <ClCompile Include="deferred_lighting\rnd\texture.cpp" />
     <ClCompile Include="deferred_lighting\rnd\utility.cpp" />
     <ClCompile Include="deferred_lighting\vertex_spec.cpp" />
@@ -163,7 +162,6 @@
     <ClInclude Include="deferred_lighting\rnd\filter_shader.h" />
     <ClInclude Include="deferred_lighting\rnd\framebuffer.h" />
     <ClInclude Include="deferred_lighting\rnd\opengl.h" />
-    <ClInclude Include="deferred_lighting\rnd\shader.h" />
     <ClInclude Include="deferred_lighting\rnd\texture.h" />
     <ClInclude Include="deferred_lighting\rnd\utility.h" />
     <ClInclude Include="deferred_lighting\vertex_spec.h" />

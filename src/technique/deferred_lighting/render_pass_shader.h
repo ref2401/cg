@@ -51,7 +51,7 @@ public:
 	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
 
 private:
-	rnd::Shader_program _prog;
+	cg::rnd::opengl::Glsl_program _prog;
 	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = rnd::Invalid::uniform_location;
@@ -76,7 +76,7 @@ public:
 	void use(const Directional_light_params& dl_params) noexcept;
 
 private:
-	rnd::Shader_program _prog;
+	cg::rnd::opengl::Glsl_program _prog;
 	GLint _u_arr_far_pane_coords_location = rnd::Invalid::uniform_location;
 	GLint _u_dlight_direction_to_light_vs_location = rnd::Invalid::uniform_location;
 	GLint _u_dlight_irradiance_location = rnd::Invalid::uniform_location;
@@ -102,7 +102,7 @@ public:
 		const Directional_light_params& dir_light) noexcept;
 
 private:
-	rnd::Shader_program _prog;
+	cg::rnd::opengl::Glsl_program _prog;
 	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_dir_light_projection_matrix_location = rnd::Invalid::uniform_location;
@@ -129,7 +129,7 @@ public:
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
 private:
-	rnd::Shader_program _prog;
+	cg::rnd::opengl::Glsl_program _prog;
 	GLint _u_projection_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_view_matrix_location = rnd::Invalid::uniform_location;
 	GLint _u_arr_model_matrix_location = rnd::Invalid::uniform_location;
@@ -151,7 +151,7 @@ public:
 		size_t sample_ray_count, size_t random_normal_count) noexcept;
 
 private:
-	rnd::Shader_program _prog;
+	cg::rnd::opengl::Glsl_program _prog;
 	GLint _u_arr_sample_ray_location = rnd::Invalid::uniform_location;
 	GLint _u_arr_random_normal_location = rnd::Invalid::uniform_location;
 };
@@ -171,7 +171,8 @@ public:
 	void use() noexcept;
 
 private:
-	rnd::Shader_program _prog;
+
+	cg::rnd::opengl::Glsl_program _prog;
 };
 
 } // namespace deferred_lighting
