@@ -265,11 +265,11 @@ Material_gallery::Material_gallery()
 			Strand_properties(
 			/* curl_radius */				0.0f,
 			/* curl_frequency */			0.0,
-			/* shadow_factor_power */		1.1f,
+			/* shadow_factor_power */		0.6f,
 			/* shell_count */				32,
 			/* specular_factor */			0.0,
 			/* specular_power */			1.0,
-			/* threshold_power */			0.6f,
+			/* threshold_power */			1.1f,
 			/* fur_mask_uv_min_factor */	1.0f,
 			/* fur_mask_uv_max_factor */	1.0f,
 			/* mass */						0.1f,

@@ -9,8 +9,8 @@ uniform mat4 g_model_matrix;
 uniform vec4 g_view_position_ws;
 // x: curl_radius
 // y: curl_frequency
-// z: threshold_power
-// w: shadow_factor_power
+// z: shadow_factor_power
+// w: threshold_power
 uniform vec4 g_strand_props;
 
 layout(location = 0) in vec3 vert_position;
