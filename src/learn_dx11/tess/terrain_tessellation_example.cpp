@@ -13,7 +13,8 @@ namespace tess {
 
 Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_ctx) :
 	Example(rnd_ctx)
-{}
+{
+}
 
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {

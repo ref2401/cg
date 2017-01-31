@@ -6,7 +6,7 @@ Required tools
 - Visual Studio Community 2015
 - CMake
 - Git
-- Make sure that cmake, git & devenv commands are available from command line.
+- Make sure that cmake, git & devenv commands are available from the command line.
 
 Clone the repository as usual and then execute `init.cmd` script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```. Don't forget to switch configuration to x86.
 

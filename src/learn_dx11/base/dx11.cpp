@@ -180,8 +180,8 @@ Pipeline_state::Pipeline_state(ID3D11Device* device, IDXGISwapChain* swap_chain,
 	update_viewport(viewport_size, device, swap_chain);
 }
 
-Pipeline_state::Pipeline_state(Pipeline_state&& state) noexcept :
-_depth_stencil_state(std::move(state._depth_stencil_state)),
+Pipeline_state::Pipeline_state(Pipeline_state&& state) noexcept 
+	: _depth_stencil_state(std::move(state._depth_stencil_state)),
 	_tex_depth_stencil(std::move(state._tex_depth_stencil)),
 	_depth_stencil_view(std::move(state._depth_stencil_view)),
 	_rasterizer_state(std::move(state._rasterizer_state)),
@@ -353,8 +353,8 @@ void Render_context::resize_viewport(const cg::uint2& viewport_size)
 	assert(greater_than(viewport_size, 0));
 
 	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
-	_pipeline_state.dispose_depth_stencil_view();
-	_pipeline_state.dispose_render_target_view();
+	//_pipeline_state.dispose_depth_stencil_view();
+	//_pipeline_state.dispose_render_target_view();
 
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
 	_swap_chain->GetDesc(&swap_chain_desc);
