@@ -314,15 +314,6 @@ Material_gallery::Material_gallery()
 
 // ----- Fur_pass -----
 
-Fur_pass::Fur_pass(const uint2& viewport_size)
-{
-	_tex_rt = Texture_2d_immut(GL_RGBA32F, 1, viewport_size);
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _tex_rt);
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.validate();
-}
-
 void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
 	const mat4& pvm_matrix, const mat4& model_matrix,
 	const float3& view_position_ws, const float3& light_dir_ws) noexcept
@@ -338,9 +329,6 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	glBindTextureUnit(1, material.tex_fur_mask().id());
 	glBindVertexArray(geometry_buffers.render_vao_id());
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	//glViewport(0, 0, _tex_rt.size().width, _tex_rt.size().height);
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
 
 	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
@@ -348,22 +336,9 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
 	}
 
-	/*size_t draw_count = material.strand_props().shell_count;
-	for (size_t si = 0; si < draw_count; ++si) {
-		_program.set_shell_index(si);
-
-		for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
-			glDrawElements(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count, GL_UNSIGNED_INT, nullptr);
-		}
-	}*/
-
 	glBindTextureUnit(0, Invalid::texture_id);
 	glBindTextureUnit(1, Invalid::texture_id);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
-	/*glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
-		0, 0, _tex_rt.size().width, _tex_rt.size().height,
-		0, 0, _tex_rt.size().width, _tex_rt.size().height,
-		GL_COLOR_BUFFER_BIT, GL_LINEAR);*/
 
 	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
@@ -451,8 +426,7 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	//_geometry_buffers(0.3f, "../data/rect_2x2.obj"),
 	//_geometry_buffers(0.3f, "../data/sphere-20x20.obj"),
 	_geometry_buffers(0.1f, "../data/models/bunny.obj"),
-	_dir_to_light_ws(normalize(float3(50, 1, 100.0))),
-	_fur_pass(_app_ctx.window.viewport_size())
+	_dir_to_light_ws(normalize(float3(50, 1, 100.0)))
 {
 	update_projection_matrix();
 	_curr_material = &_material_gallery.cat_material();

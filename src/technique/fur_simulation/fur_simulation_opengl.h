@@ -183,7 +183,7 @@ private:
 class Fur_pass final {
 public:
 
-	Fur_pass(const cg::uint2& viewport_size);
+	Fur_pass() = default;
 
 	Fur_pass(const Fur_pass&) = delete;
 
@@ -202,8 +202,6 @@ public:
 private:
 
 	Fur_pass_program _program;
-	Texture_2d_immut _tex_rt;
-	Framebuffer _fbo;
 };
 
 class Opaque_model_pass final {
