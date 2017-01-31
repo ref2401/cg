@@ -69,4 +69,5 @@ vec3 calc_position(float h, vec3 tangent, vec3 bitangent)
 	const vec3 curl_offset = g_strand_props.x * (cos_a * tangent + sin_a * bitangent);
 
 	return bent_pos + curl_offset;
+	//return p0;
 }

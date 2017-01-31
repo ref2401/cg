@@ -252,7 +252,7 @@ Material_gallery::Material_gallery()
 	const Sampler_desc fur_mask_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 	
 	{ // fur mask
-		Image_2d image_fur_mask("../data/fur_simulation/noise-texture-03.png");
+		Image_2d image_fur_mask("../data/fur_simulation/noise-texture.png");
 		_tex_fur_mask = Texture_2d_immut(GL_R8, 1, fur_mask_sampler, image_fur_mask);
 	}
 
@@ -267,12 +267,10 @@ Material_gallery::Material_gallery()
 			/* curl_frequency */			0.0,
 			/* shadow_factor_power */		0.6f,
 			/* shell_count */				32,
-			/* specular_factor */			0.0,
-			/* specular_power */			1.0,
 			/* threshold_power */			1.1f,
 			/* fur_mask_uv_min_factor */	1.0f,
 			/* fur_mask_uv_max_factor */	1.0f,
-			/* mass */						0.1f,
+			/* mass */						0.05f,
 			/* k */							4.0f,
 			/* damping */					0.5f));
 	}
@@ -287,14 +285,30 @@ Material_gallery::Material_gallery()
 			/* curl_frequency */			4.0,
 			/* shadow_factor_power */		0.6f,
 			/* shell_count */				32,
-			/* specular_factor */			0.0,
-			/* specular_power */			1.0,
 			/* threshold_power */			0.6f,
 			/* fur_mask_uv_min_factor */	0.5f,
 			/* fur_mask_uv_max_factor */	0.5f,
-			/* mass */						1.2f,
+			/* mass */						0.6f,
 			/* k */							100.5f,
 			/* damping */					5.5f));
+	}
+
+	{ // bunny material
+		Image_2d image_diffuse_rgb("../data/fur_simulation/bunny-diffuse-rgb.png");
+		_tex_bunny_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
+
+		_bunny_material = std::make_unique<Material>(_tex_bunny_diffuse_rgb, _tex_fur_mask,
+			Strand_properties(
+			/* curl_radius */				0.07f,
+			/* curl_frequency */			8.0,
+			/* shadow_factor_power */		1.0f,
+			/* shell_count */				64,
+			/* threshold_power */			1.1f,
+			/* fur_mask_uv_min_factor */	0.5f,
+			/* fur_mask_uv_max_factor */	3.0f,
+			/* mass */						0.1f,
+			/* k */							1.0f,
+			/* damping */					0.5f));
 	}
 }
 
@@ -318,6 +332,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 
 	glBindTextureUnit(0, material.tex_diffuse_rgb().id());
 	glBindTextureUnit(1, material.tex_fur_mask().id());
@@ -331,10 +346,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
 			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
-		//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
-		//	GL_UNSIGNED_INT, nullptr, 2, geometry_buffers.meshes()[mi].base_vertex);
 	}
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	/*size_t draw_count = material.strand_props().shell_count;
 	for (size_t si = 0; si < draw_count; ++si) {
@@ -354,6 +366,31 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 		GL_COLOR_BUFFER_BIT, GL_LINEAR);*/
 
 	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+}
+
+// ----- Opaque_model_pass -----
+
+void Opaque_model_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
+	const cg::mat4& projection_view_matrix, const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept
+{
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	glBindTextureUnit(0, material.tex_diffuse_rgb().id());
+	
+	glBindVertexArray(geometry_buffers.render_vao_id());
+	_program.bind(projection_view_matrix, model_matrix, dir_to_light_ws);
+
+	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
+		glDrawElementsBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
+			GL_UNSIGNED_INT, nullptr, geometry_buffers.meshes()[mi].base_vertex);
+	}
+
+	glBindTextureUnit(0, Invalid::texture_id);
+
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -408,11 +445,12 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 
 Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
 	Example(app_ctx),
-	_curr_viewpoint(float3(0, 0, 7), float3(0, 0, 0)),
+	_curr_viewpoint(float3(0, 3, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
-	_model_transform(float3::zero, normalize(float3(0, 1, 0)), float3(2.0f)),
+	_model_transform(float3(0, -0.5, 0), normalize(float3(0, 1, 0)), float3(2.0f)),
 	//_geometry_buffers(0.3f, "../data/rect_2x2.obj"),
-	_geometry_buffers(0.3f, "../data/sphere-20x20.obj"),
+	//_geometry_buffers(0.3f, "../data/sphere-20x20.obj"),
+	_geometry_buffers(0.1f, "../data/models/bunny.obj"),
 	_dir_to_light_ws(normalize(float3(50, 1, 100.0))),
 	_fur_pass(_app_ctx.window.viewport_size())
 {
@@ -456,6 +494,9 @@ void Fur_simulation_opengl_example::on_keyboard()
 	else if(_app_ctx.keyboard.is_down(Key::digit_2)) {
 		_curr_material = &_material_gallery.curly_red_material();
 	}
+	else if (_app_ctx.keyboard.is_down(Key::digit_3)) {
+		_curr_material = &_material_gallery.bunny_material();
+	}
 }
 
 void Fur_simulation_opengl_example::on_mouse_move()
@@ -497,11 +538,12 @@ void Fur_simulation_opengl_example::render(float interpolation_factor)
 	const mat4 pvm_matrix = projection_view_matrix * _model_matrix;
 	_prev_viewpoint = _curr_viewpoint;
 
-
 	static const float3 color = rgb(0x817c6e);
-	//static const float3 color = float3::zero;
 	glClearColor(color.r, color.g, color.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//_opaque_model_pass.perform(_geometry_buffers, *_curr_material,
+	//	projection_view_matrix, _model_matrix, _dir_to_light_ws);
 
 	_fur_pass.perform(_geometry_buffers, *_curr_material,
 		pvm_matrix, _model_matrix, view_position, _dir_to_light_ws);
@@ -521,12 +563,12 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 		_model_transform.scale);
 
 	const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
-	const mat4 inv_model_matrix = inverse(_model_matrix);
-	const float4 extern_accel_ms(mul(inv_model_matrix, external_accelerations).xyz(), dt);
-	const float3 angular_ms(mul(inv_model_matrix, -angular_velocity).xyz());
+	const mat3 inv_model_matrix(_model_matrix);
+	const float4 extern_accel_ms(mul(inv_model_matrix, external_accelerations), dt);
+	const float3 angular_ms(mul(inv_model_matrix, -angular_velocity));
 
 	_physics_pass.perform(_geometry_buffers, extern_accel_ms, angular_ms,
-		0.3f, _curr_material->strand_props());
+		0.1f, _curr_material->strand_props());
 }
 
 void Fur_simulation_opengl_example::update_curr_viewpoint()

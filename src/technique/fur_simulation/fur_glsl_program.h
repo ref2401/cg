@@ -69,6 +69,32 @@ private:
 	GLint _g_strand_props = Invalid::uniform_location;
 };
 
+class Opaque_model_pass_program final {
+public:
+
+	Opaque_model_pass_program();
+
+	Opaque_model_pass_program(const Opaque_model_pass_program&) = delete;
+
+	Opaque_model_pass_program(Opaque_model_pass_program&&) = delete;
+
+
+	Opaque_model_pass_program& operator=(const Opaque_model_pass_program&) = delete;
+
+	Opaque_model_pass_program operator=(Opaque_model_pass_program&&) = delete;
+
+
+	void bind(const cg::mat4& projection_view_matrix, 
+		const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept;
+
+private:
+
+	Glsl_program _program;
+	GLint _g_projection_view_matrix_location = Invalid::uniform_location;
+	GLint _g_model_matrix_location = Invalid::uniform_location;
+	GLint _g_dir_to_light_ws_location = Invalid::uniform_location;
+};
+
 class Strand_debug_pass_program final {
 public:
 

@@ -85,12 +85,11 @@ struct Strand_properties final {
 	Strand_properties() noexcept = default;
 
 	Strand_properties(float curl_radius, float curl_frequency, float shadow_factor_power,
-		size_t shell_count, float specular_factor, float specular_power,
-		float threshold_power, float fur_mask_uv_min_factor, float fur_mask_uv_max_factor,
+		size_t shell_count, float threshold_power, 
+		float fur_mask_uv_min_factor, float fur_mask_uv_max_factor,
 		float mass, float k, float c) noexcept
 		: curl_radius(curl_radius), curl_frequency(curl_frequency), 
 		shadow_factor_power(shadow_factor_power), shell_count(shell_count),
-		specular_factor(specular_factor), specular_power(specular_power),
 		threshold_power(threshold_power), fur_mask_uv_min_factor(fur_mask_uv_min_factor), 
 		fur_mask_uv_max_factor(fur_mask_uv_max_factor), mass(mass), k(k), c(c)
 	{}
@@ -100,8 +99,6 @@ struct Strand_properties final {
 	float curl_frequency = 0.0;
 	float shadow_factor_power = 1.0f;
 	size_t shell_count = 8;
-	float specular_factor = 0.0;
-	float specular_power = 1.0;
 	float threshold_power = 1.0f;
 	float fur_mask_uv_min_factor = 1.0f;
 	float fur_mask_uv_max_factor = 1.0f;

@@ -37,4 +37,11 @@ void main()
 
 	vec3 rgb = diffuse_term * diffuse_rgb * frag.shadow_factor;
 	rt_color = vec4(rgb, fur_alpha);
+
+	//if (rt_color.x > rt_color.y) {
+	//	rt_color = vec4(frag.tex_coord, 0, 1);
+	//} 
+	//else {
+	//	rt_color = vec4(frag.tex_coord, 0, 1);
+	//}
 }

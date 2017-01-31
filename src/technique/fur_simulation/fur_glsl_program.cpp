@@ -43,6 +43,28 @@ void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
 		strand_props.fur_mask_uv_max_factor));
 }
 
+// ----- Opaque_model_pass_program -----
+
+Opaque_model_pass_program::Opaque_model_pass_program()
+{
+	auto prog_desc = load_glsl_program_desc("../data/fur_simulation/opaque_model");
+	_program = Glsl_program("opaque-model-pass", prog_desc);
+
+	_g_projection_view_matrix_location = _program.get_uniform_location("g_projection_view_matrix");
+	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
+	_g_dir_to_light_ws_location = _program.get_uniform_location("g_dir_to_light_ws");
+}
+
+void Opaque_model_pass_program::bind(const cg::mat4& projection_view_matrix,
+	const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept
+{
+	glUseProgram(_program.id());
+
+	set_uniform(_g_projection_view_matrix_location, projection_view_matrix);
+	set_uniform(_g_model_matrix_location, model_matrix);
+	set_uniform(_g_dir_to_light_ws_location, dir_to_light_ws);
+}
+
 // ----- Physics_simulation_pass_program -----
 
 Physics_simulation_pass_program::Physics_simulation_pass_program()

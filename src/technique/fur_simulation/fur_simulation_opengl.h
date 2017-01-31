@@ -154,6 +154,11 @@ public:
 	Material_gallery& operator=(Material_gallery&&) = delete;
 
 
+	const Material& bunny_material() const noexcept
+	{
+		return *_bunny_material;
+	}
+
 	const Material& cat_material() const noexcept
 	{
 		return *_cat_material;
@@ -169,8 +174,60 @@ private:
 	Texture_2d_immut _tex_fur_mask;
 	Texture_2d_immut _tex_car_diffuse_rgb;
 	Texture_2d_immut _tex_red_curl_material;
+	Texture_2d_immut _tex_bunny_diffuse_rgb;
 	std::unique_ptr<Material> _cat_material;
 	std::unique_ptr<Material> _curly_red_material;
+	std::unique_ptr<Material> _bunny_material;
+};
+
+class Fur_pass final {
+public:
+
+	Fur_pass(const cg::uint2& viewport_size);
+
+	Fur_pass(const Fur_pass&) = delete;
+
+	Fur_pass(Fur_pass&&) = delete;
+
+
+	Fur_pass& operator=(const Fur_pass&) = delete;
+
+	Fur_pass& operator=(Fur_pass&&) = delete;
+
+
+	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
+		const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
+		const cg::float3& view_position_ws, const cg::float3& light_dir_ws) noexcept;
+
+private:
+
+	Fur_pass_program _program;
+	Texture_2d_immut _tex_rt;
+	Framebuffer _fbo;
+};
+
+class Opaque_model_pass final {
+public:
+
+	Opaque_model_pass() = default;
+
+	Opaque_model_pass(const Opaque_model_pass&) = delete;
+
+	Opaque_model_pass(Opaque_model_pass&&) = delete;
+
+
+	Opaque_model_pass& operator=(const Opaque_model_pass&) = delete;
+
+	Opaque_model_pass& operator=(Opaque_model_pass&&) = delete;
+
+
+	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
+		const cg::mat4& projection_view_matrix, const cg::mat4& model_matrix, 
+		const cg::float3& dir_to_light_ws) noexcept;
+
+private:
+
+	Opaque_model_pass_program _program;
 };
 
 class Physics_simulation_pass final {
@@ -217,32 +274,6 @@ public:
 private:
 
 	Strand_debug_pass_program _program;
-};
-
-class Fur_pass final {
-public:
-
-	Fur_pass(const cg::uint2& viewport_size);
-
-	Fur_pass(const Fur_pass&) = delete;
-
-	Fur_pass(Fur_pass&&) = delete;
-
-
-	Fur_pass& operator=(const Fur_pass&) = delete;
-
-	Fur_pass& operator=(Fur_pass&&) = delete;
-
-
-	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
-		const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
-		const cg::float3& view_position_ws, const cg::float3& light_dir_ws) noexcept;
-
-private:
-
-	Fur_pass_program _program;
-	Texture_2d_immut _tex_rt;
-	Framebuffer _fbo;
 };
 
 class Fur_simulation_opengl_example final : public cg::sys::Example {
@@ -299,9 +330,10 @@ private:
 	Geometry_buffers _geometry_buffers;
 	cg::float3 _dir_to_light_ws;
 	// render
+	Fur_pass _fur_pass;
+	Opaque_model_pass _opaque_model_pass;
 	Physics_simulation_pass _physics_pass;
 	Strand_debug_pass _strand_debug_pass;
-	Fur_pass _fur_pass;
 };
 
 } // fur_simulation
