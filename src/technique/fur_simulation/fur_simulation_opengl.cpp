@@ -267,9 +267,9 @@ Material_gallery::Material_gallery()
 			/* curl_frequency */			0.0,
 			/* shadow_factor_power */		0.6f,
 			/* shell_count */				32,
-			/* threshold_power */			1.1f,
+			/* threshold_power */			0.8f,
 			/* fur_mask_uv_min_factor */	1.0f,
-			/* fur_mask_uv_max_factor */	1.0f,
+			/* fur_mask_uv_max_factor */	3.0f,
 			/* mass */						0.05f,
 			/* k */							4.0f,
 			/* damping */					0.5f));
@@ -281,14 +281,14 @@ Material_gallery::Material_gallery()
 
 		_curly_red_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
 			Strand_properties(
-			/* curl_radius */				0.01f,
+			/* curl_radius */				0.007f,
 			/* curl_frequency */			4.0,
 			/* shadow_factor_power */		0.6f,
 			/* shell_count */				32,
 			/* threshold_power */			0.6f,
-			/* fur_mask_uv_min_factor */	0.5f,
-			/* fur_mask_uv_max_factor */	0.5f,
-			/* mass */						0.6f,
+			/* fur_mask_uv_min_factor */	2.0f,
+			/* fur_mask_uv_max_factor */	2.0f,
+			/* mass */						0.1f,
 			/* k */							100.5f,
 			/* damping */					5.5f));
 	}
@@ -485,7 +485,7 @@ void Fur_simulation_opengl_example::on_keyboard()
 	if (_app_ctx.keyboard.is_down(Key::space)) {
 		_movement_speed = float3::zero;
 		_movement_acceleration = float3::zero;
-		_model_transform.position = float3::zero;
+		_model_transform.position = float3(0, -0.5, 0);
 	}
 
 	if (_app_ctx.keyboard.is_down(Key::digit_1)) {
