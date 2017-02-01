@@ -13,7 +13,7 @@ namespace mesh_rnd {
 
 class Vertex_skinning_example final : public Example {
 public:
-	Vertex_skinning_example(Render_context& rnd_ctx);
+	Vertex_skinning_example(Render_context_old& rnd_ctx);
 
 	Vertex_skinning_example(const Vertex_skinning_example&) = delete;
 
@@ -53,7 +53,7 @@ private:
 
 	void update_projection_matrix(float wh_aspect_ratio);
 
-	void setup_projection_view_matrices();
+	void update_projection_view_matrices();
 
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _scene_cbuffer;

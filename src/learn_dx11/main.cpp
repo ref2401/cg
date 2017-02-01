@@ -11,25 +11,19 @@
 
 int main(int argc, char* argv[])
 {
-	cg::uint2 wnd_position(90, 50);
-	cg::uint2 wnd_size(960, 540);
+	cg::uint2 window_position(90, 50);
+	cg::uint2 window_size(960, 540);
 
 	try {
-		Com_ptr<ID3D11Debug> debug;
-
-		{
-			OutputDebugString("----------------\n");
-			learn_dx11::Application app(wnd_position, wnd_size);
-			debug = app.get_dx_debug();
-
-			// Uncomment any line to execute the appropriate example.
-			app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
-			//app.run<learn_dx11::mesh_rnd::Vertex_skinning_example>();
-			//app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
-			//app.run<learn_dx11::tess::Terrain_tessellation_example>();
-		}
-
-		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		OutputDebugString("----------------\n");
+		learn_dx11::Application app(window_position, window_size);
+			
+		// Uncomment any line to execute the appropriate example.
+		app.run<learn_dx11::mesh_rnd::Static_mesh_example>();
+		//app.run<learn_dx11::mesh_rnd::Vertex_skinning_example>();
+		//app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
+		//app.run<learn_dx11::tess::Terrain_tessellation_example>();
+	
 	}
 	catch(std::exception& exc) {
 		OutputDebugString("\nException:\n");

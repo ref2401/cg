@@ -111,31 +111,32 @@ namespace learn_dx11 {
 
 void Example::clear_color_buffer(const cg::float4& clear_color)
 {
-	_device_ctx->ClearRenderTargetView(_pipeline_state.render_target_view(), clear_color.data);
+	_device_ctx->ClearRenderTargetView(_rnd_ctx.render_target_view(), clear_color.data);
 }
 
 void Example::clear_depth_stencil_buffer(float clear_depth)
 {
-	_device_ctx->ClearDepthStencilView(_pipeline_state.depth_stencil_view(),
+	assert(_rnd_ctx.depth_stencil_view());
+
+	_device_ctx->ClearDepthStencilView(_rnd_ctx.depth_stencil_view(),
 		D3D11_CLEAR_DEPTH, clear_depth, 1);
 }
 
-void Example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
-{
-	ID3D11RasterizerState* state = nullptr;
-	HRESULT hr = _device->CreateRasterizerState(&desc, &state);
-	assert(hr == S_OK);
-
-	_device_ctx->RSSetState(state);
-	_pipeline_state.set_rasterizer_state(state);
-}
+//void Example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
+//{
+//	ID3D11RasterizerState* state = nullptr;
+//	HRESULT hr = _device->CreateRasterizerState(&desc, &state);
+//	assert(hr == S_OK);
+//
+//	_device_ctx->RSSetState(state);
+//	_pipeline_state.set_rasterizer_state(state);
+//}
 
 // ----- Application -----
 
 Application::Application(cg::uint2 window_position, cg::uint2 window_size) :
 	_hinstance(GetModuleHandle(nullptr)),
-	_hwnd(make_window(_hinstance, window_position, window_size)),
-	_rnd_ctx(_hwnd, window_size)
+	_hwnd(make_window(_hinstance, window_position, window_size))
 {
 	g_app = this;
 }
@@ -145,14 +146,6 @@ Application::~Application() noexcept
 	g_app = nullptr;
 	dispose_window(_hwnd);
 	_hinstance = nullptr;
-}
-
-Com_ptr<ID3D11Debug> Application::get_dx_debug()
-{
-	Com_ptr<ID3D11Debug> debug(_rnd_ctx.debug());
-	debug->AddRef();
-
-	return debug;
 }
 
 void Application::on_keypress()
@@ -165,9 +158,11 @@ void Application::on_window_resize(const uint2& window_size)
 {
 	assert(greater_than(window_size, 0));
 
-	if (window_size == _rnd_ctx.pipeline_state().viewport_size()) return;
+	if (window_size == _rnd_ctx->viewport_size()) return;
 
-	_rnd_ctx.resize_viewport(window_size);
+	if (_rnd_ctx)
+		_rnd_ctx->resize_viewport(window_size);
+
 	if (_example)
 		_example->on_viewport_resize(window_size);
 }
@@ -191,7 +186,7 @@ void Application::run_main_loop()
 		
 		_example->update(float(dt.count()));
 		_example->render();
-		_rnd_ctx.swap_color_buffers();
+		_rnd_ctx->swap_color_buffers();
 	}
 }
 

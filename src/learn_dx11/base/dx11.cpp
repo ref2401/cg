@@ -303,17 +303,33 @@ void Pipeline_state::update_viewport(const uint2& viewport_size,
 	_viewport_desc.MaxDepth = 1.0f;
 }
 
-// ----- Rendering_context -----
+// ----- Render_context -----
 
-Render_context::Render_context(HWND hwnd, const uint2& window_size)
+Render_context::Render_context(HWND hwnd, const cg::uint2& window_size, bool init_depth_stencil_view)
+	: _viewport_size(window_size)
 {
 	assert(greater_than(window_size, 0));
 	assert(hwnd);
 
 	init_device(hwnd, window_size);
+	update_render_target_view();
+	update_depth_stencil_view(init_depth_stencil_view);
+	bind_default_render_targets();
+}
+
+void Render_context::bind_default_render_targets()
+{
+	ID3D11RenderTargetView* rtv = _render_target_view.ptr;
+	_device_ctx->OMSetRenderTargets(1, &rtv, _depth_stencil_view.ptr);
 	
-	_pipeline_state = Pipeline_state(_device.ptr, _swap_chain.ptr, window_size);
-	setup_pipeline_state();
+	D3D11_VIEWPORT viewport_desc;
+	viewport_desc.TopLeftX = 0;
+	viewport_desc.TopLeftY = 0;
+	viewport_desc.Width = float(_viewport_size.width);
+	viewport_desc.Height = float(_viewport_size.height);
+	viewport_desc.MinDepth = 0.0;
+	viewport_desc.MaxDepth = 1.0f;
+	_device_ctx->RSSetViewports(1, &viewport_desc);
 }
 
 void Render_context::init_device(HWND hwnd, const uint2& window_size)
@@ -348,7 +364,120 @@ void Render_context::init_device(HWND hwnd, const uint2& window_size)
 	hr = _device->QueryInterface<ID3D11Debug>(&_debug.ptr);
 }
 
+void Render_context::update_depth_stencil_view(bool force_refresh)
+{
+	// force_refresh may be true only when Render_context constructor is being called.
+	//
+	// if not force_refresh and _depth_stencil_view was not initialized last time
+	// then we must not initialize _depth_stencil_view at all.
+	if (!(force_refresh || _depth_stencil_view)) return;
+
+	_tex_depth_stencil.dispose();
+	_depth_stencil_view.dispose();
+
+	D3D11_TEXTURE2D_DESC tex_desc = {};
+	tex_desc.Width = _viewport_size.width;
+	tex_desc.Height = _viewport_size.height;
+	tex_desc.MipLevels = 1;
+	tex_desc.ArraySize = 1;
+	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	HRESULT hr = _device->CreateTexture2D(&tex_desc, nullptr, &_tex_depth_stencil.ptr);
+	assert(hr == S_OK);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC view_desc = {};
+	view_desc.Format = tex_desc.Format;
+	view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	view_desc.Texture2D.MipSlice = 0;
+
+	hr = _device->CreateDepthStencilView(_tex_depth_stencil.ptr, &view_desc, &_depth_stencil_view.ptr);
+	assert(hr == S_OK);
+}
+
+void Render_context::update_render_target_view()
+{
+	_render_target_view.dispose();
+
+	Com_ptr<ID3D11Texture2D> tex_back_buffer;
+	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
+	assert(hr == S_OK);
+
+	hr = _device->CreateRenderTargetView(tex_back_buffer.ptr, nullptr, &_render_target_view.ptr);
+	assert(hr == S_OK);
+}
+
 void Render_context::resize_viewport(const cg::uint2& viewport_size)
+{
+	//assert(greater_than(viewport_size, 0));
+
+	//_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
+	////_pipeline_state.dispose_depth_stencil_view();
+	////_pipeline_state.dispose_render_target_view();
+
+	//DXGI_SWAP_CHAIN_DESC swap_chain_desc;
+	//_swap_chain->GetDesc(&swap_chain_desc);
+	//_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount,
+	//	viewport_size.width, viewport_size.height,
+	//	swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
+
+	//_pipeline_state.update_viewport(viewport_size, _device.ptr, _swap_chain.ptr);
+	//setup_pipeline_state();
+}
+
+void Render_context::swap_color_buffers()
+{
+	_swap_chain->Present(0, 0);
+}
+
+
+Render_context_old::Render_context_old(HWND hwnd, const uint2& window_size)
+{
+	assert(greater_than(window_size, 0));
+	assert(hwnd);
+
+	init_device(hwnd, window_size);
+	
+	_pipeline_state = Pipeline_state(_device.ptr, _swap_chain.ptr, window_size);
+	setup_pipeline_state();
+}
+
+void Render_context_old::init_device(HWND hwnd, const uint2& window_size)
+{
+	HRESULT hr;
+
+	DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
+	swap_chain_desc.BufferCount = 2;
+	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swap_chain_desc.BufferDesc.Width = window_size.width;
+	swap_chain_desc.BufferDesc.Height = window_size.height;
+	swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swap_chain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swap_chain_desc.BufferDesc.RefreshRate.Numerator = 60;
+	swap_chain_desc.BufferDesc.RefreshRate.Denominator = 1;
+	swap_chain_desc.SampleDesc.Count = 1;
+	swap_chain_desc.SampleDesc.Quality = 0;
+	swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swap_chain_desc.Windowed = true;
+	swap_chain_desc.OutputWindow = hwnd;
+
+	D3D_FEATURE_LEVEL expected_feature_level = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL actual_feature_level;
+
+	hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+		D3D11_CREATE_DEVICE_DEBUG, &expected_feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc,
+		&_swap_chain.ptr, &_device.ptr, &actual_feature_level, &_device_ctx.ptr);
+	assert(hr == S_OK);
+	assert(actual_feature_level == expected_feature_level);
+
+	hr = _device->QueryInterface<ID3D11Debug>(&_debug.ptr);
+}
+
+void Render_context_old::resize_viewport(const cg::uint2& viewport_size)
 {
 	assert(greater_than(viewport_size, 0));
 
@@ -366,7 +495,7 @@ void Render_context::resize_viewport(const cg::uint2& viewport_size)
 	setup_pipeline_state();
 }
 
-void Render_context::setup_pipeline_state()
+void Render_context_old::setup_pipeline_state()
 {
 	// rasterizer stage
 	_device_ctx->RSSetState(_pipeline_state.rasterizer_state());
@@ -378,7 +507,7 @@ void Render_context::setup_pipeline_state()
 	_device_ctx->OMSetRenderTargets(1, &rtv, _pipeline_state.depth_stencil_view());
 }
 
-void Render_context::swap_color_buffers()
+void Render_context_old::swap_color_buffers()
 {
 	_swap_chain->Present(0, 0);
 }

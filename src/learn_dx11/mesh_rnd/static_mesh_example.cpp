@@ -20,14 +20,15 @@ namespace mesh_rnd {
 
 // ----- Static_mesh_example -----
 
-Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) :
-	Example(rnd_ctx)
+Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx) 
+	: Example(rnd_ctx)
 {
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_cbuffers();
 	init_material();
-	setup_projection_view_matrices(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
+	init_depth_stencil_state();
+	update_projection_view_matrices(_rnd_ctx.viewport_size().aspect_ratio());
 	setup_pipeline_state();
 }
 
@@ -43,6 +44,17 @@ void Static_mesh_example::init_cbuffers()
 	float matrix_data[16];
 	to_array_column_major_order(_model_matrix, matrix_data);
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
+}
+
+void Static_mesh_example::init_depth_stencil_state()
+{
+	D3D11_DEPTH_STENCIL_DESC desc = {};
+	desc.DepthEnable = true;
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = _device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
 }
 
 void Static_mesh_example::init_geometry()
@@ -142,6 +154,7 @@ void Static_mesh_example::init_shaders()
 
 void Static_mesh_example::setup_pipeline_state()
 {
+	// input assembler
 	size_t offset = 0;
 	size_t stride = sizeof(float2) + 2 * sizeof(float3);
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
@@ -149,19 +162,24 @@ void Static_mesh_example::setup_pipeline_state()
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
 	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	// vertex shaer
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_scene_cbuffer.ptr);
 	_device_ctx->VSSetConstantBuffers(1, 1, &_model_cbuffer.ptr);
 	
+	// pixel shader
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
 	_device_ctx->PSSetShaderResources(0, 1, &_tex_diffuse_rgb_view.ptr);
+
+	// output merger stage
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 1);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);
 }
 
-void Static_mesh_example::setup_projection_view_matrices(float wh_aspect_ratio)
+void Static_mesh_example::update_projection_view_matrices(float wh_aspect_ratio)
 {
 	using cg::perspective_matrix_directx;
 	using cg::to_array_column_major_order;
@@ -179,7 +197,7 @@ void Static_mesh_example::setup_projection_view_matrices(float wh_aspect_ratio)
 
 void Static_mesh_example::on_viewport_resize(const cg::uint2& viewport_size)
 {
-	setup_projection_view_matrices(viewport_size.aspect_ratio());
+	update_projection_view_matrices(viewport_size.aspect_ratio());
 }
 
 void Static_mesh_example::render()

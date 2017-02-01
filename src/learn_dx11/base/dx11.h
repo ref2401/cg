@@ -186,21 +186,21 @@ private:
 	D3D11_VIEWPORT _viewport_desc;
 };
 
-// The Render_context class provides access to all the DirectX's essential objects
+// The Render_context_old class provides access to all the DirectX's essential objects
 // which are required by every example from this project.
-class Render_context final {
+class Render_context_old final {
 public:
 
-	Render_context(HWND hwnd, const cg::uint2& window_size);
+	Render_context_old(HWND hwnd, const cg::uint2& window_size);
 
-	Render_context(const Render_context&) = delete;
+	Render_context_old(const Render_context_old&) = delete;
 
-	Render_context(Render_context&&) noexcept = delete;
+	Render_context_old(Render_context_old&&) noexcept = delete;
 
 
-	Render_context& operator=(const Render_context&) = delete;
+	Render_context_old& operator=(const Render_context_old&) = delete;
 
-	Render_context& operator=(Render_context&&) noexcept = delete;
+	Render_context_old& operator=(Render_context_old&&) noexcept = delete;
 
 
 	ID3D11Debug* debug() noexcept
@@ -238,6 +238,77 @@ private:
 	Com_ptr<ID3D11DeviceContext> _device_ctx;
 	Com_ptr<IDXGISwapChain> _swap_chain;
 	Pipeline_state _pipeline_state;
+};
+
+class Render_context final {
+public:
+
+	Render_context(HWND hwnd, const cg::uint2& window_size, bool init_depth_stencil_view);
+
+	Render_context(const Render_context&) = delete;
+
+	Render_context(Render_context&&) noexcept = delete;
+
+
+	Render_context& operator=(const Render_context&) = delete;
+
+	Render_context& operator=(Render_context&&) noexcept = delete;
+
+
+	ID3D11Debug* debug() noexcept
+	{
+		return _debug.ptr;
+	}
+
+	ID3D11Device* device() noexcept
+	{
+		return _device.ptr;
+	}
+
+	ID3D11DeviceContext* device_ctx() noexcept
+	{
+		return _device_ctx.ptr;
+	}
+
+	ID3D11DepthStencilView* depth_stencil_view() noexcept
+	{
+		return _depth_stencil_view.ptr;
+	}
+
+	ID3D11RenderTargetView* render_target_view() noexcept
+	{
+		return _render_target_view.ptr;
+	}
+
+	// Binds default render target ((owned by the window)), depth/stencil targets (if any)
+	// and sets up the default viewport.
+	void bind_default_render_targets();
+
+	void resize_viewport(const cg::uint2& viewport_size);
+
+	cg::uint2 viewport_size() const noexcept
+	{
+		return _viewport_size;
+	}
+
+	void swap_color_buffers();
+
+private:
+
+	void init_device(HWND hwnd, const cg::uint2& window_size);
+
+	void update_depth_stencil_view(bool force_refresh = false);
+
+	void update_render_target_view();
+
+	cg::uint2 _viewport_size;
+	Com_ptr<ID3D11Device> _device;
+	Com_ptr<ID3D11Debug> _debug;
+	Com_ptr<ID3D11DeviceContext> _device_ctx;
+	Com_ptr<IDXGISwapChain> _swap_chain;
+	Com_ptr<ID3D11RenderTargetView> _render_target_view;
+	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
+	Com_ptr<ID3D11DepthStencilView> _depth_stencil_view;
 };
 
 

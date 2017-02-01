@@ -12,6 +12,9 @@ namespace mesh_rnd {
 class Static_mesh_example final : public Example {
 public:
 
+	static constexpr bool init_depth_stencil_view = true;
+
+
 	Static_mesh_example(Render_context& rnd_ctx);
 
 	Static_mesh_example(const Static_mesh_example&) = delete;
@@ -34,6 +37,8 @@ private:
 
 	void init_cbuffers();
 
+	void init_depth_stencil_state();
+
 	void init_geometry();
 
 	void init_material();
@@ -41,15 +46,18 @@ private:
 	void init_shaders();
 
 	// Calculates projection & view matrices and writes values to the _scene_cbuffer.
-	void setup_projection_view_matrices(float wh_aspect_ratio);
+	void update_projection_view_matrices(float wh_aspect_ratio);
 
 	// Sets up the pipeline after initialization is complete.
 	void setup_pipeline_state();
 
+	
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
 	Com_ptr<ID3D11Buffer> _index_buffer;
+	// renderer settings
+	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	// scene
 	size_t _model_index_count;
 	cg::mat4 _projection_matrix;

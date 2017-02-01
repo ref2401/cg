@@ -12,7 +12,7 @@ using cg::mat4;
 namespace learn_dx11 {
 namespace mesh_rnd {
 
-Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) :
+Vertex_skinning_example::Vertex_skinning_example(Render_context_old& rnd_ctx) :
 	Example(rnd_ctx)
 {
 	init_cbuffers();
@@ -21,7 +21,7 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) :
 	
 	_view_matrix = cg::view_matrix(float3(0, 2, 8.0f), float3::zero);
 	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
-	setup_projection_view_matrices();
+	update_projection_view_matrices();
 	setup_pipeline_state();
 }
 
@@ -188,7 +188,7 @@ void Vertex_skinning_example::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Vertex_skinning_example::setup_projection_view_matrices()
+void Vertex_skinning_example::update_projection_view_matrices()
 {
 	float matrix_data[16];
 	mat4 proj_view_matrix = _projection_matrix * _view_matrix;
@@ -200,7 +200,7 @@ void Vertex_skinning_example::setup_projection_view_matrices()
 void Vertex_skinning_example::on_viewport_resize(const cg::uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
-	setup_projection_view_matrices();
+	update_projection_view_matrices();
 }
 
 void Vertex_skinning_example::render()

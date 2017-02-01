@@ -13,7 +13,7 @@ namespace mesh_rnd {
 
 // ----- Displacement_mapping_example -----
 
-Displacement_mapping_example::Displacement_mapping_example(Render_context& rnd_ctx) :
+Displacement_mapping_example::Displacement_mapping_example(Render_context_old& rnd_ctx) :
 	Example(rnd_ctx)
 {
 	_view_matrix = cg::view_matrix(float3(0, 3, 3), float3::zero);

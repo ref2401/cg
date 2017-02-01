@@ -11,7 +11,7 @@ namespace mesh_rnd {
 class Displacement_mapping_example final : public Example {
 public:
 
-	Displacement_mapping_example(Render_context& rnd_ctx);
+	Displacement_mapping_example(Render_context_old& rnd_ctx);
 
 	Displacement_mapping_example(const Displacement_mapping_example&) = delete;
 

@@ -13,11 +13,11 @@ namespace learn_dx11 {
 class Example {
 public:
 
-	Example(Render_context& rnd_ctx) noexcept : 
+	Example(Render_context& rnd_ctx) noexcept 
+		: _rnd_ctx(rnd_ctx),
 		_device(rnd_ctx.device()),
 		_debug(rnd_ctx.debug()),
-		_device_ctx(rnd_ctx.device_ctx()),
-		_pipeline_state(rnd_ctx.pipeline_state())
+		_device_ctx(rnd_ctx.device_ctx())
 	{}
 
 	virtual ~Example() noexcept {}
@@ -37,14 +37,10 @@ protected:
 
 	void clear_depth_stencil_buffer(float clear_depth);
 
-	// Creates a new rasterizer state object, overwrites _pipeline_state.resterizer_state() 
-	// object with the new one and sets the new state as the current of the pipeline.
-	void setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc);
-
-	ID3D11Device* _device;
-	ID3D11Debug* _debug;
-	ID3D11DeviceContext* _device_ctx;
-	Pipeline_state& _pipeline_state;
+	Render_context& _rnd_ctx;
+	ID3D11Device* _device = nullptr;
+	ID3D11Debug* _debug = nullptr;
+	ID3D11DeviceContext* _device_ctx = nullptr;
 };
 
 // Application class represents the entry point of the project.
@@ -67,8 +63,6 @@ public:
 	Application& operator=(Application&&) = delete;
 
 
-	Com_ptr<ID3D11Debug> get_dx_debug();
-
 	void on_keypress();
 
 	void on_window_resize(const cg::uint2& window_size);
@@ -86,7 +80,7 @@ private:
 
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
-	Render_context _rnd_ctx;
+	std::unique_ptr<Render_context> _rnd_ctx;
 	std::unique_ptr<Example> _example;
 };
 
@@ -94,13 +88,30 @@ template<typename T>
 void Application::run()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from learn_dx11::Example.");
+	assert(!_rnd_ctx);
 	assert(!_example);
 
-	show_window();
+	Com_ptr<ID3D11Debug> debug;
 
-	_example = std::make_unique<T>(_rnd_ctx);
-	run_main_loop();
-	_example.reset();
+	{
+		RECT rect;
+		GetClientRect(_hwnd, &rect);
+		cg::uint2 viewport_size(rect.right - rect.left, rect.bottom - rect.top);
+
+		_rnd_ctx = std::make_unique<Render_context>(_hwnd, viewport_size, T::init_depth_stencil_view);
+		debug = _rnd_ctx->debug();
+		debug->AddRef();
+
+		show_window();
+
+		_example = std::make_unique<T>(*_rnd_ctx);
+		run_main_loop();
+		_example.reset();
+		_rnd_ctx.reset();
+	}
+
+	if (debug)
+		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 }
 
 } // learn_dx11

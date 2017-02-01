@@ -19,16 +19,16 @@ struct Com_ptr final {
 
 	Com_ptr() noexcept {}
 
-	explicit Com_ptr(T* ptr) noexcept :
-		ptr(ptr)
+	explicit Com_ptr(T* ptr) noexcept 
+		: ptr(ptr)
 	{}
 
 	Com_ptr(nullptr_t) noexcept {}
 
 	Com_ptr(const Com_ptr&) = delete;
 
-	Com_ptr(Com_ptr&& com_ptr) noexcept :
-	ptr(com_ptr.ptr)
+	Com_ptr(Com_ptr&& com_ptr) noexcept 
+		: ptr(com_ptr.ptr)
 	{
 		com_ptr.ptr = nullptr;
 	}
