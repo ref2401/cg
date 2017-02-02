@@ -11,7 +11,10 @@ namespace tess {
 class Terrain_tessellation_example final : public Example {
 public:
 
-	Terrain_tessellation_example(Render_context_old& rnd_ctx);
+	constexpr static bool init_depth_stencil_view = true;
+
+
+	Terrain_tessellation_example(Render_context& rnd_ctx);
 
 	Terrain_tessellation_example(const Terrain_tessellation_example&) = delete;
 
