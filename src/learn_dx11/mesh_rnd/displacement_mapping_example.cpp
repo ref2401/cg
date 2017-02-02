@@ -13,8 +13,8 @@ namespace mesh_rnd {
 
 // ----- Displacement_mapping_example -----
 
-Displacement_mapping_example::Displacement_mapping_example(Render_context_old& rnd_ctx) :
-	Example(rnd_ctx)
+Displacement_mapping_example::Displacement_mapping_example(Render_context& rnd_ctx) 
+	: Example(rnd_ctx)
 {
 	_view_matrix = cg::view_matrix(float3(0, 3, 3), float3::zero);
 	_model_matrix = cg::rotation_matrix_ox<mat4>(-cg::pi_2) * cg::scale_matrix<mat4>(float3(3));
@@ -23,8 +23,9 @@ Displacement_mapping_example::Displacement_mapping_example(Render_context_old& r
 	init_shaders();
 	init_cbuffers();
 	init_terrain_textures();
+	init_render_states();
 
-	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
+	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
 	setup_projection_view_matrix();
 	setup_pipeline_state();
 }
@@ -37,6 +38,31 @@ void Displacement_mapping_example::init_cbuffers()
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 
 	_projection_view_cbuffer = make_cbuffer(_device, sizeof(mat4));
+}
+
+void Displacement_mapping_example::init_render_states()
+{
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	depth_stencil_desc.DepthEnable = true;
+	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+
+	D3D11_RASTERIZER_DESC def_raster_desc = {};
+	def_raster_desc.FillMode = D3D11_FILL_SOLID;
+	def_raster_desc.CullMode = D3D11_CULL_BACK;
+	def_raster_desc.FrontCounterClockwise = true;
+
+	hr = _device->CreateRasterizerState(&def_raster_desc, &_default_rasterizer_state.ptr);
+	assert(hr == S_OK);
+
+	D3D11_RASTERIZER_DESC wire_raster_desc = def_raster_desc;
+	wire_raster_desc.FillMode = D3D11_FILL_WIREFRAME;
+
+	hr = _device->CreateRasterizerState(&wire_raster_desc, &_wireframe_rasterizer_state.ptr);
+	assert(hr == S_OK);
 }
 
 void Displacement_mapping_example::init_shaders()
@@ -154,13 +180,7 @@ void Displacement_mapping_example::setup_pipeline_state()
 	_device_ctx->PSSetShaderResources(0, 1, &_tex_terrain_normal_map_srv.ptr);
 	_device_ctx->PSSetSamplers(0, 1, &_linear_sampler.ptr);
 
-	// wireframe rasterizer state
-	D3D11_RASTERIZER_DESC rastr_state_desc = {};
-	_pipeline_state.rasterizer_state()->GetDesc(&rastr_state_desc);
-	rastr_state_desc.FillMode = D3D11_FILL_WIREFRAME;
-	setup_rasterizer_state(rastr_state_desc);
-	HRESULT hr0 = _device->CreateRasterizerState(&rastr_state_desc, &_wireframe_rasterizer_state.ptr);
-	assert(hr0 == S_OK);
+	//_device_ctx->RSSetState(_default_rasterizer_state.ptr);
 	_device_ctx->RSSetState(_wireframe_rasterizer_state.ptr);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);

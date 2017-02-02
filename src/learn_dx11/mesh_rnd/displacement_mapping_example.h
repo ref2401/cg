@@ -11,7 +11,10 @@ namespace mesh_rnd {
 class Displacement_mapping_example final : public Example {
 public:
 
-	Displacement_mapping_example(Render_context_old& rnd_ctx);
+	static constexpr bool init_depth_stencil_view = true;
+
+
+	Displacement_mapping_example(Render_context& rnd_ctx);
 
 	Displacement_mapping_example(const Displacement_mapping_example&) = delete;
 
@@ -33,6 +36,8 @@ private:
 
 	void init_cbuffers();
 
+	void init_render_states();
+
 	void init_shaders();
 
 	void init_terrain_textures();
@@ -43,10 +48,14 @@ private:
 
 	void update_projection_matrix(float wh_aspect_ratio);
 
+	// renderer settings
+	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
+	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
+
 	Hlsl_shader_set _shader_set;
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
-	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
 	Com_ptr<ID3D11Texture2D> _tex_terrain_displacement_map;
 	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_displacement_map_srv;
 	Com_ptr<ID3D11Texture2D> _tex_terrain_normal_map;
