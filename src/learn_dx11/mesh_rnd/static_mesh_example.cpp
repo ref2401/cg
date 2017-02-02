@@ -27,7 +27,7 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx)
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_cbuffers();
 	init_material();
-	init_depth_stencil_state();
+	init_render_states();
 	update_projection_view_matrices(_rnd_ctx.viewport_size().aspect_ratio());
 	setup_pipeline_state();
 }
@@ -44,17 +44,6 @@ void Static_mesh_example::init_cbuffers()
 	float matrix_data[16];
 	to_array_column_major_order(_model_matrix, matrix_data);
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
-}
-
-void Static_mesh_example::init_depth_stencil_state()
-{
-	D3D11_DEPTH_STENCIL_DESC desc = {};
-	desc.DepthEnable = true;
-	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	desc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	HRESULT hr = _device->CreateDepthStencilState(&desc, &_depth_stencil_state.ptr);
-	assert(hr == S_OK);
 }
 
 void Static_mesh_example::init_geometry()
@@ -143,6 +132,25 @@ void Static_mesh_example::init_material()
 	assert(hr == S_OK);
 }
 
+void Static_mesh_example::init_render_states()
+{
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	depth_stencil_desc.DepthEnable = true;
+	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+
+	D3D11_RASTERIZER_DESC rasterizer_desc = {};
+	rasterizer_desc.FillMode = D3D11_FILL_SOLID;
+	rasterizer_desc.CullMode = D3D11_CULL_BACK;
+	rasterizer_desc.FrontCounterClockwise = true;
+
+	hr = _device->CreateRasterizerState(&rasterizer_desc, &_rasterizer_state.ptr);
+	assert(hr == S_OK);
+}
+
 void Static_mesh_example::init_shaders()
 {
 	auto hlsl_data = cg::data::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
@@ -171,6 +179,9 @@ void Static_mesh_example::setup_pipeline_state()
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
 	_device_ctx->PSSetShaderResources(0, 1, &_tex_diffuse_rgb_view.ptr);
+
+	// rasterizer stage
+	_device_ctx->RSSetState(_rasterizer_state.ptr);
 
 	// output merger stage
 	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 1);

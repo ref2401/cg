@@ -171,7 +171,7 @@ private:
 
 	void init_rasterizer_state(ID3D11Device* device);
 
-	void init_depth_stencil_state(ID3D11Device* device);
+	void init_render_states(ID3D11Device* device);
 
 	void update_depth_stencil_view(ID3D11Device* device);
 

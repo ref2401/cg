@@ -175,7 +175,7 @@ Pipeline_state::Pipeline_state(ID3D11Device* device, IDXGISwapChain* swap_chain,
 	assert(swap_chain != nullptr);
 	assert(greater_than(viewport_size, 0));
 
-	init_depth_stencil_state(device);
+	init_render_states(device);
 	init_rasterizer_state(device);
 	update_viewport(viewport_size, device, swap_chain);
 }
@@ -233,7 +233,7 @@ void Pipeline_state::init_rasterizer_state(ID3D11Device* device)
 	assert(hr == S_OK);
 }
 
-void Pipeline_state::init_depth_stencil_state(ID3D11Device* device)
+void Pipeline_state::init_render_states(ID3D11Device* device)
 {
 	D3D11_DEPTH_STENCIL_DESC desc = {};
 	desc.DepthEnable = true;
@@ -412,20 +412,26 @@ void Render_context::update_render_target_view()
 
 void Render_context::resize_viewport(const cg::uint2& viewport_size)
 {
-	//assert(greater_than(viewport_size, 0));
+	assert(greater_than(viewport_size, 0));
 
-	//_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
-	////_pipeline_state.dispose_depth_stencil_view();
-	////_pipeline_state.dispose_render_target_view();
+	const bool update_depth_stencil = !!_depth_stencil_view;
+	
+	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
+	_render_target_view.dispose();
+	_tex_depth_stencil.dispose();
+	_depth_stencil_view.dispose();
 
-	//DXGI_SWAP_CHAIN_DESC swap_chain_desc;
-	//_swap_chain->GetDesc(&swap_chain_desc);
-	//_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount,
-	//	viewport_size.width, viewport_size.height,
-	//	swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
+	_viewport_size = viewport_size;
 
-	//_pipeline_state.update_viewport(viewport_size, _device.ptr, _swap_chain.ptr);
-	//setup_pipeline_state();
+	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
+	_swap_chain->GetDesc(&swap_chain_desc);
+	_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount,
+		viewport_size.width, viewport_size.height,
+		swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
+
+	update_render_target_view();
+	update_depth_stencil_view(update_depth_stencil); // if there was no depth_stencil_view then it would not be created
+	bind_default_render_targets();
 }
 
 void Render_context::swap_color_buffers()

@@ -37,11 +37,11 @@ private:
 
 	void init_cbuffers();
 
-	void init_depth_stencil_state();
-
 	void init_geometry();
 
 	void init_material();
+
+	void init_render_states();
 
 	void init_shaders();
 
@@ -58,6 +58,7 @@ private:
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	// renderer settings
 	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
 	size_t _model_index_count;
 	cg::mat4 _projection_matrix;
