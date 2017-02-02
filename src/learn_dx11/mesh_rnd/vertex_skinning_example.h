@@ -13,7 +13,11 @@ namespace mesh_rnd {
 
 class Vertex_skinning_example final : public Example {
 public:
-	Vertex_skinning_example(Render_context_old& rnd_ctx);
+
+	static constexpr bool init_depth_stencil_view = true;
+
+
+	Vertex_skinning_example(Render_context& rnd_ctx);
 
 	Vertex_skinning_example(const Vertex_skinning_example&) = delete;
 
@@ -47,6 +51,8 @@ private:
 
 	void init_geometry();
 
+	void init_render_states();
+
 	void init_shaders();
 
 	void setup_pipeline_state();
@@ -64,6 +70,9 @@ private:
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
 	Com_ptr<ID3D11SamplerState> _linear_sampler_state;
+	// renderer state
+	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
 	std::vector<Draw_indexed_params> _draw_indexed_params;
 	std::unique_ptr<Model_animation> _model_animation;

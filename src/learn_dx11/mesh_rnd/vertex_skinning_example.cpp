@@ -12,16 +12,18 @@ using cg::mat4;
 namespace learn_dx11 {
 namespace mesh_rnd {
 
-Vertex_skinning_example::Vertex_skinning_example(Render_context_old& rnd_ctx) :
-	Example(rnd_ctx)
+Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx) 
+	: Example(rnd_ctx)
 {
 	init_cbuffers();
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
+	init_render_states();
 	
 	_view_matrix = cg::view_matrix(float3(0, 2, 8.0f), float3::zero);
-	update_projection_matrix(rnd_ctx.pipeline_state().viewport_size().aspect_ratio());
+	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
 	update_projection_view_matrices();
+
 	setup_pipeline_state();
 }
 
@@ -153,6 +155,25 @@ void Vertex_skinning_example::init_draw_indexed_params(
 	assert(hr == S_OK);
 }
 
+void Vertex_skinning_example::init_render_states()
+{
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	depth_stencil_desc.DepthEnable = true;
+	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+
+	D3D11_RASTERIZER_DESC rasterizer_desc = {};
+	rasterizer_desc.FillMode = D3D11_FILL_SOLID;
+	rasterizer_desc.CullMode = D3D11_CULL_BACK;
+	rasterizer_desc.FrontCounterClockwise = true;
+
+	hr = _device->CreateRasterizerState(&rasterizer_desc, &_rasterizer_state.ptr);
+	assert(hr == S_OK);
+}
+
 void Vertex_skinning_example::init_shaders()
 {
 	auto hlsl_data = cg::data::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/vertex_skinning.hlsl");
@@ -183,6 +204,12 @@ void Vertex_skinning_example::setup_pipeline_state()
 
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetSamplers(0, 1, &_linear_sampler_state.ptr);
+
+	// rasterizer stage
+	_device_ctx->RSSetState(_rasterizer_state.ptr);
+
+	// output merger stage
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 1);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);

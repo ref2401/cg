@@ -170,7 +170,7 @@ void Application::on_window_resize(const uint2& window_size)
 void Application::run_main_loop()
 {
 	using Time_point_t = std::chrono::high_resolution_clock::time_point;
-	using Duration_milliseconds_t = std::chrono::duration<std::chrono::milliseconds::rep, std::milli>;
+	using Duration_microseconds_t = std::chrono::duration<std::chrono::microseconds::rep, std::micro>;
 
 	Time_point_t prev_frame_time;
 	Time_point_t curr_frame_time = std::chrono::high_resolution_clock::now();
@@ -181,10 +181,10 @@ void Application::run_main_loop()
 
 		prev_frame_time = curr_frame_time;
 		curr_frame_time = std::chrono::high_resolution_clock::now();
-		Duration_milliseconds_t dt = std::chrono::duration_cast<Duration_milliseconds_t>(
+		Duration_microseconds_t dt = std::chrono::duration_cast<Duration_microseconds_t>(
 			curr_frame_time - prev_frame_time);
 		
-		_example->update(float(dt.count()));
+		_example->update(dt.count() / 1000.0f);
 		_example->render();
 		_rnd_ctx->swap_color_buffers();
 	}
