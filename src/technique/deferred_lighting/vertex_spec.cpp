@@ -21,7 +21,7 @@ Static_vertex_spec::Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_bindi
 	_vertex_buffer(std::move(vertex_buffer)),
 	_index_buffer(std::move(index_buffer))
 {
-	assert(vao_id != Invalid::vao_id);
+	assert(vao_id != Blank::vao_id);
 }
 Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept 
 	: _vao_id(spec._vao_id),
@@ -29,7 +29,7 @@ Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept
 	_vertex_buffer(std::move(spec._vertex_buffer)),
 	_index_buffer(std::move(spec._index_buffer))
 {
-	spec._vao_id = Invalid::vao_id;
+	spec._vao_id = Blank::vao_id;
 	spec._vertex_buffer_binding_index = 0;
 }
 
@@ -38,7 +38,7 @@ Static_vertex_spec::~Static_vertex_spec() noexcept
 {
 	dispose();
 
-	_vao_id = Invalid::vao_id;
+	_vao_id = Blank::vao_id;
 	_vertex_buffer_binding_index = 0;
 }
 
@@ -53,7 +53,7 @@ Static_vertex_spec& Static_vertex_spec::operator=(Static_vertex_spec&& spec) noe
 	_vertex_buffer = std::move(spec._vertex_buffer);
 	_index_buffer = std::move(spec._index_buffer);
 
-	spec._vao_id = Invalid::vao_id;
+	spec._vao_id = Blank::vao_id;
 	spec._vertex_buffer_binding_index = 0;
 
 	return *this;
@@ -61,9 +61,9 @@ Static_vertex_spec& Static_vertex_spec::operator=(Static_vertex_spec&& spec) noe
 
 void Static_vertex_spec::dispose() noexcept
 {
-	if (_vao_id != Invalid::vao_id) {
+	if (_vao_id != Blank::vao_id) {
 		glDeleteVertexArrays(1, &_vao_id);
-		_vao_id = Invalid::vao_id;
+		_vao_id = Blank::vao_id;
 	}
 }
 
@@ -97,7 +97,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 	glVertexArrayVertexBuffer(_vao_id, 0, vertex_buffer.id(), vb_binding_index, _format_desc.vertex_byte_count);
 
 	// position
-	assert(attrib_layout.position_location != Invalid::vertex_attrib_location);
+	assert(attrib_layout.position_location != Blank::vertex_attrib_location);
 	glEnableVertexArrayAttrib(_vao_id, attrib_layout.position_location);
 	glVertexArrayAttribBinding(_vao_id, attrib_layout.position_location, vb_binding_index);
 	glVertexArrayAttribFormat(_vao_id, attrib_layout.position_location,
@@ -105,7 +105,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 
 	// normal
 	if (has_normal(_format_desc.attribs)) {
-		assert(attrib_layout.normal_location != Invalid::vertex_attrib_location);
+		assert(attrib_layout.normal_location != Blank::vertex_attrib_location);
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.normal_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.normal_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.normal_location,
@@ -114,7 +114,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 
 	// tex_coord
 	if (has_tex_coord(_format_desc.attribs)) {
-		assert(attrib_layout.tex_coord_location != Invalid::vertex_attrib_location);
+		assert(attrib_layout.tex_coord_location != Blank::vertex_attrib_location);
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tex_coord_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.tex_coord_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.tex_coord_location,
@@ -123,7 +123,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 
 	// tangent_h
 	if (has_tangent_space(_format_desc.attribs)) {
-		assert(attrib_layout.tangent_h_location != Invalid::vertex_attrib_location);
+		assert(attrib_layout.tangent_h_location != Blank::vertex_attrib_location);
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tangent_h_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.tangent_h_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.tangent_h_location,
@@ -133,10 +133,10 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer.id());
 
 	if (unbind_vao)
-		glBindVertexArray(Invalid::vao_id);
+		glBindVertexArray(Blank::vao_id);
 
 	GLuint vao_id_temp = _vao_id;
-	_vao_id = Invalid::vao_id; // this ends building process
+	_vao_id = Blank::vao_id; // this ends building process
 	return Static_vertex_spec(vao_id_temp, vb_binding_index,
 		std::move(vertex_buffer), std::move(index_buffer));
 }

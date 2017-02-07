@@ -46,12 +46,17 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../data/common_data/rect-1x1.obj");
 	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/gbuffer_pass");
+	config.gbuffer_pass_code.name = "gbuffer-pass-shader";
 	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.lighting_pass_dir_code.name = "lighting-pass-dir-shader";
 	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/shadow_map_pass");
+	config.shadow_map_pass_code.name = "shadow-map-pass-shader";
 	config.ssao_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/ssao_pass");
+	config.ssao_pass_code.name = "ssao-pass-shader";
 	config.material_lighting_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/material_pass");
+	config.material_lighting_pass_code.name = "material-pass-shader";
 	config.tone_mapping_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/tone_mapping_pass");
-
+	config.tone_mapping_pass_code.name = "tone-mapping-pass-shader";
 	return config;
 }
 
@@ -70,9 +75,9 @@ Material::Material(float smoothness, Texture_2d_immut tex_diffuse_rgb,
 	tex_specular_intensity(std::move(tex_specular_intensity))
 {
 	assert(this->smoothness >= 0.0f);
-	assert(this->tex_diffuse_rgb.id() != Invalid::texture_id);
-	assert(this->tex_normal_map.id() != Invalid::texture_id);
-	assert(this->tex_specular_intensity.id() != Invalid::texture_id);
+	assert(this->tex_diffuse_rgb.id() != Blank::texture_id);
+	assert(this->tex_normal_map.id() != Blank::texture_id);
+	assert(this->tex_specular_intensity.id() != Blank::texture_id);
 }
 
 // ----- Material_library -----

@@ -104,7 +104,7 @@ void Gbuffer_pass::end() noexcept
 {
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 }
 
 void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
@@ -116,7 +116,7 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
-		glBindSampler(curr_unit, Invalid::sampler_id);
+		glBindSampler(curr_unit, Blank::sampler_id);
 		glBindTextureUnit(curr_unit, uniform_array_tex_normal_map[rnd_offset + curr_unit]);
 	}
 }
@@ -148,7 +148,7 @@ void Lighting_pass::begin() noexcept
 
 void Lighting_pass::end() noexcept
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 }
 
 void Lighting_pass::perform_directional_light_pass(const std::array<float3, 4>& far_plane_coords, 
@@ -207,10 +207,10 @@ void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& vi
 void Material_lighting_pass::end() noexcept
 {
 	glDisable(GL_CULL_FACE);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 
 	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//glBlitNamedFramebuffer(_fbo.id(), Blank::framebuffer_id,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -226,8 +226,8 @@ void Material_lighting_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_co
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
 		// 13 - the size of every uniform array of sampler2D (material_pass.pixel.glsl)
-		glBindSampler(curr_unit, Invalid::sampler_id);
-		glBindSampler(curr_unit + 13, Invalid::sampler_id);
+		glBindSampler(curr_unit, Blank::sampler_id);
+		glBindSampler(curr_unit + 13, Blank::sampler_id);
 		glBindTextureUnit(curr_unit, uniform_array_tex_diffuse_rgb[rnd_offset + curr_unit]);
 		glBindTextureUnit(curr_unit + 13, uniform_array_tex_specular_intensity[rnd_offset + curr_unit]);
 	}
@@ -268,7 +268,7 @@ void Shadow_map_pass::end() noexcept
 
 	filter_shadow_map();
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 }
 
 void Shadow_map_pass::filter_shadow_map() noexcept
@@ -332,10 +332,10 @@ void Ssao_pass::perform() noexcept
 	filter_ssao_map();
 	
 	// end
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 
 	//_fbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-	//glBlitNamedFramebuffer(_fbo.id(), Invalid::framebuffer_id,
+	//glBlitNamedFramebuffer(_fbo.id(), Blank::framebuffer_id,
 	//	0, 0, _gbuffer.tex_ssao_map().size().width, _gbuffer.tex_ssao_map().size().height,
 	//	0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height,
 	//	GL_COLOR_BUFFER_BIT, GL_LINEAR);

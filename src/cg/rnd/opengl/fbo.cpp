@@ -7,7 +7,7 @@ namespace {
 
 void validate_framebuffer(GLuint id, GLenum target)
 {
-	assert(id != cg::rnd::opengl::Invalid::framebuffer_id);
+	assert(id != cg::rnd::opengl::Blank::framebuffer_id);
 	assert(target == GL_FRAMEBUFFER
 		|| target == GL_READ_FRAMEBUFFER
 		|| target == GL_DRAW_FRAMEBUFFER);
@@ -47,7 +47,7 @@ Renderbuffer::Renderbuffer(Renderbuffer&& rnd_buff) noexcept
 	_internal_format(rnd_buff._internal_format),
 	_size(rnd_buff._size)
 {
-	rnd_buff._id = Invalid::renderbuffer_id;
+	rnd_buff._id = Blank::renderbuffer_id;
 	rnd_buff._internal_format = GL_NONE;
 	rnd_buff._size = uint2::zero;
 }
@@ -66,7 +66,7 @@ Renderbuffer& Renderbuffer::operator=(Renderbuffer&& rnd_buff) noexcept
 	_internal_format = rnd_buff._internal_format;
 	_size = rnd_buff._size;
 
-	rnd_buff._id = Invalid::renderbuffer_id;
+	rnd_buff._id = Blank::renderbuffer_id;
 	rnd_buff._internal_format = GL_NONE;
 	rnd_buff._size = uint2::zero;
 	return *this;
@@ -74,17 +74,17 @@ Renderbuffer& Renderbuffer::operator=(Renderbuffer&& rnd_buff) noexcept
 
 void Renderbuffer::dispose() noexcept
 {
-	if (_id = Invalid::renderbuffer_id) return;
+	if (_id = Blank::renderbuffer_id) return;
 
 	glDeleteRenderbuffers(1, &_id);
-	_id = Invalid::renderbuffer_id;
+	_id = Blank::renderbuffer_id;
 	_internal_format = GL_NONE;
 	_size = uint2::zero;
 }
 
 void Renderbuffer::reallocate_storage(GLenum internal_format, const uint2& size) noexcept
 {
-	assert(_id != Invalid::renderbuffer_id);
+	assert(_id != Blank::renderbuffer_id);
 	assert(is_valid_texture_internal_format(internal_format));
 	assert(greater_than(size, 0));
 
@@ -111,7 +111,7 @@ Framebuffer::Framebuffer() noexcept
 Framebuffer::Framebuffer(Framebuffer&& fb) noexcept 
 	: _id(fb._id)
 {
-	fb._id = Invalid::framebuffer_id;
+	fb._id = Blank::framebuffer_id;
 }
 
 Framebuffer::~Framebuffer() noexcept
@@ -127,16 +127,16 @@ Framebuffer& Framebuffer::operator=(Framebuffer&& fb) noexcept
 
 	_id = fb._id;
 
-	fb._id = Invalid::framebuffer_id;
+	fb._id = Blank::framebuffer_id;
 
 	return *this;
 }
 
 void Framebuffer::attach_color_target(GLenum color_attachment, const Texture_2d_i& texture, GLuint mipmap_index) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
+	assert(_id != Blank::framebuffer_id);
 	assert(is_valid_color_attachment(color_attachment));
-	assert(texture.id() != Invalid::texture_id);
+	assert(texture.id() != Blank::texture_id);
 	assert(mipmap_index < texture.mipmap_level_count());
 
 	glNamedFramebufferTexture(_id, color_attachment, texture.id(), mipmap_index);
@@ -144,16 +144,16 @@ void Framebuffer::attach_color_target(GLenum color_attachment, const Texture_2d_
 
 void Framebuffer::attach_depth_target(const Renderbuffer& rnd_buff) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
-	assert(rnd_buff.id() != Invalid::renderbuffer_id);
+	assert(_id != Blank::framebuffer_id);
+	assert(rnd_buff.id() != Blank::renderbuffer_id);
 
 	glNamedFramebufferRenderbuffer(_id, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rnd_buff.id());
 }
 
 void Framebuffer::attach_depth_target(const Texture_2d_i& texture, GLuint mipmap_index) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
-	assert(texture.id() != Invalid::texture_id);
+	assert(_id != Blank::framebuffer_id);
+	assert(texture.id() != Blank::texture_id);
 	assert(mipmap_index < texture.mipmap_level_count());
 
 	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, texture.id(), mipmap_index);
@@ -161,29 +161,29 @@ void Framebuffer::attach_depth_target(const Texture_2d_i& texture, GLuint mipmap
 
 void Framebuffer::detach_color_target(GLenum color_attachment) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
+	assert(_id != Blank::framebuffer_id);
 	assert(is_valid_color_attachment(color_attachment));
-	glNamedFramebufferTexture(_id, color_attachment, Invalid::texture_id, 0);
+	glNamedFramebufferTexture(_id, color_attachment, Blank::texture_id, 0);
 }
 
 void Framebuffer::detach_depth_target() noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
-	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, Invalid::texture_id, 0);
-	glNamedFramebufferRenderbuffer(_id, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, Invalid::renderbuffer_id);
+	assert(_id != Blank::framebuffer_id);
+	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, Blank::texture_id, 0);
+	glNamedFramebufferRenderbuffer(_id, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, Blank::renderbuffer_id);
 }
 
 void Framebuffer::dispose() noexcept
 {
-	if (_id == Invalid::framebuffer_id) return;
+	if (_id == Blank::framebuffer_id) return;
 
 	glDeleteFramebuffers(1, &_id);
-	_id = Invalid::framebuffer_id;
+	_id = Blank::framebuffer_id;
 }
 
 void Framebuffer::set_draw_buffer(GLenum buff) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
+	assert(_id != Blank::framebuffer_id);
 	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
 
 	glNamedFramebufferDrawBuffer(_id, buff);
@@ -207,7 +207,7 @@ void Framebuffer::set_draw_buffers(GLenum loc0, GLenum loc1, GLenum loc2, GLenum
 
 void Framebuffer::set_read_buffer(GLenum buff) noexcept
 {
-	assert(_id != Invalid::framebuffer_id);
+	assert(_id != Blank::framebuffer_id);
 	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
 	
 	glNamedFramebufferReadBuffer(_id, buff);
@@ -215,7 +215,7 @@ void Framebuffer::set_read_buffer(GLenum buff) noexcept
 
 void Framebuffer::validate() const
 {
-	assert(_id != Invalid::framebuffer_id);
+	assert(_id != Blank::framebuffer_id);
 
 	validate_framebuffer(_id, GL_DRAW_FRAMEBUFFER);
 	validate_framebuffer(_id, GL_READ_FRAMEBUFFER);

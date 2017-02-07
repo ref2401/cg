@@ -32,34 +32,42 @@ public:
 		Glsl_compute_desc cd0;
 		Assert::IsTrue(cd0.compute_shader_source_code.empty());
 
+		std::string name = "cs-name";
 		std::string compute_srt = "abc";
-		Glsl_compute_desc cd1(compute_srt);
+		Glsl_compute_desc cd1(name, compute_srt);
+		Assert::AreEqual(name, cd1.name);
 		Assert::AreEqual(compute_srt, cd1.compute_shader_source_code);
 
-		Glsl_compute_desc cd2("abc");
-		Assert::AreEqual("abc", cd2.compute_shader_source_code.c_str());
+		Glsl_compute_desc cd2(name.c_str(), compute_srt.c_str());
+		Assert::AreEqual(name.c_str(), cd2.name.c_str());
+		Assert::AreEqual(compute_srt.c_str(), cd2.compute_shader_source_code.c_str());
 
 		// copy ctor
 		Glsl_compute_desc cd_c = cd2;
+		Assert::AreEqual(cd2.name, cd_c.name);
 		Assert::AreEqual(cd2.compute_shader_source_code, cd_c.compute_shader_source_code);
 
 		// move ctor
 		Glsl_compute_desc cd_m = std::move(cd_c);
+		Assert::AreEqual(cd2.name, cd_m.name);
 		Assert::AreEqual(cd2.compute_shader_source_code, cd_m.compute_shader_source_code);
+		Assert::IsTrue(cd_c.name.empty());
 		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
 	}
 
 	TEST_METHOD(assignments)
 	{
-		Glsl_compute_desc cd("abc");
+		Glsl_compute_desc cd("cs-name", "abc");
 
 		Glsl_compute_desc cd_c;
 		cd_c = cd;
+		Assert::AreEqual(cd.name, cd_c.name);
 		Assert::AreEqual(cd.compute_shader_source_code, cd_c.compute_shader_source_code);
 
 		Glsl_compute_desc cd_m;
 		cd_m = std::move(cd_c);
 		Assert::AreEqual(cd.compute_shader_source_code, cd_m.compute_shader_source_code);
+		Assert::IsTrue(cd_c.name.empty());
 		Assert::IsTrue(cd_c.compute_shader_source_code.empty());
 	}
 };
@@ -73,6 +81,7 @@ public:
 		Assert::IsTrue(pd0.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd0.fragment_shader_source_code.empty());
 
+		pd0.name = "awesome-shader-name";
 		pd0.vertex_shader_source_code = "abc";
 		pd0.fragment_shader_source_code = "123";
 		pd0.transform_feedback.varying_names.push_back("out_var_0");
@@ -80,12 +89,14 @@ public:
 
 		// copy ctor
 		Glsl_program_desc pd_c = pd0;
+		Assert::AreEqual(pd0.name, pd_c.name);
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_c.fragment_shader_source_code);
 		Assert::AreEqual(pd0.transform_feedback, pd_c.transform_feedback);
 
 		// move ctor
 		Glsl_program_desc pd_m = std::move(pd_c);
+		Assert::AreEqual(pd0.name, pd_m.name);
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_m.fragment_shader_source_code);
 		Assert::AreEqual(pd0.transform_feedback, pd_m.transform_feedback);
@@ -98,6 +109,7 @@ public:
 	TEST_METHOD(assignments)
 	{
 		Glsl_program_desc pd;
+		pd.name = "awesome-shader-name";
 		pd.vertex_shader_source_code = "abc";
 		pd.fragment_shader_source_code = "123";
 		pd.transform_feedback.varying_names.push_back("out_var_0");
@@ -105,12 +117,14 @@ public:
 
 		Glsl_program_desc pd_c;
 		pd_c = pd;
+		Assert::AreEqual(pd.name, pd_c.name);
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_c.fragment_shader_source_code);
 		Assert::AreEqual(pd.transform_feedback, pd_c.transform_feedback);
 
 		Glsl_program_desc pd_m;
 		pd_m = std::move(pd_c);
+		Assert::AreEqual(pd.name, pd_m.name);
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_m.fragment_shader_source_code);
 		Assert::AreEqual(pd.transform_feedback, pd_m.transform_feedback);

@@ -89,7 +89,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::buffer_id;
+	GLuint _id = Blank::buffer_id;
 	size_t _byte_count = 0;
 	size_t _curr_byte_count = 0;
 };
@@ -139,7 +139,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::buffer_id;
+	GLuint _id = Blank::buffer_id;
 	size_t _byte_count = 0;
 };
 
@@ -191,7 +191,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::buffer_id;
+	GLuint _id = Blank::buffer_id;
 	size_t _byte_count = 0;
 	void* _ptr = nullptr;
 };

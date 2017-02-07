@@ -336,9 +336,9 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
 	}
 
-	glBindTextureUnit(0, Invalid::texture_id);
-	glBindTextureUnit(1, Invalid::texture_id);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Invalid::framebuffer_id);
+	glBindTextureUnit(0, Blank::texture_id);
+	glBindTextureUnit(1, Blank::texture_id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Blank::framebuffer_id);
 
 	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
@@ -364,7 +364,7 @@ void Opaque_model_pass::perform(const Geometry_buffers& geometry_buffers, const 
 			GL_UNSIGNED_INT, nullptr, geometry_buffers.meshes()[mi].base_vertex);
 	}
 
-	glBindTextureUnit(0, Invalid::texture_id);
+	glBindTextureUnit(0, Blank::texture_id);
 
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -388,7 +388,7 @@ void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers,
 		glDrawArrays(GL_POINTS, 0, geometry_buffers.vertex_count());
 	glEndTransformFeedback();
 	
-	glBindVertexArray(Invalid::vao_id);
+	glBindVertexArray(Blank::vao_id);
 	geometry_buffers.swap_physics_source_dest_buffers();
 	
 	glDisable(GL_RASTERIZER_DISCARD);
@@ -410,10 +410,10 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 	glDrawArrays(GL_LINES, 0, 4 * geometry_buffers.vertex_count());
 
 	glDisable(GL_DEPTH_TEST);
-	glBindTextureUnit(0, Invalid::texture_id);
-	glBindTextureUnit(1, Invalid::texture_id);
-	glBindTextureUnit(2, Invalid::texture_id);
-	glBindVertexArray(Invalid::vao_id);
+	glBindTextureUnit(0, Blank::texture_id);
+	glBindTextureUnit(1, Blank::texture_id);
+	glBindTextureUnit(2, Blank::texture_id);
+	glBindVertexArray(Blank::vao_id);
 }
 
 // ----- Fur_simulation_opengl_example -----

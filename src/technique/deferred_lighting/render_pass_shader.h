@@ -52,11 +52,11 @@ public:
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_smoothness_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_normal_map_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_projection_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_view_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_smoothness_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_tex_normal_map_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 class Lighting_pass_dir_shader_program final {
@@ -77,11 +77,11 @@ public:
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_arr_far_pane_coords_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_direction_to_light_vs_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_irradiance_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_ambient_irradiance_up_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dlight_ambient_irradiance_down_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_arr_far_pane_coords_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dlight_direction_to_light_vs_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dlight_irradiance_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dlight_ambient_irradiance_up_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dlight_ambient_irradiance_down_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 class Material_lighting_pass_shader_program final {
@@ -103,13 +103,13 @@ public:
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_dir_light_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_diffuse_rgb_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_tex_specular_intensity_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_projection_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_view_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dir_light_projection_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_dir_light_view_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_tex_diffuse_rgb_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_tex_specular_intensity_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 class Shadow_map_pass_shader_program final {
@@ -130,9 +130,9 @@ public:
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_projection_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_view_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_projection_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_view_matrix_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_model_matrix_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 class Ssao_pass_shader_program final {
@@ -152,8 +152,8 @@ public:
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_arr_sample_ray_location = cg::rnd::opengl::Invalid::uniform_location;
-	GLint _u_arr_random_normal_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_arr_sample_ray_location = cg::rnd::opengl::Blank::uniform_location;
+	GLint _u_arr_random_normal_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 class Tone_mapping_pass_shader_program final {

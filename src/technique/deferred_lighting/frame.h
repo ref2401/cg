@@ -180,7 +180,7 @@ private:
 	size_t _offset_draw_indirect = 0;
 
 	// future Frame_packet stuff:
-	GLuint _vao_id = cg::rnd::opengl::Invalid::vao_id;
+	GLuint _vao_id = cg::rnd::opengl::Blank::vao_id;
 	size_t _renderable_count;
 	std::vector<float> _uniform_array_model_matrix;
 	std::vector<float> _uniform_array_smoothness;

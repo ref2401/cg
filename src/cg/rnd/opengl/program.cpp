@@ -13,34 +13,36 @@ namespace opengl {
 
 // ----- Glsl_program -----
 
-Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_compute_desc& compute_data)
-	: _name(name)
+Glsl_program::Glsl_program(const cg::data::Glsl_compute_desc& compute_desc)
+	: _name(compute_desc.name)
 {
-	assert(!name.empty());
-	assert(!compute_data.compute_shader_source_code.empty());
+	assert(!compute_desc.name.empty());
+	assert(!compute_desc.compute_shader_source_code.empty());
 
 	try {
-		Glsl_shader shader(GL_COMPUTE_SHADER, compute_data.compute_shader_source_code);
+		Glsl_shader shader(GL_COMPUTE_SHADER, compute_desc.compute_shader_source_code);
 
 		_id = glCreateProgram();
 		glAttachShader(_id, shader.id());
-		glLinkProgram(_id);
-		glDetachShader(_id, shader.id()); // once shaders have been linked into a program they are no longer needed.
+
+		link(*this);
+		validate(*this);
+
+		// once shaders have been linked into a program they are no longer needed.
+		glDetachShader(_id, shader.id()); 
 	}
 	catch (...) {
-		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
+		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' compute shader program.");
 
 		dispose();
 		std::throw_with_nested(std::runtime_error(exc_msg));
 	}
-
-	validate();
 }
 
-Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_desc)
-	: _name(name)
+Glsl_program::Glsl_program(const cg::data::Glsl_program_desc& prog_desc)
+	: _name(prog_desc.name)
 {
-	assert(!name.empty());
+	assert(!prog_desc.name.empty());
 	assert(prog_desc.has_vertex_shader());
 
 	try {
@@ -75,7 +77,8 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 			delete[] varying_names;
 		}
 
-		glLinkProgram(_id);
+		link(*this);
+		validate(*this);
 
 		// once shaders have been linked into a program they are no longer needed.
 		glDetachShader(_id, vertex_shader.id());
@@ -87,15 +90,13 @@ Glsl_program::Glsl_program(const std::string& name, const cg::data::Glsl_program
 		dispose();
 		std::throw_with_nested(std::runtime_error(exc_msg));
 	}
-
-	validate();
 }
 
 Glsl_program::Glsl_program(Glsl_program&& prog) noexcept
 	: _id(prog._id),
 	_name(std::move(prog._name))
 {
-	prog._id = Invalid::glsl_program_id;
+	prog._id = Blank::program_id;
 }
 
 Glsl_program::~Glsl_program() noexcept
@@ -111,96 +112,18 @@ Glsl_program& Glsl_program::operator=(Glsl_program&& prog) noexcept
 	_id = prog._id;
 	_name = std::move(prog._name);
 
-	prog._id = Invalid::glsl_program_id;
+	prog._id = Blank::program_id;
 
 	return *this;
 }
 
 void Glsl_program::dispose() noexcept
 {
-	if (_id == Invalid::glsl_program_id) return;
+	if (_id == Blank::program_id) return;
 
 	glDeleteProgram(_id);
-	_id = Invalid::glsl_program_id;
+	_id = Blank::program_id;
 	_name.clear();
-}
-
-GLint Glsl_program::get_property(GLenum prop) const noexcept
-{
-	assert(_id != Invalid::glsl_program_id);
-	assert(is_valid_program_property(prop));
-
-	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
-	glGetProgramiv(_id, prop, &v);
-	assert(v != -1);
-
-	return v;
-}
-
-GLint Glsl_program::get_uniform_location(const std::string& uniform_name) const
-{
-	return get_uniform_location(uniform_name.c_str());
-}
-
-GLint Glsl_program::get_uniform_location(const char* uniform_name) const
-{
-	assert(_id != Invalid::glsl_program_id);
-	assert(uniform_name);
-
-	GLint location = glGetUniformLocation(_id, uniform_name);
-	ENFORCE(location != Invalid::uniform_location,
-		"Shader program '", _name, "' does not have a uniform called '", uniform_name, "'.");
-
-	return location;
-}
-
-bool Glsl_program::linked() const noexcept
-{
-	assert(_id != Invalid::glsl_program_id);
-	return get_property(GL_LINK_STATUS) != 0;
-}
-
-std::string Glsl_program::log() const noexcept
-{
-	assert(_id != Invalid::glsl_program_id);
-
-	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
-	if (log_size == 0) return {};
-
-	GLsizei actual_size;
-	char* msg_buffer = new char[log_size];
-	glGetProgramInfoLog(_id, log_size, &actual_size, msg_buffer);
-
-	std::string msg(msg_buffer, actual_size);
-	delete[] msg_buffer;
-
-	return msg;
-}
-
-bool Glsl_program::valid() const noexcept
-{
-	assert(_id != Invalid::glsl_program_id);
-	return get_property(GL_VALIDATE_STATUS) != 0;
-}
-
-void Glsl_program::validate()
-{
-	if (!linked()) {
-		std::string msg_log = log();
-		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '", _name, "'.\n", msg_log);
-
-		dispose();
-		throw std::runtime_error(exc_msg);
-	}
-
-	glValidateProgram(_id);
-	if (!valid()) {
-		std::string msg_log = log();
-		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '", _name, "'.\n", msg_log);
-
-		dispose();
-		throw std::runtime_error(exc_msg);
-	}
 }
 
 // ----- Glsl_shader -----
@@ -215,7 +138,7 @@ Glsl_shader::Glsl_shader(GLenum type, const std::string& source_code)
 	const char* source_ptr = source_code.c_str();
 	glShaderSource(_id, 1, &source_ptr, nullptr);
 	glCompileShader(_id);
-	if (compiled()) return; // The compilation succeeded.
+	if (compile_status(*this)) return; // The compilation succeeded.
 
 
 	// Glsl_shader compilation error handling
@@ -234,7 +157,7 @@ Glsl_shader::Glsl_shader(GLenum type, const std::string& source_code)
 			break;
 	}
 		
-	std::string log_msg = log();
+	std::string log_msg = info_log(*this);
 	std::string exc_msg = EXCEPTION_MSG(type_name, " shader compilation error.\n", log_msg);
 
 	dispose();
@@ -245,7 +168,7 @@ Glsl_shader::Glsl_shader(Glsl_shader&& shader) noexcept
 	: _id(shader._id),
 	_type(shader._type)
 {
-	shader._id = Invalid::shader_id;
+	shader._id = Blank::shader_id;
 	shader._type = GL_NONE;
 }
 
@@ -262,56 +185,60 @@ Glsl_shader& Glsl_shader::operator=(Glsl_shader&& shader) noexcept
 	_id = shader._id;
 	_type = shader._type;
 
-	shader._id = Invalid::shader_id;
+	shader._id = Blank::shader_id;
 	shader._type = GL_NONE;
 
 	return *this;
 }
 
-bool Glsl_shader::compiled() const noexcept
-{
-	return get_property(GL_COMPILE_STATUS) == 1;
-}
-
 void Glsl_shader::dispose() noexcept
 {
-	if (_id == Invalid::shader_id) return;
+	if (_id == Blank::shader_id) return;
 
 	glDeleteShader(_id);
-	_id = Invalid::shader_id;
+	_id = Blank::shader_id;
 	_type = GL_NONE;
 }
 
-GLint Glsl_shader::get_property(GLenum prop) const noexcept
+// ----- funcs -----
+
+bool compile_status(const Glsl_shader& shader) noexcept
 {
-	assert(_id != Invalid::shader_id);
-	assert(is_valid_shader_property(prop));
-
-	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
-	glGetShaderiv(_id, prop, &v);
-	assert(v != -1);
-
-	return v;
+	assert(shader.id() != Blank::shader_id);
+	return parameter(shader, GL_COMPILE_STATUS) != 0;
 }
 
-std::string Glsl_shader::log() const noexcept
+std::string info_log(const Glsl_program& program) noexcept
 {
-	assert(_id != Invalid::shader_id);
+	assert(program.id() != Blank::program_id);
 
-	GLint log_size = get_property(GL_INFO_LOG_LENGTH);
-	if (log_size == 0) return {};
+	GLint length = parameter(program, GL_INFO_LOG_LENGTH);
+	if (length == 0) return{};
 
-	GLsizei actual_size;
-	char* msg_buffer = new char[log_size];
-	glGetShaderInfoLog(_id, log_size, &actual_size, msg_buffer);
-
-	std::string msg(msg_buffer, actual_size);
+	GLsizei actual_length;
+	char* msg_buffer = new char[length];
+	glGetProgramInfoLog(program.id(), length, &actual_length, msg_buffer);
+	std::string msg(msg_buffer, actual_length);
 	delete[] msg_buffer;
 
 	return msg;
 }
 
-// ----- funcs -----
+std::string info_log(const Glsl_shader& shader) noexcept
+{
+	assert(shader.id() != Blank::shader_id);
+
+	GLint length = parameter(shader, GL_INFO_LOG_LENGTH);
+	if (length == 0) return{};
+
+	GLsizei actual_length = 0;
+	char* msg_buffer = new char[length];
+	glGetShaderInfoLog(shader.id(), length, &actual_length, msg_buffer);
+	std::string msg(msg_buffer, actual_length);
+	delete[] msg_buffer;
+
+	return msg;
+}
 
 bool is_valid_program_property(GLenum value) noexcept
 {
@@ -337,45 +264,117 @@ bool is_valid_shader_type(GLenum value) noexcept
 		|| (value == GL_COMPUTE_SHADER);
 }
 
+bool is_valid_program_parameter(GLenum pname) noexcept
+{
+	return pname == GL_ACTIVE_ATTRIBUTES
+		|| pname == GL_ACTIVE_ATTRIBUTE_MAX_LENGTH
+		|| pname == GL_ACTIVE_UNIFORM_BLOCKS
+		|| pname == GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH
+		|| pname == GL_ACTIVE_UNIFORMS
+		|| pname == GL_ACTIVE_UNIFORM_MAX_LENGTH
+		|| pname == GL_ATTACHED_SHADERS
+		|| pname == GL_DELETE_STATUS
+		|| pname == GL_INFO_LOG_LENGTH
+		|| pname == GL_LINK_STATUS
+		|| pname == GL_PROGRAM_BINARY_RETRIEVABLE_HINT
+		|| pname == GL_TRANSFORM_FEEDBACK_BUFFER_MODE
+		|| pname == GL_TRANSFORM_FEEDBACK_VARYINGS
+		|| pname == GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH
+		|| pname == GL_VALIDATE_STATUS;
+}
+
+bool is_valid_shader_parameter(GLenum pname) noexcept
+{
+	return pname == GL_SHADER_TYPE
+		|| pname == GL_DELETE_STATUS
+		|| pname == GL_COMPILE_STATUS
+		|| pname == GL_INFO_LOG_LENGTH
+		|| pname == GL_SHADER_SOURCE_LENGTH;
+}
+
+void link(const Glsl_program& program)
+{
+	assert(program.id() != Blank::program_id);
+
+	glLinkProgram(program.id());
+	if (!link_status(program)) {
+		std::string msg_log = info_log(program);
+		std::string exc_msg = EXCEPTION_MSG("Program linkage failed. '",
+			program.name(), "'.\n", msg_log);
+
+		throw std::runtime_error(exc_msg);
+	}
+}
+
+bool link_status(const Glsl_program& program) noexcept
+{
+	assert(program.id());
+	return parameter(program, GL_LINK_STATUS) != 0;
+}
+
+GLint parameter(const Glsl_program& program, GLenum pname) noexcept
+{
+	assert(program.id() != Blank::program_id);
+	assert(is_valid_program_parameter(pname));
+
+	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
+	glGetProgramiv(program.id(), pname, &v);
+	assert(v != -1);
+
+	return v;
+}
+
+GLint parameter(const Glsl_shader& shader, GLenum pname) noexcept
+{
+	assert(shader.id() != Blank::shader_id);
+	assert(is_valid_shader_parameter(pname));
+
+	GLint v = -1; // opengl: If an error is generated, no change is made to the contents of value.
+	glGetShaderiv(shader.id(), pname, &v);
+	assert(v != -1);
+
+	return v;
+}
+
 void set_uniform(GLint location, unsigned int val) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform1ui(location, val);
 }
 
 void set_uniform(GLint location, float val) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform1f(location, val);
 }
 
 void set_uniform(GLint location, const uint2& v) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform2ui(location, v.x, v.y);
 }
 
 void set_uniform(GLint location, const float2& v) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform2f(location, v.x, v.y);
 }
 
 void set_uniform(GLint location, const float3& v) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform3f(location, v.x, v.y, v.z);
 }
 
 void set_uniform(GLint location, const float4& v) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	glUniform4f(location, v.x, v.y, v.z, v.w);
 }
 
 void set_uniform(GLint location, const mat3& mat) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 
 	float arr[9];
 	to_array_column_major_order(mat, arr);
@@ -384,7 +383,7 @@ void set_uniform(GLint location, const mat3& mat) noexcept
 
 void set_uniform(GLint location, const mat4& mat) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 
 	float arr[16];
 	to_array_column_major_order(mat, arr);
@@ -393,7 +392,7 @@ void set_uniform(GLint location, const mat4& mat) noexcept
 
 void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	glUniform1iv(location, count, ptr);
@@ -401,7 +400,7 @@ void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexc
 
 void set_uniform_array_float(GLint location, const float* ptr, size_t count) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	glUniform1fv(location, count, ptr);
@@ -409,7 +408,7 @@ void set_uniform_array_float(GLint location, const float* ptr, size_t count) noe
 
 void set_uniform_array_float3(GLint location, const float* ptr, size_t count) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	glUniform3fv(location, count, ptr);
@@ -417,7 +416,7 @@ void set_uniform_array_float3(GLint location, const float* ptr, size_t count) no
 
 void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count)
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	constexpr size_t component_count = 9; // each mat3 has exactly 9 components
@@ -431,7 +430,7 @@ void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count)
 
 void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count)
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	constexpr size_t component_count = 16; // each mat4 has exactly 16 components
@@ -445,10 +444,42 @@ void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count)
 
 void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept
 {
-	assert(location != Invalid::uniform_location);
+	assert(location != Blank::uniform_location);
 	assert(count > 0);
 
 	glUniformMatrix4fv(location, count, false, ptr);
+}
+
+GLint uniform_location(const Glsl_program& program, const char* uniform_name)
+{
+	assert(program.id() != Blank::program_id);
+	assert(uniform_name && std::strlen(uniform_name) > 0);
+
+	GLint location = glGetUniformLocation(program.id(), uniform_name);
+	ENFORCE(location != Blank::uniform_location,
+		"Shader program '", program.name(), "' does not have a uniform called '", uniform_name, "'.");
+
+	return location;
+}
+
+void validate(const Glsl_program& program)
+{
+	assert(program.id() != Blank::program_id);
+
+	glValidateProgram(program.id());
+	if (!validate_status(program)) {
+		std::string msg_log = info_log(program);
+		std::string exc_msg = EXCEPTION_MSG("Program validation failed. '",
+			program.name(), "'.\n", msg_log);
+
+		throw std::runtime_error(exc_msg);
+	}
+}
+
+bool validate_status(const Glsl_program& program) noexcept
+{
+	assert(program.id());
+	return parameter(program, GL_VALIDATE_STATUS) != 0;
 }
 
 } // namespace opengl

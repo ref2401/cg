@@ -26,7 +26,7 @@ Buffer_dynamic::Buffer_dynamic(Buffer_dynamic&& buffer) noexcept :
 	_byte_count(buffer._byte_count),
 	_curr_byte_count(buffer._curr_byte_count)
 {
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 	buffer._curr_byte_count = 0;
 }
@@ -46,7 +46,7 @@ Buffer_dynamic& Buffer_dynamic::operator=(Buffer_dynamic&& buffer) noexcept
 	_byte_count = buffer._byte_count;
 	_curr_byte_count = buffer._curr_byte_count;
 
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 	buffer._curr_byte_count = 0;
 
@@ -55,15 +55,15 @@ Buffer_dynamic& Buffer_dynamic::operator=(Buffer_dynamic&& buffer) noexcept
 
 void Buffer_dynamic::dispose() noexcept
 {
-	if (_id == Invalid::buffer_id) return;
+	if (_id == Blank::buffer_id) return;
 
 	glDeleteBuffers(1, &_id);
-	_id = Invalid::buffer_id;
+	_id = Blank::buffer_id;
 }
 
 void Buffer_dynamic::read(void* dest_ptr) noexcept
 {
-	assert(_id != Invalid::buffer_id);
+	assert(_id != Blank::buffer_id);
 	assert(dest_ptr);
 
 	if (_curr_byte_count == 0) return;
@@ -74,7 +74,7 @@ void Buffer_dynamic::read(void* dest_ptr) noexcept
 
 void Buffer_dynamic::write(size_t byte_count, const void* data_ptr)
 {
-	assert(_id != Invalid::buffer_id);
+	assert(_id != Blank::buffer_id);
 
 	size_t req_byte_count = _curr_byte_count + byte_count;
 	if (req_byte_count > _byte_count) {
@@ -111,7 +111,7 @@ Buffer_gpu::Buffer_gpu(Buffer_gpu&& buffer) noexcept :
 	_id(buffer._id),
 	_byte_count(buffer._byte_count)
 {
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 }
 
@@ -129,7 +129,7 @@ Buffer_gpu& Buffer_gpu::operator=(Buffer_gpu&& buffer) noexcept
 	_id = buffer._id;
 	_byte_count = buffer._byte_count;
 
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 
 	return *this;
@@ -137,10 +137,10 @@ Buffer_gpu& Buffer_gpu::operator=(Buffer_gpu&& buffer) noexcept
 
 void Buffer_gpu::dispose() noexcept
 {
-	if (_id == Invalid::buffer_id) return;
+	if (_id == Blank::buffer_id) return;
 
 	glDeleteBuffers(1, &_id);
-	_id = Invalid::buffer_id;
+	_id = Blank::buffer_id;
 }
 
 // ----- Buffer_persistent-----
@@ -162,7 +162,7 @@ Buffer_persistent_map::Buffer_persistent_map(Buffer_persistent_map&& buffer) noe
 	_byte_count(buffer._byte_count),
 	_ptr(buffer._ptr)
 {
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 	buffer._ptr = nullptr;
 }
@@ -182,7 +182,7 @@ Buffer_persistent_map& Buffer_persistent_map::operator=(Buffer_persistent_map&& 
 	_byte_count = buffer._byte_count;
 	_ptr = buffer._ptr;
 
-	buffer._id = Invalid::buffer_id;
+	buffer._id = Blank::buffer_id;
 	buffer._byte_count = 0;
 	buffer._ptr = nullptr;
 
@@ -191,13 +191,13 @@ Buffer_persistent_map& Buffer_persistent_map::operator=(Buffer_persistent_map&& 
 
 void Buffer_persistent_map::dispose() noexcept
 {
-	if (_id == Invalid::buffer_id) return;
+	if (_id == Blank::buffer_id) return;
 
 	glUnmapNamedBuffer(_id);
 	glDeleteBuffers(1, &_id);
 
 	_byte_count = 0;
-	_id = Invalid::buffer_id;
+	_id = Blank::buffer_id;
 	_ptr = nullptr;
 }
 
@@ -206,8 +206,8 @@ void Buffer_persistent_map::dispose() noexcept
 void copy(const Buffer_i& src, size_t src_offset,
 	Buffer_i& dest, size_t dest_offset, size_t byte_count) noexcept
 {
-	assert(src.id() != Invalid::buffer_id);
-	assert(dest.id() != Invalid::buffer_id);
+	assert(src.id() != Blank::buffer_id);
+	assert(dest.id() != Blank::buffer_id);
 	assert(src.byte_count() >= src_offset + byte_count);
 	assert(dest.byte_count() >= dest_offset + byte_count);
 

@@ -69,7 +69,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::sampler_id;
+	GLuint _id = Blank::sampler_id;
 };
 
 class Texture_2d_i {
@@ -149,7 +149,7 @@ private:
 	// Previous texture's contents will be lost.
 	void reallocate_storage(GLenum internal_format, GLuint mipmap_level_count, uint2 size) noexcept;
 
-	GLuint _id = Invalid::texture_id;
+	GLuint _id = Blank::texture_id;
 	GLenum _internal_format = GL_NONE;
 	GLuint _mipmap_level_count = 0;
 	uint2 _size;
@@ -212,7 +212,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::texture_id;
+	GLuint _id = Blank::texture_id;
 	GLenum _internal_format = GL_NONE;
 	GLuint _mipmap_level_count = 0;
 	uint2 _size;
@@ -290,7 +290,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::texture_id;
+	GLuint _id = Blank::texture_id;
 	GLenum _internal_format = GL_NONE;
 	GLuint _mipmap_level_count = 0;
 	uint3 _size;
@@ -343,7 +343,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::texture_id;
+	GLuint _id = Blank::texture_id;
 	GLenum _internal_format = GL_NONE;
 	Buffer _buffer;
 };
@@ -373,17 +373,17 @@ Texture_buffer<Buffer>::Texture_buffer(Texture_buffer&& tb) noexcept
 	_internal_format(tb._internal_format),
 	_buffer(std::move(tb._buffer))
 {
-	tb._id = Invalid::texture_id;
+	tb._id = Blank::texture_id;
 	tb._internal_format = GL_NONE;
 }
 
 template<typename Buffer>
 void Texture_buffer<Buffer>::dispose() noexcept
 {
-	if (_id == Invalid::texture_id) return;
+	if (_id == Blank::texture_id) return;
 
 	glDeleteTextures(1, &_id);
-	_id = Invalid::texture_id;
+	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
 	_buffer.~Buffer();
 }
@@ -399,7 +399,7 @@ Texture_buffer<Buffer>& Texture_buffer<Buffer>::operator=(Texture_buffer&& tb) n
 	_internal_format = tb._internal_format;
 	_buffer = std::move(tb._buffer);
 
-	tb._id = Invalid::texture_id;
+	tb._id = Blank::texture_id;
 	tb._internal_format = GL_NONE;
 
 	return *this;

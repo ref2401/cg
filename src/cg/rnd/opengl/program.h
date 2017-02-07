@@ -16,9 +16,9 @@ public:
 
 	Glsl_program() noexcept = default;
 
-	Glsl_program(const std::string& name, const cg::data::Glsl_compute_desc& compute_data);
+	explicit Glsl_program(const cg::data::Glsl_compute_desc& compute_desc);
 
-	Glsl_program(const std::string& name, const cg::data::Glsl_program_desc& prog_data);
+	explicit Glsl_program(const cg::data::Glsl_program_desc& prog_data);
 
 	Glsl_program(const Glsl_program&) = delete;
 
@@ -32,13 +32,7 @@ public:
 	Glsl_program& operator=(Glsl_program&& prog) noexcept;
 
 
-	// Returns a location value of the specified uniform.
-	// Throws if the uniform name does not belong to this shader program.
-	GLint get_uniform_location(const std::string& uniform_name) const;
-
-	// Returns a location value of the specified uniform.
-	// Throws if the uniform name does not belong to this shader program.
-	GLint get_uniform_location(const char* uniform_name) const;
+	void dispose() noexcept;
 
 	// Program's unique id.
 	GLuint id() const noexcept
@@ -46,31 +40,15 @@ public:
 		return _id;
 	}
 
-	// Returns true if the last link operation was successful.
-	bool linked() const noexcept;
-
-	// Returns information log for this program. The information log for a program
-	// is modified when the shader is linked or validated. 
-	std::string log() const noexcept;
-
 	// Program's name
 	const std::string& name() const noexcept
 	{
 		return _name;
 	}
 
-	// Returns true if the last validate operation was successful.
-	bool valid() const noexcept;
-
 private:
 
-	void dispose() noexcept;
-
-	GLint get_property(GLenum prop) const noexcept;
-
-	void validate();
-
-	GLuint _id = Invalid::glsl_program_id;
+	GLuint _id = Blank::program_id;
 	std::string _name;
 };
 
@@ -92,18 +70,14 @@ public:
 
 	Glsl_shader& operator=(Glsl_shader&& shader) noexcept;
 
-	// Returns true if the last compile operation was successful.
-	bool compiled() const noexcept;
+
+	void dispose() noexcept;
 
 	// Glsl_shader's unique id.
 	GLuint id() const noexcept
 	{
 		return _id;
 	}
-
-	// Returns information log for this shader. The information log for a shader
-	// is modified when the shader is compiled.
-	std::string log() const noexcept;
 
 	// Type of this shader object.	
 	GLenum type() const noexcept
@@ -113,14 +87,21 @@ public:
 
 private:
 
-	void dispose() noexcept;
-
-	GLint get_property(GLenum prop) const noexcept;
-
-	GLuint _id = Invalid::shader_id;
+	GLuint _id = Blank::shader_id;
 	GLenum _type = GL_NONE;
 };
 
+
+// Returns true if the last compile operation was successful.
+bool compile_status(const Glsl_shader& shader) noexcept;
+
+// Returns information log for the specified program. 
+// The information log for a program is modified when the shader is linked or validated. 
+std::string info_log(const Glsl_program& program) noexcept;
+
+// Returns information log for the specified shader. 
+// The information log for a shader is modified when the shader is compiled.
+std::string info_log(const Glsl_shader& shader) noexcept;
 
 // Validate glGetProgram 'pname' argument value;
 bool is_valid_program_property(GLenum value) noexcept;
@@ -130,6 +111,19 @@ bool is_valid_shader_property(GLenum value) noexcept;
 
 // Validates shader object type value. 
 bool is_valid_shader_type(GLenum value) noexcept;
+
+bool is_valid_program_parameter(GLenum pname) noexcept;
+
+bool is_valid_shader_parameter(GLenum pname) noexcept;
+
+void link(const Glsl_program& program);
+
+// Returns true if the last link operation was successful.
+bool link_status(const Glsl_program& program) noexcept;
+
+GLint parameter(const Glsl_program& program, GLenum pname) noexcept;
+
+GLint parameter(const Glsl_shader& shader, GLenum pname) noexcept;
 
 void set_uniform(GLint location, unsigned int val) noexcept;
 
@@ -158,6 +152,23 @@ void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count);
 void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count);
 
 void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept;
+
+// Returns a location value of the specified uniform.
+// Throws if the uniform name does not belong to this shader program.
+GLint uniform_location(const Glsl_program& program, const char* uniform_name);
+
+// Returns a location value of the specified uniform.
+// Throws if the uniform name does not belong to this shader program.
+inline GLint uniform_location(const Glsl_program& program, const std::string& uniform_name)
+{
+	return uniform_location(program, uniform_name.c_str());
+}
+
+
+void validate(const Glsl_program& program);
+
+// Returns true if the last validate operation was successful.
+bool validate_status(const Glsl_program& program) noexcept;
 
 } // namespace opengl
 } // namespace rnd

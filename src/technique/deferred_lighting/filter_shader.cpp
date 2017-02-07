@@ -57,9 +57,10 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 	cg::data::Glsl_program_desc src_code = cg::data::load_glsl_program_desc(
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
+	src_code.name = "filter-shader";
 
-	_prog = cg::rnd::opengl::Glsl_program("filter-shader", src_code);
-	_u_filter_direction_location = _prog.get_uniform_location("u_filter_direction");
+	_prog = cg::rnd::opengl::Glsl_program(src_code);
+	_u_filter_direction_location = uniform_location(_prog, "u_filter_direction");
 }
 
 Filter_shader_program::Filter_shader_program(Filter_shader_program&& sp) noexcept :
@@ -70,7 +71,7 @@ Filter_shader_program::Filter_shader_program(Filter_shader_program&& sp) noexcep
 {
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
+	sp._u_filter_direction_location = cg::rnd::opengl::Blank::uniform_location;
 }
 
 Filter_shader_program& Filter_shader_program::operator=(
@@ -85,7 +86,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 
 	sp._filter_type = Filter_type::none;
 	sp._kernel_radius = Filter_kernel_radius::none;
-	sp._u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
+	sp._u_filter_direction_location = cg::rnd::opengl::Blank::uniform_location;
 
 	return *this;
 }
@@ -93,7 +94,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 {
 	assert(_kernel_radius != Filter_kernel_radius::none);
-	assert(_prog.id() != cg::rnd::opengl::Invalid::glsl_program_id);
+	assert(_prog.id() != cg::rnd::opengl::Blank::program_id);
 
 	glUseProgram(_prog.id());
 	cg::rnd::opengl::set_uniform(_u_filter_direction_location, direction);

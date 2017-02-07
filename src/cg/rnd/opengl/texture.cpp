@@ -46,7 +46,7 @@ Sampler::Sampler(const Sampler_desc& desc) noexcept
 Sampler::Sampler(Sampler&& smp) noexcept :
 	_id(smp._id)
 {
-	smp._id = Invalid::sampler_id;
+	smp._id = Blank::sampler_id;
 }
 
 Sampler::~Sampler() noexcept
@@ -60,17 +60,17 @@ Sampler& Sampler::operator=(Sampler&& smp) noexcept
 
 	dispose();
 	_id = smp._id;
-	smp._id = Invalid::sampler_id;
+	smp._id = Blank::sampler_id;
 
 	return *this;
 }
 
 void Sampler::dispose() noexcept
 {
-	if (_id == Invalid::sampler_id) return;
+	if (_id == Blank::sampler_id) return;
 
 	glDeleteSamplers(1, &_id);
-	_id = Invalid::sampler_id;
+	_id = Blank::sampler_id;
 }
 
 // ----- Texture_2d -----
@@ -98,7 +98,7 @@ Texture_2d::Texture_2d(Texture_2d&& tex) noexcept :
 	_mipmap_level_count(tex._mipmap_level_count),
 	_size(tex._size)
 {
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint2::zero;
@@ -119,7 +119,7 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 	_mipmap_level_count = tex._mipmap_level_count;
 	_size = tex._size;
 
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint2::zero;
@@ -129,10 +129,10 @@ Texture_2d& Texture_2d::operator=(Texture_2d&& tex) noexcept
 
 void Texture_2d::dispose() noexcept
 {
-	if (_id == Invalid::texture_id) return;
+	if (_id == Blank::texture_id) return;
 
 	glDeleteTextures(1, &_id);
-	_id = Invalid::texture_id;
+	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
 	_mipmap_level_count = 0;
 	_size = uint2::zero;
@@ -140,7 +140,7 @@ void Texture_2d::dispose() noexcept
 
 void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_count, uint2 size) noexcept
 {
-	assert(_id != Invalid::texture_id);
+	assert(_id != Blank::texture_id);
 	assert(is_valid_texture_internal_format(internal_format));
 	assert(greater_than(size, 0));
 	assert(mipmap_level_count > 0);
@@ -160,7 +160,7 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 		get_texture_sub_image_type(_internal_format),
 		nullptr);
 
-	glBindTexture(GL_TEXTURE_2D, Invalid::texture_id);
+	glBindTexture(GL_TEXTURE_2D, Blank::texture_id);
 }
 
 void Texture_2d::set_size(const uint2& size) noexcept
@@ -211,7 +211,7 @@ Texture_2d_immut::Texture_2d_immut(Texture_2d_immut&& tex) noexcept :
 	_mipmap_level_count(tex._mipmap_level_count),
 	_size(tex._size)
 {
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint2::zero;
@@ -232,7 +232,7 @@ Texture_2d_immut& Texture_2d_immut::operator=(Texture_2d_immut&& tex) noexcept
 	_mipmap_level_count = tex._mipmap_level_count;
 	_size = tex._size;
 
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint2::zero;
@@ -242,16 +242,16 @@ Texture_2d_immut& Texture_2d_immut::operator=(Texture_2d_immut&& tex) noexcept
 
 void Texture_2d_immut::dispose() noexcept
 {
-	if (_id == Invalid::texture_id) return;
+	if (_id == Blank::texture_id) return;
 
 	glDeleteTextures(1, &_id);
-	_id = Invalid::texture_id;
+	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
 }
 
 void Texture_2d_immut::write(GLuint mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept
 {
-	assert(_id != Invalid::texture_id);
+	assert(_id != Blank::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
 	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
@@ -300,7 +300,7 @@ Texture_3d_immut::Texture_3d_immut(Texture_3d_immut&& tex) noexcept :
 	_mipmap_level_count(tex._mipmap_level_count),
 	_size(tex._size)
 {
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint3::zero;
@@ -321,7 +321,7 @@ Texture_3d_immut& Texture_3d_immut::operator=(Texture_3d_immut&& tex) noexcept
 	_mipmap_level_count = tex._mipmap_level_count;
 	_size = tex._size;
 
-	tex._id = Invalid::texture_id;
+	tex._id = Blank::texture_id;
 	tex._internal_format = GL_NONE;
 	tex._mipmap_level_count = 0;
 	tex._size = uint3::zero;
@@ -331,16 +331,16 @@ Texture_3d_immut& Texture_3d_immut::operator=(Texture_3d_immut&& tex) noexcept
 
 void Texture_3d_immut::dispose() noexcept
 {
-	if (_id == Invalid::texture_id) return;
+	if (_id == Blank::texture_id) return;
 
 	glDeleteTextures(1, &_id);
-	_id = Invalid::texture_id;
+	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
 }
 
 void Texture_3d_immut::write(GLuint mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept
 {
-	assert(_id != Invalid::texture_id);
+	assert(_id != Blank::texture_id);
 	assert(mipmap_level < _mipmap_level_count);
 	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
@@ -522,7 +522,7 @@ bool is_valid_texture_wrap_mode(GLenum value) noexcept
 //void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
 //	const cg::data::Image_2d& image) noexcept
 //{
-//	assert(tex_id != Invalid::texture_id);
+//	assert(tex_id != Blank::texture_id);
 //
 //}
 

@@ -57,7 +57,7 @@ private:
 	// Reallocates a new storage for the renderbuffer object.
 	void reallocate_storage(GLenum internal_format, const cg::uint2& size) noexcept;
 
-	GLuint _id = Invalid::renderbuffer_id;
+	GLuint _id = Blank::renderbuffer_id;
 	GLenum _internal_format = GL_NONE;
 	cg::uint2 _size = cg::uint2::zero;
 };
@@ -122,7 +122,7 @@ private:
 
 	void dispose() noexcept;
 
-	GLuint _id = Invalid::framebuffer_id;
+	GLuint _id = Blank::framebuffer_id;
 };
 
 

@@ -13,14 +13,15 @@ namespace fur_simulation {
 Fur_pass_program::Fur_pass_program()
 {
 	auto prog_desc = load_glsl_program_desc("../data/fur_simulation/fur_pass");
-	_program = Glsl_program("fur-pass", prog_desc);
+	prog_desc.name = "fur-pass";
+	_program = Glsl_program(prog_desc);
 
-	_g_pvm_matrix_location = _program.get_uniform_location("g_pvm_matrix");
-	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
-	_g_view_position_ws_location = _program.get_uniform_location("g_view_position_ws");
-	_g_strand_props_location = _program.get_uniform_location("g_strand_props");
-	_g_light_dir_ws_location = _program.get_uniform_location("g_light_dir_ws");
-	_g_fur_mask_uv_factors_location = _program.get_uniform_location("g_fur_mask_uv_factors");
+	_g_pvm_matrix_location = uniform_location(_program, "g_pvm_matrix");
+	_g_model_matrix_location = uniform_location(_program, "g_model_matrix");
+	_g_view_position_ws_location = uniform_location(_program, "g_view_position_ws");
+	_g_strand_props_location = uniform_location(_program, "g_strand_props");
+	_g_light_dir_ws_location = uniform_location(_program, "g_light_dir_ws");
+	_g_fur_mask_uv_factors_location = uniform_location(_program, "g_fur_mask_uv_factors");
 }
 
 void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
@@ -48,11 +49,12 @@ void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
 Opaque_model_pass_program::Opaque_model_pass_program()
 {
 	auto prog_desc = load_glsl_program_desc("../data/fur_simulation/opaque_model");
-	_program = Glsl_program("opaque-model-pass", prog_desc);
+	prog_desc.name = "opaque-model-pass";
+	_program = Glsl_program(prog_desc);
 
-	_g_projection_view_matrix_location = _program.get_uniform_location("g_projection_view_matrix");
-	_g_model_matrix_location = _program.get_uniform_location("g_model_matrix");
-	_g_dir_to_light_ws_location = _program.get_uniform_location("g_dir_to_light_ws");
+	_g_projection_view_matrix_location = uniform_location(_program, "g_projection_view_matrix");
+	_g_model_matrix_location = uniform_location(_program, "g_model_matrix");
+	_g_dir_to_light_ws_location = uniform_location(_program, "g_dir_to_light_ws");
 }
 
 void Opaque_model_pass_program::bind(const cg::mat4& projection_view_matrix,
@@ -72,11 +74,12 @@ Physics_simulation_pass_program::Physics_simulation_pass_program()
 	auto program_desc = load_glsl_program_desc(
 		"../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr,
 		true, "tf_p_curr", "tf_velocity", "gl_NextBuffer", "tf_debug_slot");
+	program_desc.name = "physics-simulation-pass";
 
-	_program = Glsl_program("physics-simulation-pass", program_desc);
-	_g_angular_velocity_ms_location = _program.get_uniform_location("g_angular_velocity_ms");
-	_g_external_accel_ms_location = _program.get_uniform_location("g_external_acceleration_ms");
-	_g_strand_props = _program.get_uniform_location("g_strand_props");
+	_program = Glsl_program(program_desc);
+	_g_angular_velocity_ms_location = uniform_location(_program, "g_angular_velocity_ms");
+	_g_external_accel_ms_location = uniform_location(_program, "g_external_acceleration_ms");
+	_g_strand_props = uniform_location(_program, "g_strand_props");
 }
 
 void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, 
@@ -94,8 +97,9 @@ void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms,
 Strand_debug_pass_program::Strand_debug_pass_program()
 {
 	auto program_desc = load_glsl_program_desc("../data/fur_simulation/strand_debug_pass");
-	_program = Glsl_program("strand-debug-passs", program_desc);
-	_g_pvm_matrix_location = _program.get_uniform_location("g_pvm_matrix");
+	program_desc.name = "strand-debug-pass";
+	_program = Glsl_program(program_desc);
+	_g_pvm_matrix_location = uniform_location(_program, "g_pvm_matrix");
 }
 
 void Strand_debug_pass_program::bind(const cg::mat4& pvm_matrix) noexcept

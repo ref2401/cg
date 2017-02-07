@@ -90,11 +90,11 @@ private:
 	Texture_buffer<Buffer_gpu> _tbo_debug_slot;
 	Buffer_gpu _model_attribs_buffer;
 	Buffer_gpu _index_buffer;
-	GLuint _blank_vao_id = Invalid::vao_id;
-	GLuint _physics_0_vao_id = Invalid::vao_id;
-	GLuint _physics_1_vao_id = Invalid::vao_id;
-	GLuint _render_vao_0_id = Invalid::vao_id;
-	GLuint _render_vao_1_id = Invalid::vao_id;
+	GLuint _blank_vao_id = Blank::vao_id;
+	GLuint _physics_0_vao_id = Blank::vao_id;
+	GLuint _physics_1_vao_id = Blank::vao_id;
+	GLuint _render_vao_0_id = Blank::vao_id;
+	GLuint _render_vao_1_id = Blank::vao_id;
 	size_t _vertex_count = 0;
 	mutable bool _read_from_physics_0 = true;
 };

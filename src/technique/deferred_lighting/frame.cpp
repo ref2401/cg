@@ -53,9 +53,9 @@ Material_instance::Material_instance(float smoothness,
 	tex_specular_intensity_id(tex_specular_intensity_id)
 {
 	assert(this->smoothness >= 0.0f);
-	assert(this->tex_diffuse_rgb_id != Invalid::texture_id);
-	assert(this->tex_normal_map_id != Invalid::texture_id);
-	assert(this->tex_specular_intensity_id != Invalid::texture_id);
+	assert(this->tex_diffuse_rgb_id != Blank::texture_id);
+	assert(this->tex_normal_map_id != Blank::texture_id);
+	assert(this->tex_specular_intensity_id != Blank::texture_id);
 }
 
 // ----- Frame -----
@@ -120,7 +120,7 @@ void Frame::push_back_renderable(const Renderable& rnd)
 
 void Frame::prepare_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept
 {
-	assert(vao_id != Invalid::vao_id);
+	assert(vao_id != Blank::vao_id);
 
 	glBindVertexArray(vao_id);
 
@@ -136,7 +136,7 @@ void Frame::prepare_vao(GLuint vao_id, GLuint draw_index_binding_index) noexcept
 	glVertexArrayBindingDivisor(vao_id, draw_index_binding_index, 1);
 	glEnableVertexArrayAttrib(vao_id, draw_index_attrib_location);
 
-	glBindVertexArray(Invalid::vao_id);
+	glBindVertexArray(Blank::vao_id);
 }
 
 void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept

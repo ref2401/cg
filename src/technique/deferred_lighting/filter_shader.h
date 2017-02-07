@@ -59,7 +59,7 @@ private:
 	Filter_type _filter_type = Filter_type::none;
 	Filter_kernel_radius _kernel_radius = Filter_kernel_radius::none;
 	cg::rnd::opengl::Glsl_program _prog;
-	GLint _u_filter_direction_location = cg::rnd::opengl::Invalid::uniform_location;
+	GLint _u_filter_direction_location = cg::rnd::opengl::Blank::uniform_location;
 };
 
 

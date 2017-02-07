@@ -7,12 +7,12 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
-class Invalid final {
+class Blank final {
 public:
 
 	static constexpr GLuint buffer_id = 0;
 	static constexpr GLuint framebuffer_id = 0;
-	static constexpr GLuint glsl_program_id = 0;
+	static constexpr GLuint program_id = 0;
 	static constexpr GLuint renderbuffer_id = 0;
 	static constexpr GLuint sampler_id = 0;
 	static constexpr GLuint shader_id = 0;

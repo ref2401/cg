@@ -34,13 +34,13 @@ public:
 private:
 
 	Glsl_program _program;
-	GLint _g_pvm_matrix_location = Invalid::uniform_location;
-	GLint _g_model_matrix_location = Invalid::uniform_location;
-	GLint _g_view_position_ws_location = Invalid::uniform_location;
-	GLint _g_strand_props_location = Invalid::uniform_location;
-	GLint _g_shell_index_location = Invalid::uniform_location;
-	GLint _g_light_dir_ws_location = Invalid::uniform_location;
-	GLint _g_fur_mask_uv_factors_location = Invalid::uniform_location;
+	GLint _g_pvm_matrix_location = Blank::uniform_location;
+	GLint _g_model_matrix_location = Blank::uniform_location;
+	GLint _g_view_position_ws_location = Blank::uniform_location;
+	GLint _g_strand_props_location = Blank::uniform_location;
+	GLint _g_shell_index_location = Blank::uniform_location;
+	GLint _g_light_dir_ws_location = Blank::uniform_location;
+	GLint _g_fur_mask_uv_factors_location = Blank::uniform_location;
 };
 
 class Physics_simulation_pass_program final {
@@ -64,9 +64,9 @@ public:
 private:
 
 	Glsl_program _program;
-	GLint _g_angular_velocity_ms_location = Invalid::uniform_location;
-	GLint _g_external_accel_ms_location = Invalid::uniform_location;
-	GLint _g_strand_props = Invalid::uniform_location;
+	GLint _g_angular_velocity_ms_location = Blank::uniform_location;
+	GLint _g_external_accel_ms_location = Blank::uniform_location;
+	GLint _g_strand_props = Blank::uniform_location;
 };
 
 class Opaque_model_pass_program final {
@@ -90,9 +90,9 @@ public:
 private:
 
 	Glsl_program _program;
-	GLint _g_projection_view_matrix_location = Invalid::uniform_location;
-	GLint _g_model_matrix_location = Invalid::uniform_location;
-	GLint _g_dir_to_light_ws_location = Invalid::uniform_location;
+	GLint _g_projection_view_matrix_location = Blank::uniform_location;
+	GLint _g_model_matrix_location = Blank::uniform_location;
+	GLint _g_dir_to_light_ws_location = Blank::uniform_location;
 };
 
 class Strand_debug_pass_program final {
@@ -115,7 +115,7 @@ public:
 private:
 
 	Glsl_program _program;
-	GLint _g_pvm_matrix_location = Invalid::uniform_location;
+	GLint _g_pvm_matrix_location = Blank::uniform_location;
 };
 
 } // namespace fur_simulation

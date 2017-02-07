@@ -15,15 +15,16 @@ struct Glsl_compute_desc final {
 
 	Glsl_compute_desc() = default;
 
-	Glsl_compute_desc(const std::string& compute_shader_source_code)
-		: compute_shader_source_code(compute_shader_source_code)
+	Glsl_compute_desc(const std::string& name, const std::string& compute_shader_source_code)
+		: name(name), compute_shader_source_code(compute_shader_source_code)
 	{}
 
-	Glsl_compute_desc(const char* compute_shader_source_code)
-		: compute_shader_source_code(compute_shader_source_code)
+	Glsl_compute_desc(const char* name, const char* compute_shader_source_code)
+		: name(name), compute_shader_source_code(compute_shader_source_code)
 	{}
 
 
+	std::string name;
 	std::string compute_shader_source_code;
 };
 
@@ -66,6 +67,7 @@ struct Glsl_program_desc {
 	}
 
 
+	std::string name;
 	std::string vertex_shader_source_code;
 	std::string fragment_shader_source_code;
 	Transform_feedback_desc transform_feedback;
