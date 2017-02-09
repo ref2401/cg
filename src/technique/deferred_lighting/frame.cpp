@@ -22,6 +22,35 @@ Buffer_gpu make_draw_index_buffer(size_t draw_call_count)
 
 namespace deferred_lighting {
 
+// ----- Buffer_partitioned -----
+
+Buffer_partitioned::Buffer_partitioned(Buffer_partitioned&& bp) noexcept
+	: _partition_count(bp._partition_count),
+	_partition_byte_count(bp._partition_byte_count),
+	_partition_offset(bp._partition_offset),
+	_buffer(std::move(bp._buffer))
+{
+	bp._partition_count = 0;
+	bp._partition_byte_count = 0;
+	bp._partition_offset = 0;
+}
+
+Buffer_partitioned& Buffer_partitioned::operator=(Buffer_partitioned&& bp) noexcept
+{
+	if (this == &bp) return *this;
+
+	_partition_count = bp._partition_count;
+	_partition_byte_count = bp._partition_byte_count;
+	_partition_offset = bp._partition_offset;
+	_buffer = std::move(bp._buffer);
+
+	bp._partition_count = 0;
+	bp._partition_byte_count = 0;
+	bp._partition_offset = 0;
+
+	return *this;
+}
+
 // ----- Directional_light -----
 
 Directional_light::Directional_light(const float3& position, const float3& target,

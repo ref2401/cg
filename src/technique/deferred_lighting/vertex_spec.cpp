@@ -11,11 +11,11 @@ using namespace cg::rnd::opengl;
 
 namespace deferred_lighting {
 
-// ----- Static_vertex_spec
+// ----- Static_vertex_spec -----
 
 Static_vertex_spec::Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_binding_index,
-	cg::rnd::opengl::Buffer_gpu vertex_buffer,
-	cg::rnd::opengl::Buffer_gpu index_buffer) noexcept
+	cg::rnd::opengl::Buffer_immut vertex_buffer,
+	cg::rnd::opengl::Buffer_immut index_buffer) noexcept
 	: _vao_id(vao_id), 
 	_vertex_buffer_binding_index(vertex_buffer_binding_index),
 	_vertex_buffer(std::move(vertex_buffer)),
@@ -23,6 +23,7 @@ Static_vertex_spec::Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_bindi
 {
 	assert(vao_id != Blank::vao_id);
 }
+
 Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept 
 	: _vao_id(spec._vao_id),
 	_vertex_buffer_binding_index(spec._vertex_buffer_binding_index),
@@ -32,7 +33,6 @@ Static_vertex_spec::Static_vertex_spec(Static_vertex_spec&& spec) noexcept
 	spec._vao_id = Blank::vao_id;
 	spec._vertex_buffer_binding_index = 0;
 }
-
 
 Static_vertex_spec::~Static_vertex_spec() noexcept
 {
@@ -67,7 +67,7 @@ void Static_vertex_spec::dispose() noexcept
 	}
 }
 
-// ----- Static_vertex_spec_builder
+// ----- Static_vertex_spec_builder -----
 
 Static_vertex_spec_builder::Static_vertex_spec_builder(
 	size_t vertex_buffer_capacity, size_t index_buffer_capacity)
@@ -84,8 +84,8 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 
 	assert(building_process());
 
-	cg::rnd::opengl::Buffer_gpu vertex_buffer(_vertex_data);
-	cg::rnd::opengl::Buffer_gpu index_buffer(_index_data);
+	cg::rnd::opengl::Buffer_immut vertex_buffer(0, _vertex_data);
+	cg::rnd::opengl::Buffer_immut index_buffer(0, _index_data);
 
 	//GLuint ids[2]; // vertex_buffer_id, index_buffer_id;
 	//glCreateBuffers(2, ids);

@@ -25,8 +25,8 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	_tbo_position_buffer = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.position_buffer);
 	_tbo_physics_buffer_0 = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.simulation_buffer);
 	_tbo_physics_buffer_1 = Texture_buffer<Buffer_gpu>(GL_RGB32F, byte_count(geometry.simulation_buffer), nullptr);
-	_model_attribs_buffer = Buffer_gpu(geometry.model_attribs_buffer);
-	_index_buffer = Buffer_gpu(geometry.index_buffer);
+	_model_attribs_buffer = Buffer_immut(0, geometry.model_attribs_buffer);
+	_index_buffer = Buffer_immut(0, geometry.index_buffer);
 	_meshes = std::move(geometry.meshes);
 
 	for (const auto& mesh : _meshes)

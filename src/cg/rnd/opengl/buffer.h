@@ -22,10 +22,106 @@ public:
 
 
 	// Size in bytes of the buffer's data store. 
-	virtual size_t byte_count() const noexcept = 0;
+	virtual GLsizeiptr byte_count() const noexcept = 0;
 
 	// Buffer's unique id.
 	virtual GLuint id() const noexcept = 0;
+};
+
+// Buffer is a buffer object which contents and size may be changed after creation. 
+class Buffer final : public virtual Buffer_i {
+public:
+
+	Buffer() noexcept = default;
+
+	template<typename T>
+	Buffer(GLenum usage, const std::vector<T>& vector) noexcept
+		: Buffer(usage, cg::byte_count(vector), vector.data())
+	{}
+
+	Buffer(GLenum usage, GLsizeiptr byte_count, const void* data_ptr = nullptr) noexcept;
+
+	Buffer(const Buffer&) = delete;
+
+	Buffer(Buffer&& buffer) noexcept;
+
+	~Buffer() noexcept;
+
+
+	Buffer& operator=(const Buffer&) = delete;
+
+	Buffer& operator=(Buffer&& buffer) noexcept;
+
+
+	// Size in bytes of the buffer's data store. 
+	GLsizeiptr byte_count() const noexcept override
+	{
+		return _byte_count;
+	}
+
+	// Number of bytes already written into the buffer's data store.
+	size_t curr_byte_count() const noexcept
+	{
+		return _curr_byte_count;
+	}
+
+	void dispose() noexcept;
+
+	// Buffer's unique id.
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+private:
+
+	GLuint _id = Blank::buffer_id;
+	GLsizeiptr _byte_count = 0;
+	size_t _curr_byte_count = 0;
+};
+
+class Buffer_immut final : public virtual Buffer_i {
+public:
+
+	Buffer_immut() noexcept = default;
+
+	template<typename T>
+	Buffer_immut(GLbitfield flags, const std::vector<T>& vector) noexcept
+		: Buffer_immut(flags, cg::byte_count(vector), vector.data())
+	{}
+
+	Buffer_immut(GLbitfield flags, size_t byte_count, const void* data_ptr) noexcept;
+
+	Buffer_immut(const Buffer_immut&) = delete;
+
+	Buffer_immut(Buffer_immut&& buffer) noexcept;
+
+	~Buffer_immut() noexcept;
+
+
+	Buffer_immut& operator=(const Buffer_immut&) = delete;
+
+	Buffer_immut& operator=(Buffer_immut&& buffer) noexcept;
+
+
+	// Size in bytes of the buffer's data store. 
+	GLsizeiptr byte_count() const noexcept override
+	{
+		return _byte_count;
+	}
+
+	void dispose() noexcept;
+
+	// Buffer's unique id.
+	GLuint id() const noexcept override
+	{
+		return _id;
+	}
+
+private:
+
+	GLuint _id = Blank::buffer_id;
+	GLsizeiptr _byte_count = 0;
 };
 
 // Buffer_dynamic is a buffer object which contents and size may be changed after creation.
@@ -57,7 +153,7 @@ public:
 
 
 	// Size in bytes of the buffer's data store. 
-	size_t byte_count() const noexcept override
+	GLsizeiptr byte_count() const noexcept override
 	{
 		return _byte_count;
 	}
@@ -90,7 +186,7 @@ private:
 	void dispose() noexcept;
 
 	GLuint _id = Blank::buffer_id;
-	size_t _byte_count = 0;
+	GLsizeiptr _byte_count = 0;
 	size_t _curr_byte_count = 0;
 };
 
@@ -124,7 +220,7 @@ public:
 
 
 	// Size in bytes of the buffer's data store. 
-	size_t byte_count() const noexcept override
+	GLsizeiptr byte_count() const noexcept override
 	{
 		return _byte_count;
 	}
@@ -140,7 +236,7 @@ private:
 	void dispose() noexcept;
 
 	GLuint _id = Blank::buffer_id;
-	size_t _byte_count = 0;
+	GLsizeiptr _byte_count = 0;
 };
 
 // Persistent_buffer represents opengl buffer object that is mapped once during the constructuon
@@ -151,7 +247,7 @@ public:
 
 	Buffer_persistent_map() noexcept = default;
 
-	Buffer_persistent_map(size_t byte_count) noexcept;
+	explicit Buffer_persistent_map(GLsizeiptr byte_count) noexcept;
 
 	Buffer_persistent_map(const Buffer_persistent_map& buff) = delete;
 
@@ -166,173 +262,34 @@ public:
 
 
 	// How many bytes are allocated for this buffer object on the GPU.
-	size_t byte_count() const noexcept override
+	GLsizeiptr byte_count() const noexcept override
 	{
 		return _byte_count;
 	}
+
+	void* data() noexcept
+	{
+		return _ptr;
+	}
+
+	const void* data() const noexcept
+	{
+		return _ptr;
+	}
+
+	void dispose() noexcept;
 
 	GLuint id() const noexcept override
 	{
 		return _id;
 	}
 
-	// Writes a sequence of objects of type T into the buffer.
-	// Params:
-	// -	offset: Byte offset from the beginig of the buffer.
-	// -	ptr: Pointer to the first object of type T in the sequence.
-	// -	count: How many objects are in the sequence pointed by ptr.
-	//		If count is 0 the method returns immediately.
-	// Returns:	offset + sizeof(T) * count.
-	//			Byte offset into the buffer that can be used for subsequent writes.	
-	template<typename T>
-	size_t write(size_t offset, const T* ptr, size_t count = 1) noexcept;
-
 private:
-
-	void dispose() noexcept;
 
 	GLuint _id = Blank::buffer_id;
-	size_t _byte_count = 0;
+	GLsizeiptr _byte_count = 0;
 	void* _ptr = nullptr;
 };
-
-template<typename T>
-size_t Buffer_persistent_map::write(size_t offset, const T* ptr, size_t count) noexcept
-{
-	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
-	if (count == 0) return offset;
-
-	const size_t data_byte_count = sizeof(T) * count;
-	const size_t ret_offset = offset + data_byte_count;
-	assert(ret_offset <= _byte_count);
-
-	std::memcpy(reinterpret_cast<unsigned char*>(_ptr) + offset, ptr, data_byte_count);
-	return ret_offset;
-}
-
-// Partitioned_buffer is a buffer decorator that implements double/triple/whatever_factor buffering technique.
-// Buffering technique is supposed to solve CPU-GPU synchronization problem.
-// Partitioned_buffer creates an internal object of type Buffer_type 
-// which is partitioned into subbufer_count equal chunks. 
-// At every time Partitioned_buffer writes only into the specific(active/current) chunk of the internal buffer.
-template<typename Buffer_type>
-class Buffer_partitioned final {
-
-	static_assert(std::is_same<Buffer_type, Buffer_persistent_map>::value,
-		"Only Buffer_persistent_map as Buffer_type is supported at the moment.");
-
-public:
-
-	// Creates object of Buffer_type which size is byte_count * subbuffer_count bytes.
-	Buffer_partitioned(size_t partition_count, size_t partition_byte_count) noexcept
-		: _partition_count(partition_count), _partition_byte_count(partition_byte_count),
-		_buffer(partition_count * partition_byte_count)
-	{}
-
-	Buffer_partitioned(const Buffer_partitioned&) = delete;
-
-	Buffer_partitioned(Buffer_partitioned&& bp) noexcept;
-
-	~Buffer_partitioned() noexcept = default;
-
-
-	Buffer_partitioned& operator=(const Buffer_partitioned&) = delete;
-
-	Buffer_partitioned& operator=(Buffer_partitioned&& bp) noexcept;
-
-
-	// The index of partition which is currently used as target for writes.
-	// The number lies in range [0, partition_count).
-	size_t current_partition_index() const noexcept
-	{
-		return _partition_offset / _partition_byte_count;
-	}
-
-	GLuint id() const noexcept
-	{
-		return _buffer.id();
-	}
-
-	// Makes current the next buffer partition. If the end of the internal buffer has been reached
-	// then the first partition (index: 0) will be current.
-	void move_next_partition() noexcept
-	{
-		size_t next_index = (current_partition_index() + 1) % _partition_count;
-		_partition_offset = next_index * _partition_byte_count;
-	}
-
-	// How many bytes are occupies by each partition of the internal buffer.
-	size_t partition_byte_count() const noexcept
-	{
-		return _partition_byte_count;
-	}
-
-	// The number of partitions of the internal buffer.
-	size_t partition_count() const noexcept
-	{
-		return _partition_count;
-	}
-
-	// Writes a sequence of objects of type T into the current partiotion of the internal buffer.
-	// Params:
-	// -	rel_offset: Byte offset from the beginig of the current partition.
-	// -	ptr: Pointer to the first object of type T in the sequence.
-	// -	count: How many objects are in the sequence pointed by ptr.
-	//		If count is 0 the method returns immediately.
-	// Returns:	rel_offset + sizeof(T) * count.
-	//			Byte offset into the current partition that can be used for subsequent writes.	
-	template<typename T>
-	size_t write(size_t rel_offset, const T* ptr, size_t count = 1) noexcept;
-
-private:
-	size_t _partition_count = 0;
-	size_t _partition_byte_count = 0;
-	size_t _partition_offset = 0;
-	Buffer_type _buffer;
-};
-
-template<typename Buffer_type>
-Buffer_partitioned<Buffer_type>::Buffer_partitioned(Buffer_partitioned&& bp) noexcept
-	: _partition_count(bp._partition_count),
-	_partition_byte_count(bp._partition_byte_count),
-	_partition_offset(bp._partition_offset)
-	_buffer(std::move(bp._buffer))
-{
-	bp._partition_count = 0;
-	bp._partition_byte_count = 0;
-	bp._partition_offset = 0;
-}
-
-template<typename Buffer_type>
-Buffer_partitioned<Buffer_type>& Buffer_partitioned<Buffer_type>::operator=(Buffer_partitioned&& bp) noexcept
-{
-	if (this == &bp) return *this;
-
-	_partition_count = bp._partition_count;
-	_partition_byte_count = bp._partition_byte_count;
-	_partition_offset = bp._partition_offset;
-	_buffer = std::move(bp._buffer);
-
-	bp._partition_count = 0;
-	bp._partition_byte_count = 0;
-	bp._partition_offset = 0;
-
-	return *this;
-}
-
-template<typename Buffer_type>
-template<typename T>
-size_t Buffer_partitioned<Buffer_type>::write(size_t rel_offset, const T* ptr, size_t count) noexcept
-{
-	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
-	if (count == 0) return rel_offset;
-
-	const size_t ret_offset = rel_offset + sizeof(T) * count;
-	assert(ret_offset <= _partition_byte_count);
-
-	_buffer.write<T>(_partition_offset + rel_offset, ptr, count);
-	return ret_offset;
-}
 
 
 // Copies contents of the src buffer to the dest buffer.
@@ -343,14 +300,18 @@ size_t Buffer_partitioned<Buffer_type>::write(size_t rel_offset, const T* ptr, s
 // -	dest_offset: The offset, in btes, within destination buffer object at which data will be written.
 // -	byte_count:	The size, in bytes, of the data to be copied 
 //					from the source buffer object to the destination buffer object.
-void copy(const Buffer_i& src, size_t src_offset,
-	Buffer_i& dest, size_t dest_offset, size_t byte_count) noexcept;
+void copy(const Buffer_i& src, GLintptr src_offset,
+	const Buffer_i& dest, GLintptr dest_offset, GLsizeiptr byte_count) noexcept;
 
 // Copies contents of the src buffer to the dest buffer.
-inline void copy(const Buffer_i& src, Buffer_i& dest, size_t byte_count) noexcept
+inline void copy(const Buffer_i& src, const Buffer_i& dest, GLsizeiptr byte_count) noexcept
 {
 	copy(src, 0, dest, 0, byte_count);
 }
+
+//// Copies byte_count sequential bytes pointed to by data_ptr into buffer's data store.
+//// Reallocates buffer's data store (preserving already written data) if there is not enough memory.
+//void write(const Buffer_i& buffer, size_t byte_count, const void* data_ptr);
 
 // If T represents one of the OpenGL buffers, 
 // provides the member constant value equal to true. Otherwise value is false.
@@ -368,6 +329,34 @@ struct is_opengl_buffer<T, false> final : std::false_type {};
 // ditto
 template<typename T>
 constexpr bool is_opengl_buffer_v = is_opengl_buffer<T>::value;
+
+// Validates glBindBuffer 'target' argument value.
+bool is_valid_buffer_target(GLenum target) noexcept;
+
+// Validates glBufferData/glNamedBufferData 'usage' argument value.
+bool is_valid_buffer_usage(GLenum usage) noexcept;
+
+// Writes a sequence of objects of type T into the buffer.
+// Params:
+// -	offset: Byte offset from the beginig of the buffer.
+// -	ptr: Pointer to the first object of type T in the sequence.
+// -	count: How many objects are in the sequence pointed by ptr.
+//		If count is 0 the method returns immediately.
+// Returns:	offset + sizeof(T) * count.
+//			Byte offset into the buffer that can be used for subsequent writes.	
+template<typename T>
+size_t write(Buffer_persistent_map& buffer, size_t offset, const T* ptr, size_t count = 1) noexcept
+{
+	static_assert(std::is_trivially_copy_assignable<T>::value, "T must satisfy is_trivially_copy_assignable.");
+	if (count == 0) return offset;
+
+	const size_t data_byte_count = sizeof(T) * count;
+	const size_t ret_offset = offset + data_byte_count;
+	assert(GLsizeiptr(ret_offset) <= buffer.byte_count());
+
+	std::memcpy(reinterpret_cast<unsigned char*>(buffer.data()) + offset, ptr, data_byte_count);
+	return ret_offset;
+}
 
 } // namespace opengl
 } // namespace rnd

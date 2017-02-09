@@ -5,6 +5,102 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
+// ----- Buffer -----
+
+Buffer::Buffer(GLenum usage, GLsizeiptr byte_count, const void* data_ptr) noexcept
+	: _byte_count(byte_count)
+{
+	assert(byte_count > 0);
+	assert(is_valid_buffer_usage(usage));
+
+	glCreateBuffers(1, &_id);
+	glNamedBufferData(_id, byte_count, data_ptr, usage);
+}
+
+Buffer::Buffer(Buffer&& buffer) noexcept :
+	_id(buffer._id),
+	_byte_count(buffer._byte_count)
+{
+	buffer._id = Blank::buffer_id;
+	buffer._byte_count = 0;
+}
+
+Buffer::~Buffer() noexcept
+{
+	dispose();
+}
+
+Buffer& Buffer::operator=(Buffer&& buffer) noexcept
+{
+	if (this == &buffer) return *this;
+
+	dispose();
+
+	_id = buffer._id;
+	_byte_count = buffer._byte_count;
+
+	buffer._id = Blank::buffer_id;
+	buffer._byte_count = 0;
+
+	return *this;
+}
+
+void Buffer::dispose() noexcept
+{
+	if (_id == Blank::buffer_id) return;
+
+	glDeleteBuffers(1, &_id);
+	_id = Blank::buffer_id;
+	_byte_count = 0;
+}
+
+// ----- Buffer_immut -----
+
+Buffer_immut::Buffer_immut(GLbitfield flags, size_t byte_count, const void* data_ptr) noexcept 
+	: _byte_count(byte_count)
+{
+	assert(byte_count > 0);
+
+	glCreateBuffers(1, &_id);
+	glNamedBufferStorage(_id, _byte_count, data_ptr, flags);
+}
+
+Buffer_immut::Buffer_immut(Buffer_immut&& buffer) noexcept
+	: _id(buffer._id),
+	_byte_count(buffer._byte_count)
+{
+	buffer._id = Blank::buffer_id;
+	buffer._byte_count = 0;
+}
+
+Buffer_immut::~Buffer_immut() noexcept
+{
+	dispose();
+}
+
+Buffer_immut& Buffer_immut::operator=(Buffer_immut&& buffer) noexcept
+{
+	if (this == &buffer) return *this;
+
+	dispose();
+
+	_id = buffer._id;
+	_byte_count = buffer._byte_count;
+
+	buffer._id = Blank::buffer_id;
+	buffer._byte_count = 0;
+
+	return *this;
+}
+
+void Buffer_immut::dispose() noexcept
+{
+	if (_id == Blank::buffer_id) return;
+
+	glDeleteBuffers(1, &_id);
+	_id = Blank::buffer_id;
+}
+
 // ----- Buffer_dynamic -----
 
 Buffer_dynamic::Buffer_dynamic() noexcept : 
@@ -145,7 +241,7 @@ void Buffer_gpu::dispose() noexcept
 
 // ----- Buffer_persistent-----
 
-Buffer_persistent_map::Buffer_persistent_map(size_t byte_count) noexcept
+Buffer_persistent_map::Buffer_persistent_map(GLsizeiptr byte_count) noexcept
 	: _byte_count(byte_count)
 {
 	assert(byte_count > 0);
@@ -203,8 +299,8 @@ void Buffer_persistent_map::dispose() noexcept
 
 // ---- funcs -----
 
-void copy(const Buffer_i& src, size_t src_offset,
-	Buffer_i& dest, size_t dest_offset, size_t byte_count) noexcept
+void copy(const Buffer_i& src, GLintptr  src_offset,
+	const Buffer_i& dest, GLintptr  dest_offset, GLsizeiptr byte_count) noexcept
 {
 	assert(src.id() != Blank::buffer_id);
 	assert(dest.id() != Blank::buffer_id);
@@ -216,6 +312,36 @@ void copy(const Buffer_i& src, size_t src_offset,
 	glCopyNamedBufferSubData(src.id(), dest.id(), src_offset, dest_offset, byte_count);
 }
 
+bool is_valid_buffer_target(GLenum target) noexcept
+{
+	return target == GL_ARRAY_BUFFER
+		|| target == GL_ATOMIC_COUNTER_BUFFER
+		|| target == GL_DISPATCH_INDIRECT_BUFFER
+		|| target == GL_DRAW_INDIRECT_BUFFER
+		|| target == GL_COPY_READ_BUFFER
+		|| target == GL_COPY_WRITE_BUFFER
+		|| target == GL_ELEMENT_ARRAY_BUFFER
+		|| target == GL_PIXEL_PACK_BUFFER
+		|| target == GL_PIXEL_UNPACK_BUFFER
+		|| target == GL_QUERY_BUFFER
+		|| target == GL_SHADER_STORAGE_BUFFER
+		|| target == GL_TEXTURE_BUFFER
+		|| target == GL_TRANSFORM_FEEDBACK_BUFFER
+		|| target == GL_UNIFORM_BUFFER;
+}
+
+bool is_valid_buffer_usage(GLenum usage) noexcept
+{
+	return usage == GL_STATIC_COPY
+		|| usage == GL_STATIC_READ
+		|| usage == GL_STATIC_DRAW
+		|| usage == GL_DYNAMIC_COPY
+		|| usage == GL_DYNAMIC_READ
+		|| usage == GL_DYNAMIC_DRAW
+		|| usage == GL_STREAM_COPY
+		|| usage == GL_STREAM_COPY
+		|| usage == GL_STREAM_DRAW;
+}
 
 } // namespace opengl
 } // namespace rnd

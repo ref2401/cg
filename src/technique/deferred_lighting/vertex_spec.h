@@ -189,8 +189,8 @@ public:
 	Static_vertex_spec() noexcept = default;
 
 	Static_vertex_spec(GLuint vao_id, GLuint vertex_buffer_binding_index,
-		cg::rnd::opengl::Buffer_gpu vertex_buffer, 
-		cg::rnd::opengl::Buffer_gpu index_buffer) noexcept;
+		cg::rnd::opengl::Buffer_immut vertex_buffer,
+		cg::rnd::opengl::Buffer_immut index_buffer) noexcept;
 
 	Static_vertex_spec(const Static_vertex_spec&) = delete;
 
@@ -217,8 +217,8 @@ private:
 
 	GLuint _vao_id = cg::rnd::opengl::Blank::vao_id;
 	GLuint _vertex_buffer_binding_index = 0;
-	cg::rnd::opengl::Buffer_gpu _vertex_buffer;
-	cg::rnd::opengl::Buffer_gpu _index_buffer;
+	cg::rnd::opengl::Buffer_immut _vertex_buffer;
+	cg::rnd::opengl::Buffer_immut _index_buffer;
 };
 
 class Static_vertex_spec_builder final {
