@@ -306,10 +306,8 @@ public:
 
 	Texture_buffer() noexcept = default;
 
-	template<typename T>
-	Texture_buffer(GLenum internal_format, const std::vector<T>& vector) noexcept;
-
-	Texture_buffer(GLenum internal_format, size_t byte_count, const void* data_ptr = nullptr) noexcept;
+	template<typename... Args>
+	Texture_buffer(GLenum internal_format, Args&&... args) noexcept;
 
 	Texture_buffer(const Texture_buffer&) = delete;
 
@@ -327,6 +325,8 @@ public:
 		return _buffer;
 	}
 
+	void dispose() noexcept;
+
 	// Texture's unique id.
 	GLuint id() const noexcept
 	{
@@ -341,25 +341,15 @@ public:
 
 private:
 
-	void dispose() noexcept;
-
 	GLuint _id = Blank::texture_id;
 	GLenum _internal_format = GL_NONE;
 	Buffer _buffer;
 };
 
 template<typename Buffer>
-template<typename T>
-Texture_buffer<Buffer>::Texture_buffer(GLenum internal_format, 
-	const std::vector<T>& vector) noexcept
-	: Texture_buffer(internal_format, cg::byte_count(vector), vector.data())
-{}
-
-template<typename Buffer>
-Texture_buffer<Buffer>::Texture_buffer(GLenum internal_format,
-	size_t byte_count, const void* data_ptr = nullptr) noexcept
-	: _internal_format(internal_format),
-	_buffer(byte_count, data_ptr)
+template<typename... Args>
+Texture_buffer<Buffer>::Texture_buffer(GLenum internal_format, Args&&... args) noexcept
+	: _buffer(std::forward<Args>(args)...)
 {
 	assert(is_valid_texture_buffer_internal_format(internal_format));
 
@@ -385,7 +375,7 @@ void Texture_buffer<Buffer>::dispose() noexcept
 	glDeleteTextures(1, &_id);
 	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
-	_buffer.~Buffer();
+	_buffer.dispose();
 }
 
 template<typename Buffer>
@@ -424,26 +414,6 @@ std::ostream& operator<<(std::ostream& out, const Sampler_desc& desc);
 
 std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc);
 
-// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
-// based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
-GLenum get_texture_sub_image_format(cg::data::Pixel_format fmt) noexcept;
-
-// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
-// based on the specified texture internal format.
-// Returns GL_NONE if internal_format value is not a valid value.
-GLenum get_texture_sub_image_format(GLenum internal_format) noexcept;
-
-// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
-// based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
-GLenum get_texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
-
-// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
-// based on the specified texture internal format.
-// Returns GL_NONE if internal_format value is not a valid value.
-GLenum get_texture_sub_image_type(GLenum internal_format) noexcept;
-
 // Validates glTexImage/glTexStorage/glTextureStorage 'internalformat' argument value.
 bool is_valid_texture_internal_format(GLenum value) noexcept;
 
@@ -459,6 +429,25 @@ bool is_valid_texture_min_filter(GLenum value) noexcept;
 // Validates sampler/texture WRAP_{S/T/R} parameter value.
 bool is_valid_texture_wrap_mode(GLenum value) noexcept;
 
+// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum texture_sub_image_format(cg::data::Pixel_format fmt) noexcept;
+
+// Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
+// based on the specified texture internal format.
+// Returns GL_NONE if internal_format value is not a valid value.
+GLenum texture_sub_image_format(GLenum internal_format) noexcept;
+
+// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified image format.
+// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
+GLenum texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
+
+// Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
+// based on the specified texture internal format.
+// Returns GL_NONE if internal_format value is not a valid value.
+GLenum texture_sub_image_type(GLenum internal_format) noexcept;
 
 } // namespace opengl
 } // namespace rnd

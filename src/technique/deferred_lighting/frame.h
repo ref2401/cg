@@ -264,7 +264,7 @@ private:
 	const size_t _batch_size = 13;
 	std::array<GLsync, 3> _sync_objects;
 	Buffer_partitioned _draw_indirect_buffer;
-	cg::rnd::opengl::Buffer_gpu _draw_index_buffer;  // simulates gl_DrawID
+	cg::rnd::opengl::Buffer_immut _draw_index_buffer;  // simulates gl_DrawID
 	size_t _offset_draw_indirect = 0;
 
 	// future Frame_packet stuff:

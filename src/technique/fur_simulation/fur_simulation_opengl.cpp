@@ -22,9 +22,9 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 {
 	Model_geometry_data geometry(strand_lenght, geometry_filename);
 
-	_tbo_position_buffer = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.position_buffer);
-	_tbo_physics_buffer_0 = Texture_buffer<Buffer_gpu>(GL_RGB32F, geometry.simulation_buffer);
-	_tbo_physics_buffer_1 = Texture_buffer<Buffer_gpu>(GL_RGB32F, byte_count(geometry.simulation_buffer), nullptr);
+	_tbo_position_buffer = Texture_buffer<Buffer_immut>(GL_RGB32F, 0, geometry.position_buffer);
+	_tbo_physics_buffer_0 = Texture_buffer<Buffer_immut>(GL_RGB32F, 0, geometry.simulation_buffer);
+	_tbo_physics_buffer_1 = Texture_buffer<Buffer_immut>(GL_RGB32F, 0, byte_count(geometry.simulation_buffer), nullptr);
 	_model_attribs_buffer = Buffer_immut(0, geometry.model_attribs_buffer);
 	_index_buffer = Buffer_immut(0, geometry.index_buffer);
 	_meshes = std::move(geometry.meshes);
@@ -41,7 +41,7 @@ Geometry_buffers::Geometry_buffers(float strand_lenght, const char* geometry_fil
 	init_render_1_vao(geometry.layout);
 
 	// debug_slot_buffer settings
-	_tbo_debug_slot = Texture_buffer<Buffer_gpu>(GL_RGBA32F, _vertex_count * 4 * sizeof(float), nullptr);
+	_tbo_debug_slot = Texture_buffer<Buffer_immut>(GL_RGBA32F, 0, _vertex_count * 4 * sizeof(float), nullptr);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, _tbo_debug_slot.buffer().id());
 }
 

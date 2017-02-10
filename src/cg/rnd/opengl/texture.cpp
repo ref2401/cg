@@ -156,8 +156,8 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internal_format,
 		_size.width, _size.height, 0,
-		get_texture_sub_image_format(_internal_format),
-		get_texture_sub_image_type(_internal_format),
+		texture_sub_image_format(_internal_format),
+		texture_sub_image_type(_internal_format),
 		nullptr);
 
 	glBindTexture(GL_TEXTURE_2D, Blank::texture_id);
@@ -262,8 +262,8 @@ void Texture_2d_immut::write(GLuint mipmap_level, const uint2& offset, const cg:
 
 	glTextureSubImage2D(_id, mipmap_level, offset.x, offset.y,
 		image.size().width, image.size().height,
-		get_texture_sub_image_format(image.pixel_format()),
-		get_texture_sub_image_type(image.pixel_format()),
+		texture_sub_image_format(image.pixel_format()),
+		texture_sub_image_type(image.pixel_format()),
 		image.data());
 }
 
@@ -351,8 +351,8 @@ void Texture_3d_immut::write(GLuint mipmap_level, const uint3& offset, const cg:
 
 	glTextureSubImage3D(_id, mipmap_level, offset.x, offset.y, offset.z,
 		image.size().width, image.size().height, 1,
-		get_texture_sub_image_format(image.pixel_format()),
-		get_texture_sub_image_type(image.pixel_format()),
+		texture_sub_image_format(image.pixel_format()),
+		texture_sub_image_type(image.pixel_format()),
 		image.data());
 }
 
@@ -370,74 +370,6 @@ std::wostream& operator<<(std::wostream& out, const Sampler_desc& desc)
 	out << "Sampler_desc(" << desc.min_filter << ", " << desc.mag_filter << ", "
 		<< desc.wrap_s << ", " << desc.wrap_t << ", " << desc.wrap_r << ')';
 	return out;
-}
-
-GLenum get_texture_sub_image_format(Pixel_format fmt) noexcept
-{
-	switch (fmt) {
-		default:
-		case Pixel_format::none: return GL_NONE;
-
-		case Pixel_format::red_8: return GL_RED;
-		case Pixel_format::rg_8: return GL_RG;
-		case Pixel_format::rgb_8: return GL_RGB;
-		case Pixel_format::rgba_8: return GL_RGBA;
-	}
-}
-
-GLenum get_texture_sub_image_format(GLenum internal_format) noexcept
-{
-	switch (internal_format) {
-		default:					return GL_NONE;
-
-		case GL_R8:					return GL_RED;
-		case GL_R32F:				return GL_RED;
-		case GL_RG8:				return GL_RG;
-		case GL_RG32F:				return GL_RG;
-		case GL_RGB8:				return GL_RGB;
-		case GL_RGB32F:				return GL_RGB;
-		case GL_RGBA8:				return GL_RGBA;
-		case GL_RGBA32F:			return GL_RGBA;
-		case GL_DEPTH_COMPONENT24:	return GL_DEPTH_COMPONENT;
-		case GL_DEPTH_COMPONENT32:	return GL_DEPTH_COMPONENT;
-		case GL_DEPTH_COMPONENT32F:	return GL_DEPTH_COMPONENT;
-		case GL_DEPTH24_STENCIL8:	return GL_DEPTH_STENCIL;
-		case GL_DEPTH32F_STENCIL8:	return GL_DEPTH_STENCIL;
-	}
-}
-
-GLenum get_texture_sub_image_type(Pixel_format fmt) noexcept
-{
-	switch (fmt) {
-		default:
-		case Pixel_format::none: return GL_NONE;
-
-		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rg_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
-	}
-}
-
-GLenum get_texture_sub_image_type(GLenum internal_format) noexcept
-{
-	switch (internal_format) {
-		default:					return GL_NONE;
-
-		case GL_R8:					return GL_UNSIGNED_BYTE;
-		case GL_R32F:				return GL_FLOAT;
-		case GL_RG8:				return GL_UNSIGNED_BYTE;
-		case GL_RG32F:				return GL_FLOAT;
-		case GL_RGB8:				return GL_UNSIGNED_BYTE;
-		case GL_RGB32F:				return GL_FLOAT;
-		case GL_RGBA8:				return GL_UNSIGNED_BYTE;
-		case GL_RGBA32F:			return GL_FLOAT;
-		case GL_DEPTH_COMPONENT24:	return GL_UNSIGNED_INT;
-		case GL_DEPTH_COMPONENT32:	return GL_UNSIGNED_INT;
-		case GL_DEPTH_COMPONENT32F:	return GL_FLOAT;
-		case GL_DEPTH24_STENCIL8:	return GL_UNSIGNED_INT_24_8;
-		case GL_DEPTH32F_STENCIL8:	return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
-	}
 }
 
 bool is_valid_texture_internal_format(GLenum value) noexcept
@@ -517,6 +449,74 @@ bool is_valid_texture_wrap_mode(GLenum value) noexcept
 		|| (value == GL_CLAMP_TO_EDGE)
 		|| (value == GL_MIRRORED_REPEAT)
 		|| (value == GL_MIRROR_CLAMP_TO_EDGE);
+}
+
+GLenum texture_sub_image_format(Pixel_format fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Pixel_format::none: return GL_NONE;
+
+		case Pixel_format::red_8: return GL_RED;
+		case Pixel_format::rg_8: return GL_RG;
+		case Pixel_format::rgb_8: return GL_RGB;
+		case Pixel_format::rgba_8: return GL_RGBA;
+	}
+}
+
+GLenum texture_sub_image_format(GLenum internal_format) noexcept
+{
+	switch (internal_format) {
+		default:					return GL_NONE;
+
+		case GL_R8:					return GL_RED;
+		case GL_R32F:				return GL_RED;
+		case GL_RG8:				return GL_RG;
+		case GL_RG32F:				return GL_RG;
+		case GL_RGB8:				return GL_RGB;
+		case GL_RGB32F:				return GL_RGB;
+		case GL_RGBA8:				return GL_RGBA;
+		case GL_RGBA32F:			return GL_RGBA;
+		case GL_DEPTH_COMPONENT24:	return GL_DEPTH_COMPONENT;
+		case GL_DEPTH_COMPONENT32:	return GL_DEPTH_COMPONENT;
+		case GL_DEPTH_COMPONENT32F:	return GL_DEPTH_COMPONENT;
+		case GL_DEPTH24_STENCIL8:	return GL_DEPTH_STENCIL;
+		case GL_DEPTH32F_STENCIL8:	return GL_DEPTH_STENCIL;
+	}
+}
+
+GLenum texture_sub_image_type(Pixel_format fmt) noexcept
+{
+	switch (fmt) {
+		default:
+		case Pixel_format::none: return GL_NONE;
+
+		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rg_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
+		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
+	}
+}
+
+GLenum texture_sub_image_type(GLenum internal_format) noexcept
+{
+	switch (internal_format) {
+		default:					return GL_NONE;
+
+		case GL_R8:					return GL_UNSIGNED_BYTE;
+		case GL_R32F:				return GL_FLOAT;
+		case GL_RG8:				return GL_UNSIGNED_BYTE;
+		case GL_RG32F:				return GL_FLOAT;
+		case GL_RGB8:				return GL_UNSIGNED_BYTE;
+		case GL_RGB32F:				return GL_FLOAT;
+		case GL_RGBA8:				return GL_UNSIGNED_BYTE;
+		case GL_RGBA32F:			return GL_FLOAT;
+		case GL_DEPTH_COMPONENT24:	return GL_UNSIGNED_INT;
+		case GL_DEPTH_COMPONENT32:	return GL_UNSIGNED_INT;
+		case GL_DEPTH_COMPONENT32F:	return GL_FLOAT;
+		case GL_DEPTH24_STENCIL8:	return GL_UNSIGNED_INT_24_8;
+		case GL_DEPTH32F_STENCIL8:	return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+	}
 }
 
 //void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
