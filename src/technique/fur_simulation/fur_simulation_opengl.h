@@ -36,17 +36,17 @@ public:
 
 	GLuint blank_vao_id() const noexcept
 	{
-		return _blank_vao_id;
+		return _blank_vao.id();
 	}
 
 	GLuint physics_vao_id() const noexcept
 	{
-		return (_read_from_physics_0) ? _physics_0_vao_id : _physics_1_vao_id;
+		return (_read_from_physics_0) ? _physics_0_vao.id() : _physics_1_vao.id();
 	}
 
 	GLuint render_vao_id() const noexcept
 	{
-		return (_read_from_physics_0) ? _render_vao_0_id : _render_vao_1_id;
+		return (_read_from_physics_0) ? _render_vao_0.id() : _render_vao_1.id();
 	}
 
 	GLsizei vertex_count() const noexcept
@@ -90,11 +90,11 @@ private:
 	Texture_buffer<Buffer_immut> _tbo_debug_slot;
 	Buffer_immut _model_attribs_buffer;
 	Buffer_immut _index_buffer;
-	GLuint _blank_vao_id = Blank::vao_id;
-	GLuint _physics_0_vao_id = Blank::vao_id;
-	GLuint _physics_1_vao_id = Blank::vao_id;
-	GLuint _render_vao_0_id = Blank::vao_id;
-	GLuint _render_vao_1_id = Blank::vao_id;
+	Vao _blank_vao;
+	Vao _physics_0_vao;
+	Vao _physics_1_vao;
+	Vao _render_vao_0;
+	Vao _render_vao_1;
 	size_t _vertex_count = 0;
 	mutable bool _read_from_physics_0 = true;
 };

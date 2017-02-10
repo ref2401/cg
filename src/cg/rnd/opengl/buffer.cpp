@@ -159,7 +159,46 @@ void Buffer_persistent_map::dispose() noexcept
 	_ptr = nullptr;
 }
 
-// ---- funcs -----
+// ----- Vao -----
+
+Vao::Vao() noexcept
+{
+	glCreateVertexArrays(1, &_id);
+}
+
+Vao::Vao(Vao&& vao) noexcept
+	: _id(vao._id)
+{
+	vao._id = Blank::vao_id;
+}
+
+Vao::~Vao() noexcept
+{
+	dispose();
+}
+
+Vao& Vao::operator=(Vao&& vao) noexcept
+{
+	if (this == &vao) return *this;
+
+	dispose();
+
+	_id = vao._id;
+
+	vao._id = Blank::vao_id;
+
+	return *this;
+}
+
+void Vao::dispose() noexcept
+{
+	if (_id == Blank::vao_id) return;
+
+	glDeleteVertexArrays(1, &_id);
+	_id = Blank::vao_id;
+}
+
+// ----- funcs -----
 
 void copy(const Buffer_i& src, GLintptr  src_offset,
 	const Buffer_i& dest, GLintptr  dest_offset, GLsizeiptr byte_count) noexcept

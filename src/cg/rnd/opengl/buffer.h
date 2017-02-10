@@ -176,6 +176,35 @@ private:
 	void* _ptr = nullptr;
 };
 
+class Vao final {
+public:
+
+	Vao() noexcept;
+
+	Vao(const Vao&) = delete;
+
+	Vao(Vao&& vao) noexcept;
+
+	~Vao() noexcept;
+
+
+	Vao& operator=(const Vao) = delete;
+
+	Vao& operator=(Vao&& vao) noexcept;
+
+
+	void dispose() noexcept;
+
+	GLuint id() const noexcept
+	{
+		return _id;
+	}
+
+private:
+
+	GLuint _id = Blank::vao_id;
+};
+
 
 // Copies contents of the src buffer to the dest buffer.
 // Params:
@@ -193,10 +222,6 @@ inline void copy(const Buffer_i& src, const Buffer_i& dest, GLsizeiptr byte_coun
 {
 	copy(src, 0, dest, 0, byte_count);
 }
-
-//// Copies byte_count sequential bytes pointed to by data_ptr into buffer's data store.
-//// Reallocates buffer's data store (preserving already written data) if there is not enough memory.
-//void write(const Buffer_i& buffer, size_t byte_count, const void* data_ptr);
 
 // If T represents one of the OpenGL buffers, 
 // provides the member constant value equal to true. Otherwise value is false.
@@ -220,6 +245,10 @@ bool is_valid_buffer_target(GLenum target) noexcept;
 
 // Validates glBufferData/glNamedBufferData 'usage' argument value.
 bool is_valid_buffer_usage(GLenum usage) noexcept;
+
+//// Copies byte_count sequential bytes pointed to by data_ptr into buffer's data store.
+//// Reallocates buffer's data store (preserving already written data) if there is not enough memory.
+//void write(const Buffer_i& buffer, size_t byte_count, const void* data_ptr);
 
 // Writes a sequence of objects of type T into the buffer.
 // Params:
