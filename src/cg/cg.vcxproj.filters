@@ -58,6 +58,9 @@
     <ClCompile Include="rnd\opengl\texture.cpp">
       <Filter>rnd\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="base\base.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

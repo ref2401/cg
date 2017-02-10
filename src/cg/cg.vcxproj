@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base\base.cpp" />
     <ClCompile Include="data\file.cpp" />
     <ClCompile Include="data\image.cpp" />
     <ClCompile Include="data\model.cpp" />

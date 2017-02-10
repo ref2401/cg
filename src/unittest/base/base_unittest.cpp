@@ -54,7 +54,7 @@ TEST_CLASS(cg_base_base_Funcs) {
 
 	TEST_METHOD(get_exception_message)
 	{
-		using cg::get_exception_message;
+		using cg::exception_message;
 
 		std::string topmost_msg = "topmost_msg";
 		std::string middle_msg = "middle_exception";
@@ -80,7 +80,7 @@ TEST_CLASS(cg_base_base_Funcs) {
 			}
 		}
 		catch (std::exception& exc) {
-			actual_msg = get_exception_message(exc);
+			actual_msg = exception_message(exc);
 		}
 			
 		Assert::AreEqual(expected_msg, actual_msg);

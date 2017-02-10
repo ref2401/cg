@@ -25,25 +25,7 @@
 	}																										
 
 namespace cg {
-
 namespace internal {
-
-inline void accumulate_exception_message_impl(std::string& dest, const std::exception& exc)
-{
-	dest.append("- ");
-	dest.append(exc.what());
-	dest.push_back('\n');
-
-	try {
-		std::rethrow_if_nested(exc);
-	}
-	catch (const std::exception& nested_exc) {
-		accumulate_exception_message_impl(dest, nested_exc);
-	}
-	catch (...) {
-		assert(false); // hell no!
-	}
-}
 
 inline void concat_impl(std::ostringstream& string_stream)
 {}
@@ -69,12 +51,7 @@ inline std::string concat(const Args&... args)
 
 // Constructs exception message string considering all the nested exceptions.
 // Each exception message is formatted as a new line and starts with " - " prefix. 
-inline std::string get_exception_message(const std::exception& exc)
-{
-	std::string msg;
-	cg::internal::accumulate_exception_message_impl(msg, exc);
-	return msg;
-}
+std::string exception_message(const std::exception& exc);
 
 // Calculates how many bytes are in the specified number of kilobytes.
 // Uses base 2 definition: 1 Kb = 1024 bytes = 2^10 bytes.
