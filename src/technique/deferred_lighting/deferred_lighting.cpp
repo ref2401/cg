@@ -45,18 +45,12 @@ Renderer_config make_render_config(uint2 viewport_size)
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
 	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../data/common_data/rect-1x1.obj");
-	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/gbuffer_pass");
-	config.gbuffer_pass_code.name = "gbuffer-pass-shader";
-	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/lighting_pass_dir");
-	config.lighting_pass_dir_code.name = "lighting-pass-dir-shader";
-	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/shadow_map_pass");
-	config.shadow_map_pass_code.name = "shadow-map-pass-shader";
-	config.ssao_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/ssao_pass");
-	config.ssao_pass_code.name = "ssao-pass-shader";
-	config.material_lighting_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/material_pass");
-	config.material_lighting_pass_code.name = "material-pass-shader";
-	config.tone_mapping_pass_code = cg::data::load_glsl_program_desc("../data/deferred_lighting_shaders/tone_mapping_pass");
-	config.tone_mapping_pass_code.name = "tone-mapping-pass-shader";
+	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("gbuffer-pass-shader", "../data/deferred_lighting_shaders/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("lighting-pass-dir-shader", "../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("shadow-map-pass-shader", "../data/deferred_lighting_shaders/shadow_map_pass");
+	config.ssao_pass_code = cg::data::load_glsl_program_desc("ssao-pass-shader", "../data/deferred_lighting_shaders/ssao_pass");
+	config.material_lighting_pass_code = cg::data::load_glsl_program_desc("material-pass-shader", "../data/deferred_lighting_shaders/material_pass");
+	config.tone_mapping_pass_code = cg::data::load_glsl_program_desc("tone-mapping-pass-shader", "../data/deferred_lighting_shaders/tone_mapping_pass");
 	return config;
 }
 

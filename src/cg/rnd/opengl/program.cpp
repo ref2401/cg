@@ -53,10 +53,10 @@ Glsl_program::Glsl_program(const cg::data::Glsl_program_desc& prog_desc)
 		glAttachShader(_id, vertex_shader.id());
 
 		// fragment shader
-		Glsl_shader pixel_shader;
+		Glsl_shader fragment_shader;
 		if (prog_desc.has_fragment_shader()) {
-			pixel_shader = Glsl_shader(GL_FRAGMENT_SHADER, prog_desc.fragment_shader_source_code);
-			glAttachShader(_id, pixel_shader.id());
+			fragment_shader = Glsl_shader(GL_FRAGMENT_SHADER, prog_desc.fragment_shader_source_code);
+			glAttachShader(_id, fragment_shader.id());
 		}
 
 		// transform feedback
@@ -82,7 +82,7 @@ Glsl_program::Glsl_program(const cg::data::Glsl_program_desc& prog_desc)
 
 		// once shaders have been linked into a program they are no longer needed.
 		glDetachShader(_id, vertex_shader.id());
-		if (prog_desc.has_fragment_shader()) glDetachShader(_id, pixel_shader.id());
+		if (prog_desc.has_fragment_shader()) glDetachShader(_id, fragment_shader.id());
 	}
 	catch (...) {
 		std::string exc_msg = EXCEPTION_MSG("Error occured while creating the '", _name, "' shader program.");
@@ -205,7 +205,7 @@ void Glsl_shader::dispose() noexcept
 bool compile_status(const Glsl_shader& shader) noexcept
 {
 	assert(shader.id() != Blank::shader_id);
-	return parameter(shader, GL_COMPILE_STATUS) != 0;
+	return parameter(shader, GL_COMPILE_STATUS) == GL_TRUE;
 }
 
 std::string info_log(const Glsl_program& program) noexcept
@@ -309,7 +309,7 @@ void link(const Glsl_program& program)
 bool link_status(const Glsl_program& program) noexcept
 {
 	assert(program.id());
-	return parameter(program, GL_LINK_STATUS) != 0;
+	return parameter(program, GL_LINK_STATUS) == GL_TRUE;
 }
 
 GLint parameter(const Glsl_program& program, GLenum pname) noexcept
@@ -479,7 +479,7 @@ void validate(const Glsl_program& program)
 bool validate_status(const Glsl_program& program) noexcept
 {
 	assert(program.id());
-	return parameter(program, GL_VALIDATE_STATUS) != 0;
+	return parameter(program, GL_VALIDATE_STATUS) == GL_TRUE;
 }
 
 } // namespace opengl
