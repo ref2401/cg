@@ -79,11 +79,11 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& 
 	_prog(source_code),
 	_gbuffer(gbuffer)
 {
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_nds());
-	_fbo.attach_depth_target(_gbuffer.aux_depth_renderbuffer());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT0, _gbuffer.tex_nds());
+	attach_depth_target(_fbo, _gbuffer.aux_depth_renderbuffer());
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
+	set_read_buffer(_fbo, GL_NONE);
+	validate(_fbo);
 }
 
 void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
@@ -127,12 +127,12 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc
 	_gbuffer(gbuffer),
 	_dir_prog(dir_source_code)
 {
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT2, _gbuffer.tex_lighting_specular_term());
-	_fbo.set_draw_buffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT0, _gbuffer.tex_lighting_ambient_term());
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT1, _gbuffer.tex_lighting_diffuse_term());
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT2, _gbuffer.tex_lighting_specular_term());
+	set_draw_buffers(_fbo, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2);
+	set_read_buffer(_fbo, GL_NONE);
+	validate(_fbo);
 }
 
 void Lighting_pass::begin() noexcept
@@ -167,10 +167,10 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 	_gbuffer(gbuffer),
 	_prog(source_code)
 {
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_material_lighting_result());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT0, _gbuffer.tex_material_lighting_result());
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
+	set_read_buffer(_fbo, GL_NONE);
+	validate(_fbo);
 }
 
 void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& view_matrix,
@@ -240,12 +240,12 @@ Shadow_map_pass::Shadow_map_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_
 	_prog(source_code),
 	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_03)
 {
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
-	_fbo.attach_depth_target(_gbuffer.aux_depth_renderbuffer());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT0, _gbuffer.tex_shadow_map());
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT1, _gbuffer.tex_aux_render_target());
+	attach_depth_target(_fbo, _gbuffer.aux_depth_renderbuffer());
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
+	set_read_buffer(_fbo, GL_NONE);
+	validate(_fbo);
 }
 
 void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
@@ -276,7 +276,7 @@ void Shadow_map_pass::filter_shadow_map() noexcept
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 
 	// horz filter pass (render to _gbuffer.tex_aux_render_target())
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT1);
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT1);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(0, _gbuffer.tex_shadow_map().id());
@@ -285,7 +285,7 @@ void Shadow_map_pass::filter_shadow_map() noexcept
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 
 	// vert filter pass (render to _gbuffer.tex_shadow_map())
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
 	glBindTextureUnit(0, _gbuffer.tex_aux_render_target().id());
 
 	_filter_shader_program.use_for_vertical_pass();
@@ -306,11 +306,11 @@ Ssao_pass::Ssao_pass(Gbuffer& gbuffer, const Glsl_program_desc& source_code) :
 	_sample_rays(generate_sphere_normalized_sample_kernel(sample_ray_count + random_normal_count)),
 	_filter_shader_program(Filter_type::gaussian, Filter_kernel_radius::radius_05)
 {
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT0, _gbuffer.tex_ssao_map());
-	_fbo.attach_color_target(GL_COLOR_ATTACHMENT1, _gbuffer.tex_ssao_map_aux());
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
-	_fbo.set_read_buffer(GL_NONE);
-	_fbo.validate();
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT0, _gbuffer.tex_ssao_map());
+	attach_color_target(_fbo, GL_COLOR_ATTACHMENT1, _gbuffer.tex_ssao_map_aux());
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
+	set_read_buffer(_fbo, GL_NONE);
+	validate(_fbo);
 }
 
 void Ssao_pass::perform() noexcept
@@ -347,7 +347,7 @@ void Ssao_pass::filter_ssao_map() noexcept
 	glBindVertexArray(_gbuffer.aux_geometry_vao_id());
 
 	// horz filter pass (render to _gbuffer.tex_ssao_map_aux())
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT1);
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT1);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(0, _gbuffer.tex_ssao_map().id());
@@ -356,7 +356,7 @@ void Ssao_pass::filter_ssao_map() noexcept
 	draw_elements_base_vertex(_gbuffer.aux_geometry_rect_1x1_params());
 
 	// vert filter pass (render to _gbuffer.tex_shadow_map())
-	_fbo.set_draw_buffer(GL_COLOR_ATTACHMENT0);
+	set_draw_buffer(_fbo, GL_COLOR_ATTACHMENT0);
 	glBindTextureUnit(0, _gbuffer.tex_ssao_map_aux().id());
 
 	_filter_shader_program.use_for_vertical_pass();

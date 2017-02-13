@@ -132,47 +132,6 @@ Framebuffer& Framebuffer::operator=(Framebuffer&& fb) noexcept
 	return *this;
 }
 
-void Framebuffer::attach_color_target(GLenum color_attachment, const Texture_2d_i& texture, GLuint mipmap_index) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(is_valid_color_attachment(color_attachment));
-	assert(texture.id() != Blank::texture_id);
-	assert(mipmap_index < texture.mipmap_level_count());
-
-	glNamedFramebufferTexture(_id, color_attachment, texture.id(), mipmap_index);
-}
-
-void Framebuffer::attach_depth_target(const Renderbuffer& rnd_buff) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(rnd_buff.id() != Blank::renderbuffer_id);
-
-	glNamedFramebufferRenderbuffer(_id, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rnd_buff.id());
-}
-
-void Framebuffer::attach_depth_target(const Texture_2d_i& texture, GLuint mipmap_index) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(texture.id() != Blank::texture_id);
-	assert(mipmap_index < texture.mipmap_level_count());
-
-	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, texture.id(), mipmap_index);
-}
-
-void Framebuffer::detach_color_target(GLenum color_attachment) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(is_valid_color_attachment(color_attachment));
-	glNamedFramebufferTexture(_id, color_attachment, Blank::texture_id, 0);
-}
-
-void Framebuffer::detach_depth_target() noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	glNamedFramebufferTexture(_id, GL_DEPTH_ATTACHMENT, Blank::texture_id, 0);
-	glNamedFramebufferRenderbuffer(_id, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, Blank::renderbuffer_id);
-}
-
 void Framebuffer::dispose() noexcept
 {
 	if (_id == Blank::framebuffer_id) return;
@@ -181,47 +140,49 @@ void Framebuffer::dispose() noexcept
 	_id = Blank::framebuffer_id;
 }
 
-void Framebuffer::set_draw_buffer(GLenum buff) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
-
-	glNamedFramebufferDrawBuffer(_id, buff);
-}
-
-void Framebuffer::set_draw_buffers(GLenum loc0, GLenum loc1, GLenum loc2, GLenum loc3,
-	GLenum loc4, GLenum loc5, GLenum loc6, GLenum loc7) noexcept
-{
-	assert(is_valid_color_attachment(loc0) || loc0 == GL_NONE);
-	assert(is_valid_color_attachment(loc1) || loc1 == GL_NONE);
-	assert(is_valid_color_attachment(loc2) || loc2 == GL_NONE);
-	assert(is_valid_color_attachment(loc3) || loc3 == GL_NONE);
-	assert(is_valid_color_attachment(loc4) || loc4 == GL_NONE);
-	assert(is_valid_color_attachment(loc5) || loc5 == GL_NONE);
-	assert(is_valid_color_attachment(loc6) || loc6 == GL_NONE);
-	assert(is_valid_color_attachment(loc7) || loc7 == GL_NONE);
-
-	GLenum buffs[8] = { loc0, loc1, loc2, loc3, loc4, loc5, loc6, loc7 };
-	glNamedFramebufferDrawBuffers(_id, std::extent<decltype(buffs)>::value, buffs);
-}
-
-void Framebuffer::set_read_buffer(GLenum buff) noexcept
-{
-	assert(_id != Blank::framebuffer_id);
-	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
-	
-	glNamedFramebufferReadBuffer(_id, buff);
-}
-
-void Framebuffer::validate() const
-{
-	assert(_id != Blank::framebuffer_id);
-
-	validate_framebuffer(_id, GL_DRAW_FRAMEBUFFER);
-	validate_framebuffer(_id, GL_READ_FRAMEBUFFER);
-}
-
 // ----- funcs -----
+
+void attach_color_target(const Framebuffer& fbo, GLenum color_attachment, 
+	const Texture_2d_i& texture, GLint mipmap_index) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(is_valid_color_attachment(color_attachment));
+	assert(texture.id() != Blank::texture_id);
+	assert(mipmap_index < texture.mipmap_level_count());
+
+	glNamedFramebufferTexture(fbo.id(), color_attachment, texture.id(), mipmap_index);
+}
+
+void attach_depth_target(const Framebuffer& fbo, const Renderbuffer& rnd_buff) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(rnd_buff.id() != Blank::renderbuffer_id);
+
+	glNamedFramebufferRenderbuffer(fbo.id(), GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rnd_buff.id());
+}
+
+void attach_depth_target(const Framebuffer& fbo, const Texture_2d_i& texture, GLint mipmap_index) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(texture.id() != Blank::texture_id);
+	assert(mipmap_index < texture.mipmap_level_count());
+
+	glNamedFramebufferTexture(fbo.id(), GL_DEPTH_ATTACHMENT, texture.id(), mipmap_index);
+}
+
+void detach_color_target(const Framebuffer& fbo, GLenum color_attachment) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(is_valid_color_attachment(color_attachment));
+	glNamedFramebufferTexture(fbo.id(), color_attachment, Blank::texture_id, 0);
+}
+
+void detach_depth_target(const Framebuffer& fbo) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	glNamedFramebufferTexture(fbo.id(), GL_DEPTH_ATTACHMENT, Blank::texture_id, 0);
+	glNamedFramebufferRenderbuffer(fbo.id(), GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, Blank::renderbuffer_id);
+}
 
 bool is_valid_color_attachment(const GLenum& v) noexcept
 {
@@ -233,6 +194,48 @@ bool is_valid_color_attachment(const GLenum& v) noexcept
 		|| (v == GL_COLOR_ATTACHMENT5)
 		|| (v == GL_COLOR_ATTACHMENT6)
 		|| (v == GL_COLOR_ATTACHMENT7);
+}
+
+void set_draw_buffer(const Framebuffer& fbo, GLenum buff) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
+
+	glNamedFramebufferDrawBuffer(fbo.id(), buff);
+}
+
+void set_draw_buffers(const Framebuffer& fbo, 
+	GLenum loc0, GLenum loc1, GLenum loc2, GLenum loc3,
+	GLenum loc4, GLenum loc5, GLenum loc6, GLenum loc7) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(is_valid_color_attachment(loc0) || loc0 == GL_NONE);
+	assert(is_valid_color_attachment(loc1) || loc1 == GL_NONE);
+	assert(is_valid_color_attachment(loc2) || loc2 == GL_NONE);
+	assert(is_valid_color_attachment(loc3) || loc3 == GL_NONE);
+	assert(is_valid_color_attachment(loc4) || loc4 == GL_NONE);
+	assert(is_valid_color_attachment(loc5) || loc5 == GL_NONE);
+	assert(is_valid_color_attachment(loc6) || loc6 == GL_NONE);
+	assert(is_valid_color_attachment(loc7) || loc7 == GL_NONE);
+
+	GLenum buffs[8] = { loc0, loc1, loc2, loc3, loc4, loc5, loc6, loc7 };
+	glNamedFramebufferDrawBuffers(fbo.id(), std::extent<decltype(buffs)>::value, buffs);
+}
+
+void set_read_buffer(const Framebuffer& fbo, GLenum buff) noexcept
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+	assert(is_valid_color_attachment(buff) || buff == GL_NONE);
+
+	glNamedFramebufferReadBuffer(fbo.id(), buff);
+}
+
+void validate(const Framebuffer& fbo)
+{
+	assert(fbo.id() != Blank::framebuffer_id);
+
+	validate_framebuffer(fbo.id(), GL_DRAW_FRAMEBUFFER);
+	validate_framebuffer(fbo.id(), GL_READ_FRAMEBUFFER);
 }
 
 } // namespace opengl

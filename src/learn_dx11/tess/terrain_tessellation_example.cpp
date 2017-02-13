@@ -1,6 +1,7 @@
 #include "learn_dx11/tess/terrain_tessellation_example.h"
 
 #include <cassert>
+#include <iostream>
 #include <iterator>
 #include <vector>
 
@@ -62,7 +63,7 @@ Terrain_model::Terrain_model(const uint2& cell_count)
 
 void Terrain_model::init_vertex_attribs(const uint2& cell_count)
 {
-	// positions are in range [(-0.5f, 0.0f, -0.5f), (0.5f, 0.5f, 0.5f)]
+	// positions are in range [(-0.5f, 0.0f, -0.5f), (0.5f, 0.0f, 0.5f)]
 	// tex_coords are in range [(0.0, 0.0), (1.0, 1.0)]
 
 	for (uint32_t r = 0; r < cell_count.x + 1; ++r) {

@@ -503,7 +503,7 @@ void write(const Texture_2d_i& texture, GLint mipmap_level, const uint2& offset,
 		image.data());
 }
 
-void write(const Texture_3d_i& texture, GLuint mipmap_level, const uint3& offset, 
+void write(const Texture_3d_i& texture, GLint mipmap_level, const uint3& offset, 
 	const cg::data::Image_2d& image) noexcept
 {
 	assert(texture.id() != Blank::texture_id);
