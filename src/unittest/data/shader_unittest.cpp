@@ -10,16 +10,7 @@
 using cg::data::Glsl_compute_desc;
 using cg::data::Glsl_program_desc;
 using cg::data::Hlsl_shader_set_data;
-using cg::data::Transform_feedback_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
-
-
-namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
-
-template<> inline std::wstring ToString<Transform_feedback_desc>(const Transform_feedback_desc& t) { RETURN_WIDE_STRING(t); }
-
-}}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
 
 namespace unittest {
@@ -84,26 +75,27 @@ public:
 		pd0.name = "awesome-shader-name";
 		pd0.vertex_shader_source_code = "abc";
 		pd0.fragment_shader_source_code = "123";
-		pd0.transform_feedback.varying_names.push_back("out_var_0");
-		pd0.transform_feedback.interleaved_buffer_mode = true;
+		pd0.tf_varying_names.push_back("out_var_0");
+		pd0.tf_interleaved_buffer_mode = true;
 
 		// copy ctor
 		Glsl_program_desc pd_c = pd0;
 		Assert::AreEqual(pd0.name, pd_c.name);
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_c.fragment_shader_source_code);
-		Assert::AreEqual(pd0.transform_feedback, pd_c.transform_feedback);
+		Assert::AreEqual(pd0.tf_interleaved_buffer_mode, pd_c.tf_interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(pd0.tf_varying_names.cbegin(), pd0.tf_varying_names.cend(), pd_c.tf_varying_names.cbegin()));
 
 		// move ctor
 		Glsl_program_desc pd_m = std::move(pd_c);
 		Assert::AreEqual(pd0.name, pd_m.name);
 		Assert::AreEqual(pd0.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd0.fragment_shader_source_code, pd_m.fragment_shader_source_code);
-		Assert::AreEqual(pd0.transform_feedback, pd_m.transform_feedback);
+		Assert::AreEqual(pd0.tf_interleaved_buffer_mode, pd_m.tf_interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(pd0.tf_varying_names.cbegin(), pd0.tf_varying_names.cend(), pd_m.tf_varying_names.cbegin()));
 		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
-		Assert::IsTrue(pd_c.transform_feedback.varying_names.empty());
-		Assert::IsFalse(pd_c.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd_c.tf_varying_names.empty());
 	}
 
 	TEST_METHOD(assignments)
@@ -112,26 +104,28 @@ public:
 		pd.name = "awesome-shader-name";
 		pd.vertex_shader_source_code = "abc";
 		pd.fragment_shader_source_code = "123";
-		pd.transform_feedback.varying_names.push_back("out_var_0");
-		pd.transform_feedback.interleaved_buffer_mode = true;
+		pd.tf_varying_names.push_back("out_var_0");
+		pd.tf_interleaved_buffer_mode = true;
 
 		Glsl_program_desc pd_c;
 		pd_c = pd;
 		Assert::AreEqual(pd.name, pd_c.name);
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_c.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_c.fragment_shader_source_code);
-		Assert::AreEqual(pd.transform_feedback, pd_c.transform_feedback);
+		Assert::AreEqual(pd.tf_interleaved_buffer_mode, pd_c.tf_interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(pd.tf_varying_names.cbegin(), pd.tf_varying_names.cend(), pd_c.tf_varying_names.cbegin()));
+
 
 		Glsl_program_desc pd_m;
 		pd_m = std::move(pd_c);
 		Assert::AreEqual(pd.name, pd_m.name);
 		Assert::AreEqual(pd.vertex_shader_source_code, pd_m.vertex_shader_source_code);
 		Assert::AreEqual(pd.fragment_shader_source_code, pd_m.fragment_shader_source_code);
-		Assert::AreEqual(pd.transform_feedback, pd_m.transform_feedback);
+		Assert::AreEqual(pd.tf_interleaved_buffer_mode, pd_m.tf_interleaved_buffer_mode);
+		Assert::IsTrue(std::equal(pd.tf_varying_names.cbegin(), pd.tf_varying_names.cend(), pd_m.tf_varying_names.cbegin()));
 		Assert::IsTrue(pd_c.vertex_shader_source_code.empty());
 		Assert::IsTrue(pd_c.fragment_shader_source_code.empty());
-		Assert::IsTrue(pd_c.transform_feedback.varying_names.empty());
-		Assert::IsFalse(pd_c.transform_feedback.interleaved_buffer_mode);
+		Assert::IsTrue(pd_c.tf_varying_names.empty());
 	}
 
 	TEST_METHOD(has_xxx_shader)
@@ -235,99 +229,6 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_shader_Transform_feedback_desc) { 
-public:
-
-	TEST_METHOD(assignment_operator)
-	{
-		Transform_feedback_desc tf;
-		tf.varying_names.push_back("out_var_0");
-		tf.varying_names.push_back("out_var_1");
-		tf.interleaved_buffer_mode = true;
-
-		// copy assignment
-		Transform_feedback_desc tf_c;
-		tf_c = tf;
-		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
-		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
-
-		// move assignments
-		Transform_feedback_desc tf_m;
-		tf_m = std::move(tf_c);
-		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
-		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
-		Assert::IsTrue(tf_c.varying_names.empty());
-		Assert::IsFalse(tf_c.interleaved_buffer_mode);
-	}
-
-	TEST_METHOD(ctors)
-	{
-		Transform_feedback_desc tf;
-		Assert::IsTrue(tf.varying_names.empty());
-		Assert::IsFalse(tf.interleaved_buffer_mode);
-		Assert::IsFalse(tf.is_used());
-
-		tf.varying_names.push_back("out_var_0");
-		tf.varying_names.push_back("out_var_1");
-		tf.interleaved_buffer_mode = true;
-
-		// copy ctor
-		Transform_feedback_desc tf_c = tf;
-		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_c.varying_names.cbegin()));
-		Assert::AreEqual(tf.interleaved_buffer_mode, tf_c.interleaved_buffer_mode);
-
-		// move ctor
-		Transform_feedback_desc tf_m = std::move(tf_c);
-		Assert::IsTrue(std::equal(tf.varying_names.cbegin(), tf.varying_names.cend(), tf_m.varying_names.cbegin()));
-		Assert::AreEqual(tf.interleaved_buffer_mode, tf_m.interleaved_buffer_mode);
-		Assert::IsTrue(tf_c.varying_names.empty());
-		Assert::IsFalse(tf_c.interleaved_buffer_mode);
-	}
-
-	TEST_METHOD(equal_operator)
-	{
-		Transform_feedback_desc tf;
-		tf.interleaved_buffer_mode = true;
-		tf.varying_names.push_back("out_var_0");
-
-		// interleaved_buffer_mode
-		Transform_feedback_desc tf_0;
-		tf_0.interleaved_buffer_mode = false;
-		tf_0.varying_names.push_back("out_var_0");
-		Assert::AreNotEqual(tf, tf_0);
-
-		// varying_names
-		Transform_feedback_desc tf_1;
-		tf_1.interleaved_buffer_mode = true;
-		Assert::AreNotEqual(tf, tf_1);
-
-		Transform_feedback_desc tf_2;
-		tf_2.interleaved_buffer_mode = true;
-		tf_2.varying_names.push_back("out_var_100");
-		Assert::AreNotEqual(tf, tf_2);
-
-		// same objects
-		Transform_feedback_desc tf_3;
-		tf_3.interleaved_buffer_mode = true;
-		tf_3.varying_names.push_back("out_var_0");
-		Assert::AreEqual(tf, tf_3);
-	}
-
-	TEST_METHOD(is_used_property)
-	{
-		Transform_feedback_desc tf;
-		Assert::IsTrue(tf.varying_names.empty());
-		Assert::IsFalse(tf.interleaved_buffer_mode);
-		Assert::IsFalse(tf.is_used());
-
-		tf.varying_names.push_back("out_var_0");
-		Assert::IsTrue(tf.is_used());
-
-		tf.varying_names.clear();
-		Assert::IsFalse(tf.is_used());
-	}
-};
-
 TEST_CLASS(cg_data_shader_Funcs) {
 public:
 
@@ -362,27 +263,15 @@ public:
 		auto pd0 = load_glsl_program_desc(name, Filenames::not_real_glsl_program_name);
 		Assert::AreEqual(expected_vertex_source, pd0.vertex_shader_source_code);
 		Assert::AreEqual(expected_fragment_source, pd0.fragment_shader_source_code);
-		Assert::IsFalse(pd0.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(pd0.transform_feedback.varying_names.empty());
+		Assert::IsTrue(pd0.tf_interleaved_buffer_mode);
+		Assert::IsTrue(pd0.tf_varying_names.empty());
 
 		// vertex shader only, without transform feedback
 		auto pd1 = load_glsl_program_desc(name, Filenames::not_real_glsl_single_vertex_program_name);
 		Assert::AreEqual(expected_single_vertex_source, pd1.vertex_shader_source_code);
 		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
-		Assert::IsFalse(pd1.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(pd1.transform_feedback.varying_names.empty());
-		
-		const char* varying_names[3] = { "out_var_0", "out_var_1", "out_var_2" };
-
-		// with transform feedback
-		auto pd2 = load_glsl_program_desc(name, Filenames::not_real_glsl_program_name,
-			true, varying_names[0], varying_names[1], varying_names[2]);
-		Assert::AreEqual(expected_vertex_source, pd2.vertex_shader_source_code);
-		Assert::AreEqual(expected_fragment_source, pd2.fragment_shader_source_code);
-		Assert::IsTrue(pd2.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(std::equal(
-			std::cbegin(varying_names), std::cend(varying_names), 
-			pd2.transform_feedback.varying_names.cbegin()));
+		Assert::IsTrue(pd1.tf_interleaved_buffer_mode);
+		Assert::IsTrue(pd1.tf_varying_names.empty());
 	}
 
 	TEST_METHOD(load_glsl_program_desc_separate_filenames)
@@ -403,27 +292,15 @@ public:
 		auto pd0 = load_glsl_program_desc(name, Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl);
 		Assert::AreEqual(expected_vertex_source, pd0.vertex_shader_source_code);
 		Assert::AreEqual(expected_fragment_source, pd0.fragment_shader_source_code);
-		Assert::IsFalse(pd0.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(pd0.transform_feedback.varying_names.empty());
+		Assert::IsTrue(pd0.tf_interleaved_buffer_mode);
+		Assert::IsTrue(pd0.tf_varying_names.empty());
 
 		// vertex shader only without transform feedback
 		auto pd1 = load_glsl_program_desc(name, Filenames::not_real_single_vertex_glsl.c_str(), "");
 		Assert::AreEqual(expected_single_vertex_source, pd1.vertex_shader_source_code);
 		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
-		Assert::IsFalse(pd1.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(pd1.transform_feedback.varying_names.empty());
-
-		const char* varying_names[3] = { "out_var_0", "out_var_1", "out_var_2" };
-
-		// with transform feedback
-		auto pd2 = load_glsl_program_desc(name, Filenames::not_real_vertex_glsl, Filenames::not_real_fragment_glsl,
-			true, varying_names[0], varying_names[1], varying_names[2]);
-		Assert::AreEqual(expected_vertex_source, pd2.vertex_shader_source_code);
-		Assert::AreEqual(expected_fragment_source, pd2.fragment_shader_source_code);
-		Assert::IsTrue(pd2.transform_feedback.interleaved_buffer_mode);
-		Assert::IsTrue(std::equal(
-			std::cbegin(varying_names), std::cend(varying_names),
-			pd2.transform_feedback.varying_names.cbegin()));
+		Assert::IsTrue(pd1.tf_interleaved_buffer_mode);
+		Assert::IsTrue(pd1.tf_varying_names.empty());
 	}
 
 	TEST_METHOD(load_hlsl_shader_set_data)

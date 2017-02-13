@@ -60,14 +60,14 @@ Glsl_program::Glsl_program(const cg::data::Glsl_program_desc& prog_desc)
 		}
 
 		// transform feedback
-		if (prog_desc.transform_feedback.is_used()) {
-			const size_t varying_count = prog_desc.transform_feedback.varying_names.size();
-			const GLenum buffer_mode = (prog_desc.transform_feedback.interleaved_buffer_mode)
+		if (prog_desc.transform_feedback_is_used()) {
+			const size_t varying_count = prog_desc.tf_varying_names.size();
+			const GLenum buffer_mode = (prog_desc.tf_interleaved_buffer_mode)
 				? (GL_INTERLEAVED_ATTRIBS) : (GL_SEPARATE_ATTRIBS);
 
 			const char** varying_names = new const char*[varying_count];
 			const char** tmp = varying_names;
-			for (const auto& name : prog_desc.transform_feedback.varying_names) {
+			for (const auto& name : prog_desc.tf_varying_names) {
 				*tmp = name.c_str();
 				++tmp;
 			}
