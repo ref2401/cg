@@ -30,6 +30,8 @@ public:
 	Renderbuffer& operator=(Renderbuffer&& rnd_buff) noexcept;
 
 
+	void dispose() noexcept;
+
 	GLuint id() const noexcept
 	{
 		return _id;
@@ -51,8 +53,6 @@ public:
 	void set_size(const cg::uint2& size) noexcept;
 
 private:
-
-	void dispose() noexcept;
 
 	// Reallocates a new storage for the renderbuffer object.
 	void reallocate_storage(GLenum internal_format, const cg::uint2& size) noexcept;
@@ -94,6 +94,8 @@ public:
 	// Clears depth texture attachment point & depth renderbuffer attachment point.
 	void detach_depth_target() noexcept;
 
+	void dispose() noexcept;
+
 	GLuint id() const noexcept
 	{
 		return _id;
@@ -119,8 +121,6 @@ public:
 	void validate() const;
 
 private:
-
-	void dispose() noexcept;
 
 	GLuint _id = Blank::framebuffer_id;
 };
