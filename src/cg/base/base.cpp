@@ -32,4 +32,4 @@ std::string exception_message(const std::exception& exc)
 	return msg;
 }
 
-} // namespace
+} // namespace cg

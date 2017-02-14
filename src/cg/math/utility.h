@@ -14,13 +14,11 @@ namespace internal {
 // Approx_equal_helper resolvses to different operator() overloads
 // which depends on whether the Numeric type is floating point or intergral.
 // If Numeric is neither an integer nor a floating point value then compilation fails.
-template<typename Numeric,
-	bool is_floating_point = std::is_floating_point<Numeric>::value,
-	bool is_integral = std::is_integral<Numeric>::value>
-	struct Approx_equal_helper;
+template<typename Numeric, bool is_floating_point = std::is_floating_point<Numeric>::value>
+struct Approx_equal_helper;
 
 template<typename Numeric>
-struct Approx_equal_helper<Numeric, false, true> {
+struct Approx_equal_helper<Numeric, false> final {
 	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs_diff) noexcept
 	{
 		return lhs == rhs;
@@ -28,7 +26,7 @@ struct Approx_equal_helper<Numeric, false, true> {
 };
 
 template<typename Numeric>
-struct Approx_equal_helper<Numeric, true, false> {
+struct Approx_equal_helper<Numeric, true> final {
 	bool operator()(const Numeric& lhs, const Numeric& rhs, const Numeric& max_abs_diff) noexcept
 	{
 		assert(std::isfinite(lhs));
