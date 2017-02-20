@@ -152,7 +152,7 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 
 	glBindTexture(GL_TEXTURE_2D, _id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.f);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internal_format,
 		_size.width, _size.height, 0,
@@ -182,7 +182,7 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 	assert(greater_than(size, 0));
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, _size.width, _size.height);
+	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, GLsizei(_size.width), GLsizei(_size.height));
 	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
@@ -202,7 +202,7 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 	: Texture_2d_immut(internal_format, mipmap_level_count, sampler_desc, image.size())
 {
 	assert(image.pixel_format() != Pixel_format::none);
-	write(0, uint2::zero, image);
+	write(*this, 0, uint2::zero, image);
 }
 
 Texture_2d_immut::Texture_2d_immut(Texture_2d_immut&& tex) noexcept :
@@ -249,24 +249,6 @@ void Texture_2d_immut::dispose() noexcept
 	_internal_format = GL_NONE;
 }
 
-void Texture_2d_immut::write(GLuint mipmap_level, const uint2& offset, const cg::data::Image_2d& image) noexcept
-{
-	assert(_id != Blank::texture_id);
-	assert(mipmap_level < _mipmap_level_count);
-	assert(image.pixel_format() != Pixel_format::none);
-	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(_size.width >= offset.width + image.size().width);
-	assert(_size.height >= offset.height + image.size().height);
-
-	if (image.size() == uint2::zero) return;
-
-	glTextureSubImage2D(_id, mipmap_level, offset.x, offset.y,
-		image.size().width, image.size().height,
-		texture_sub_image_format(image.pixel_format()),
-		texture_sub_image_type(image.pixel_format()),
-		image.data());
-}
-
 // ----- Texture_3d_immut -----
 
 Texture_3d_immut::Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_count, const uint3& size) noexcept
@@ -281,6 +263,7 @@ Texture_3d_immut::Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_c
 	glCreateTextures(GL_TEXTURE_3D, 1, &_id);
 	glTextureStorage3D(_id, _mipmap_level_count, _internal_format, 
 		_size.width, _size.height, _size.depth);
+	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
 Texture_3d_immut::Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_count,
@@ -336,24 +319,6 @@ void Texture_3d_immut::dispose() noexcept
 	glDeleteTextures(1, &_id);
 	_id = Blank::texture_id;
 	_internal_format = GL_NONE;
-}
-
-void Texture_3d_immut::write(GLuint mipmap_level, const uint3& offset, const cg::data::Image_2d& image) noexcept
-{
-	assert(_id != Blank::texture_id);
-	assert(mipmap_level < _mipmap_level_count);
-	assert(image.pixel_format() != Pixel_format::none);
-	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(_size.width >= offset.width + image.size().width);
-	assert(_size.height >= offset.height + image.size().height);
-
-	if (image.size() == uint2::zero) return;
-
-	glTextureSubImage3D(_id, mipmap_level, offset.x, offset.y, offset.z,
-		image.size().width, image.size().height, 1,
-		texture_sub_image_format(image.pixel_format()),
-		texture_sub_image_type(image.pixel_format()),
-		image.data());
 }
 
 // ----- funcs -----
@@ -519,12 +484,43 @@ GLenum texture_sub_image_type(GLenum internal_format) noexcept
 	}
 }
 
-//void texture_2d_sub_image(GLuint tex_id, size_t mipmap_level, const uint2& offset, 
-//	const cg::data::Image_2d& image) noexcept
-//{
-//	assert(tex_id != Blank::texture_id);
-//
-//}
+void write(const Texture_2d_i& texture, GLint mipmap_level, const uint2& offset, 
+	const cg::data::Image_2d& image) noexcept
+{
+	assert(texture.id() != Blank::texture_id);
+	assert(mipmap_level < texture.mipmap_level_count());
+	assert(image.pixel_format() != Pixel_format::none);
+	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
+	assert(offset.width + image.size().width <= texture.size().width);
+	assert(offset.height + image.size().height <= texture.size().height);
+
+	if (image.size() == uint2::zero) return;
+
+	glTextureSubImage2D(texture.id(), mipmap_level, offset.x, offset.y,
+		image.size().width, image.size().height,
+		texture_sub_image_format(image.pixel_format()),
+		texture_sub_image_type(image.pixel_format()),
+		image.data());
+}
+
+void write(const Texture_3d_i& texture, GLint mipmap_level, const uint3& offset, 
+	const cg::data::Image_2d& image) noexcept
+{
+	assert(texture.id() != Blank::texture_id);
+	assert(mipmap_level < texture.mipmap_level_count());
+	assert(image.pixel_format() != Pixel_format::none);
+	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
+	assert(offset.width + image.size().width <= texture.size().width);
+	assert(offset.height + image.size().height <= texture.size().height);
+
+	if (image.size() == uint2::zero) return;
+
+	glTextureSubImage3D(texture.id(), mipmap_level, offset.x, offset.y, offset.z,
+		image.size().width, image.size().height, 1,
+		texture_sub_image_format(image.pixel_format()),
+		texture_sub_image_type(image.pixel_format()),
+		image.data());
+}
 
 } // namespace opengl
 } // namespace rnd

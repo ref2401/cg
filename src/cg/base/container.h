@@ -1,6 +1,9 @@
 #ifndef CG_BASE_CONTAINER_H_
 #define CG_BASE_CONTAINER_H_
 
+#include <utility>
+#include <vector>
+
 
 namespace cg {
 
@@ -18,6 +21,31 @@ inline size_t byte_count(const Container& c) noexcept
 {
 	return sizeof(Container::value_type) * c.size();
 }
+
+template<typename T>
+inline void push_back(std::vector<T>& vector) 
+{}
+
+template<typename T, typename U, typename... Args>
+void push_back(std::vector<T>& vector, U&& object, Args&&... args)
+{
+	vector.push_back(std::forward<U>(object));
+	push_back(vector, std::forward<Args>(args)...);
+}
+
+//template<typename... Args>
+//void push_back(std::vector<std::string>& vector, const char* str, Args&&... args)
+//{
+//	vector.emplace_back(str);
+//	push_back(vector, std::forward<Args>(args)...);
+//}
+//
+//template<typename... Args>
+//void push_back(std::vector<std::string>& vector, const char* str, Args&&... args)
+//{
+//	vector.emplace_back(str);
+//	push_back(vector, std::forward<Args>(args)...);
+//}
 
 } // namespace cg
 

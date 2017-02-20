@@ -55,9 +55,9 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 	assert(_kernel_radius != Filter_kernel_radius::none);
 
 	cg::data::Glsl_program_desc src_code = cg::data::load_glsl_program_desc(
+		"filter-shader",
 		"../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
-	src_code.name = "filter-shader";
 
 	_prog = cg::rnd::opengl::Glsl_program(src_code);
 	_u_filter_direction_location = uniform_location(_prog, "u_filter_direction");

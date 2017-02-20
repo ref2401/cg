@@ -69,10 +69,10 @@ void Opaque_model_pass_program::bind(const cg::mat4& projection_view_matrix,
 
 Physics_simulation_pass_program::Physics_simulation_pass_program()
 {
-	auto program_desc = load_glsl_program_desc(
-		"../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr,
-		true, "tf_p_curr", "tf_velocity", "gl_NextBuffer", "tf_debug_slot");
-	program_desc.name = "physics-simulation-pass";
+	auto program_desc = load_glsl_program_desc("physics-simulation-pass",
+		"../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr);
+	program_desc.tf_interleaved_buffer_mode = true;
+	push_back(program_desc.tf_varying_names, "tf_p_curr", "tf_velocity", "gl_NextBuffer", "tf_debug_slot");
 
 	_program = Glsl_program(program_desc);
 	_g_angular_velocity_ms_location = uniform_location(_program, "g_angular_velocity_ms");
