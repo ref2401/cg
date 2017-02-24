@@ -3,6 +3,7 @@ Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11
 ## Clone, init & build (x86 only)
 Required tools
 - DirectX SDK (install it before Visual Studio)
+- Vulkan SDK
 - Visual Studio Community 2015
 - CMake
 - Git

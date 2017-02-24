@@ -120,7 +120,7 @@ void set_draw_buffer(const Framebuffer& fbo, GLenum buff) noexcept;
 // Params:
 // -	loc{n}: specifies in which color buffer a pixel(fragment) shader writes its output.
 //				n belongs to the ragne [0, 7].
-// GL_NONE specifies that pixl(fragment) shader output value is not written into any color buffer.
+// GL_NONE specifies that fragment shader output value is not written into any color buffer.
 void set_draw_buffers(const Framebuffer& fbo, 
 	GLenum loc0 = GL_NONE, GLenum loc1 = GL_NONE, GLenum loc2 = GL_NONE, GLenum loc3 = GL_NONE, 
 	GLenum loc4 = GL_NONE, GLenum loc5 = GL_NONE, GLenum loc6 = GL_NONE, GLenum loc7 = GL_NONE) noexcept;
