@@ -6,5 +6,5 @@
 
 void main()
 {
-	learn_vk::Vulkan_context vulkan;
+	learn_vk::Vulkan_context vulkan("learn vk, example 1.");
 }
