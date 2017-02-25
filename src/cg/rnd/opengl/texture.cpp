@@ -152,7 +152,6 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 
 	glBindTexture(GL_TEXTURE_2D, _id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internal_format,
 		_size.width, _size.height, 0,
