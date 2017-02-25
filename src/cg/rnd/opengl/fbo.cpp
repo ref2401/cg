@@ -74,7 +74,7 @@ Renderbuffer& Renderbuffer::operator=(Renderbuffer&& rnd_buff) noexcept
 
 void Renderbuffer::dispose() noexcept
 {
-	if (_id = Blank::renderbuffer_id) return;
+	if (_id == Blank::renderbuffer_id) return;
 
 	glDeleteRenderbuffers(1, &_id);
 	_id = Blank::renderbuffer_id;
