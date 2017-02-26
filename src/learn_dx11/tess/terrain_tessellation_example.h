@@ -34,6 +34,8 @@ public:
 
 private:
 
+	void init_shaders();
+
 };
 
 } // namespace tess

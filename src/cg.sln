@@ -65,6 +65,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fur_simulation", "fur_simul
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "learn_vk", "learn_vk\learn_vk.vcxproj", "{F08D7997-B863-41D3-8B59-757071C67F3C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tess", "tess", "{5844AD2D-91F5-46CB-91E8-EA6FEF50473C}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\learn_dx11\tess\terrain_tessellation.hlsl = ..\data\learn_dx11\tess\terrain_tessellation.hlsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -123,5 +128,6 @@ Global
 		{8766FCF4-6CDF-423B-8843-3BAA7C3E0180} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{FC5A5AAD-B9BC-4240-82B4-00DA66ABCC2E} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 		{17790165-C1A5-456A-907E-87E4B5D6291A} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
+		{5844AD2D-91F5-46CB-91E8-EA6FEF50473C} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 	EndGlobalSection
 EndGlobal

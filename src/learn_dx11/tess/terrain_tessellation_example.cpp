@@ -171,6 +171,11 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 	Terrain_model terrain_model = make_terrain_model(3, 2);
 }
 
+void Terrain_tessellation_example::init_shaders()
+{
+
+}
+
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {
 }
