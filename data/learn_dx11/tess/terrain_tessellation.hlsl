@@ -18,7 +18,7 @@ struct VS_result {
 VS_result vs_main(in Vertex vertex)
 {
 	VS_result result;
-	result.position_ws = mul(g_model_matrix, vec4(vertex.position)).xyz;
+	result.position_ws = mul(g_model_matrix, float4(vertex.position, 1.0)).xyz;
 	result.tex_coord = vertex.tex_coord;
 
 	return result;
@@ -31,7 +31,7 @@ struct HS_result_const_func {
 	float inside_factors[2]	: SV_InsideTessFactor;
 };
 
-HS_result_const_func hs_main_const_func(InputPatch<VS_result> patch)
+HS_result_const_func hs_main_const_func(InputPatch<VS_result, 12> patch)
 {
 	static const float factor = 32;
 
@@ -40,8 +40,8 @@ HS_result_const_func hs_main_const_func(InputPatch<VS_result> patch)
 	result.edge_factors[1] = factor;
 	result.edge_factors[2] = factor;
 	result.edge_factors[3] = factor;
-	result.inside_factors[4] = factor;
-	result.inside_factors[5] = factor;
+	result.inside_factors[0] = factor;
+	result.inside_factors[1] = factor;
 
 	return result;
 }
@@ -76,19 +76,25 @@ struct DS_result {
 	float2 tex_coord	: FRAG_TEX_COORD;
 };
 
+[domain("quad")]
 DS_result ds_main(const OutputPatch<HS_result, 4> patch,
 	float2 domain_location : SV_DomainLocation,
 	HS_result_const_func path_data)
 {
-	float3 pos_ws = float3();
-	pow.xz = patch[0].position_ws.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
+	float3 pos_ws = float3(0.0, 0.0, 0.0);
+	pos_ws.xz = patch[0].position_ws.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
 		+ patch[1].position_ws.xz * domain_location.x * (1.0f - domain_location.y)
-		+ patch[2].position_ws.xz * (1.0f - uv.x) * domain_location.y
+		+ patch[2].position_ws.xz * (1.0f - domain_location.x) * domain_location.y
 		+ patch[3].position_ws.xz * domain_location.x * domain_location.y;
+
+	float2 tex_coord = patch[0].tex_coord * (1.0f - domain_location.x) * (1.0f - domain_location.y)
+		+ patch[1].tex_coord * domain_location.x * (1.0f - domain_location.y)
+		+ patch[2].tex_coord * (1.0f - domain_location.x) * domain_location.y
+		+ patch[3].tex_coord * domain_location.x * domain_location.y;
 
 	DS_result result;
 	result.position_cs = mul(g_projection_view_matrix, float4(pos_ws, 1.0f));
-
+	result.tex_coord = tex_coord;
 	return result;
 }
 

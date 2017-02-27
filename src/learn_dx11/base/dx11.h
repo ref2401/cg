@@ -24,7 +24,7 @@ public:
 
 	Hlsl_shader_set() noexcept = default;
 
-	Hlsl_shader_set(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+	Hlsl_shader_set(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
 
 	Hlsl_shader_set(const Hlsl_shader_set&) = delete;
 
@@ -80,13 +80,13 @@ public:
 
 private:
 
-	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
 
-	void init_hull_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+	void init_hull_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
 
-	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
 
-	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_data& hlsl_data);
+	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
 
 	Com_ptr<ID3D11VertexShader> _vertex_shader;
 	Com_ptr<ID3DBlob> _vertex_shader_bytecode;

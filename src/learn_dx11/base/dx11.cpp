@@ -7,7 +7,7 @@
 
 using cg::uint2;
 using cg::greater_than;
-using cg::data::Hlsl_shader_set_data;
+using cg::data::Hlsl_shader_set_desc;
 
 
 namespace {
@@ -48,7 +48,7 @@ namespace learn_dx11 {
 
 // ----- Hlsl_shader_set -----
 
-Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
 {
 	assert(hlsl_data.has_vertex_shader());
 	assert(hlsl_data.has_pixel_shader());
@@ -90,7 +90,7 @@ Hlsl_shader_set& Hlsl_shader_set::operator=(Hlsl_shader_set&& set) noexcept
 	return *this;
 }
 
-void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
 {
 	try {
 		_vertex_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -109,7 +109,7 @@ void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader
 	}
 }
 
-void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
 {
 	try {
 		_hull_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -128,7 +128,7 @@ void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_s
 	}
 }
 
-void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
 {
 	try {
 		_domain_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -147,7 +147,7 @@ void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader
 	}
 }
 
-void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_set_data& hlsl_data)
+void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
 {
 	try {
 		_pixel_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,

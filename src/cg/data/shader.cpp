@@ -69,10 +69,10 @@ Glsl_program_desc load_glsl_program_desc(const char* name, const char* vertex_fi
 	return program_desc;
 }
 
-Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename)
+Hlsl_shader_set_desc load_hlsl_shader_set_desc(const char* filename)
 {
 	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));
-	Hlsl_shader_set_data data;
+	Hlsl_shader_set_desc data;
 
 	data.source_code = load_text(filename);
 	data.source_filename = filename;

@@ -168,20 +168,116 @@ namespace tess {
 Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_ctx) 
 	: Example(rnd_ctx)
 {
+	init_cbuffer();
+	init_shaders();
+	init_pipeline_state();
 	Terrain_model terrain_model = make_terrain_model(3, 2);
+
+	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	setup_projection_view_matrix();
+	setup_pipeline_state();
+}
+
+void Terrain_tessellation_example::init_cbuffer()
+{
+	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+
+	float arr[16];
+	to_array_column_major_order(_model_matrix, arr);
+	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, arr, 0, 0);
+
+	_projection_view_cbuffer = make_cbuffer(_device, sizeof(mat4));
+}
+
+void Terrain_tessellation_example::init_pipeline_state()
+{
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	depth_stencil_desc.DepthEnable = true;
+	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+
+	// default rastr state
+	D3D11_RASTERIZER_DESC default_rastr_desc = {};
+	default_rastr_desc.FillMode = D3D11_FILL_SOLID;
+	default_rastr_desc.CullMode = D3D11_CULL_BACK;
+	default_rastr_desc.FrontCounterClockwise = true;
+	hr = _device->CreateRasterizerState(&default_rastr_desc, &_default_rasterizer_state.ptr);
+	assert(hr == S_OK);
+
+	// wireframe rastr state
+	D3D11_RASTERIZER_DESC wireframe_rastr_desc = default_rastr_desc;
+	wireframe_rastr_desc.FillMode = D3D11_FILL_WIREFRAME;
+	hr = _device->CreateRasterizerState(&wireframe_rastr_desc, &_wireframe_rasterizer_state.ptr);
+	assert(hr == S_OK);
 }
 
 void Terrain_tessellation_example::init_shaders()
 {
+	auto shader_desc = cg::data::load_hlsl_shader_set_desc(
+		"../data/learn_dx11/tess/terrain_tessellation.hlsl");
 
+	shader_desc.vertex_shader_entry_point = "vs_main";
+	shader_desc.hull_shader_entry_point = "hs_main";
+	shader_desc.domain_shader_entry_point = "ds_main";
+	shader_desc.pixel_shader_entry_point = "ps_main";
+
+	_shader_set = Hlsl_shader_set(_device, shader_desc);
 }
 
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {
+	update_projection_matrix(viewport_size.aspect_ratio());
+	setup_projection_view_matrix();
 }
 
 void Terrain_tessellation_example::render()
 {
+	static const float4 clear_color = cg::rgba(0xbca8ffff);
+
+	clear_color_buffer(clear_color);
+	clear_depth_stencil_buffer(1.0f);
+}
+
+void Terrain_tessellation_example::setup_pipeline_state()
+{
+	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
+
+	// vertex shader
+	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
+	_device_ctx->VSSetConstantBuffers(0, 1, &_model_cbuffer.ptr);
+	// hull shader
+	_device_ctx->HSSetShader(_shader_set.hull_shader(), nullptr, 0);
+	// domain shader
+	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
+	_device_ctx->DSSetConstantBuffers(0, 1, &_projection_view_cbuffer.ptr);
+	// pixel shader
+	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
+
+	_device_ctx->RSSetState(_wireframe_rasterizer_state.ptr);
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
+
+
+	HRESULT hr = _debug->ValidateContext(_device_ctx);
+	assert(hr == S_OK);
+}
+
+void Terrain_tessellation_example::setup_projection_view_matrix()
+{
+	const mat4 mat = _projection_matrix * _view_matrix;
+
+	float arr[16];
+	to_array_column_major_order(mat, arr);
+	_device_ctx->UpdateSubresource(_projection_view_cbuffer.ptr, 0, nullptr, arr, 0, 0);
+}
+
+void Terrain_tessellation_example::update_projection_matrix(float aspect_ratio)
+{
+	assert(aspect_ratio > 0.0f);
+
+	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, aspect_ratio, 0.1f, 100.0f);
 }
 
 } // namespace tess

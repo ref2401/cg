@@ -55,11 +55,11 @@ struct Glsl_program_desc {
 	bool tf_interleaved_buffer_mode = true;
 };
 
-// Hlsl_shader_set_data struct stores all required and optional params
+// Hlsl_shader_set_desc struct stores all required and optional params
 // which are used in hlsl shader creation process.
-struct Hlsl_shader_set_data final {
+struct Hlsl_shader_set_desc final {
 
-	Hlsl_shader_set_data() = default;
+	Hlsl_shader_set_desc() = default;
 
 
 	// Returns true if vertex shader's entry point is specified.
@@ -146,13 +146,13 @@ inline Glsl_program_desc load_glsl_program_desc(const std::string& name,
 
 // Loads the specified hlsl shader source code file.
 // If the specified file does not exist the function will throw. 
-Hlsl_shader_set_data load_hlsl_shader_set_data(const char* filename);
+Hlsl_shader_set_desc load_hlsl_shader_set_desc(const char* filename);
 
 // Loads the specified hlsl shader source code file.
 // If the specified file does not exist the function will throw. 
-inline Hlsl_shader_set_data load_hlsl_shader_set_data(const std::string& filename)
+inline Hlsl_shader_set_desc load_hlsl_shader_set_desc(const std::string& filename)
 {
-	return load_hlsl_shader_set_data(filename.c_str());
+	return load_hlsl_shader_set_desc(filename.c_str());
 }
 
 } // namespace data

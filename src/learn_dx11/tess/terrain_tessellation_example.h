@@ -34,8 +34,31 @@ public:
 
 private:
 
+	void init_cbuffer();
+
+	void init_pipeline_state();
+
 	void init_shaders();
 
+	void setup_pipeline_state();
+
+	void setup_projection_view_matrix();
+
+	void update_projection_matrix(float aspect_ratio);
+
+
+	// pipeline state
+	Hlsl_shader_set _shader_set;
+	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	Com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
+	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
+	// resources
+	Com_ptr<ID3D11Buffer> _model_cbuffer;
+	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
+
+	cg::mat4 _projection_matrix;
+	cg::mat4 _view_matrix;
+	cg::mat4 _model_matrix;
 };
 
 } // namespace tess

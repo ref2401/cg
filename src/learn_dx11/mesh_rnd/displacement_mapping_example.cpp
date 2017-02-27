@@ -50,6 +50,7 @@ void Displacement_mapping_example::init_render_states()
 	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
 	assert(hr == S_OK);
 
+	// fill_solid rastr state
 	D3D11_RASTERIZER_DESC def_raster_desc = {};
 	def_raster_desc.FillMode = D3D11_FILL_SOLID;
 	def_raster_desc.CullMode = D3D11_CULL_BACK;
@@ -58,6 +59,7 @@ void Displacement_mapping_example::init_render_states()
 	hr = _device->CreateRasterizerState(&def_raster_desc, &_default_rasterizer_state.ptr);
 	assert(hr == S_OK);
 
+	// wireframe rastr state
 	D3D11_RASTERIZER_DESC wire_raster_desc = def_raster_desc;
 	wire_raster_desc.FillMode = D3D11_FILL_WIREFRAME;
 
@@ -67,7 +69,7 @@ void Displacement_mapping_example::init_render_states()
 
 void Displacement_mapping_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_data(
+	auto hlsl_data = cg::data::load_hlsl_shader_set_desc(
 		"../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
 	
 	hlsl_data.vertex_shader_entry_point = "vs_main";

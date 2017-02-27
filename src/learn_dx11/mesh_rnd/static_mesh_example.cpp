@@ -153,7 +153,7 @@ void Static_mesh_example::init_render_states()
 
 void Static_mesh_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_data("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
+	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
