@@ -36,6 +36,8 @@ private:
 
 	void init_cbuffer();
 
+	void init_geometry();
+
 	void init_pipeline_state();
 
 	void init_shaders();
@@ -53,8 +55,12 @@ private:
 	Com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
 	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
 	// resources
+	Com_ptr<ID3D11Buffer> _vertex_buffer;
+	Com_ptr<ID3D11Buffer> _index_buffer;
+	Com_ptr<ID3D11InputLayout> _input_layout;
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
+	UINT _index_count;
 
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
