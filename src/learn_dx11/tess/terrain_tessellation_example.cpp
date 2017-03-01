@@ -27,7 +27,7 @@ public:
 		int64_t r = cg::clamp(row, int64_t(0), _row_count);
 		int64_t c = cg::clamp(column, int64_t(0), _column_count);
 
-		return uint32_t(r * _row_count + c);
+		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t bottom_right_index(int64_t row, int64_t column) noexcept
@@ -35,7 +35,7 @@ public:
 		int64_t r = cg::clamp(row, int64_t(0), _row_count);
 		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
 
-		return uint32_t(r * _row_count + c);
+		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t top_left_index(int64_t row, int64_t column) noexcept
@@ -43,7 +43,7 @@ public:
 		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
 		int64_t c = cg::clamp(column, int64_t(0), _column_count);
 
-		return uint32_t(r * _row_count + c);
+		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t top_right_index(int64_t row, int64_t column) noexcept
@@ -51,7 +51,7 @@ public:
 		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
 		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
 
-		return uint32_t(r * _row_count + c);
+		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 private:
@@ -109,7 +109,7 @@ Terrain_model make_terrain_model(size_t z_cell_count, size_t x_cell_count)
 			const float x_coord = float(x) / x_cell_count;
 			const float vert[Terrain_model::vertex_component_count] = {
 				x_coord - 0.5f, 0.0f, z_coord - 0.5f,	// position
-				x_coord, 1.0f - z_coord					// tex_coord
+				x_coord, z_coord						// tex_coord
 			};
 
 			model.vertex_attribs.insert(model.vertex_attribs.cend(), vert, vert + Terrain_model::vertex_component_count);
@@ -172,7 +172,7 @@ namespace tess {
 Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_ctx) 
 	: Example(rnd_ctx)
 {
-	_model_matrix = scale_matrix<mat4>(float3(3.0f));
+	_model_matrix = scale_matrix<mat4>(float3(1.0f));
 	_view_matrix = view_matrix(float3(0, 2, 2), float3::zero);
 	
 	init_cbuffer();
@@ -182,6 +182,24 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 
 	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
 	setup_projection_view_matrix();
+
+	D3D11_TEXTURE2D_DESC dt_desc = {};
+	dt_desc.Width = rnd_ctx.viewport_size().width;
+	dt_desc.Height = rnd_ctx.viewport_size().height;
+	dt_desc.MipLevels = 1;
+	dt_desc.ArraySize = 1;
+	dt_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	dt_desc.SampleDesc.Count = 1;
+	dt_desc.SampleDesc.Quality = 0;
+	dt_desc.Usage = D3D11_USAGE_DEFAULT;
+	dt_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+
+	HRESULT hr = _device->CreateTexture2D(&dt_desc, nullptr, &_tex_debug.ptr);
+	assert(hr == S_OK);
+
+	hr = _device->CreateRenderTargetView(_tex_debug.ptr, nullptr, &_tex_debug_rt_view.ptr);
+	assert(hr == S_OK);
+
 	setup_pipeline_state();
 }
 
@@ -198,7 +216,7 @@ void Terrain_tessellation_example::init_cbuffer()
 
 void Terrain_tessellation_example::init_geometry()
 {
-	Terrain_model terrain_model = make_terrain_model(3, 2);
+	Terrain_model terrain_model = make_terrain_model(1, 1);
 	_index_count = UINT(terrain_model.indices.size());
 
 	// vertex buffer
@@ -283,8 +301,10 @@ void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size
 void Terrain_tessellation_example::render()
 {
 	static const float4 clear_color = cg::rgba(0xd1d7ffff);
+	static const float4 clear_color_debug = float4::zero;
 
 	clear_color_buffer(clear_color);
+	_device_ctx->ClearRenderTargetView(_tex_debug_rt_view.ptr, clear_color_debug.data);
 	clear_depth_stencil_buffer(1.0f);
 
 	_device_ctx->DrawIndexed(_index_count, 0, 0);
@@ -312,8 +332,12 @@ void Terrain_tessellation_example::setup_pipeline_state()
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
 	_device_ctx->RSSetState(_wireframe_rasterizer_state.ptr);
-	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
+	_device_ctx->RSSetState(_default_rasterizer_state.ptr);
 
+	// output merger
+	ID3D11RenderTargetView* rt_views[2] = { _rnd_ctx.render_target_view(), _tex_debug_rt_view.ptr };
+	_device_ctx->OMSetRenderTargets(2, rt_views, _rnd_ctx.depth_stencil_view());
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);

@@ -61,6 +61,9 @@ private:
 	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
 	UINT _index_count;
+	// debug
+	Com_ptr<ID3D11Texture2D> _tex_debug;
+	Com_ptr<ID3D11RenderTargetView> _tex_debug_rt_view;
 
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;

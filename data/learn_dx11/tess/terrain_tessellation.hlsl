@@ -53,7 +53,7 @@ struct HS_result {
 
 [domain("quad")]
 [partitioning("fractional_odd")]
-[outputtopology("triangle_cw")]
+[outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("hs_main_const_func")]
 HS_result hs_main(InputPatch<VS_result, 12> patch, uint patch_id : SV_OutputControlPointID)
@@ -73,6 +73,7 @@ cbuffer Projection_view : register(b0) {
 
 struct DS_result {
 	float4 position_cs	: SV_Position;
+	float3 position_ws	: FRAG_POSITION_WS;
 	float2 tex_coord	: FRAG_TEX_COORD;
 };
 
@@ -82,25 +83,41 @@ DS_result ds_main(const OutputPatch<HS_result, 4> patch,
 	HS_result_const_func path_data)
 {
 	float3 pos_ws = float3(0.0, 0.0, 0.0);
-	pos_ws.xz = patch[0].position_ws.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
+	pos_ws.xz = patch[0].position_ws.xz * domain_location.x * (1.0f - domain_location.y)
+		+ patch[1].position_ws.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
+		+ patch[2].position_ws.xz * domain_location.x * domain_location.y
+		+ patch[3].position_ws.xz * (1.0f - domain_location.x) * domain_location.y;
+	/*pos_ws.xz = patch[0].position_ws.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
 		+ patch[1].position_ws.xz * domain_location.x * (1.0f - domain_location.y)
 		+ patch[2].position_ws.xz * (1.0f - domain_location.x) * domain_location.y
-		+ patch[3].position_ws.xz * domain_location.x * domain_location.y;
+		+ patch[3].position_ws.xz * domain_location.x * domain_location.y;*/
 
-	float2 tex_coord = patch[0].tex_coord * (1.0f - domain_location.x) * (1.0f - domain_location.y)
-		+ patch[1].tex_coord * domain_location.x * (1.0f - domain_location.y)
-		+ patch[2].tex_coord * (1.0f - domain_location.x) * domain_location.y
-		+ patch[3].tex_coord * domain_location.x * domain_location.y;
+	//float2 tex_coord = patch[0].tex_coord * (1.0f - domain_location.x) * (1.0f - domain_location.y)
+	//	+ patch[1].tex_coord * domain_location.x * (1.0f - domain_location.y)
+	//	+ patch[2].tex_coord * (1.0f - domain_location.x) * domain_location.y
+	//	+ patch[3].tex_coord * domain_location.x * domain_location.y;
+
+	float2 tex_coord = domain_location;
 
 	DS_result result;
 	result.position_cs = mul(g_projection_view_matrix, float4(pos_ws, 1.0f));
+	result.position_ws = pos_ws;
 	result.tex_coord = tex_coord;
 	return result;
 }
 
 // ----- Pixel Shader -----
 
-float4 ps_main(in DS_result frag) : SV_Target
+struct PS_result {
+	float4 rt_color_0: SV_Target0;
+	float4 rt_color_1: SV_Target1;
+};
+
+PS_result ps_main(in DS_result frag)
 {
-	return float4(frag.tex_coord, 0.0f, 1.0f);
+	PS_result result;
+	result.rt_color_0 = float4(frag.tex_coord, 0.0f, 1.0f);
+	result.rt_color_1 = float4(frag.position_ws, 1.0f);
+
+	return result;
 }
