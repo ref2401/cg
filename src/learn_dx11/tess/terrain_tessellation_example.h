@@ -26,6 +26,8 @@ public:
 	Terrain_tessellation_example& operator=(Terrain_tessellation_example&&) noexcept = delete;
 
 
+	void on_keypress() override;
+
 	void on_viewport_resize(const cg::uint2& viewport_size) override;
 
 	void render() override;
@@ -34,7 +36,7 @@ public:
 
 private:
 
-	void init_cbuffer();
+	void init_cbuffers();
 
 	void init_geometry();
 
@@ -44,10 +46,15 @@ private:
 
 	void setup_pipeline_state();
 
-	void setup_projection_view_matrix();
+	void setup_pvm_matrix();
 
 	void update_projection_matrix(float aspect_ratio);
 
+
+	cg::float3 _viewpoint_position;
+	cg::mat4 _projection_matrix;
+	cg::mat4 _view_matrix;
+	cg::mat4 _model_matrix;
 
 	// pipeline state
 	Hlsl_shader_set _shader_set;
@@ -58,16 +65,9 @@ private:
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
-	Com_ptr<ID3D11Buffer> _model_cbuffer;
 	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
+	Com_ptr<ID3D11Buffer> _tess_control_cbuffer;
 	UINT _index_count;
-	// debug
-	Com_ptr<ID3D11Texture2D> _tex_debug;
-	Com_ptr<ID3D11RenderTargetView> _tex_debug_rt_view;
-
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
 };
 
 } // namespace tess

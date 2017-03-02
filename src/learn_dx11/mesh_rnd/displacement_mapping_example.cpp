@@ -26,7 +26,7 @@ Displacement_mapping_example::Displacement_mapping_example(Render_context& rnd_c
 	init_render_states();
 
 	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
-	setup_projection_view_matrix();
+	setup_pvm_matrix();
 	setup_pipeline_state();
 }
 
@@ -150,7 +150,7 @@ void Displacement_mapping_example::init_terrain_textures()
 void Displacement_mapping_example::on_viewport_resize(const uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
-	setup_projection_view_matrix();
+	setup_pvm_matrix();
 }
 
 void Displacement_mapping_example::render()
@@ -189,7 +189,7 @@ void Displacement_mapping_example::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Displacement_mapping_example::setup_projection_view_matrix()
+void Displacement_mapping_example::setup_pvm_matrix()
 {
 	float matrix_data[16];
 	mat4 proj_view_matrix = _projection_matrix * _view_matrix;

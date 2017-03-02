@@ -44,7 +44,7 @@ private:
 
 	void setup_pipeline_state();
 
-	void setup_projection_view_matrix();
+	void setup_pvm_matrix();
 
 	void update_projection_matrix(float wh_aspect_ratio);
 

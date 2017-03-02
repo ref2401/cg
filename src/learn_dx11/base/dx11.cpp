@@ -314,7 +314,8 @@ Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	Com_ptr<ID3D11Buffer> cbuffer;
-	device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
+	HRESULT hr = device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
+	assert(hr == S_OK);
 
 	return cbuffer;
 }

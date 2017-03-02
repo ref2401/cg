@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 #include "cg/base/container.h"
 
@@ -170,53 +171,44 @@ namespace tess {
 // ----- Terrain_tessellation_example -----
 
 Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_ctx) 
-	: Example(rnd_ctx)
+	: Example(rnd_ctx),
+	_viewpoint_position(-3, 8, 16)
 {
-	_model_matrix = scale_matrix<mat4>(float3(1.0f));
-	_view_matrix = view_matrix(float3(0, 2, 2), float3::zero);
+	_model_matrix = scale_matrix<mat4>(float3(20.0f));
+	//_model_matrix = mat4::identity;
+	_view_matrix = view_matrix(_viewpoint_position, float3::zero);
 	
-	init_cbuffer();
+	init_cbuffers();
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_pipeline_state();
 
 	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
-	setup_projection_view_matrix();
-
-	D3D11_TEXTURE2D_DESC dt_desc = {};
-	dt_desc.Width = rnd_ctx.viewport_size().width;
-	dt_desc.Height = rnd_ctx.viewport_size().height;
-	dt_desc.MipLevels = 1;
-	dt_desc.ArraySize = 1;
-	dt_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	dt_desc.SampleDesc.Count = 1;
-	dt_desc.SampleDesc.Quality = 0;
-	dt_desc.Usage = D3D11_USAGE_DEFAULT;
-	dt_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-
-	HRESULT hr = _device->CreateTexture2D(&dt_desc, nullptr, &_tex_debug.ptr);
-	assert(hr == S_OK);
-
-	hr = _device->CreateRenderTargetView(_tex_debug.ptr, nullptr, &_tex_debug_rt_view.ptr);
-	assert(hr == S_OK);
-
+	setup_pvm_matrix();
 	setup_pipeline_state();
 }
 
-void Terrain_tessellation_example::init_cbuffer()
+void Terrain_tessellation_example::init_cbuffers()
 {
-	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
-
-	float arr[16];
-	to_array_column_major_order(_model_matrix, arr);
-	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, arr, 0, 0);
-
+	// projection view cbuffer
 	_projection_view_cbuffer = make_cbuffer(_device, sizeof(mat4));
+
+	// tess control cbuffer
+	// 8 = 3 (camera position) + 2 (lod_min_max) + 2(distance_min_max) + 1 (stub float)
+	const float4 camepa_position_ms = mul(inverse(_model_matrix), _viewpoint_position);
+	const float distance = len(camepa_position_ms);
+	const float tess_arr[12] = {
+		camepa_position_ms.x, camepa_position_ms.y, camepa_position_ms.z, camepa_position_ms.w,
+		0.1f * distance, 1.5f * distance, 0.0f, 0.0f,	// distance_min_max
+		1.0f, 32.0f, 0.0f, 0.0f,						// lod_min_max
+	};
+	_tess_control_cbuffer = make_cbuffer(_device, sizeof(float) * std::extent<decltype(tess_arr)>::value);
+	_device_ctx->UpdateSubresource(_tess_control_cbuffer.ptr, 0, nullptr, tess_arr, 0, 0);
 }
 
 void Terrain_tessellation_example::init_geometry()
 {
-	Terrain_model terrain_model = make_terrain_model(1, 1);
+	Terrain_model terrain_model = make_terrain_model(8, 8);
 	_index_count = UINT(terrain_model.indices.size());
 
 	// vertex buffer
@@ -292,10 +284,14 @@ void Terrain_tessellation_example::init_shaders()
 	_shader_set = Hlsl_shader_set(_device, shader_desc);
 }
 
+void Terrain_tessellation_example::on_keypress()
+{
+}
+
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
-	setup_projection_view_matrix();
+	setup_pvm_matrix();
 }
 
 void Terrain_tessellation_example::render()
@@ -304,7 +300,6 @@ void Terrain_tessellation_example::render()
 	static const float4 clear_color_debug = float4::zero;
 
 	clear_color_buffer(clear_color);
-	_device_ctx->ClearRenderTargetView(_tex_debug_rt_view.ptr, clear_color_debug.data);
 	clear_depth_stencil_buffer(1.0f);
 
 	_device_ctx->DrawIndexed(_index_count, 0, 0);
@@ -322,9 +317,9 @@ void Terrain_tessellation_example::setup_pipeline_state()
 
 	// vertex shader
 	_device_ctx->VSSetShader(_shader_set.vertex_shader(), nullptr, 0);
-	_device_ctx->VSSetConstantBuffers(0, 1, &_model_cbuffer.ptr);
 	// hull shader
 	_device_ctx->HSSetShader(_shader_set.hull_shader(), nullptr, 0);
+	_device_ctx->HSSetConstantBuffers(0, 1, &_tess_control_cbuffer.ptr);
 	// domain shader
 	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
 	_device_ctx->DSSetConstantBuffers(0, 1, &_projection_view_cbuffer.ptr);
@@ -332,20 +327,18 @@ void Terrain_tessellation_example::setup_pipeline_state()
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
 	_device_ctx->RSSetState(_wireframe_rasterizer_state.ptr);
-	_device_ctx->RSSetState(_default_rasterizer_state.ptr);
+	//_device_ctx->RSSetState(_default_rasterizer_state.ptr);
 
 	// output merger
-	ID3D11RenderTargetView* rt_views[2] = { _rnd_ctx.render_target_view(), _tex_debug_rt_view.ptr };
-	_device_ctx->OMSetRenderTargets(2, rt_views, _rnd_ctx.depth_stencil_view());
 	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);
 }
 
-void Terrain_tessellation_example::setup_projection_view_matrix()
+void Terrain_tessellation_example::setup_pvm_matrix()
 {
-	const mat4 mat = _projection_matrix * _view_matrix;
+	const mat4 mat = _projection_matrix * _view_matrix * _model_matrix;
 
 	float arr[16];
 	to_array_column_major_order(mat, arr);
