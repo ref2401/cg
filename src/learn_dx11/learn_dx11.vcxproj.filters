@@ -23,6 +23,12 @@
     <ClCompile Include="tess\terrain_tessellation_example.cpp">
       <Filter>tess</Filter>
     </ClCompile>
+    <ClCompile Include="tess\terrain_grid_model.cpp">
+      <Filter>tess</Filter>
+    </ClCompile>
+    <ClCompile Include="tess\compute_complanarity_example.cpp">
+      <Filter>tess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -55,6 +61,12 @@
       <Filter>mesh_rnd</Filter>
     </ClInclude>
     <ClInclude Include="tess\terrain_tessellation_example.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\terrain_grid_model.h">
+      <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="tess\compute_complanarity_example.h">
       <Filter>tess</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,167 +1,13 @@
 #include "learn_dx11/tess/terrain_tessellation_example.h"
 
 #include <cassert>
-#include <iostream>
 #include <iterator>
 #include <type_traits>
 #include <vector>
 #include "cg/base/container.h"
+#include "learn_dx11/tess/terrain_grid_model.h"
 
 using namespace cg;
-
-
-namespace {
-
-class Vertex_index_helper final {
-public:
-
-	Vertex_index_helper(size_t row_count, size_t column_count) noexcept
-		: _row_count(int64_t(row_count)), _column_count(int64_t(column_count))
-	{
-		assert(row_count > 0);
-		assert(column_count > 0);
-	}
-
-
-	uint32_t bottom_left_index(int64_t row, int64_t column) noexcept
-	{
-		int64_t r = cg::clamp(row, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column, int64_t(0), _column_count);
-
-		return uint32_t(r * (_column_count + 1) + c);
-	}
-
-	uint32_t bottom_right_index(int64_t row, int64_t column) noexcept
-	{
-		int64_t r = cg::clamp(row, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
-
-		return uint32_t(r * (_column_count + 1) + c);
-	}
-
-	uint32_t top_left_index(int64_t row, int64_t column) noexcept
-	{
-		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column, int64_t(0), _column_count);
-
-		return uint32_t(r * (_column_count + 1) + c);
-	}
-
-	uint32_t top_right_index(int64_t row, int64_t column) noexcept
-	{
-		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
-
-		return uint32_t(r * (_column_count + 1) + c);
-	}
-
-private:
-
-	int64_t _row_count = 0;
-	int64_t _column_count = 0;
-};
-
-struct Terrain_model final {
-	// each vertex has position(float3) and tex_coord(float2) -> 5 components per vertex.
-	static constexpr size_t vertex_component_count = 5;
-
-
-	// each vertex has position(float3) and tex_coord(float2)
-	std::vector<float> vertex_attribs;
-	
-	// 12 indices for each patch. 
-	// 4 stands for the cell itselft (bottom left, bottom right, top left, top right)
-	// 2 - left cell (bottom left, top left)
-	// 2 - bottom cell (bottom left, bottom right)
-	// 2 - right cell (bottom right, top right)
-	// 2 - top cell (top left, top right)
-	std::vector<uint32_t> indices;
-
-	size_t patch_count = 0;
-};
-
-Terrain_model make_terrain_model(size_t z_cell_count, size_t x_cell_count)
-{
-	assert(z_cell_count > 0);
-	assert(x_cell_count > 0);
-
-
-	constexpr size_t patch_index_count = 12;
-	const size_t expected_vertex_attrib_count = (z_cell_count + 1) * (x_cell_count + 1) * Terrain_model::vertex_component_count;
-	const size_t expected_index_count = z_cell_count * x_cell_count * patch_index_count;
-	
-	Terrain_model model;
-	model.vertex_attribs.reserve(expected_vertex_attrib_count);
-	model.indices.reserve(expected_index_count);
-	model.patch_count = z_cell_count * x_cell_count;
-
-	// ----- vertices -----
-	// positions are in range [(-0.5f, 0.0f, -0.5f), (0.5f, 0.0f, 0.5f)]
-	// tex_coords are in range [(0.0, 0.0), (1.0, 1.0)]
-	// bottom-left position of the grid is (-0.5f, 0.0f, 0.5f) tex_coords [0.0f, 0.0f]
-	// top-right position of the grid is (0.5f, 0.0f, -0.5f) tex_coords [1.0f, 1.0f]
-	const size_t z_coord_count = z_cell_count + 1;
-	const size_t x_coord_count = x_cell_count + 1;
-
-	for (size_t z = z_coord_count; z > 0; --z) {
-		const float z_coord = float(z - 1) / z_cell_count;
-
-		for (size_t x = 0; x < x_coord_count; ++x) {
-			const float x_coord = float(x) / x_cell_count;
-			const float vert[Terrain_model::vertex_component_count] = {
-				x_coord - 0.5f, 0.0f, z_coord - 0.5f,	// position
-				x_coord, z_coord						// tex_coord
-			};
-
-			model.vertex_attribs.insert(model.vertex_attribs.cend(), vert, vert + Terrain_model::vertex_component_count);
-		}
-	}
-
-	// ----- patch indices -----
-	Vertex_index_helper index_helper(z_cell_count, x_cell_count);
-
-	for (int64_t r = 0; r < z_cell_count; ++r) {
-		for (int64_t c = 0; c < x_cell_count; ++c) {
-
-			//std::cout << std::endl << "<" << r << ", " << c << ">" << std::endl << std::endl;
-
-			uint32_t patch_indices[patch_index_count];
-			patch_indices[0] = index_helper.bottom_left_index(r, c);
-			patch_indices[1] = index_helper.bottom_right_index(r, c);
-			patch_indices[2] = index_helper.top_left_index(r, c);
-			patch_indices[3] = index_helper.top_right_index(r, c);
-			// left cell: 
-			patch_indices[4] = index_helper.bottom_left_index(r, c - 1);
-			patch_indices[5] = index_helper.top_left_index(r, c - 1);
-			// bottom cell:
-			patch_indices[6] = index_helper.bottom_left_index(r - 1, c);
-			patch_indices[7] = index_helper.bottom_right_index(r - 1, c);
-			// right cell:
-			patch_indices[8] = index_helper.bottom_right_index(r, c + 1);
-			patch_indices[9] = index_helper.top_right_index(r, c + 1);
-			// top cell:
-			patch_indices[10] = index_helper.top_left_index(r + 1, c);
-			patch_indices[11] = index_helper.top_right_index(r + 1, c);
-
-			model.indices.insert(model.indices.cend(), patch_indices, patch_indices + patch_index_count);
-
-			//std::cout << patch_indices[0] << " " << patch_indices[1] << " " 
-			//	<< patch_indices[2] << " " << patch_indices[3] << " " << std::endl;
-
-			//std::cout << "left:\t" << patch_indices[4] << " " << patch_indices[5] << std::endl;
-			//std::cout << "bottom:\t" << patch_indices[6] << " " << patch_indices[7] << std::endl;
-			//std::cout << "right:\t" << patch_indices[8] << " " << patch_indices[9] << std::endl;
-			//std::cout << "top: \t" << patch_indices[10] << " " << patch_indices[11] << std::endl;
-		}
-
-		std::cout << std::endl;
-	}
-
-	assert(model.vertex_attribs.size() == expected_vertex_attrib_count);
-	assert(model.indices.size() == expected_index_count);
-	return model;
-}
-} // namespace
 
 
 namespace learn_dx11 {
@@ -172,10 +18,9 @@ namespace tess {
 
 Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_ctx) 
 	: Example(rnd_ctx),
-	_viewpoint_position(-3, 8, 16)
+	_viewpoint_position(-8, 8, 16)
 {
 	_model_matrix = scale_matrix<mat4>(float3(20.0f));
-	//_model_matrix = mat4::identity;
 	_view_matrix = view_matrix(_viewpoint_position, float3::zero);
 	
 	init_cbuffers();
@@ -208,27 +53,27 @@ void Terrain_tessellation_example::init_cbuffers()
 
 void Terrain_tessellation_example::init_geometry()
 {
-	Terrain_model terrain_model = make_terrain_model(8, 8);
-	_index_count = UINT(terrain_model.indices.size());
+	Terrain_grid_model terrain_model(8, 8);
+	_index_count = UINT(terrain_model.index_count());
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = cg::byte_count(terrain_model.vertex_attribs);
+	vb_desc.ByteWidth = terrain_model.vertex_buffer_byte_count();
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
-	vb_data.pSysMem = terrain_model.vertex_attribs.data();
+	vb_data.pSysMem = terrain_model.vertex_buffer_data();
 
 	HRESULT hr = _device->CreateBuffer(&vb_desc, &vb_data, &_vertex_buffer.ptr);
 	assert(hr == S_OK);
 
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = cg::byte_count(terrain_model.indices);
+	ib_desc.ByteWidth = terrain_model.index_buffer_byte_count();
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA ib_data = {};
-	ib_data.pSysMem = terrain_model.indices.data();
+	ib_data.pSysMem = terrain_model.index_buffer_data();
 
 	hr = _device->CreateBuffer(&ib_desc, &ib_data, &_index_buffer.ptr);
 	assert(hr == S_OK);
@@ -284,10 +129,6 @@ void Terrain_tessellation_example::init_shaders()
 	_shader_set = Hlsl_shader_set(_device, shader_desc);
 }
 
-void Terrain_tessellation_example::on_keypress()
-{
-}
-
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
@@ -296,8 +137,7 @@ void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size
 
 void Terrain_tessellation_example::render()
 {
-	static const float4 clear_color = cg::rgba(0xd1d7ffff);
-	static const float4 clear_color_debug = float4::zero;
+	const float4 clear_color = cg::rgba(0xd1d7ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);
@@ -309,7 +149,7 @@ void Terrain_tessellation_example::setup_pipeline_state()
 {
 	// input assembler
 	constexpr size_t offset = 0;
-	constexpr size_t vertex_byte_count = sizeof(float) * Terrain_model::vertex_component_count;
+	constexpr size_t vertex_byte_count = sizeof(float) * Terrain_grid_model::vertex_component_count;
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &vertex_byte_count, &offset);

@@ -26,7 +26,7 @@ public:
 	Terrain_tessellation_example& operator=(Terrain_tessellation_example&&) noexcept = delete;
 
 
-	void on_keypress() override;
+	void on_keypress() override {}
 
 	void on_viewport_resize(const cg::uint2& viewport_size) override;
 
