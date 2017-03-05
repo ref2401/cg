@@ -46,6 +46,27 @@ Com_ptr<ID3DBlob> compile_shader(const std::string& source_code,
 
 namespace learn_dx11 {
 
+// ----- Hlsl_compute -----
+
+Hlsl_compute::Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_desc& compute_desc)
+{
+	assert(compute_desc.source_code.length() > 0);
+
+	try {
+		_bytecode = compile_shader(compute_desc.source_code, compute_desc.source_filename,
+			compute_desc.compute_shader_entry_point, "cs_5_0", compute_desc.compile_flags);
+
+		HRESULT hr = device->CreateComputeShader(_bytecode->GetBufferPointer(), 
+			_bytecode->GetBufferSize(), nullptr, &_shader.ptr);
+
+		ENFORCE(hr == S_OK, std::to_string(hr));
+	}
+	catch (...) {
+		std::string exc_msg = EXCEPTION_MSG("Compute shader creation error.");
+		std::throw_with_nested(std::runtime_error(exc_msg));
+	}
+}
+
 // ----- Hlsl_shader_set -----
 
 Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)

@@ -25,6 +25,8 @@ Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_c
 
 	on_viewport_resize(rnd_ctx.viewport_size());
 	setup_pipeline_state();
+
+	preprocess_displacement_map();
 }
 
 void Compute_complanarity_example::init_cbuffers()
@@ -164,6 +166,15 @@ void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
 	setup_pvm_matrix();
+}
+
+void Compute_complanarity_example::preprocess_displacement_map()
+{
+	auto compute_desc = cg::data::load_hlsl_compute_desc(
+		"../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
+	compute_desc.compute_shader_entry_point = "cs_main";
+
+	Hlsl_compute compute(_device, compute_desc);
 }
 
 void Compute_complanarity_example::render()

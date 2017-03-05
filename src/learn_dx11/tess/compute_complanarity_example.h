@@ -45,6 +45,8 @@ private:
 
 	void init_textures();
 
+	void preprocess_displacement_map();
+
 	void setup_pipeline_state();
 
 	void setup_pvm_matrix();

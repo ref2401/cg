@@ -55,6 +55,20 @@ struct Glsl_program_desc {
 	bool tf_interleaved_buffer_mode = true;
 };
 
+struct Hlsl_compute_desc final {
+	// Hlsl source code.
+	std::string source_code;
+
+	// Hlsl source code filename. Use in error messages.
+	std::string source_filename;
+
+	// The name of a function where vertex shader execution begins.
+	std::string compute_shader_entry_point;
+
+	// The D3DCOMPILE constants specify how the compiler compiles the HLSL code.
+	uint32_t compile_flags = 0;
+};
+
 // Hlsl_shader_set_desc struct stores all required and optional params
 // which are used in hlsl shader creation process.
 struct Hlsl_shader_set_desc final {
@@ -142,6 +156,13 @@ inline Glsl_program_desc load_glsl_program_desc(const std::string& name,
 	const std::string& vertex_filename, const std::string& fragment_filename)
 {
 	return load_glsl_program_desc(name.c_str(), vertex_filename.c_str(), fragment_filename.c_str());
+}
+
+Hlsl_compute_desc load_hlsl_compute_desc(const char* filename);
+
+inline Hlsl_compute_desc load_hlsl_compute_desc(const std::string& filename)
+{
+	return load_hlsl_compute_desc(filename.c_str());
 }
 
 // Loads the specified hlsl shader source code file.

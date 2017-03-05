@@ -19,6 +19,37 @@ using namespace DirectX;
 
 namespace learn_dx11 {
 
+class Hlsl_compute final { 
+public:
+
+	Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_desc& compute_desc);
+
+	Hlsl_compute(const Hlsl_compute&) = delete;
+
+	Hlsl_compute(Hlsl_compute&& compute) noexcept = default;
+
+
+	Hlsl_compute& operator=(const Hlsl_compute&) = delete;
+
+	Hlsl_compute& operator=(Hlsl_compute&& compute) noexcept = default;
+
+
+	ID3D11ComputeShader* shader() noexcept
+	{
+		return _shader.ptr;
+	}
+
+	ID3DBlob* bytecode() noexcept
+	{
+		return _bytecode.ptr;
+	}
+
+private:
+
+	Com_ptr<ID3D11ComputeShader> _shader;
+	Com_ptr<ID3DBlob> _bytecode;
+};
+
 class Hlsl_shader_set final {
 public:
 
@@ -184,7 +215,6 @@ inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device)
 // The contents of the texture is uninitialized.
 Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
 	ID3D11Texture2D* tex_origin, const cg::uint2& size);
-
 
 } // namespace learn_dx11
 

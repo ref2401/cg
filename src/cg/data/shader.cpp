@@ -69,6 +69,17 @@ Glsl_program_desc load_glsl_program_desc(const char* name, const char* vertex_fi
 	return program_desc;
 }
 
+Hlsl_compute_desc load_hlsl_compute_desc(const char* filename)
+{
+	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl compute file '", filename, "' does not exist."));
+	Hlsl_compute_desc desc;
+
+	desc.source_code = load_text(filename);
+	desc.source_filename = filename;
+
+	return desc;
+}
+
 Hlsl_shader_set_desc load_hlsl_shader_set_desc(const char* filename)
 {
 	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));

@@ -67,6 +67,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "learn_vk", "learn_vk\learn_
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tess", "tess", "{5844AD2D-91F5-46CB-91E8-EA6FEF50473C}"
 	ProjectSection(SolutionItems) = preProject
+		..\data\learn_dx11\tess\compute_complanarity.compute.hlsl = ..\data\learn_dx11\tess\compute_complanarity.compute.hlsl
 		..\data\learn_dx11\tess\compute_complanarity.hlsl = ..\data\learn_dx11\tess\compute_complanarity.hlsl
 		..\data\learn_dx11\tess\terrain_tessellation.hlsl = ..\data\learn_dx11\tess\terrain_tessellation.hlsl
 	EndProjectSection
