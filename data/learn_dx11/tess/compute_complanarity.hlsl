@@ -110,9 +110,12 @@ HS_result hs_main(InputPatch<VS_result, 12> patch, uint patch_id : SV_OutputCont
 
 // ----- Domain Shader -----
 
-cbuffer Projection_view : register(b0) {
+cbuffer Pvm_matrix_cbuffer : register(b0) {
 	float4x4 g_pvm_matrix : packoffset(c0);
 };
+
+Texture2D<float> g_tex_displacement_map		: register(t0);
+SamplerState g_sampler_default				: register(s0);
 
 struct DS_result {
 	float4 position_cs	: SV_Position;
@@ -125,16 +128,21 @@ DS_result ds_main(const OutputPatch<HS_result, 4> patch,
 	float2 domain_location : SV_DomainLocation,
 	HS_result_const_func path_data)
 {
+	static const float3 normal_ms = float3(0.0, 1.0, 0.0);
+
 	float3 pos_ms = float3(0.0, 0.0, 0.0);
 	pos_ms.xz = patch[0].position_ms.xz * domain_location.x * (1.0f - domain_location.y)
 		+ patch[1].position_ms.xz * (1.0f - domain_location.x) * (1.0f - domain_location.y)
 		+ patch[2].position_ms.xz * domain_location.x * domain_location.y
 		+ patch[3].position_ms.xz * (1.0f - domain_location.x) * domain_location.y;
 
-	float2 tex_coord = patch[0].tex_coord * domain_location.x * (1.0f - domain_location.y)
+	const float2 tex_coord = patch[0].tex_coord * domain_location.x * (1.0f - domain_location.y)
 		+ patch[1].tex_coord * (1.0f - domain_location.x) * (1.0f - domain_location.y)
 		+ patch[2].tex_coord * domain_location.x * domain_location.y
 		+ patch[3].tex_coord * (1.0f - domain_location.x) * domain_location.y;
+
+	const float displ = 0.5f * g_tex_displacement_map.SampleLevel(g_sampler_default, tex_coord, 0).x;
+	pos_ms += displ * normal_ms;
 
 	DS_result result;
 	result.position_cs = mul(g_pvm_matrix, float4(pos_ms, 1.0f));
@@ -147,14 +155,12 @@ DS_result ds_main(const OutputPatch<HS_result, 4> patch,
 
 struct PS_result {
 	float4 rt_color_0: SV_Target0;
-	float4 rt_color_1: SV_Target1;
 };
 
 PS_result ps_main(in DS_result frag)
 {
 	PS_result result;
 	result.rt_color_0 = (float4)1.0f;
-	result.rt_color_1 = float4(frag.debug_vec, 1.0f);
 
 	return result;
 }

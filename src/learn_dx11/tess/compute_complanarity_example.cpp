@@ -1,6 +1,7 @@
 #include "learn_dx11/tess/compute_complanarity_example.h"
 
 #include <cassert>
+#include "cg/data/image.h"
 #include "learn_dx11/tess/terrain_grid_model.h"
 
 using namespace cg;
@@ -11,14 +12,15 @@ namespace tess {
 
 Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_ctx)
 	: Example(rnd_ctx),
-	_viewpoint_position(0.0f, 8.0f, 16.0f)
+	_viewpoint_position(8.0f, 8.0f, 24.0f)
 {
-	_model_matrix = scale_matrix<mat4>(float3(20.0f));
+	_model_matrix = scale_matrix<mat4>(float3(30.0f));
 	_view_matrix = view_matrix(_viewpoint_position, float3::zero);
 
 	init_cbuffers();
 	init_shaders();
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
+	init_textures();
 	init_pipeline_state();
 
 	on_viewport_resize(rnd_ctx.viewport_size());
@@ -36,7 +38,7 @@ void Compute_complanarity_example::init_cbuffers()
 	const float tess_arr[12] = {
 		camepa_position_ms.x, camepa_position_ms.y, camepa_position_ms.z, camepa_position_ms.w,
 		0.1f * distance, 1.5f * distance, 0.0f, 0.0f,	// distance_min_max
-		1.0f, 32.0f, 0.0f, 0.0f,						// lod_min_max
+		1.0f, 16.0f, 0.0f, 0.0f,						// lod_min_max
 	};
 	_tess_control_cbuffer = make_cbuffer(_device, sizeof(float) * std::extent<decltype(tess_arr)>::value);
 	_device_ctx->UpdateSubresource(_tess_control_cbuffer.ptr, 0, nullptr, tess_arr, 0, 0);
@@ -44,7 +46,7 @@ void Compute_complanarity_example::init_cbuffers()
 
 void Compute_complanarity_example::init_geometry()
 {
-	Terrain_grid_model terrain_model(8, 8);
+	Terrain_grid_model terrain_model(16, 16);
 	_index_count = UINT(terrain_model.index_count());
 
 	// vertex buffer
@@ -120,6 +122,44 @@ void Compute_complanarity_example::init_shaders()
 	_shader_set = Hlsl_shader_set(_device, shader_desc);
 }
 
+void Compute_complanarity_example::init_textures()
+{
+	using cg::data::Image_2d;
+	using cg::data::byte_count;
+
+	// displacement map
+	Image_2d image_displ("../data/learn_dx11/terrain_displacement_map.png", 1, false);
+
+	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
+	tex_displ_desc.Width = image_displ.size().width;
+	tex_displ_desc.Height = image_displ.size().height;
+	tex_displ_desc.MipLevels = 1;
+	tex_displ_desc.ArraySize = 1;
+	tex_displ_desc.Format = DXGI_FORMAT_R8_UNORM;
+	tex_displ_desc.SampleDesc.Count = 1;
+	tex_displ_desc.SampleDesc.Quality = 0;
+	tex_displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
+	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
+	tex_displ_data.pSysMem = image_displ.data();
+	tex_displ_data.SysMemPitch = image_displ.size().width * byte_count(image_displ.pixel_format());
+	tex_displ_data.SysMemSlicePitch = image_displ.byte_count();
+
+	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_displacement_map.ptr);
+	assert(hr == S_OK);
+
+	hr = _device->CreateShaderResourceView(_tex_displacement_map.ptr, nullptr, &_tex_srv_displacement_map.ptr);
+	assert(hr == S_OK);
+
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	hr = _device->CreateSamplerState(&sampler_desc, &_linear_sampler.ptr);
+	assert(hr == S_OK);
+}
+
 void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
@@ -154,6 +194,8 @@ void Compute_complanarity_example::setup_pipeline_state()
 	// domain shader
 	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
 	_device_ctx->DSSetConstantBuffers(0, 1, &_pvm_matrix_cbuffer.ptr);
+	_device_ctx->DSSetShaderResources(0, 1, &_tex_srv_displacement_map.ptr);
+	_device_ctx->DSSetSamplers(0, 1, &_linear_sampler.ptr);
 	// pixel shader
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 

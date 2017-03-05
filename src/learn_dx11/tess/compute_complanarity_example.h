@@ -43,6 +43,8 @@ private:
 
 	void init_shaders();
 
+	void init_textures();
+
 	void setup_pipeline_state();
 
 	void setup_pvm_matrix();
@@ -63,6 +65,9 @@ private:
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
+	Com_ptr<ID3D11Texture2D> _tex_displacement_map;
+	Com_ptr<ID3D11ShaderResourceView> _tex_srv_displacement_map;
+	Com_ptr<ID3D11SamplerState> _linear_sampler;
 	UINT _index_count;
 };
 
