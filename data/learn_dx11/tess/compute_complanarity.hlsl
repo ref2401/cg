@@ -68,6 +68,23 @@ HS_result_const_func hs_main_const_func(InputPatch<VS_result, 12> patch)
 	result.edge_factors[3] = min(top_lod, center_lod);
 	result.inside_factors[0] = center_lod;
 	result.inside_factors[1] = center_lod;
+	
+	//HS_result_const_func result;
+	//result.edge_factors[0] = left_lod;
+	//result.edge_factors[1] = bottom_lod;
+	//result.edge_factors[2] = right_lod;
+	//result.edge_factors[3] = left_lod;
+	//result.inside_factors[0] = center_lod;
+	//result.inside_factors[1] = center_lod;
+
+	//static const float factor = 1;
+	//HS_result_const_func result;
+	//result.edge_factors[0] = factor;
+	//result.edge_factors[1] = factor;
+	//result.edge_factors[2] = factor;
+	//result.edge_factors[3] = factor;
+	//result.inside_factors[0] = factor;
+	//result.inside_factors[1] = factor;
 
 	return result;
 }
@@ -93,7 +110,7 @@ HS_result hs_main(InputPatch<VS_result, 12> patch, uint patch_id : SV_OutputCont
 
 // ----- Domain Shader -----
 
-cbuffer Pvm_matrix_cbuffer : register(b0) {
+cbuffer Projection_view : register(b0) {
 	float4x4 g_pvm_matrix : packoffset(c0);
 };
 

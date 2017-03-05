@@ -65,7 +65,7 @@ private:
 	Com_ptr<ID3D11Buffer> _vertex_buffer;
 	Com_ptr<ID3D11Buffer> _index_buffer;
 	Com_ptr<ID3D11InputLayout> _input_layout;
-	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
+	Com_ptr<ID3D11Buffer> _pvm_matrix_cbuffer;
 	Com_ptr<ID3D11Buffer> _tess_control_cbuffer;
 	UINT _index_count;
 };

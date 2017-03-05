@@ -35,8 +35,8 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 
 void Terrain_tessellation_example::init_cbuffers()
 {
-	// projection view cbuffer
-	_projection_view_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	// pvm_matrix_cbuffer
+	_pvm_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
 
 	// tess control cbuffer
 	// 8 = 3 (camera position) + 2 (lod_min_max) + 2(distance_min_max) + 1 (stub float)
@@ -162,7 +162,7 @@ void Terrain_tessellation_example::setup_pipeline_state()
 	_device_ctx->HSSetConstantBuffers(0, 1, &_tess_control_cbuffer.ptr);
 	// domain shader
 	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
-	_device_ctx->DSSetConstantBuffers(0, 1, &_projection_view_cbuffer.ptr);
+	_device_ctx->DSSetConstantBuffers(0, 1, &_pvm_matrix_cbuffer.ptr);
 	// pixel shader
 	_device_ctx->PSSetShader(_shader_set.pixel_shader(), nullptr, 0);
 
@@ -182,7 +182,7 @@ void Terrain_tessellation_example::setup_pvm_matrix()
 
 	float arr[16];
 	to_array_column_major_order(mat, arr);
-	_device_ctx->UpdateSubresource(_projection_view_cbuffer.ptr, 0, nullptr, arr, 0, 0);
+	_device_ctx->UpdateSubresource(_pvm_matrix_cbuffer.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Terrain_tessellation_example::update_projection_matrix(float aspect_ratio)
