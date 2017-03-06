@@ -72,6 +72,7 @@ private:
 	Com_ptr<ID3D11Texture2D> _tex_displacement_map;
 	Com_ptr<ID3D11ShaderResourceView> _tex_srv_displacement_map;
 	Com_ptr<ID3D11Texture2D> _tex_lookup;
+	Com_ptr<ID3D11UnorderedAccessView> _tex_uav_lookup;
 	Com_ptr<ID3D11ShaderResourceView> _tex_srv_lookup;
 	Com_ptr<ID3D11SamplerState> _linear_sampler;
 	UINT _index_count;

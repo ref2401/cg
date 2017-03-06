@@ -24,11 +24,10 @@ Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_c
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_textures();
 	init_pipeline_state();
+	preprocess_displacement_map();
 
 	on_viewport_resize(rnd_ctx.viewport_size());
 	setup_pipeline_state();
-
-	preprocess_displacement_map();
 }
 
 void Compute_complanarity_example::init_cbuffers()
@@ -172,6 +171,9 @@ void Compute_complanarity_example::init_textures()
 	hr = _device->CreateShaderResourceView(_tex_lookup.ptr, nullptr, &_tex_srv_lookup.ptr);
 	assert(hr == S_OK);
 
+	hr = _device->CreateUnorderedAccessView(_tex_lookup.ptr, nullptr, &_tex_uav_lookup.ptr);
+	assert(hr == S_OK);
+
 
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -181,7 +183,7 @@ void Compute_complanarity_example::init_textures()
 	hr = _device->CreateSamplerState(&sampler_desc, &_linear_sampler.ptr);
 	assert(hr == S_OK);
 }
-
+	
 void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_size)
 {
 	update_projection_matrix(viewport_size.aspect_ratio());
@@ -190,19 +192,29 @@ void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_
 
 void Compute_complanarity_example::preprocess_displacement_map()
 {
-	assert(_tex_displacement_map.ptr);
-
+	assert(_tex_srv_displacement_map.ptr);
+	assert(_tex_uav_lookup.ptr);
 	
 	auto compute_desc = cg::data::load_hlsl_compute_desc(
 		"../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
 
+
+	D3D11_TEXTURE2D_DESC displ_desc;
+	_tex_displacement_map->GetDesc(&displ_desc);
+
 	Hlsl_compute compute(_device, compute_desc);
+	_device_ctx->CSSetShader(compute.shader(), nullptr, 0);
+	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_displacement_map.ptr);
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_lookup.ptr, nullptr);
+	_device_ctx->Dispatch(displ_desc.Width / _terrain_z_cell_count, displ_desc.Height / _terrain_x_cell_count, 1);
 }
 
 void Compute_complanarity_example::render()
 {
 	const float4 clear_color = cg::rgba(0xd1d7ffff);
+
+	preprocess_displacement_map();
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);

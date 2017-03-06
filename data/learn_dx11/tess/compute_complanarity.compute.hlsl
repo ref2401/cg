@@ -5,8 +5,8 @@ Texture2D g_tex_displacement_map	: register(t0);
 
 struct Dispatch_desc {
 	uint3 group_id		: SV_GroupID;
-	uint3 dt_id			: SV_DispatchThreadID;
 	uint3 gt_id			: SV_GroupThreadID;
+	uint3 dt_id			: SV_DispatchThreadID;
 	uint group_index	: SV_GroupIndex;
 };
 
@@ -21,10 +21,10 @@ groupshared float3 corners[2][2];
 [numthreads(kernel_width, kernel_height, 1)]
 void cs_main(Dispatch_desc desc)
 {
-	const bool is_left_top = all(desc.dt_id == uint3(0, 0, 0));
-	const bool is_left_bottom = all(desc.dt_id == uint3(0, kernel_height - 1, 0));
-	const bool is_right_top = all(desc.dt_id == uint3(kernel_width - 1, 0, 0));
-	const bool is_right_bottom = all(desc.dt_id == uint3(kernel_width - 1, kernel_height - 1, 0));
+	const bool is_left_top = all(desc.gt_id.xy == uint2(0, 0));
+	const bool is_left_bottom = all(desc.gt_id.xy == uint2(0, kernel_height - 1));
+	const bool is_right_top = all(desc.gt_id.xy == uint2(kernel_width - 1, 0));
+	const bool is_right_bottom = all(desc.gt_id.xy == uint2(kernel_width - 1, kernel_height - 1));
 
 	if (is_left_top || is_left_bottom || is_right_top || is_right_bottom) {
 		const float displ = g_tex_displacement_map.Load(uint3(desc.dt_id.xy, 0)).x;
@@ -65,6 +65,7 @@ void cs_main(Dispatch_desc desc)
 		kernel[desc.group_index] = g_tex_displacement_map.Load(uint3(desc.dt_id.xy, 0)).x;
 	}
 
+
 	GroupMemoryBarrierWithGroupSync();
 
 	if (desc.group_index == 0) {
@@ -78,27 +79,36 @@ void cs_main(Dispatch_desc desc)
 		if (min_corner.y < corners[0][1].y) min_corner = corners[0][1];
 		if (min_corner.y < corners[1][0].y) min_corner = corners[1][0];
 		if (min_corner.y < corners[1][1].y) min_corner = corners[1][1];
-
-		plane = float4(normal, dot(normal, min_corner));
+		
+		plane = float4(normal, -dot(normal, min_corner));
+		out_tex_patch_plane[desc.group_id.xy] = float4(corners[0][1], 1.0f);
 	}
 
 	GroupMemoryBarrierWithGroupSync();
 
-	const float3 position = float3(desc.gt_id.x / (float)kernel_width, 
-		kernel[desc.group_index],
-		desc.gt_id.y / (float)kernel_height);
-	kernel[desc.group_index] = dot(plane.xyz, position) - plane.w;
+	//const float3 position = float3(desc.gt_id.x / (float)(kernel_width - 1), 
+	//	kernel[desc.group_index],
+	//	desc.gt_id.y / (float)(kernel_height - 1));
+	//kernel[desc.group_index] = dot(plane.xyz, position) - plane.w;
 
-	GroupMemoryBarrierWithGroupSync();
+	//GroupMemoryBarrierWithGroupSync();
 
-	if (desc.group_index == 0) {
-		float dev = 0.0f;
+	//if (desc.group_index == 0) {
+	//	float dev = 0.0f;
 
-		for (uint i = 0; i < kernel_width * kernel_height; ++i)
-			dev += pow(kernel[i], 2);
+	//	for (uint i = 0; i < kernel_width * kernel_height; ++i)
+	//		dev += pow(kernel[i], 2);
 
-		dev /= (float)(kernel_width * kernel_height - 1);
-		dev = sqrt(dev);
-		out_tex_patch_plane[desc.group_id.xy] = float4(plane.xyz, dev);
-	}
+	//	dev /= (float)(kernel_width * kernel_height - 1);
+	//	dev = sqrt(dev);
+	//	//out_tex_patch_plane[desc.group_id.xy] = float4(plane.xyz, dev);
+	//	//out_tex_patch_plane[desc.group_id.xy] = float4(kernel[0], kernel[1], kernel[2], kernel[3]);
+	//	out_tex_patch_plane[desc.group_id.xy] = plane;
+	//}
 }
+
+//ComputeDistanceFromPlane(plane, float3((float)GTid.x / 15.0f, groupResults[GI], (float)GTid.y / 15.0f));
+//float ComputeDistanceFromPlane(float4 plane, float3 position)
+//{
+//	return dot(plane.xyz, position) - plane.w;
+//}
