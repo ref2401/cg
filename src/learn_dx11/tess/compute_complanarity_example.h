@@ -54,6 +54,8 @@ private:
 	void update_projection_matrix(float aspect_ratio);
 
 
+	const size_t _terrain_z_cell_count;
+	const size_t _terrain_x_cell_count;
 	cg::float3 _viewpoint_position;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
@@ -69,6 +71,8 @@ private:
 	Com_ptr<ID3D11InputLayout> _input_layout;
 	Com_ptr<ID3D11Texture2D> _tex_displacement_map;
 	Com_ptr<ID3D11ShaderResourceView> _tex_srv_displacement_map;
+	Com_ptr<ID3D11Texture2D> _tex_lookup;
+	Com_ptr<ID3D11ShaderResourceView> _tex_srv_lookup;
 	Com_ptr<ID3D11SamplerState> _linear_sampler;
 	UINT _index_count;
 };

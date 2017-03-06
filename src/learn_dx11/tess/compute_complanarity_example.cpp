@@ -12,6 +12,8 @@ namespace tess {
 
 Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_ctx)
 	: Example(rnd_ctx),
+	_terrain_z_cell_count(16),
+	_terrain_x_cell_count(16),
 	_viewpoint_position(8.0f, 8.0f, 24.0f)
 {
 	_model_matrix = scale_matrix<mat4>(float3(30.0f));
@@ -48,7 +50,7 @@ void Compute_complanarity_example::init_cbuffers()
 
 void Compute_complanarity_example::init_geometry()
 {
-	Terrain_grid_model terrain_model(16, 16);
+	Terrain_grid_model terrain_model(_terrain_z_cell_count, _terrain_x_cell_count);
 	_index_count = UINT(terrain_model.index_count());
 
 	// vertex buffer
@@ -153,6 +155,24 @@ void Compute_complanarity_example::init_textures()
 	hr = _device->CreateShaderResourceView(_tex_displacement_map.ptr, nullptr, &_tex_srv_displacement_map.ptr);
 	assert(hr == S_OK);
 
+	// lookup texture
+	D3D11_TEXTURE2D_DESC lookup_desc = {};
+	lookup_desc.Width = _terrain_z_cell_count;
+	lookup_desc.Height = _terrain_x_cell_count;
+	lookup_desc.MipLevels = 1;
+	lookup_desc.ArraySize = 1;
+	lookup_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	lookup_desc.SampleDesc.Count = 1;
+	lookup_desc.SampleDesc.Quality = 0;
+	lookup_desc.Usage = D3D11_USAGE_DEFAULT;
+	lookup_desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+	hr = _device->CreateTexture2D(&lookup_desc, nullptr, &_tex_lookup.ptr);
+	assert(hr == S_OK);
+
+	hr = _device->CreateShaderResourceView(_tex_lookup.ptr, nullptr, &_tex_srv_lookup.ptr);
+	assert(hr == S_OK);
+
+
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -170,6 +190,9 @@ void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_
 
 void Compute_complanarity_example::preprocess_displacement_map()
 {
+	assert(_tex_displacement_map.ptr);
+
+	
 	auto compute_desc = cg::data::load_hlsl_compute_desc(
 		"../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
