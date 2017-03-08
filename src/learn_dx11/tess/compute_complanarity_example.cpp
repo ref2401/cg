@@ -14,10 +14,10 @@ Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_c
 	: Example(rnd_ctx),
 	_terrain_z_cell_count(16),
 	_terrain_x_cell_count(16),
-	_viewpoint_position(8.0f, 8.0f, 24.0f)
+	_viewpoint_position(0, 24, 0)
 {
-	_model_matrix = scale_matrix<mat4>(float3(30.0f));
-	_view_matrix = view_matrix(_viewpoint_position, float3::zero);
+	_model_matrix = scale_matrix<mat4>(float3(25.0f));
+	_view_matrix = view_matrix(_viewpoint_position, float3::zero, -float3::unit_z);
 
 	init_cbuffers();
 	init_shaders();
@@ -40,8 +40,8 @@ void Compute_complanarity_example::init_cbuffers()
 	const float distance = len(camepa_position_ms);
 	const float tess_arr[12] = {
 		camepa_position_ms.x, camepa_position_ms.y, camepa_position_ms.z, camepa_position_ms.w,
-		0.1f * distance, 1.5f * distance, 0.0f, 0.0f,	// distance_min_max
-		1.0f, 16.0f, 0.0f, 0.0f,						// lod_min_max
+		0.1f * distance, 1.5f * distance, 0.0f, 0.0f,								// distance_min_max.xy, 0, 0
+		1.0f, 16.0f, float(_terrain_z_cell_count), float(_terrain_x_cell_count),	// lod_min_max, terrain z/x cell count
 	};
 	_tess_control_cbuffer = make_cbuffer(_device, sizeof(float) * std::extent<decltype(tess_arr)>::value);
 	_device_ctx->UpdateSubresource(_tess_control_cbuffer.ptr, 0, nullptr, tess_arr, 0, 0);
@@ -194,7 +194,7 @@ void Compute_complanarity_example::preprocess_displacement_map()
 {
 	assert(_tex_srv_displacement_map.ptr);
 	assert(_tex_uav_lookup.ptr);
-	
+
 	auto compute_desc = cg::data::load_hlsl_compute_desc(
 		"../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
@@ -207,14 +207,17 @@ void Compute_complanarity_example::preprocess_displacement_map()
 	_device_ctx->CSSetShader(compute.shader(), nullptr, 0);
 	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_displacement_map.ptr);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_lookup.ptr, nullptr);
+	
 	_device_ctx->Dispatch(displ_desc.Width / _terrain_z_cell_count, displ_desc.Height / _terrain_x_cell_count, 1);
+
+	_device_ctx->CSSetShader(nullptr, nullptr, 0);
+	ID3D11UnorderedAccessView* uav[1] = { nullptr };
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, uav, nullptr);
 }
 
 void Compute_complanarity_example::render()
 {
 	const float4 clear_color = cg::rgba(0xd1d7ffff);
-
-	preprocess_displacement_map();
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);
@@ -237,6 +240,7 @@ void Compute_complanarity_example::setup_pipeline_state()
 	// hull shader
 	_device_ctx->HSSetShader(_shader_set.hull_shader(), nullptr, 0);
 	_device_ctx->HSSetConstantBuffers(0, 1, &_tess_control_cbuffer.ptr);
+	_device_ctx->HSSetShaderResources(0, 1, &_tex_srv_lookup.ptr);
 	// domain shader
 	_device_ctx->DSSetShader(_shader_set.domain_shader(), nullptr, 0);
 	_device_ctx->DSSetConstantBuffers(0, 1, &_pvm_matrix_cbuffer.ptr);

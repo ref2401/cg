@@ -75,40 +75,32 @@ void cs_main(Dispatch_desc desc)
 			+ raw_normals[1][1]);
 
 		float3 min_corner = float3(0.0f, 1e9f, 0.0f);
-		if (min_corner.y < corners[0][0].y) min_corner = corners[0][0];
-		if (min_corner.y < corners[0][1].y) min_corner = corners[0][1];
-		if (min_corner.y < corners[1][0].y) min_corner = corners[1][0];
-		if (min_corner.y < corners[1][1].y) min_corner = corners[1][1];
+		if (min_corner.y > corners[0][0].y) min_corner = corners[0][0];
+		if (min_corner.y > corners[0][1].y) min_corner = corners[0][1];
+		if (min_corner.y > corners[1][0].y) min_corner = corners[1][0];
+		if (min_corner.y > corners[1][1].y) min_corner = corners[1][1];
 		
 		plane = float4(normal, -dot(normal, min_corner));
-		out_tex_patch_plane[desc.group_id.xy] = float4(corners[0][1], 1.0f);
+		out_tex_patch_plane[desc.group_id.xy] = plane;
 	}
 
 	GroupMemoryBarrierWithGroupSync();
 
-	//const float3 position = float3(desc.gt_id.x / (float)(kernel_width - 1), 
-	//	kernel[desc.group_index],
-	//	desc.gt_id.y / (float)(kernel_height - 1));
-	//kernel[desc.group_index] = dot(plane.xyz, position) - plane.w;
+	const float3 position = float3(desc.gt_id.x / (float)(kernel_width - 1), 
+		kernel[desc.group_index],
+		desc.gt_id.y / (float)(kernel_height - 1));
+	kernel[desc.group_index] = dot(plane.xyz, position) - plane.w;
 
-	//GroupMemoryBarrierWithGroupSync();
+	GroupMemoryBarrierWithGroupSync();
 
-	//if (desc.group_index == 0) {
-	//	float dev = 0.0f;
+	if (desc.group_index == 0) {
+		float dev = 0.0f;
 
-	//	for (uint i = 0; i < kernel_width * kernel_height; ++i)
-	//		dev += pow(kernel[i], 2);
+		for (uint i = 0; i < kernel_width * kernel_height; ++i)
+			dev += pow(kernel[i], 2);
 
-	//	dev /= (float)(kernel_width * kernel_height - 1);
-	//	dev = sqrt(dev);
-	//	//out_tex_patch_plane[desc.group_id.xy] = float4(plane.xyz, dev);
-	//	//out_tex_patch_plane[desc.group_id.xy] = float4(kernel[0], kernel[1], kernel[2], kernel[3]);
-	//	out_tex_patch_plane[desc.group_id.xy] = plane;
-	//}
+		dev /= (float)(kernel_width * kernel_height - 1);
+		dev = sqrt(dev);
+		out_tex_patch_plane[desc.group_id.xy] = float4(plane.xyz, dev);
+	}
 }
-
-//ComputeDistanceFromPlane(plane, float3((float)GTid.x / 15.0f, groupResults[GI], (float)GTid.y / 15.0f));
-//float ComputeDistanceFromPlane(float4 plane, float3 position)
-//{
-//	return dot(plane.xyz, position) - plane.w;
-//}
