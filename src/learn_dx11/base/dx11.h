@@ -22,6 +22,8 @@ namespace learn_dx11 {
 class Hlsl_compute final { 
 public:
 
+	Hlsl_compute() noexcept = default;
+
 	Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_desc& compute_desc);
 
 	Hlsl_compute(const Hlsl_compute&) = delete;

@@ -72,6 +72,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tess", "tess", "{5844AD2D-9
 		..\data\learn_dx11\tess\terrain_tessellation.hlsl = ..\data\learn_dx11\tess\terrain_tessellation.hlsl
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image_processing", "image_processing", "{F905F489-63ED-44B1-8611-A5643ACC8FCB}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\learn_dx11\image_processing\gaussian_filter.compute.hlsl = ..\data\learn_dx11\image_processing\gaussian_filter.compute.hlsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,5 +136,6 @@ Global
 		{FC5A5AAD-B9BC-4240-82B4-00DA66ABCC2E} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 		{17790165-C1A5-456A-907E-87E4B5D6291A} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{5844AD2D-91F5-46CB-91E8-EA6FEF50473C} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
+		{F905F489-63ED-44B1-8611-A5643ACC8FCB} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 	EndGlobalSection
 EndGlobal

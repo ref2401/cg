@@ -29,6 +29,9 @@
     <ClCompile Include="tess\compute_complanarity_example.cpp">
       <Filter>tess</Filter>
     </ClCompile>
+    <ClCompile Include="image_processing\gaussian_filter_example.cpp">
+      <Filter>image_processing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -39,6 +42,9 @@
     </Filter>
     <Filter Include="tess">
       <UniqueIdentifier>{20b3a81f-f97a-4798-b93d-bafe032253ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="image_processing">
+      <UniqueIdentifier>{bff7a302-3d13-4c0d-bd98-5ac84dd6ac80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="tess\compute_complanarity_example.h">
       <Filter>tess</Filter>
+    </ClInclude>
+    <ClInclude Include="image_processing\gaussian_filter_example.h">
+      <Filter>image_processing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
