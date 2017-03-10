@@ -15,13 +15,17 @@ namespace image_processing {
 Gaussian_filter_example::Gaussian_filter_example(Render_context& rnd_ctx)
 	: Example(rnd_ctx)
 {
-	_model_matrix = scale_matrix<mat4>(float3(0.45f));
+	_model_matrix_0 = ts_matrix(float3(-0.43f, 0.0f, 0.0f), float3(0.4f));
+	_model_matrix_1 = ts_matrix(float3(0.43f, 0.0f, 0.0f), float3(0.4f));
 
 	_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
 	init_pipeline_state();
 	init_shaders();
 	init_textures();
 	update_pvm_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	
+	perform_filtering();
+	
 	setup_pipeline_state();
 }
 
@@ -100,6 +104,31 @@ void Gaussian_filter_example::init_textures()
 	assert(hr == S_OK);
 }
 
+void Gaussian_filter_example::perform_filtering()
+{
+	constexpr size_t compute_kernel_width = 128;
+
+	uint2 offset_arr[2];
+	Com_ptr<ID3D11Buffer> offset_cbuffer = make_cbuffer(_device, 2 * sizeof(offset_arr));
+
+	D3D11_TEXTURE2D_DESC tex_desc;
+	_tex_source->GetDesc(&tex_desc);
+	const uint2 size(tex_desc.Width, tex_desc.Height);
+
+	_device_ctx->CSSetShader(_gaussian_filter_compute.shader(), nullptr, 0);
+	_device_ctx->CSSetConstantBuffers(0, 1, &offset_cbuffer.ptr);
+	// filter horizontally
+	offset_arr[0] = uint2(1, 0);
+	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
+	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_source.ptr);
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_intermidiate.ptr, nullptr);
+	_device_ctx->Dispatch(size.width / compute_kernel_width, size.height, 1);
+
+	offset_arr[0] = uint2(0, 1);
+	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_final.ptr, nullptr);
+}
+
 void Gaussian_filter_example::on_viewport_resize(const cg::uint2& viewport_size) 
 {
 	update_pvm_matrix(viewport_size.aspect_ratio());
@@ -110,6 +139,15 @@ void Gaussian_filter_example::render()
 	const float4 clear_color = cg::rgba(0xd1d7ffff);
 
 	clear_color_buffer(clear_color);
+	
+	// source image
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_source.ptr);
+	update_matrix_cbuffer(_pvm_matrix_0);
+	_device_ctx->Draw(4, 0);
+	
+	// final image
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_intermediate.ptr);
+	update_matrix_cbuffer(_pvm_matrix_1);
 	_device_ctx->Draw(4, 0);
 }
 
@@ -126,7 +164,6 @@ void Gaussian_filter_example::setup_pipeline_state()
 	// pixel shader
 	_device_ctx->PSSetShader(_render_image_shader.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
-	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_source.ptr);
 
 	// rasterizer
 	_device_ctx->RSSetState(_rasterizer_state.ptr);
@@ -137,16 +174,21 @@ void Gaussian_filter_example::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
+void Gaussian_filter_example::update_matrix_cbuffer(const cg::mat4& matrix)
+{
+	float arr[16];
+	to_array_column_major_order(matrix, arr);
+	_device_ctx->UpdateSubresource(_matrix_cbuffer.ptr, 0, nullptr, arr, 0, 0);
+}
+
 void Gaussian_filter_example::update_pvm_matrix(float aspect_ratio)
 {
 	assert(aspect_ratio > 0.0f);
 	assert(_matrix_cbuffer.ptr);
 
-	_pvm_matrix = cg::orthographic_matrix_directx(aspect_ratio, 1.0f, 0.1f, 100.0f) * _model_matrix;
-
-	float arr[16];
-	to_array_column_major_order(_pvm_matrix, arr);
-	_device_ctx->UpdateSubresource(_matrix_cbuffer.ptr, 0, nullptr, arr, 0, 0);
+	const mat4 projection_matrix = cg::orthographic_matrix_directx(aspect_ratio, 1.0f, 0.1f, 100.0f);
+	_pvm_matrix_0 = projection_matrix * _model_matrix_0;
+	_pvm_matrix_1 = projection_matrix * _model_matrix_1;
 }
 
 } // namespace image_processing

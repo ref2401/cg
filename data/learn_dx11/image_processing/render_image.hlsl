@@ -19,10 +19,10 @@ VS_output vs_main(uint vertex_id : SV_VertexID)
 	};
 
 	static const float2 tex_coords[4] = {
-		float2(0.0f, 0.0f),
-		float2(1.0f, 0.0f),
 		float2(0.0f, 1.0f),
-		float2(1.0f, 1.0f)
+		float2(1.0f, 1.0f),
+		float2(0.0f, 0.0f),
+		float2(1.0f, 0.0f)
 	};
 
 	VS_output output;

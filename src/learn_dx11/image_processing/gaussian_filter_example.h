@@ -42,7 +42,11 @@ private:
 
 	void init_textures();
 
+	void perform_filtering();
+
 	void setup_pipeline_state();
+
+	void update_matrix_cbuffer(const cg::mat4& matrix);
 
 	void update_pvm_matrix(float aspect_ratio);
 
@@ -64,8 +68,10 @@ private:
 	Hlsl_compute _gaussian_filter_compute;
 	Hlsl_shader_set _render_image_shader;
 
-	cg::mat4 _pvm_matrix;
-	cg::mat4 _model_matrix;
+	cg::mat4 _pvm_matrix_0;
+	cg::mat4 _pvm_matrix_1;
+	cg::mat4 _model_matrix_0;
+	cg::mat4 _model_matrix_1;
 };
 
 } // namespace image_processing
