@@ -15,7 +15,7 @@ namespace image_processing {
 Gaussian_filter_example::Gaussian_filter_example(Render_context& rnd_ctx)
 	: Example(rnd_ctx)
 {
-	_model_matrix = mat4::identity;
+	_model_matrix = scale_matrix<mat4>(float3(0.45f));
 
 	_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
 	init_pipeline_state();
@@ -92,6 +92,11 @@ void Gaussian_filter_example::init_textures()
 	assert(hr == S_OK);
 }
 
+void Gaussian_filter_example::on_viewport_resize(const cg::uint2& viewport_size) 
+{
+	update_pvm_matrix(viewport_size.aspect_ratio());
+}
+
 void Gaussian_filter_example::render()
 {
 	const float4 clear_color = cg::rgba(0xd1d7ffff);
@@ -127,7 +132,7 @@ void Gaussian_filter_example::update_pvm_matrix(float aspect_ratio)
 	assert(aspect_ratio > 0.0f);
 	assert(_matrix_cbuffer.ptr);
 
-	_pvm_matrix = perspective_matrix_directx(cg::pi_3, aspect_ratio, 0.1f, 100.0f) * _model_matrix;
+	_pvm_matrix = cg::orthographic_matrix_directx(aspect_ratio, 1.0f, 0.1f, 100.0f) * _model_matrix;
 
 	float arr[16];
 	to_array_column_major_order(_pvm_matrix, arr);

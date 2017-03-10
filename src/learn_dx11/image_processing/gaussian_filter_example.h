@@ -28,7 +28,7 @@ public:
 
 	void on_keypress() override {}
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override {}
+	void on_viewport_resize(const cg::uint2& viewport_size) override;
 
 	void render() override;
 
