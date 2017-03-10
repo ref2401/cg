@@ -57,7 +57,7 @@ public:
 
 	Hlsl_shader_set() noexcept = default;
 
-	Hlsl_shader_set(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_data);
+	Hlsl_shader_set(ID3D11Device* device, const cg::data::Hlsl_shader_set_desc& hlsl_desc);
 
 	Hlsl_shader_set(const Hlsl_shader_set&) = delete;
 

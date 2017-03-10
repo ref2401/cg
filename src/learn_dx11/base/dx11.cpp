@@ -69,19 +69,19 @@ Hlsl_compute::Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_de
 
 // ----- Hlsl_shader_set -----
 
-Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_data)
+Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_set_desc& hlsl_desc)
 {
-	assert(hlsl_data.has_vertex_shader());
-	assert(hlsl_data.has_pixel_shader());
+	assert(hlsl_desc.has_vertex_shader());
+	assert(hlsl_desc.has_pixel_shader());
 	
-	if (hlsl_data.has_hull_shader()) {
-		assert(hlsl_data.has_domain_shader());
+	if (hlsl_desc.has_hull_shader()) {
+		assert(hlsl_desc.has_domain_shader());
 	}
 
-	init_vertex_shader(device, hlsl_data);
-	if (hlsl_data.has_hull_shader()) init_hull_shader(device, hlsl_data);
-	if (hlsl_data.has_domain_shader()) init_domain_shader(device, hlsl_data);
-	init_pixel_shader(device, hlsl_data);
+	init_vertex_shader(device, hlsl_desc);
+	if (hlsl_desc.has_hull_shader()) init_hull_shader(device, hlsl_desc);
+	if (hlsl_desc.has_domain_shader()) init_domain_shader(device, hlsl_desc);
+	init_pixel_shader(device, hlsl_desc);
 }
 
 Hlsl_shader_set::Hlsl_shader_set(Hlsl_shader_set&& set) noexcept :

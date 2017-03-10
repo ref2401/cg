@@ -15,8 +15,29 @@ namespace image_processing {
 Gaussian_filter_example::Gaussian_filter_example(Render_context& rnd_ctx)
 	: Example(rnd_ctx)
 {
+	_model_matrix = mat4::identity;
+
+	_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	init_pipeline_state();
 	init_shaders();
 	init_textures();
+	update_pvm_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	setup_pipeline_state();
+}
+
+void Gaussian_filter_example::init_pipeline_state()
+{
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	HRESULT hr = _device->CreateDepthStencilState(&depth_stencil_desc, &_depth_stencil_state.ptr);
+	assert(hr == S_OK);
+
+	// rastr state
+	D3D11_RASTERIZER_DESC rastr_desc = {};
+	rastr_desc.FillMode = D3D11_FILL_SOLID;
+	rastr_desc.CullMode = D3D11_CULL_NONE;
+	rastr_desc.FrontCounterClockwise = true;
+	hr = _device->CreateRasterizerState(&rastr_desc, &_rasterizer_state.ptr);
+	assert(hr == S_OK);
 }
 
 void Gaussian_filter_example::init_shaders()
@@ -24,6 +45,11 @@ void Gaussian_filter_example::init_shaders()
 	auto compute_desc = cg::data::load_hlsl_compute_desc("../data/learn_dx11/image_processing/gaussian_filter.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
 	_gaussian_filter_compute = Hlsl_compute(_device, compute_desc);
+
+	auto hlsl_desc = cg::data::load_hlsl_shader_set_desc("../data/learn_dx11/image_processing/render_image.hlsl");
+	hlsl_desc.vertex_shader_entry_point = "vs_main";
+	hlsl_desc.pixel_shader_entry_point = "ps_main";
+	_render_image_shader = Hlsl_shader_set(_device, hlsl_desc);
 }
 
 void Gaussian_filter_example::init_textures()
@@ -45,17 +71,67 @@ void Gaussian_filter_example::init_textures()
 	source_data.SysMemPitch = image.size().width * cg::data::byte_count(image.pixel_format());
 	HRESULT hr = _device->CreateTexture2D(&source_desc, &source_data, &_tex_source.ptr);
 	assert(hr == S_OK);
+	hr = _device->CreateShaderResourceView(_tex_source.ptr, nullptr, &_tex_srv_source.ptr);
+	assert(hr == S_OK);
 
 	D3D11_TEXTURE2D_DESC filter_desc = source_desc;
 	filter_desc.Usage = D3D11_USAGE_DEFAULT;
+	filter_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	hr = _device->CreateTexture2D(&filter_desc, nullptr, &_tex_intermidiate.ptr);
 	assert(hr == S_OK);
+	hr = _device->CreateShaderResourceView(_tex_intermidiate.ptr, nullptr, &_tex_srv_intermediate.ptr);
+	assert(hr == S_OK);
+	hr = _device->CreateUnorderedAccessView(_tex_intermidiate.ptr, nullptr, &_tex_uav_intermidiate.ptr);
+	assert(hr == S_OK);
+
 	hr = _device->CreateTexture2D(&filter_desc, nullptr, &_tex_final.ptr);
+	assert(hr == S_OK);
+	hr = _device->CreateShaderResourceView(_tex_final.ptr, nullptr, &_tex_srv_final.ptr);
+	assert(hr == S_OK);
+	hr = _device->CreateUnorderedAccessView(_tex_final.ptr, nullptr, &_tex_uav_final.ptr);
 	assert(hr == S_OK);
 }
 
 void Gaussian_filter_example::render()
 {
+	const float4 clear_color = cg::rgba(0xd1d7ffff);
+
+	clear_color_buffer(clear_color);
+	_device_ctx->Draw(4, 0);
+}
+
+void Gaussian_filter_example::setup_pipeline_state()
+{
+	assert(_rasterizer_state.ptr);
+
+	// input assembler
+	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// vertex shader
+	_device_ctx->VSSetShader(_render_image_shader.vertex_shader(), nullptr, 0);
+	_device_ctx->VSSetConstantBuffers(0, 1, &_matrix_cbuffer.ptr);
+	// pixel shader
+	_device_ctx->PSSetShader(_render_image_shader.pixel_shader(), nullptr, 0);
+
+	// rasterizer
+	_device_ctx->RSSetState(_rasterizer_state.ptr);
+	// output merger
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
+
+	HRESULT hr = _debug->ValidateContext(_device_ctx);
+	assert(hr == S_OK);
+}
+
+void Gaussian_filter_example::update_pvm_matrix(float aspect_ratio)
+{
+	assert(aspect_ratio > 0.0f);
+	assert(_matrix_cbuffer.ptr);
+
+	_pvm_matrix = perspective_matrix_directx(cg::pi_3, aspect_ratio, 0.1f, 100.0f) * _model_matrix;
+
+	float arr[16];
+	to_array_column_major_order(_pvm_matrix, arr);
+	_device_ctx->UpdateSubresource(_matrix_cbuffer.ptr, 0, nullptr, arr, 0, 0);
 }
 
 } // namespace image_processing

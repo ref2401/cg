@@ -75,6 +75,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image_processing", "image_processing", "{F905F489-63ED-44B1-8611-A5643ACC8FCB}"
 	ProjectSection(SolutionItems) = preProject
 		..\data\learn_dx11\image_processing\gaussian_filter.compute.hlsl = ..\data\learn_dx11\image_processing\gaussian_filter.compute.hlsl
+		..\data\learn_dx11\image_processing\render_image.hlsl = ..\data\learn_dx11\image_processing\render_image.hlsl
 	EndProjectSection
 EndProject
 Global
