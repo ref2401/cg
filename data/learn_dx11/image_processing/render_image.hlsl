@@ -25,22 +25,18 @@ VS_output vs_main(uint vertex_id : SV_VertexID)
 		float2(1.0f, 1.0f)
 	};
 
-	const float4 pos = float4(positions[vertex_id], 0.0f, 1.0f);
-	
 	VS_output output;
-	output.position_cs = mul(g_pvm_matrix, pos);
+	output.position_cs = mul(g_pvm_matrix, float4(positions[vertex_id], 0.0f, 1.0f));
 	output.tex_coord = tex_coords[vertex_id];
 	return output;
 }
 
 // ----- pixel shader -----
 
-SamplerState g_sampler			: register(s0);
-Texture2D<float> g_tex_image	: register(t0);
+SamplerState g_sampler	: register(s0);
+Texture2D g_tex_image	: register(t0);
 
 float4 ps_main(VS_output pixel) : SV_Target0
 {
-	//float3 rgb = g_tex_image.Sample(g_sampler, pixel.tex_coord);
-	//return float4(rgb, 1.0f);
-	return (float4)1.0f;
+	return g_tex_image.Sample(g_sampler, pixel.tex_coord);
 }

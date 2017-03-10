@@ -52,6 +52,7 @@ private:
 	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// example stuff
 	Com_ptr<ID3D11Buffer> _matrix_cbuffer;
+	Com_ptr<ID3D11SamplerState> _sampler_state;
 	Com_ptr<ID3D11Texture2D> _tex_source;
 	Com_ptr<ID3D11ShaderResourceView> _tex_srv_source;
 	Com_ptr<ID3D11Texture2D> _tex_intermidiate;

@@ -90,6 +90,14 @@ void Gaussian_filter_example::init_textures()
 	assert(hr == S_OK);
 	hr = _device->CreateUnorderedAccessView(_tex_final.ptr, nullptr, &_tex_uav_final.ptr);
 	assert(hr == S_OK);
+
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	hr = _device->CreateSamplerState(&sampler_desc, &_sampler_state.ptr);
+	assert(hr == S_OK);
 }
 
 void Gaussian_filter_example::on_viewport_resize(const cg::uint2& viewport_size) 
@@ -117,6 +125,8 @@ void Gaussian_filter_example::setup_pipeline_state()
 	_device_ctx->VSSetConstantBuffers(0, 1, &_matrix_cbuffer.ptr);
 	// pixel shader
 	_device_ctx->PSSetShader(_render_image_shader.pixel_shader(), nullptr, 0);
+	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_source.ptr);
 
 	// rasterizer
 	_device_ctx->RSSetState(_rasterizer_state.ptr);
