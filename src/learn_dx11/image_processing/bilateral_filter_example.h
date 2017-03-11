@@ -1,5 +1,5 @@
-#ifndef LEARN_DX11_IMAGE_PROCESSNG_GAUSSIAN_FILTER_EXAMPLE_H_
-#define LEARN_DX11_IMAGE_PROCESSNG_GAUSSIAN_FILTER_EXAMPLE_H_
+#ifndef LEARN_DX11_IMAGE_PROCESSING_BILATERAL_FILTER_H_
+#define LEARN_DX11_IMAGE_PROCESSING_BILATERAL_FILTER_H_
 
 #include "cg/math/math.h"
 #include "learn_dx11/base/app.h"
@@ -8,22 +8,22 @@
 namespace learn_dx11 {
 namespace image_processing {
 
-class Gaussian_filter_example final : public Example {
+class Bilateral_filter_example final : public Example {
 public:
 
 	constexpr static bool init_depth_stencil_view = false;
 
 
-	Gaussian_filter_example(Render_context& rnd_ctx);
+	Bilateral_filter_example(Render_context& rnd_ctx);
 
-	Gaussian_filter_example(const Gaussian_filter_example&) = delete;
+	Bilateral_filter_example(const Bilateral_filter_example&) = delete;
 
-	Gaussian_filter_example(Gaussian_filter_example&&) = delete;
+	Bilateral_filter_example(Bilateral_filter_example&&) = delete;
 
 
-	Gaussian_filter_example& operator=(const Gaussian_filter_example&) = delete;
+	Bilateral_filter_example& operator=(const Bilateral_filter_example&) = delete;
 
-	Gaussian_filter_example& operator=(Gaussian_filter_example&&) = delete;
+	Bilateral_filter_example& operator=(Bilateral_filter_example&&) = delete;
 
 
 	void on_keypress() override {}
@@ -77,4 +77,4 @@ private:
 } // namespace image_processing
 } // namespace learn_dx11
 
-#endif // LEARN_DX11_IMAGE_PROCESSNG_GAUSSIAN_FILTER_EXAMPLE_H_
+#endif // LEARN_DX11_IMAGE_PROCESSING_BILATERAL_FILTER_H_

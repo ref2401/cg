@@ -32,6 +32,9 @@
     <ClCompile Include="image_processing\gaussian_filter_example.cpp">
       <Filter>image_processing</Filter>
     </ClCompile>
+    <ClCompile Include="image_processing\bilateral_filter_example.cpp">
+      <Filter>image_processing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">
@@ -76,6 +79,9 @@
       <Filter>tess</Filter>
     </ClInclude>
     <ClInclude Include="image_processing\gaussian_filter_example.h">
+      <Filter>image_processing</Filter>
+    </ClInclude>
+    <ClInclude Include="image_processing\bilateral_filter_example.h">
       <Filter>image_processing</Filter>
     </ClInclude>
   </ItemGroup>

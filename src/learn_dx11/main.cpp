@@ -7,6 +7,7 @@
 #include "learn_dx11/tess/terrain_tessellation_example.h"
 #include "learn_dx11/tess/compute_complanarity_example.h"
 #include "learn_dx11/image_processing/gaussian_filter_example.h"
+#include "learn_dx11/image_processing/bilateral_filter_example.h"
 
 
 #include "cg/data/model.h"
@@ -26,8 +27,8 @@ int main(int argc, char* argv[])
 		//app.run<learn_dx11::mesh_rnd::Displacement_mapping_example>();
 		//app.run<learn_dx11::tess::Terrain_tessellation_example>();
 		//app.run<learn_dx11::tess::Compute_complanarity_example>();
-		app.run<learn_dx11::image_processing::Gaussian_filter_example>();
-	
+		//app.run<learn_dx11::image_processing::Gaussian_filter_example>();
+		app.run<learn_dx11::image_processing::Bilateral_filter_example>();
 	}
 	catch(std::exception& exc) {
 		OutputDebugString("\nException:\n");

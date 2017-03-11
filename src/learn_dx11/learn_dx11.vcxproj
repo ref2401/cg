@@ -129,6 +129,7 @@
     <ClCompile Include="base\app.cpp" />
     <ClCompile Include="base\dx11.cpp" />
     <ClCompile Include="base\bob_lamp_model.cpp" />
+    <ClCompile Include="image_processing\bilateral_filter_example.cpp" />
     <ClCompile Include="image_processing\gaussian_filter_example.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh_rnd\displacement_mapping_example.cpp">
@@ -156,6 +157,7 @@
     <ClInclude Include="base\app.h" />
     <ClInclude Include="base\dx11.h" />
     <ClInclude Include="base\bob_lamp_model.h" />
+    <ClInclude Include="image_processing\bilateral_filter_example.h" />
     <ClInclude Include="image_processing\gaussian_filter_example.h" />
     <ClInclude Include="mesh_rnd\displacement_mapping_example.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
