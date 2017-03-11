@@ -81,11 +81,11 @@ void Gaussian_filter_example::init_textures()
 	D3D11_TEXTURE2D_DESC filter_desc = source_desc;
 	filter_desc.Usage = D3D11_USAGE_DEFAULT;
 	filter_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	hr = _device->CreateTexture2D(&filter_desc, nullptr, &_tex_intermidiate.ptr);
+	hr = _device->CreateTexture2D(&filter_desc, nullptr, &_tex_intermediate.ptr);
 	assert(hr == S_OK);
-	hr = _device->CreateShaderResourceView(_tex_intermidiate.ptr, nullptr, &_tex_srv_intermediate.ptr);
+	hr = _device->CreateShaderResourceView(_tex_intermediate.ptr, nullptr, &_tex_srv_intermediate.ptr);
 	assert(hr == S_OK);
-	hr = _device->CreateUnorderedAccessView(_tex_intermidiate.ptr, nullptr, &_tex_uav_intermidiate.ptr);
+	hr = _device->CreateUnorderedAccessView(_tex_intermediate.ptr, nullptr, &_tex_uav_intermediate.ptr);
 	assert(hr == S_OK);
 
 	hr = _device->CreateTexture2D(&filter_desc, nullptr, &_tex_final.ptr);
@@ -117,16 +117,24 @@ void Gaussian_filter_example::perform_filtering()
 
 	_device_ctx->CSSetShader(_gaussian_filter_compute.shader(), nullptr, 0);
 	_device_ctx->CSSetConstantBuffers(0, 1, &offset_cbuffer.ptr);
+	
 	// filter horizontally
 	offset_arr[0] = uint2(1, 0);
 	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_intermediate.ptr, nullptr);
 	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_source.ptr);
-	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_intermidiate.ptr, nullptr);
 	_device_ctx->Dispatch(size.width / compute_kernel_width, size.height, 1);
-
+	
+	// filter vertically
 	offset_arr[0] = uint2(0, 1);
 	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_final.ptr, nullptr);
+	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_intermediate.ptr);
+	_device_ctx->Dispatch(size.width / compute_kernel_width, size.height, 1);
+	
+	ID3D11UnorderedAccessView* uavs[1] = { nullptr };
+	_device_ctx->CSSetShader(nullptr, nullptr, 0);
+	_device_ctx->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
 }
 
 void Gaussian_filter_example::on_viewport_resize(const cg::uint2& viewport_size) 
@@ -146,7 +154,7 @@ void Gaussian_filter_example::render()
 	_device_ctx->Draw(4, 0);
 	
 	// final image
-	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_intermediate.ptr);
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_final.ptr);
 	update_matrix_cbuffer(_pvm_matrix_1);
 	_device_ctx->Draw(4, 0);
 }

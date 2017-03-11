@@ -11,17 +11,18 @@ RWTexture2D<float4> rt_result	: register(u0);
 
 
 [numthreads(compute_kernel_width, compute_kernel_height, compute_kernel_depth)]
-void cs_main(uint3 gt_id: SV_GroupThreadID, uint3 dt_id : SV_DispatchThreadID)
+void cs_main(uint3 dt_id : SV_DispatchThreadID)
 {
-	const uint3 offset = uint3(g_offset_dir, 0);
+	const int3 uvw = int3(dt_id);
+	const int3 offset = uint3(g_offset_dir, 0);
 	float3 accum = (float3)0.0f
-		+ 0.030078323f * g_tex_source.Load(dt_id - 3 * offset).rgb
-		+ 0.104983664f * g_tex_source.Load(dt_id - 2 * offset).rgb
-		+ 0.222250419f * g_tex_source.Load(dt_id - 1 * offset).rgb
-		+ 0.285375187f * g_tex_source.Load(dt_id).rgb
-		+ 0.222250419f * g_tex_source.Load(dt_id + 1 * offset).rgb
-		+ 0.104983664f * g_tex_source.Load(dt_id + 2 * offset).rgb
-		+ 0.030078323f * g_tex_source.Load(dt_id + 3 * offset).rgb;
+		+ 0.030078323f * g_tex_source.Load(uvw - 3 * offset).rgb
+		+ 0.104983664f * g_tex_source.Load(uvw - 2 * offset).rgb
+		+ 0.222250419f * g_tex_source.Load(uvw - 1 * offset).rgb
+		+ 0.285375187f * g_tex_source.Load(uvw).rgb
+		+ 0.222250419f * g_tex_source.Load(uvw + 1 * offset).rgb
+		+ 0.104983664f * g_tex_source.Load(uvw + 2 * offset).rgb
+		+ 0.030078323f * g_tex_source.Load(uvw + 3 * offset).rgb;
 
 	rt_result[dt_id.xy] = float4(accum, 1.0);
 }
