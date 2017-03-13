@@ -409,8 +409,9 @@ void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::ma
 
 // ----- Fur_simulation_opengl_example -----
 
-Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx) :
-	Example(app_ctx),
+Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx, 
+	cg::rnd::Rhi_context_i& rhi_ctx) 
+	: Example(app_ctx, rhi_ctx),
 	_curr_viewpoint(float3(0, 3, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	_model_transform(float3(0, -0.5, 0), normalize(float3(0, 1, 0)), float3(2.0f)),

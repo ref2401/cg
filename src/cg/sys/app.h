@@ -40,10 +40,17 @@ protected:
 	~Sys_message_listener_i() noexcept = default;
 };
 
+struct Example_desc final {
+	cg::rnd::Render_api render_api;
+	cg::rnd::Depth_stencil_format depth_stencil_format;
+};
+
 class Example : public virtual Sys_message_listener_i {
 public:
 
-	explicit Example(const App_context& app_ctx) noexcept : _app_ctx(app_ctx) {}
+	Example(const App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx) noexcept 
+		: _app_ctx(app_ctx) 
+	{}
 
 	Example(const Example&) = delete;
 
@@ -160,12 +167,24 @@ template<typename T>
 Clock_report Application::run_opengl_example()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
+	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,
+		"T must declare public static constexpr Example_desc example_desc field.");
 
 	App_context app_ctx(_keyboard, _mouse, _window);
-	cg::rnd::opengl::Opengl_rhi_context rhi_ctx(_window.hwnd());
-	T example(app_ctx);
+	std::unique_ptr<cg::rnd::Rhi_context_i> rhi_ctx = nullptr;
 
-	return run_main_loop(example, rhi_ctx);
+	if (T::example_desc.render_api == cg::rnd::Render_api::dx_11) {
+
+	}
+	else if (T::example_desc.render_api == cg::rnd::Render_api::opengl_45) {
+		assert(T::example_desc.depth_stencil_format == cg::rnd::Depth_stencil_format::depth_32);
+		rhi_ctx = std::make_unique<cg::rnd::opengl::Opengl_rhi_context>(_window.hwnd());
+	}
+	
+	assert(rhi_ctx);
+	T example(app_ctx, *rhi_ctx);
+
+	return run_main_loop(example, *rhi_ctx);
 }
 
 } // namespace sys

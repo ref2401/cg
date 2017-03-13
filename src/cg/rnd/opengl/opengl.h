@@ -35,7 +35,7 @@ public:
 
 	Render_api render_api() const noexcept override
 	{
-		return Render_api::opengl;
+		return Render_api::opengl_45;
 	}
 
 	void swap_color_buffers() noexcept override;

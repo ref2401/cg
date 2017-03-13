@@ -100,7 +100,13 @@ private:
 class Deferred_lighting final : public cg::sys::Example {
 public:
 
-	explicit Deferred_lighting(const cg::sys::App_context& app_ctx);
+	static constexpr cg::sys::Example_desc example_desc = {
+		cg::rnd::Render_api::opengl_45,
+		cg::rnd::Depth_stencil_format::depth_32
+	};
+
+
+	Deferred_lighting(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
 
 	~Deferred_lighting() noexcept override = default;
 

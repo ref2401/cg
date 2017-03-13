@@ -1,12 +1,19 @@
 #ifndef CG_RND_RND_H_
 #define CG_RND_RND_H_
 
+
 namespace cg {
 namespace rnd {
 
+enum class Depth_stencil_format : unsigned char {
+	none,
+	depth_24_stencil_8,
+	depth_32,
+};
+
 enum class Render_api : unsigned char {
-	dx11,
-	opengl
+	dx_11,
+	opengl_45
 };
 
 class Rhi_context_i {
