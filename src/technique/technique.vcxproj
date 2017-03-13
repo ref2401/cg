@@ -139,6 +139,7 @@
     <ClCompile Include="deferred_lighting\render.cpp" />
     <ClCompile Include="deferred_lighting\render_pass_shader.cpp" />
     <ClCompile Include="deferred_lighting\vertex_spec.cpp" />
+    <ClCompile Include="displacement_mapping\displacement_mapping.cpp" />
     <ClCompile Include="fur_simulation\fur_model.cpp" />
     <ClCompile Include="fur_simulation\fur_simulation_opengl.cpp" />
     <ClCompile Include="fur_simulation\fur_glsl_program.cpp" />

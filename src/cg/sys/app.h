@@ -48,20 +48,20 @@ struct Example_desc final {
 class Example : public virtual Sys_message_listener_i {
 public:
 
-	Example(const App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx) noexcept 
+	Example(const App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx) 
 		: _app_ctx(app_ctx) 
 	{}
 
 	Example(const Example&) = delete;
 
-	Example(Example&&) noexcept = delete;
+	Example(Example&&) = delete;
 
 	virtual ~Example() noexcept = default;
 
 
 	Example& operator=(const Example&) = delete;
 
-	Example& operator=(Example&&) noexcept = delete;
+	Example& operator=(Example&&) = delete;
 
 
 	virtual void render(float interpolation_factor) = 0;
@@ -92,8 +92,6 @@ public:
 	void enqueue_mouse_move_message(const uint2& p);
 
 	void enqueue_window_resize() noexcept;
-
-	void process_sys_messages(Sys_message_listener_i& listener) noexcept;
 
 	const Mouse& mouse() const noexcept
 	{
@@ -142,6 +140,8 @@ private:
 
 	void clear_message_queue() noexcept;
 
+	void process_sys_messages(cg::rnd::Rhi_context_i& rhi_ctx, Sys_message_listener_i& listener);
+
 	// Processes all the system messages that are in the message queue at the moment.
 	// Returns true if the application has to terminate.
 	bool pump_sys_messages() const noexcept;
@@ -149,7 +149,7 @@ private:
 	// Refreshes state of mouse, keyboard etc.
 	void refresh_device_state() noexcept;
 
-	Clock_report run_main_loop(Example& example, cg::rnd::Rhi_context_i& rhi_ctx);
+	Clock_report run_main_loop(cg::rnd::Rhi_context_i& rhi_ctx, Example& example);
 
 
 	HINSTANCE _hinstance = nullptr;
@@ -181,7 +181,7 @@ Clock_report Application::run_opengl_example()
 	assert(rhi_ctx);
 	T example(app_ctx, *rhi_ctx);
 
-	return run_main_loop(example, *rhi_ctx);
+	return run_main_loop(*rhi_ctx, example);
 }
 
 } // namespace sys

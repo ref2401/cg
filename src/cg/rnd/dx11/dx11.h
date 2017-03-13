@@ -11,6 +11,8 @@
 #include "cg/math/math.h"
 #include "cg/rnd/rnd.h"
 
+using namespace DirectX;
+
 
 namespace cg {
 namespace rnd {
@@ -166,6 +168,31 @@ public:
 
 	DX11_rhi_context& operator=(DX11_rhi_context&&) = delete;
 
+
+	ID3D11Debug* debug() noexcept
+	{
+		return _debug.ptr;
+	}
+
+	ID3D11Device* device() noexcept
+	{
+		return _device.ptr;
+	}
+
+	ID3D11DeviceContext* device_ctx() noexcept
+	{
+		return _device_ctx.ptr;
+	}
+
+	ID3D11DepthStencilView* dsv_depth_stencil() noexcept
+	{
+		return _dsv_depth_stencil.ptr;
+	}
+
+	ID3D11RenderTargetView* rtv_window() noexcept
+	{
+		return _rtv_window.ptr;
+	}
 
 	Render_api render_api() const noexcept override 
 	{

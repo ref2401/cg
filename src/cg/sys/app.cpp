@@ -13,7 +13,7 @@ using cg::sys::Mouse_buttons;
 
 // Yay! A global. The Application ctor sets its value. The Application dtor resets it to nullptr.
 // Only window_proc is supposed to use the global. 
-// If any other chunk of code uses it then your PC will burn. Consider yourself warned.
+// If any other chunk of the code uses it then your PC will burn. Consider yourself warned.
 cg::sys::Application* g_app = nullptr;
 
 Mouse_buttons get_mouse_buttons(WPARAM w_param) noexcept
@@ -303,15 +303,17 @@ void Application::enqueue_window_resize() noexcept
 	_window_resize_message = true;
 }
 
-void Application::process_sys_messages(Sys_message_listener_i& listener) noexcept
+void Application::process_sys_messages(cg::rnd::Rhi_context_i& rhi_ctx, Sys_message_listener_i& listener)
 {
 	if (_sys_message_queue.empty()) return;
 
 	assert(_sys_message_queue.size() < 64);
 
 
-	if (_window_resize_message)
+	if (_window_resize_message) {
+		rhi_ctx.resize_viewport(_window.viewport_size());
 		listener.on_window_resize();
+	}
 
 	for (const auto& msg : _sys_message_queue) {
 		switch (msg.type) {
@@ -355,20 +357,6 @@ void Application::process_sys_messages(Sys_message_listener_i& listener) noexcep
 		}
 	} // for
 
-	  //std::ostringstream title_builder;
-	  //if (_mouse.is_out()) title_builder << "out |";
-	  //else title_builder << " in |";
-
-	  //if (_mouse.left_down()) title_builder << " 1";
-	  //else title_builder << " 0";
-	  //if (_mouse.middle_down()) title_builder << "1";
-	  //else title_builder << "0";
-	  //if (_mouse.right_down()) title_builder << "1 |";
-	  //else title_builder << "0 |";
-
-	  //title_builder << _mouse.position();
-	  //window().set_title(title_builder.str());
-
 	clear_message_queue();
 }
 
@@ -406,7 +394,7 @@ void Application::refresh_device_state() noexcept
 		_mouse.set_position(uint2(cp.x, _window.viewport_size().height - cp.y - 1));
 }
 
-Clock_report Application::run_main_loop(Example& example, cg::rnd::Rhi_context_i& rhi_ctx)
+Clock_report Application::run_main_loop(cg::rnd::Rhi_context_i& rhi_ctx, Example& example)
 {
 	_window.show();
 	refresh_device_state();
@@ -422,7 +410,7 @@ Clock_report Application::run_main_loop(Example& example, cg::rnd::Rhi_context_i
 		// simulation
 		while (_clock.has_update_time()) {
 			_clock.process_update_call();
-			process_sys_messages(example);
+			process_sys_messages(rhi_ctx, example);
 			example.update(static_cast<float>(Clock::update_delta_time.count()));
 		}
 

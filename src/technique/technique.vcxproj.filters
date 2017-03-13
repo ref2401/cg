@@ -29,6 +29,9 @@
     <ClCompile Include="deferred_lighting\filter_shader.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
+    <ClCompile Include="displacement_mapping\displacement_mapping.cpp">
+      <Filter>displacement_mapping</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
