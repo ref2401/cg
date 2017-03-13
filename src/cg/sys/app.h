@@ -171,16 +171,13 @@ Clock_report Application::run_opengl_example()
 		"T must declare public static constexpr Example_desc example_desc field.");
 
 	App_context app_ctx(_keyboard, _mouse, _window);
-	std::unique_ptr<cg::rnd::Rhi_context_i> rhi_ctx = nullptr;
+	std::unique_ptr<cg::rnd::Rhi_context_i> rhi_ctx = cg::rnd::rhi_context(
+		T::example_desc.render_api,
+		_window.hwnd(),
+		_window.viewport_size(),
+		T::example_desc.depth_stencil_format
+	);
 
-	if (T::example_desc.render_api == cg::rnd::Render_api::dx_11) {
-
-	}
-	else if (T::example_desc.render_api == cg::rnd::Render_api::opengl_45) {
-		assert(T::example_desc.depth_stencil_format == cg::rnd::Depth_stencil_format::depth_32);
-		rhi_ctx = std::make_unique<cg::rnd::opengl::Opengl_rhi_context>(_window.hwnd());
-	}
-	
 	assert(rhi_ctx);
 	T example(app_ctx, *rhi_ctx);
 

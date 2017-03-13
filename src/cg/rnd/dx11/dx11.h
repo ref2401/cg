@@ -2,6 +2,14 @@
 #define CG_RND_DX11_DX11_H_
 
 #include <cstddef>
+#include <windows.h>
+#include <d3d11.h>
+#include <d3dcommon.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+#include <dxgi.h>
+#include "cg/math/math.h"
+#include "cg/rnd/rnd.h"
 
 
 namespace cg {
@@ -141,6 +149,54 @@ inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 {
 	return com_ptr.ptr != nullptr;
 }
+
+class DX11_rhi_context final : public virtual cg::rnd::Rhi_context_i {
+public:
+
+	DX11_rhi_context(HWND hwnd, const cg::uint2& viewport_size, cg::rnd::Depth_stencil_format depth_stencil_format);
+
+	DX11_rhi_context(const DX11_rhi_context&) = delete;
+
+	DX11_rhi_context(DX11_rhi_context&&) = delete;
+
+	~DX11_rhi_context() noexcept {};
+
+
+	DX11_rhi_context& operator=(const DX11_rhi_context&) = delete;
+
+	DX11_rhi_context& operator=(DX11_rhi_context&&) = delete;
+
+
+	Render_api render_api() const noexcept override 
+	{
+		return cg::rnd::Render_api::dx_11;
+	}
+
+	void resize_viewport(const cg::uint2& viewport_size) override;
+
+	void swap_color_buffers() noexcept override;
+
+private:
+
+	void init_device(HWND hwnd, const cg::uint2& viewport_size);
+
+	void init_depth_stencil_buffer(const cg::uint2& viewport_size,
+		cg::rnd::Depth_stencil_format depth_stencil_format);
+
+	void update_depth_stencil_buffer();
+
+	void update_render_target_buffer();
+
+
+	cg::uint2 _viewport_size;
+	Com_ptr<ID3D11Device> _device;
+	Com_ptr<ID3D11Debug> _debug;
+	Com_ptr<ID3D11DeviceContext> _device_ctx;
+	Com_ptr<IDXGISwapChain> _swap_chain;
+	Com_ptr<ID3D11RenderTargetView> _rtv_window;
+	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
+	Com_ptr<ID3D11DepthStencilView> _dsv_depth_stencil;
+};
 
 } // namespace dx11
 } // namespace rnd

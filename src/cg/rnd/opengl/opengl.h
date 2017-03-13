@@ -19,13 +19,13 @@ namespace opengl {
 class Opengl_rhi_context final : public virtual Rhi_context_i {
 public:
 
-	Opengl_rhi_context(HWND hwnd);
+	Opengl_rhi_context(HWND hwnd, cg::rnd::Depth_stencil_format depth_stencil_format);
 
 	Opengl_rhi_context(const Opengl_rhi_context&) = delete;
 
 	Opengl_rhi_context(Opengl_rhi_context&&) = delete;
 
-	~Opengl_rhi_context() noexcept override;
+	~Opengl_rhi_context() noexcept;
 
 
 	Opengl_rhi_context& operator=(const Opengl_rhi_context&) = delete;
@@ -38,7 +38,9 @@ public:
 		return Render_api::opengl_45;
 	}
 
-	void swap_color_buffers() noexcept override;
+	void resize_viewport(const cg::uint2& viewport_size) override;
+
+	void swap_color_buffers() override;
 
 private:
 

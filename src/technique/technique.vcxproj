@@ -88,7 +88,7 @@
       <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)..\bin_$(Configuration)\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;d3dcompiler.lib;opengl32.lib;$(SolutionDir)..\bin_$(Configuration)\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
@@ -116,7 +116,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)..\bin_$(Configuration)\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;d3dcompiler.lib;opengl32.lib;$(SolutionDir)..\bin_$(Configuration)\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,6 +156,7 @@
     <ClInclude Include="deferred_lighting\render.h" />
     <ClInclude Include="deferred_lighting\render_pass_shader.h" />
     <ClInclude Include="deferred_lighting\vertex_spec.h" />
+    <ClInclude Include="displacement_mapping\displacement_mapping.h" />
     <ClInclude Include="fur_simulation\fur_model.h" />
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h" />
     <ClInclude Include="fur_simulation\fur_glsl_program.h" />

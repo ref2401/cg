@@ -61,6 +61,12 @@
     <ClCompile Include="base\base.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="rnd\dx11\dx11.cpp">
+      <Filter>rnd\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="rnd\rnd.cpp">
+      <Filter>rnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

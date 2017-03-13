@@ -30,7 +30,6 @@ std::string get_report_message(const Clock_report& report)
 int main(int argc, char* argv[])
 {
 	using cg::uint2;
-	using cg::rnd::Render_api;
 	using cg::sys::Application;
 	using cg::sys::Application_desc;
 

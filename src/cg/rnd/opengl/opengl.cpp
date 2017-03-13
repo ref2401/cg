@@ -54,10 +54,11 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
-Opengl_rhi_context::Opengl_rhi_context(HWND hwnd) :
-	_hwnd(hwnd)
+Opengl_rhi_context::Opengl_rhi_context(HWND hwnd, cg::rnd::Depth_stencil_format depth_stencil_format)
+	: _hwnd(hwnd)
 {
 	assert(_hwnd);
+	assert(depth_stencil_format == cg::rnd::Depth_stencil_format::depth_32); // NOTE(ref2401): the other options are not implementd
 	inti_context();
 
 	_opengl_dll = LoadLibrary("opengl32.dll");
@@ -77,8 +78,6 @@ Opengl_rhi_context::Opengl_rhi_context(HWND hwnd) :
 	//	extensions.append(ext);
 	//	extensions.append("\n");
 	//}
-
-	//auto ptr = load_opengl_func("eglGetDisplayARB");
 }
 
 Opengl_rhi_context::~Opengl_rhi_context() noexcept
@@ -112,6 +111,7 @@ void Opengl_rhi_context::inti_context()
 	pixel_fmt_desc.iPixelType = PFD_TYPE_RGBA;
 	pixel_fmt_desc.cColorBits = 32;
 	pixel_fmt_desc.cDepthBits = 32;
+	pixel_fmt_desc.cStencilBits = 0;
 	pixel_fmt_desc.iLayerType = PFD_MAIN_PLANE;
 
 	int pixel_format = ChoosePixelFormat(_hdc, &pixel_fmt_desc);
@@ -817,7 +817,11 @@ void Opengl_rhi_context::load_opengl_45() const
 	glTextureBarrier = static_cast<PFNGLTEXTUREBARRIERPROC>(load_opengl_func("glTextureBarrier"));
 }
 
-void Opengl_rhi_context::swap_color_buffers() noexcept
+void Opengl_rhi_context::resize_viewport(const cg::uint2& viewport_size)
+{
+}
+
+void Opengl_rhi_context::swap_color_buffers()
 {
 	SwapBuffers(_hdc);
 }

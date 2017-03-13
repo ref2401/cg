@@ -37,6 +37,9 @@
     <Filter Include="fur_simulation">
       <UniqueIdentifier>{4f121a48-8c26-4bf5-8298-e187f3d50862}</UniqueIdentifier>
     </Filter>
+    <Filter Include="displacement_mapping">
+      <UniqueIdentifier>{b43c4de9-0f44-4682-95ec-eea45be4b807}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="deferred_lighting\deferred_lighting.h">
@@ -65,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="deferred_lighting\filter_shader.h">
       <Filter>deferred_lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="displacement_mapping\displacement_mapping.h">
+      <Filter>displacement_mapping</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
