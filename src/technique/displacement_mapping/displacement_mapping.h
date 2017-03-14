@@ -10,6 +10,12 @@ namespace displacement_mapping {
 class Displacement_mapping final : public virtual cg::sys::Example {
 public:
 
+	static constexpr cg::sys::Example_desc example_desc = {
+		cg::rnd::Render_api::dx_11,
+		cg::rnd::Depth_stencil_format::depth_24_stencil_8
+	};
+
+
 	Displacement_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
 
 	Displacement_mapping(const Displacement_mapping&) = delete;

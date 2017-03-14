@@ -104,7 +104,7 @@ public:
 	}
 
 	template<typename T>
-	Clock_report run_opengl_example();
+	Clock_report run();
 
 private:
 
@@ -164,7 +164,7 @@ private:
 };
 
 template<typename T>
-Clock_report Application::run_opengl_example()
+Clock_report Application::run()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
 	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,

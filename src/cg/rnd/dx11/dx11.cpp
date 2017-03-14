@@ -41,6 +41,12 @@ DX11_rhi_context::DX11_rhi_context(HWND hwnd, const cg::uint2& viewport_size,
 	init_device(hwnd, viewport_size);
 	init_depth_stencil_buffer(viewport_size, depth_stencil_format);
 	update_render_target_buffer();
+	bind_window_render_targets();
+}
+
+void DX11_rhi_context::bind_window_render_targets()
+{
+	_device_ctx->OMSetRenderTargets(1, &_rtv_window.ptr, _dsv_depth_stencil.ptr);
 }
 
 void DX11_rhi_context::init_device(HWND hwnd, const cg::uint2& viewport_size)
@@ -107,6 +113,7 @@ void DX11_rhi_context::init_depth_stencil_buffer(const cg::uint2& viewport_size,
 void DX11_rhi_context::resize_viewport(const cg::uint2& viewport_size)
 {
 	assert(greater_than(viewport_size, 0));
+	if (viewport_size == _viewport_size) return;
 
 	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
 	_viewport_size = viewport_size;
@@ -119,10 +126,10 @@ void DX11_rhi_context::resize_viewport(const cg::uint2& viewport_size)
 
 	update_render_target_buffer();
 	update_depth_stencil_buffer();
-	//bind_default_render_targets();
+	bind_window_render_targets();
 }
 
-void DX11_rhi_context::swap_color_buffers() noexcept
+void DX11_rhi_context::swap_color_buffers()
 {
 	_swap_chain->Present(0, 0);
 }

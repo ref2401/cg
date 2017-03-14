@@ -1,5 +1,6 @@
 #include "technique/displacement_mapping/displacement_mapping.h"
 
+using namespace cg;
 
 
 namespace displacement_mapping {
@@ -14,6 +15,7 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_device_ctx(_rhi_ctx.device_ctx())
 {
 
+	
 }
 
 void Displacement_mapping::on_window_resize()
@@ -22,6 +24,7 @@ void Displacement_mapping::on_window_resize()
 
 void Displacement_mapping::render(float interpolation_factor)
 {
+	_device_ctx->ClearRenderTargetView(_rhi_ctx.rtv_window(), float4::unit_xyzw.data);
 }
 
 void Displacement_mapping::update(float dt_msec) 

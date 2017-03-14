@@ -161,13 +161,15 @@ public:
 
 	DX11_rhi_context(DX11_rhi_context&&) = delete;
 
-	~DX11_rhi_context() noexcept {};
+	~DX11_rhi_context() noexcept {}
 
 
 	DX11_rhi_context& operator=(const DX11_rhi_context&) = delete;
 
 	DX11_rhi_context& operator=(DX11_rhi_context&&) = delete;
 
+
+	void bind_window_render_targets();
 
 	ID3D11Debug* debug() noexcept
 	{
@@ -201,7 +203,7 @@ public:
 
 	void resize_viewport(const cg::uint2& viewport_size) override;
 
-	void swap_color_buffers() noexcept override;
+	void swap_color_buffers() override;
 
 private:
 

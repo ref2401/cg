@@ -7,6 +7,7 @@
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/deferred_lighting.h"
 #include "technique/fur_simulation/fur_simulation_opengl.h"
+#include "technique/displacement_mapping/displacement_mapping.h"
 
 using cg::sys::Clock_report;
 
@@ -42,7 +43,8 @@ int main(int argc, char* argv[])
 	try {
 		Application app(app_desc);
 		//auto report = app.run_opengl_example<deferred_lighting::Deferred_lighting>();
-		auto report = app.run_opengl_example<fur_simulation::Fur_simulation_opengl_example>();
+		//auto report = app.run<fur_simulation::Fur_simulation_opengl_example>();
+		auto report = app.run<displacement_mapping::Displacement_mapping>();
 		OutputDebugString(get_report_message(report).c_str());
 	}
 	catch (std::exception& exc) {
