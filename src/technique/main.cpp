@@ -10,6 +10,7 @@
 
 using cg::sys::Clock_report;
 
+
 namespace {
 
 std::string get_report_message(const Clock_report& report)

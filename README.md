@@ -4,7 +4,7 @@ Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11
 Required tools
 - DirectX SDK (install it before Visual Studio)
 - Vulkan SDK
-- Visual Studio Community 2015
+- Visual Studio Community 2017
 - CMake
 - Git
 - Make sure that cmake, git & devenv commands are available from the command line.
