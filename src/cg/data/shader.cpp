@@ -80,10 +80,10 @@ Hlsl_compute_desc load_hlsl_compute_desc(const char* filename)
 	return desc;
 }
 
-Hlsl_shader_set_desc load_hlsl_shader_set_desc(const char* filename)
+Hlsl_shader_desc load_hlsl_shader_set_desc(const char* filename)
 {
 	ENFORCE(exists(filename), EXCEPTION_MSG("The specified hlsl file '", filename, "' does not exist."));
-	Hlsl_shader_set_desc data;
+	Hlsl_shader_desc data;
 
 	data.source_code = load_text(filename);
 	data.source_filename = filename;

@@ -8,6 +8,7 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <dxgi.h>
+#include "cg/data/shader.h"
 #include "cg/math/math.h"
 #include "cg/rnd/rnd.h"
 
@@ -161,15 +162,13 @@ public:
 
 	DX11_rhi_context(DX11_rhi_context&&) = delete;
 
-	~DX11_rhi_context() noexcept {}
+	~DX11_rhi_context() noexcept = default;
 
 
 	DX11_rhi_context& operator=(const DX11_rhi_context&) = delete;
 
 	DX11_rhi_context& operator=(DX11_rhi_context&&) = delete;
 
-
-	void bind_window_render_targets();
 
 	ID3D11Debug* debug() noexcept
 	{
@@ -201,6 +200,20 @@ public:
 		return cg::rnd::Render_api::dx_11;
 	}
 
+	const D3D11_VIEWPORT& viewport() const noexcept
+	{
+		return _viewport;
+	}
+
+	float viewport_aspect_ratio() const noexcept
+	{
+		assert(!cg::approx_equal(_viewport.Height, 0.0f));
+		return _viewport.Width / _viewport.Height;
+	}
+
+
+	void bind_window_render_targets();
+
 	void resize_viewport(const cg::uint2& viewport_size) override;
 
 	void swap_color_buffers() override;
@@ -212,12 +225,13 @@ private:
 	void init_depth_stencil_buffer(const cg::uint2& viewport_size,
 		cg::rnd::Depth_stencil_format depth_stencil_format);
 
-	void update_depth_stencil_buffer();
+	void update_depth_stencil_buffer(const uint2& viewport_size);
 
 	void update_render_target_buffer();
 
+	void update_viewport(const cg::uint2& viewport_size);
 
-	cg::uint2 _viewport_size;
+
 	Com_ptr<ID3D11Device> _device;
 	Com_ptr<ID3D11Debug> _debug;
 	Com_ptr<ID3D11DeviceContext> _device_ctx;
@@ -225,7 +239,98 @@ private:
 	Com_ptr<ID3D11RenderTargetView> _rtv_window;
 	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
 	Com_ptr<ID3D11DepthStencilView> _dsv_depth_stencil;
+	D3D11_VIEWPORT _viewport;
 };
+
+class Hlsl_shader final {
+public:
+
+	Hlsl_shader() noexcept = default;
+
+	Hlsl_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_desc);
+
+	Hlsl_shader(const Hlsl_shader&) = delete;
+
+	Hlsl_shader(Hlsl_shader&& set) noexcept;
+
+	~Hlsl_shader() noexcept = default;
+
+
+	Hlsl_shader& operator=(const Hlsl_shader&) = delete;
+
+	Hlsl_shader& operator=(Hlsl_shader&& set) noexcept;
+
+
+	ID3D11VertexShader* vertex_shader() noexcept
+	{
+		return _vertex_shader.ptr;
+	}
+
+	ID3DBlob* vertex_shader_bytecode() noexcept
+	{
+		return _vertex_shader_bytecode.ptr;
+	}
+
+	ID3D11HullShader* hull_shader() noexcept
+	{
+		return _hull_shader.ptr;
+	}
+
+	ID3DBlob* hull_shader_bytecode() noexcept
+	{
+		return _hull_shader_bytecode.ptr;
+	}
+
+	ID3D11DomainShader* domain_shader() noexcept
+	{
+		return _domain_shader.ptr;
+	}
+
+	ID3DBlob* domain_shader_bytecode() noexcept
+	{
+		return _domain_shader_bytecode.ptr;
+	}
+
+	ID3D11PixelShader* pixel_shader() noexcept
+	{
+		return _pixel_shader.ptr;
+	}
+
+	ID3DBlob* pixel_shader_bytecode() noexcept
+	{
+		return _pixel_shader_bytecode.ptr;
+	}
+
+private:
+
+	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+
+	void init_hull_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+
+	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+
+	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+
+	Com_ptr<ID3D11VertexShader> _vertex_shader;
+	Com_ptr<ID3DBlob> _vertex_shader_bytecode;
+	Com_ptr<ID3D11HullShader> _hull_shader;
+	Com_ptr<ID3DBlob> _hull_shader_bytecode;
+	Com_ptr<ID3D11DomainShader> _domain_shader;
+	Com_ptr<ID3DBlob> _domain_shader_bytecode;
+	Com_ptr<ID3D11PixelShader> _pixel_shader;
+	Com_ptr<ID3DBlob> _pixel_shader_bytecode;
+};
+
+
+// Creates an unitialized constant buffer object.
+Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count);
+
+// Creates an unitialized constant buffer object.
+template<typename T_cbuffer_data>
+inline Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device)
+{
+	return constant_buffer(device, sizeof(T_cbuffer_data));
+}
 
 } // namespace dx11
 } // namespace rnd

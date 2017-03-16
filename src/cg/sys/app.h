@@ -7,6 +7,8 @@
 #include <vector>
 #include "cg/math/math.h"
 #include "cg/rnd/rnd.h"
+#include "cg/rnd/opengl/opengl.h"
+#include "cg/rnd/dx11/dx11.h"
 #include "cg/sys/environment.h"
 #include <windows.h>
 
@@ -104,7 +106,11 @@ public:
 	}
 
 	template<typename T>
-	Clock_report run();
+	Clock_report run_dx11_example();
+
+	template<typename T>
+	Clock_report run_opengl_example();
+
 
 private:
 
@@ -164,23 +170,46 @@ private:
 };
 
 template<typename T>
-Clock_report Application::run()
+Clock_report Application::run_dx11_example()
 {
 	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
 	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,
 		"T must declare public static constexpr Example_desc example_desc field.");
 
+	Clock_report report;
+	cg::rnd::dx11::Com_ptr<ID3D11Debug> debug_layer;
+	
+	{
+		auto rhi_ctx = std::make_unique<cg::rnd::dx11::DX11_rhi_context>(
+			_window.hwnd(), _window.viewport_size(),
+			T::example_desc.depth_stencil_format);
+		
+		debug_layer = rhi_ctx->debug();
+		debug_layer->AddRef();
+
+		App_context app_ctx(_keyboard, _mouse, _window);
+		T example(app_ctx, *rhi_ctx);
+		report = run_main_loop(*rhi_ctx, example);
+	}
+
+	if (debug_layer)
+		debug_layer->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+
+	return report;
+}
+
+template<typename T>
+Clock_report Application::run_opengl_example()
+{
+	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
+	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,
+		"T must declare public static constexpr Example_desc example_desc field.");
+
+	auto rhi_ctx = std::make_unique<cg::rnd::opengl::Opengl_rhi_context>(_window.hwnd(), 
+		T::example_desc.depth_stencil_format);
+
 	App_context app_ctx(_keyboard, _mouse, _window);
-	std::unique_ptr<cg::rnd::Rhi_context_i> rhi_ctx = cg::rnd::rhi_context(
-		T::example_desc.render_api,
-		_window.hwnd(),
-		_window.viewport_size(),
-		T::example_desc.depth_stencil_format
-	);
-
-	assert(rhi_ctx);
 	T example(app_ctx, *rhi_ctx);
-
 	return run_main_loop(*rhi_ctx, example);
 }
 

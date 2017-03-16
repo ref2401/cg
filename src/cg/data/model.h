@@ -207,6 +207,7 @@ public:
 	void push_back_vertex(const Vertex& vertex);
 
 private:
+
 	std::vector<Model_mesh_info> _meshes;
 	std::vector<unsigned char> _vertex_data;
 	std::vector<uint32_t> _index_data;

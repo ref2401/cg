@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cg", "cg\cg.vcxproj", "{6F1C7DA3-E163-4BC7-8A59-99661973F995}"
 EndProject
@@ -79,6 +79,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image_processing", "image_p
 		..\data\learn_dx11\image_processing\render_image.hlsl = ..\data\learn_dx11\image_processing\render_image.hlsl
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "displacement_mapping", "displacement_mapping", "{527CDA4E-977E-47B9-8A92-7871CBBF52B0}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\displacement_mapping\parallax_displacement_mapping.hlsl = ..\data\displacement_mapping\parallax_displacement_mapping.hlsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -139,5 +144,6 @@ Global
 		{17790165-C1A5-456A-907E-87E4B5D6291A} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 		{5844AD2D-91F5-46CB-91E8-EA6FEF50473C} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 		{F905F489-63ED-44B1-8611-A5643ACC8FCB} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
+		{527CDA4E-977E-47B9-8A92-7871CBBF52B0} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 	EndGlobalSection
 EndGlobal

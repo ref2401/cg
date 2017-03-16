@@ -16,8 +16,11 @@ struct Clock_report final {
 	using Dur_msec_t = std::chrono::duration<std::chrono::milliseconds::rep, std::milli>;
 	using Dur_sec_t = std::chrono::duration<std::chrono::seconds::rep>;
 
-	Clock_report(const Dur_nano_t& elapsed_time, uintmax_t frame_count, uintmax_t update_count) noexcept :
-	elapsed_time(elapsed_time),
+
+	Clock_report() noexcept = default;
+
+	Clock_report(const Dur_nano_t& elapsed_time, uintmax_t frame_count, uintmax_t update_count) noexcept 
+		: elapsed_time(elapsed_time),
 		frame_count(frame_count),
 		update_count(update_count)
 	{}

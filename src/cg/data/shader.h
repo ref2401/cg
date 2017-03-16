@@ -63,17 +63,17 @@ struct Hlsl_compute_desc final {
 	std::string source_filename;
 
 	// The name of a function where vertex shader execution begins.
-	std::string compute_shader_entry_point;
+	std::string compute_shader_entry_point = "cs_main";
 
 	// The D3DCOMPILE constants specify how the compiler compiles the HLSL code.
 	uint32_t compile_flags = 0;
 };
 
-// Hlsl_shader_set_desc struct stores all required and optional params
+// Hlsl_shader_desc struct stores all required and optional params
 // which are used in hlsl shader creation process.
-struct Hlsl_shader_set_desc final {
+struct Hlsl_shader_desc final {
 
-	Hlsl_shader_set_desc() = default;
+	Hlsl_shader_desc() = default;
 
 
 	// Returns true if vertex shader's entry point is specified.
@@ -167,11 +167,11 @@ inline Hlsl_compute_desc load_hlsl_compute_desc(const std::string& filename)
 
 // Loads the specified hlsl shader source code file.
 // If the specified file does not exist the function will throw. 
-Hlsl_shader_set_desc load_hlsl_shader_set_desc(const char* filename);
+Hlsl_shader_desc load_hlsl_shader_set_desc(const char* filename);
 
 // Loads the specified hlsl shader source code file.
 // If the specified file does not exist the function will throw. 
-inline Hlsl_shader_set_desc load_hlsl_shader_set_desc(const std::string& filename)
+inline Hlsl_shader_desc load_hlsl_shader_set_desc(const std::string& filename)
 {
 	return load_hlsl_shader_set_desc(filename.c_str());
 }
