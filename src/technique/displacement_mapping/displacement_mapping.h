@@ -46,7 +46,7 @@ private:
 
 	void init_shaders();
 
-	//void init_textures();
+	void init_textures();
 
 	void setup_pipeline_state();
 
@@ -72,6 +72,10 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11InputLayout> _pom_input_layout;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _vertex_buffer;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _index_buffer;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_diffuse_rgb;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_displacement_map;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_normal_map;
 	UINT _vertex_stride;
 	UINT _index_count;
 };

@@ -26,13 +26,13 @@ VS_output vs_main(in Vertex vertex)
 
 // ----- Pixel shader -----
 
-//Texture2D g_tex_height_map : register(t0);
-//
-//SamplerState g_sampler {
-//	Filter = MIN_MAP_MIP_LINEAR;
-//	AddressU = WRAP;
-//	AddressV = WRAP;
-//};
+Texture2D g_tex_diffuse_rgb : register(t0);
+
+SamplerState g_sampler {
+	Filter = MIN_MAP_MIP_LINEAR;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
 
 struct PS_output {
 	float4 rt_color_0 : SV_Target0;
@@ -40,7 +40,9 @@ struct PS_output {
 
 PS_output ps_main(VS_output pixel)
 {
+	const float4 diffuse_rgb = g_tex_diffuse_rgb.Sample(g_sampler, pixel.tex_coord);
+
 	PS_output output;
-	output.rt_color_0 = float4(pixel.tex_coord, 0.0f, 1.0f);
+	output.rt_color_0 = diffuse_rgb;
 	return output;
 }

@@ -1,6 +1,7 @@
 #include "technique/displacement_mapping/displacement_mapping.h"
 
 #include <iostream>
+#include "cg/data/image.h"
 #include "cg/data/model.h"
 
 using namespace cg;
@@ -28,6 +29,7 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	init_shaders();
 	init_geometry();
 	init_pipeline_state();
+	init_textures();
 	setup_pipeline_state();
 }
 
@@ -38,7 +40,7 @@ void Displacement_mapping::init_cbuffers()
 
 void Displacement_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/sphere-20x20.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
 
@@ -105,10 +107,34 @@ void Displacement_mapping::init_shaders()
 	_pom_shader = Hlsl_shader(_device, pom_shader_desc);
 }
 
+void Displacement_mapping::init_textures()
+{
+	Image_2d diffuse_rgb("../data/displacement_mapping/rocks-diffuse.jpg", 4);
+
+	D3D11_TEXTURE2D_DESC diffuse_desc = {};
+	diffuse_desc.Width = diffuse_rgb.size().width;
+	diffuse_desc.Height = diffuse_rgb.size().height;
+	diffuse_desc.MipLevels = 1;
+	diffuse_desc.ArraySize = 1;
+	diffuse_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	diffuse_desc.SampleDesc.Count = 1;
+	diffuse_desc.SampleDesc.Quality = 0;
+	diffuse_desc.Usage = D3D11_USAGE_IMMUTABLE;
+	diffuse_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	D3D11_SUBRESOURCE_DATA diffuse_data = {};
+	diffuse_data.pSysMem = diffuse_rgb.data();
+	diffuse_data.SysMemPitch = diffuse_rgb.size().width * byte_count(diffuse_rgb.pixel_format());
+	HRESULT hr = _device->CreateTexture2D(&diffuse_desc, &diffuse_data, &_tex_diffuse_rgb.ptr);
+	assert(hr == S_OK);
+
+	hr = _device->CreateShaderResourceView(_tex_diffuse_rgb.ptr, nullptr, &_tex_srv_diffuse_rgb.ptr);
+	assert(hr == S_OK);
+}
+
 void Displacement_mapping::on_mouse_move()
 {
 	const uint2 p = _app_ctx.mouse.position();
-	const float2 curr_pos(p.x, p.y);
+	const float2 curr_pos(float(p.x), float(p.y));
 	const float2 diff = curr_pos - _prev_mouse_position;
 	_prev_mouse_position = curr_pos;
 
@@ -157,6 +183,7 @@ void Displacement_mapping::setup_pipeline_state()
 	_device_ctx->VSSetShader(_pom_shader.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_matrix.ptr);
 	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
+	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_diffuse_rgb.ptr);
 
 	_device_ctx->RSSetState(_rasterizer_state.ptr);
 	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
