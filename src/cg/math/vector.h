@@ -1493,9 +1493,9 @@ inline bool is_normalized(const float2& v) noexcept
 }
 
 // Checks whether the specified vector is normalized.
-inline bool is_normalized(const float3& v) noexcept
+inline bool is_normalized(const float3& v, float max_abs_diff = 1e-2) noexcept
 {
-	return approx_equal(len_squared(v), 1.f);
+	return approx_equal(len_squared(v), 1.0f, max_abs_diff);
 }
 
 // Checks whether the specified vector is normalized.

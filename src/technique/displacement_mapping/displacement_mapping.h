@@ -38,6 +38,12 @@ public:
 
 private:
 
+	static constexpr size_t cb_displacement_component_count = 4;
+	static constexpr size_t cb_matrices_component_count = 3 * 16 + 4;
+
+
+	void int_cbuffers();
+
 	void init_geometry();
 
 	void init_pipeline_state();
@@ -46,7 +52,7 @@ private:
 
 	void init_textures();
 
-	void setup_cb_matrices(float interpolation_factor);
+	void setup_cb_matrices(const cg::Viewpoint& viewpoint);
 
 	void setup_pipeline_state();
 
@@ -67,6 +73,7 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_matrices;
+	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_displacement;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
 	// model
 	cg::mat4 _model_matrix;
@@ -76,7 +83,9 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
 	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_diffuse_rgb;
 	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_displacement_map;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_displacement_map;
 	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_normal_map;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_normal_map;
 	UINT _vertex_stride;
 	UINT _index_count;
 };
