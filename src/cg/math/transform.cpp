@@ -2,19 +2,6 @@
 
 namespace cg {
 
-// ----- Viewpoint -----
-
-Viewpoint::Viewpoint(float3 position, float3 target, float3 up) noexcept :
-	position(position),
-	target(target),
-	up(up)
-{}
-
-mat4 Viewpoint::view_matrix() const noexcept
-{
-	return cg::view_matrix(position, target, normalize(up));
-}
-
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Viewpoint& vp)

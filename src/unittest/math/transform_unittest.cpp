@@ -80,26 +80,33 @@ public:
 
 		Assert::AreEqual(vp, Viewpoint(float3(1), float3(2), float3(3)));
 	}
-
-	TEST_METHOD(props)
-	{
-		using cg::len;
-		using cg::normalize;
-		using cg::view_matrix;
-
-
-		float3 position(1, 2, 3);
-		float3 target(4, 5, 6);
-		float3 up = normalize(float3(7, 8, 9));
-		Viewpoint vp(position, target, up);
-
-		Assert::AreEqual(normalize(target - position), vp.forward());
-		Assert::AreEqual(len(target - position), vp.distance());
-		Assert::AreEqual(view_matrix(position, target, up), vp.view_matrix());
-	}
 };
 
 TEST_CLASS(cg_math_transform_Funcs) {
+
+	TEST_METHOD(distance_Viewpoint)
+	{
+		using cg::distance;
+		using cg::len;
+
+		float3 position(1, 2, 3);
+		float3 target(4, 5, 6);
+		Viewpoint vp(position, target);
+
+		Assert::AreEqual(len(target - position), distance(vp));
+	}
+
+	TEST_METHOD(forward_Viewpoint)
+	{
+		using cg::forward;
+		using cg::normalize;
+
+		float3 position(1, 2, 3);
+		float3 target(4, 5, 6);
+		Viewpoint vp(position, target);
+
+		Assert::AreEqual(normalize(target - position), forward(vp));
+	}
 
 	TEST_METHOD(from_axis_angle_rotation)
 	{
@@ -461,6 +468,19 @@ TEST_CLASS(cg_math_transform_Funcs) {
 		Assert::AreEqual(translation_matrix(pos) * scale_matrix<mat4>(scale), ts_matrix(pos, scale));
 	}
 
+	TEST_METHOD(view_matrix_Viewpoint)
+	{
+		using cg::normalize;
+		using cg::view_matrix;
+
+		const float3 position(1, 2, 3);
+		const float3 target(4, 5, 6);
+		const float3 up = normalize(float3(7, 8, 9));
+		const Viewpoint vp(position, target, normalize(up));
+
+		Assert::AreEqual(view_matrix(position, target, normalize(up)), view_matrix(vp));
+	}
+
 	TEST_METHOD(view_matrix_Viewpoints)
 	{
 		using cg::lerp;
@@ -472,7 +492,7 @@ TEST_CLASS(cg_math_transform_Funcs) {
 		Viewpoint vp1(float3(3), float3(4), float3::unit_y);
 		auto vp = lerp(vp0, vp1, factor);
 		vp.up = normalize(vp.up);
-		auto expected_matrix = vp.view_matrix();
+		auto expected_matrix = view_matrix(vp);
 
 		Assert::AreEqual(expected_matrix, view_matrix(vp0, vp1, factor));
 	}

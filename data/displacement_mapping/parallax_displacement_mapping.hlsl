@@ -1,25 +1,36 @@
 // ----- Vertex shader -----
 
-cbuffer CB_matrix : register(b0) {
-	float4x4 g_pvm_matrix : register(c0);
+cbuffer CB_matrices : register(b0) {
+	float4x4 g_projection_view_matrix	: register(c0);
+	float4x4 g_model_matrix				: register(c4);
+	float4x4 g_normal_matrix			: register(c8);
 };
 
 struct Vertex {
 	float3 position			: VERT_POSITION_MS;
 	float3 normal			: VERT_NORMAL_MS;
 	float2 tex_coord		: VERT_TEX_COORD;
-	float4 tangent_sapce	: VERT_TANGENT_SPACE_MS;
+	float4 tangent_space	: VERT_TANGENT_SPACE_MS;
 };
 
 struct VS_output {
-	float4 position_cs	: SV_Position;
-	float2 tex_coord	: PIXEL_TEX_COORD;
+	float4 position_cs		: SV_Position;
+	float3 position_ws		: PIXEL_POSITION_WS;
+	float3 normal_ws		: PIXEL_NORMAL_WS;
+	float3 tangent_space_ws	: PIXEL_TANGENT_WS;
+	float2 tex_coord		: PIXEL_TEX_COORD;
 };
 
 VS_output vs_main(in Vertex vertex) 
 {
+	const float4 p_ws = mul(g_model_matrix, float4(vertex.position, 1.0f));
+	const float3 tangent_ws = mul(g_model_matrix, float4(vertex.tangent_space.xyz, 1.0f)).xyz;
+
 	VS_output output;
-	output.position_cs = mul(g_pvm_matrix, float4(vertex.position, 1.0f));
+	output.position_cs = mul(g_projection_view_matrix, p_ws);
+	output.position_ws = p_ws;
+	output.normal_ws = mul(g_normal_matrix, float4(vertex.normal, 1.0f)).xyz;
+	output.tangent_space_ws = float4(tangent_ws, vertex.tangent_space.w);
 	output.tex_coord = vertex.tex_coord;
 	return output;
 }

@@ -540,8 +540,8 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 void Fur_simulation_opengl_example::update_curr_viewpoint()
 {
 	if (_view_roll_angles != float2::zero) {
-		float dist = _curr_viewpoint.distance();
-		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+		float dist = distance(_curr_viewpoint);
+		float3 ox = cross(forward(_curr_viewpoint), _curr_viewpoint.up);
 		ox.y = 0.0f; // ox is always parallel the world's OX.
 		ox = normalize(ox);
 
@@ -559,7 +559,7 @@ void Fur_simulation_opengl_example::update_curr_viewpoint()
 			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
 		}
 
-		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
+		_curr_viewpoint.up = normalize(cross(ox, forward(_curr_viewpoint)));
 	}
 
 	_view_roll_angles = float2::zero;

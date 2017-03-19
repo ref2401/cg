@@ -38,8 +38,6 @@ public:
 
 private:
 
-	void init_cbuffers();
-
 	void init_geometry();
 
 	void init_pipeline_state();
@@ -48,9 +46,12 @@ private:
 
 	void init_textures();
 
+	void setup_cb_matrices(float interpolation_factor);
+
 	void setup_pipeline_state();
 
 	void update_projection_matrix();
+
 
 	// dx stuff
 	cg::rnd::dx11::DX11_rhi_context& _rhi_ctx;
@@ -65,7 +66,7 @@ private:
 	cg::mat4 _projection_matrix;
 	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_matrix;
+	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_matrices;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
 	// model
 	cg::mat4 _model_matrix;

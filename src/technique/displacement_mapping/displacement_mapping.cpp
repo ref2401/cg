@@ -19,13 +19,13 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_device(_rhi_ctx.device()),
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
-	_curr_viewpoint(float3(0, 0, 7), float3::zero, float3::unit_y),
+	_curr_viewpoint(float3(0, 2, 7), float3::zero, float3::unit_y),
 	_prev_viewpoint(_curr_viewpoint)
 {
 	update_projection_matrix();
 	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(2.0f));
 
-	init_cbuffers();
+	_cb_matrices = constant_buffer(_device, 3 * sizeof(mat4));
 	init_shaders();
 	init_geometry();
 	init_pipeline_state();
@@ -33,14 +33,9 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	setup_pipeline_state();
 }
 
-void Displacement_mapping::init_cbuffers()
-{
-	_cb_matrix = constant_buffer(_device, sizeof(mat4));
-}
-
 void Displacement_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/sphere-20x20.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
 
@@ -159,17 +154,26 @@ void Displacement_mapping::on_window_resize()
 
 void Displacement_mapping::render(float interpolation_factor)
 {
-	const mat4 view_matrix = cg::view_matrix(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
-	const mat4 pvm_matrix = _projection_matrix * view_matrix * _model_matrix;
-	float arr[16];
-	to_array_column_major_order(pvm_matrix, arr);
-	_device_ctx->UpdateSubresource(_cb_matrix.ptr, 0, nullptr, arr, 0, 0);
+	setup_cb_matrices(interpolation_factor);
 
 	_device_ctx->ClearRenderTargetView(_rhi_ctx.rtv_window(), float4::unit_xyzw.data);
 	_device_ctx->ClearDepthStencilView(_rhi_ctx.dsv_depth_stencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	_device_ctx->DrawIndexed(_index_count, 0, 0);
 
 	_prev_viewpoint = _curr_viewpoint;
+}
+
+void Displacement_mapping::setup_cb_matrices(float interpolation_factor)
+{
+	const mat4 normal_matrix = _model_matrix;
+	const mat4 view_matrix = cg::view_matrix(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
+	const mat4 projection_view_matrix = _projection_matrix * view_matrix;
+	
+	float arr[3 * 16];
+	to_array_column_major_order(projection_view_matrix, arr);
+	to_array_column_major_order(_model_matrix, arr + 16);
+	to_array_column_major_order(normal_matrix, arr + 32);
+	_device_ctx->UpdateSubresource(_cb_matrices.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::setup_pipeline_state()
@@ -181,7 +185,7 @@ void Displacement_mapping::setup_pipeline_state()
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
 
 	_device_ctx->VSSetShader(_pom_shader.vertex_shader(), nullptr, 0);
-	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_matrix.ptr);
+	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_matrices.ptr);
 	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetShaderResources(0, 1, &_tex_srv_diffuse_rgb.ptr);
 
@@ -195,8 +199,8 @@ void Displacement_mapping::setup_pipeline_state()
 void Displacement_mapping::update(float dt_msec) 
 {
 	if (_view_roll_angles != float2::zero) {
-		float dist = _curr_viewpoint.distance();
-		float3 ox = cross(_curr_viewpoint.forward(), _curr_viewpoint.up);
+		float dist = distance(_curr_viewpoint);
+		float3 ox = cross(forward(_curr_viewpoint), _curr_viewpoint.up);
 		ox.y = 0.0f; // ox is always parallel the world's OX.
 		ox = normalize(ox);
 
@@ -214,7 +218,7 @@ void Displacement_mapping::update(float dt_msec)
 			_curr_viewpoint.position = dist * normalize(rotate(q, _curr_viewpoint.position));
 		}
 
-		_curr_viewpoint.up = normalize(cross(ox, _curr_viewpoint.forward()));
+		_curr_viewpoint.up = normalize(cross(ox, forward(_curr_viewpoint)));
 	}
 
 	_view_roll_angles = float2::zero;
