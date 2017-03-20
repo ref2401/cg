@@ -1,6 +1,5 @@
 #include "technique/displacement_mapping/displacement_mapping.h"
 
-#include <iostream>
 #include "cg/data/image.h"
 #include "cg/data/model.h"
 
@@ -39,7 +38,7 @@ void Displacement_mapping::int_cbuffers()
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	float arr[Displacement_mapping::cb_displacement_component_count] = {
-		16.0f, 16.0f, 1.0f, 0.0f
+		8.0f, 64.0f, 1.0f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
@@ -226,7 +225,6 @@ void Displacement_mapping::render(float interpolation_factor)
 void Displacement_mapping::setup_cb_matrices(const Viewpoint& viewpoint)
 {
 	const mat4 normal_matrix = _model_matrix;
-	std::cout << len(viewpoint.up) << std::endl;
 	const mat4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
 	
 	float arr[Displacement_mapping::cb_matrices_component_count];
