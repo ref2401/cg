@@ -88,6 +88,9 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_normal_map;
 	UINT _vertex_stride;
 	UINT _index_count;
+	// debug
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_debug;
+	cg::rnd::dx11::Com_ptr<ID3D11RenderTargetView> _tex_rtv_debug;
 };
 
 } // displacement_mapping

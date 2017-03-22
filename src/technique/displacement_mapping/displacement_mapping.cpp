@@ -18,11 +18,11 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_device(_rhi_ctx.device()),
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
-	_curr_viewpoint(float3(0, 2, 7), float3::zero, float3::unit_y),
+	_curr_viewpoint(float3(0, 2, 5), float3::zero, float3::unit_y),
 	_prev_viewpoint(_curr_viewpoint)
 {
 	update_projection_matrix();
-	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(2.0f));
+	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(4.0f));
 
 	int_cbuffers();
 	init_shaders();
@@ -38,14 +38,14 @@ void Displacement_mapping::int_cbuffers()
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	float arr[Displacement_mapping::cb_displacement_component_count] = {
-		8.0f, 64.0f, 1.0f, 0.0f
+		32.0f, 48.0f, 0.9f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/rect_2x2.obj");
 	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/sphere-20x20.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
@@ -116,7 +116,7 @@ void Displacement_mapping::init_shaders()
 void Displacement_mapping::init_textures()
 {
 	// diffuse rgb
-	Image_2d diffuse_rgb("../data/displacement_mapping/rocks-diffuse.jpg", 4);
+	Image_2d diffuse_rgb("../data/displacement_mapping/rocks-diffuse.jpg", 4, true);
 
 	D3D11_TEXTURE2D_DESC diffuse_desc = {};
 	diffuse_desc.Width = diffuse_rgb.size().width;
@@ -138,7 +138,7 @@ void Displacement_mapping::init_textures()
 	assert(hr == S_OK);
 
 	// displacement map
-	Image_2d displ_map("../data/displacement_mapping/rocks-displacement.jpg", 1);
+	Image_2d displ_map("../data/displacement_mapping/rocks-displacement.jpg", 1, true);
 
 	D3D11_TEXTURE2D_DESC displ_desc = {};
 	displ_desc.Width = displ_map.size().width;
@@ -161,7 +161,7 @@ void Displacement_mapping::init_textures()
 
 	// normal map
 	// diffuse rgb
-	Image_2d normal_map("../data/displacement_mapping/rocks-normal.jpg", 4);
+	Image_2d normal_map("../data/displacement_mapping/rocks-normal.jpg", 4, true);
 
 	D3D11_TEXTURE2D_DESC normal_desc = {};
 	normal_desc.Width = normal_map.size().width;
@@ -180,6 +180,25 @@ void Displacement_mapping::init_textures()
 	assert(hr == S_OK);
 
 	hr = _device->CreateShaderResourceView(_tex_normal_map.ptr, nullptr, &_tex_srv_normal_map.ptr);
+	assert(hr == S_OK);
+
+
+	const UINT debug_width(_rhi_ctx.viewport().Width);
+	const UINT debug_height(_rhi_ctx.viewport().Height);
+	D3D11_TEXTURE2D_DESC debug_desc = {};
+	debug_desc.Width = debug_width;
+	debug_desc.Height = debug_height;
+	debug_desc.MipLevels = 1;
+	debug_desc.ArraySize = 1;
+	debug_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	debug_desc.SampleDesc.Count = 1;
+	debug_desc.SampleDesc.Quality = 0;
+	debug_desc.Usage = D3D11_USAGE_DEFAULT;
+	debug_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+	hr = _device->CreateTexture2D(&debug_desc, nullptr, &_tex_debug.ptr);
+	assert(hr == S_OK);
+
+	hr = _device->CreateRenderTargetView(_tex_debug.ptr, nullptr, &_tex_rtv_debug.ptr);
 	assert(hr == S_OK);
 }
 
@@ -254,6 +273,8 @@ void Displacement_mapping::setup_pipeline_state()
 
 	_device_ctx->RSSetState(_rasterizer_state.ptr);
 	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
+	ID3D11RenderTargetView* rtvs[2] = { _rhi_ctx.rtv_window(), _tex_rtv_debug.ptr };
+	_device_ctx->OMSetRenderTargets(2, rtvs, _rhi_ctx.dsv_depth_stencil());
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);
