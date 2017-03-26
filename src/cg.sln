@@ -81,7 +81,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image_processing", "image_p
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "displacement_mapping", "displacement_mapping", "{527CDA4E-977E-47B9-8A92-7871CBBF52B0}"
 	ProjectSection(SolutionItems) = preProject
-		..\data\displacement_mapping\parallax_displacement_mapping.hlsl = ..\data\displacement_mapping\parallax_displacement_mapping.hlsl
+		..\data\displacement_mapping\parallax_occlusion_mapping.hlsl = ..\data\displacement_mapping\parallax_occlusion_mapping.hlsl
 	EndProjectSection
 EndProject
 Global
