@@ -18,11 +18,11 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_device(_rhi_ctx.device()),
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
-	_curr_viewpoint(float3(0, 2, 7), float3::zero, float3::unit_y),
+	_curr_viewpoint(float3(0, 2, 5), float3::zero, float3::unit_y),
 	_prev_viewpoint(_curr_viewpoint)
 {
 	update_projection_matrix();
-	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(2.0f));
+	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(4.0f));
 
 	int_cbuffers();
 	init_shaders();
@@ -37,16 +37,16 @@ void Displacement_mapping::int_cbuffers()
 	_cb_matrices = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_matrices_component_count);
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
-	float arr[Displacement_mapping::cb_displacement_component_count] = {
-		32.0f, 48.0f, 0.1f, 0.0f
+	const float arr[Displacement_mapping::cb_displacement_component_count] = {
+		16.0f, 32.0f, 0.1f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::init_geometry()
 {
-	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/rect_2x2.obj");
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/rect_2x2.obj");
+	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
 

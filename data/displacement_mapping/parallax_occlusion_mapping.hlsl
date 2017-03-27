@@ -82,7 +82,7 @@ Parallax_result calc_parallax_offset(float2 tex_coord, int step_count, float hei
 		const float2 curr_uv_offset = step_index * uv_step;
 
 		const float curr_map_height = g_tex_height_map.SampleGrad(g_sampler,
-			tex_coord + curr_uv_offset, dx, dy).x;
+			tex_coord - curr_uv_offset, dx, dy).x;
 
 		if (curr_ray_height > curr_map_height) {
 			prev_uv_offset = curr_uv_offset;
@@ -92,8 +92,8 @@ Parallax_result calc_parallax_offset(float2 tex_coord, int step_count, float hei
 		else {
 			const float denominator = (curr_ray_height - prev_ray_height - curr_map_height + prev_map_height);
 			const float factor = (prev_map_height - prev_ray_height) / denominator;
-			//result.tex_coord = tex_coord + prev_uv_offset + factor * uv_step;
-			result.tex_coord = tex_coord + prev_uv_offset;
+			result.tex_coord = tex_coord - prev_uv_offset - factor * uv_step;
+			//result.tex_coord = tex_coord - prev_uv_offset;
 			result.debug = float4(tex_coord + curr_uv_offset, curr_uv_offset);
 			return result;
 			//return float4(curr_ray_height, curr_map_height, float(step_index) / step_count, 1.0f);
@@ -116,12 +116,12 @@ PS_output ps_main(VS_output pixel)
 	// sample ray
 	const float3 dir_from_viewpoint_ws = pixel.dir_from_viewpoint_ws;
 	const float3 dir_from_viewpoint_ts = normalize(mul(to_tbn_matrix, dir_from_viewpoint_ws));
-	const float2 max_parallax_offset = -dir_from_viewpoint_ts.xy * g_height_scale;
+	const float2 max_parallax_offset = -dir_from_viewpoint_ts.xy / dir_from_viewpoint_ts.z;
 	// sample step
 	const float cos_nv = dot(normal_ws, normalize(-dir_from_viewpoint_ws));
 	const int step_count = (int)(lerp(g_sample_min_count, g_sample_max_count, 1.0f - cos_nv));
 	const float height_step = 1.0f / (float)step_count;
-	const float2 uv_step = height_step * max_parallax_offset;
+	const float2 uv_step = g_height_scale * height_step * max_parallax_offset;
 
 	
 	const Parallax_result parallax_result = calc_parallax_offset(pixel.tex_coord, step_count, height_step, uv_step);
@@ -129,6 +129,6 @@ PS_output ps_main(VS_output pixel)
 
 	PS_output output;
 	output.rt_color_0 = diffuse_rgb;
-	output.rt_color_1 = float4(dir_from_viewpoint_ts, 1.0f);// parallax_result.debug;
+	output.rt_color_1 = float4(step_count, 0.0, 0.0, 1.0f);// parallax_result.debug;
 	return output;
 }

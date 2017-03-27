@@ -18,7 +18,6 @@ namespace data {
 Image_2d::Image_2d(const char* filename, uint8_t channel_count, bool flip_vertically)
 {
 	assert(filename && std::strlen(filename));
-	assert(channel_count >= 0);
 
 	stbi_set_flip_vertically_on_load(flip_vertically);
 
@@ -88,6 +87,7 @@ void Image_2d::dispose() noexcept
 	_size = uint2::zero;
 	_pixel_format = Pixel_format::none;
 }
+
 // ----- funcs -----
 
 std::ostream& operator<<(std::ostream& out, const Pixel_format& fmt)
