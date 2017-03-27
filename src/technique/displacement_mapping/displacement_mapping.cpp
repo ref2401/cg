@@ -22,7 +22,8 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_prev_viewpoint(_curr_viewpoint)
 {
 	update_projection_matrix();
-	_model_matrix = ts_matrix(float3(0.0f, -0.5f, 0.0f), float3(4.0f));
+	_model_position = float3(0.0f, -0.5f, 0.0f);
+	_model_scale = float3(4.0f);
 
 	int_cbuffers();
 	init_shaders();
@@ -38,7 +39,7 @@ void Displacement_mapping::int_cbuffers()
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	const float arr[Displacement_mapping::cb_displacement_component_count] = {
-		16.0f, 32.0f, 0.1f, 0.0f
+		64.0f, 128.0f, 0.1f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
@@ -182,6 +183,14 @@ void Displacement_mapping::init_textures()
 	hr = _device->CreateShaderResourceView(_tex_normal_map.ptr, nullptr, &_tex_srv_normal_map.ptr);
 	assert(hr == S_OK);
 
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	hr = _device->CreateSamplerState(&sampler_desc, &_sampler_state.ptr);
+	assert(hr == S_OK);
+
 
 	const UINT debug_width(_rhi_ctx.viewport().Width);
 	const UINT debug_height(_rhi_ctx.viewport().Height);
@@ -243,12 +252,13 @@ void Displacement_mapping::render(float interpolation_factor)
 
 void Displacement_mapping::setup_cb_matrices(const Viewpoint& viewpoint)
 {
-	const mat4 normal_matrix = _model_matrix;
+	const mat4 model_matrix = ts_matrix(_model_position, _model_scale);
+	const mat4 normal_matrix = mat4::identity;
 	const mat4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
 	
 	float arr[Displacement_mapping::cb_matrices_component_count];
 	to_array_column_major_order(projection_view_matrix, arr);
-	to_array_column_major_order(_model_matrix, arr + 16);
+	to_array_column_major_order(model_matrix, arr + 16);
 	to_array_column_major_order(normal_matrix, arr + 32);
 	arr[48] = viewpoint.position.x;
 	arr[49] = viewpoint.position.y;
@@ -268,6 +278,7 @@ void Displacement_mapping::setup_pipeline_state()
 	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_matrices.ptr);
 	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetConstantBuffers(0, 1, &_cb_displacement.ptr);
+	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
 	ID3D11ShaderResourceView* srv[3] = { _tex_srv_diffuse_rgb.ptr, _tex_srv_displacement_map.ptr, _tex_srv_normal_map.ptr };
 	_device_ctx->PSSetShaderResources(0, 3, srv);
 

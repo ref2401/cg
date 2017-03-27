@@ -74,9 +74,11 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_matrices;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_displacement;
+	cg::rnd::dx11::Com_ptr<ID3D11SamplerState> _sampler_state;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
 	// model
-	cg::mat4 _model_matrix;
+	cg::float3 _model_scale;
+	cg::float3 _model_position;
 	cg::rnd::dx11::Com_ptr<ID3D11InputLayout> _pom_input_layout;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _vertex_buffer;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _index_buffer;
