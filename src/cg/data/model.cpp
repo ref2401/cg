@@ -108,12 +108,13 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc_ts>& geometry_dat
 	assert(mesh);
 	assert(vertex_index < mesh->mNumVertices);
 
+	// NOTE(ref2401): bitangent is negated because assimp computes it in the wrong direction.
 
 	float3 position = make_cg_vector(mesh->mVertices[vertex_index]);
 	float3 normal = normalize(make_cg_vector(mesh->mNormals[vertex_index]));
 	float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv();
 	float3 tangent = normalize(make_cg_vector(mesh->mTangents[vertex_index]));
-	float3 bitangent = normalize(make_cg_vector(mesh->mBitangents[vertex_index]));
+	float3 bitangent = -normalize(make_cg_vector(mesh->mBitangents[vertex_index]));
 	float4 tangent_h = cg::data::compute_tangent_handedness(tangent, bitangent, normal);
 
 	Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> vertex(

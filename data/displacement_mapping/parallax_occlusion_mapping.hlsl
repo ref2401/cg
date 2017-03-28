@@ -24,28 +24,26 @@ struct VS_output {
 
 VS_output vs_main(in Vertex vertex) 
 {
-	const float g_parallax_step_scale = 0.05f;
+	const float g_parallax_step_scale = 0.1f;
 
 	// tangent space matrix
 	const float3 normal_ws = (mul(g_normal_matrix, float4(vertex.normal, 1.0f))).xyz;
 	const float3 tangent_ws = (mul(g_normal_matrix, float4(vertex.tangent_space.xyz, 1.0f))).xyz;
 	const float3 bitangent_ws = vertex.tangent_space.w * cross(normal_ws, tangent_ws);
 	const float3x3 world_to_tbn_matrix = float3x3(tangent_ws, bitangent_ws, normal_ws);
-	// unnormalized direction from viewpoint in tangent space
+	// ??unnormalized direction from viewpoint in tangent space
 	const float4 p_ws = mul(g_model_matrix, float4(vertex.position, 1.0f));
-	const float3 from_viewpoint_ws = p_ws.xyz - g_viewpoint_position_ws;
-	const float3 from_viewpoint_ts = mul(world_to_tbn_matrix, from_viewpoint_ws);
+	const float3 to_viewpoint_ws = (g_viewpoint_position_ws - p_ws.xyz);
+	const float3 to_viewpoint_ts = (mul(world_to_tbn_matrix, to_viewpoint_ws));
 	// parallax offset
-	const float2 parallax_dir = normalize(from_viewpoint_ts.xy);
-	const float pl = length(from_viewpoint_ts);
-	const float parallax_factor = (pl * pl - pow(from_viewpoint_ts.z, 2)) / from_viewpoint_ts.z;
+	const float2 max_parallax_displacement = to_viewpoint_ts.xy / to_viewpoint_ts.z * g_parallax_step_scale;
 
 	VS_output output;
 	output.position_cs = mul(g_projection_view_matrix, p_ws);
 	output.normal_ws = normal_ws;
 	output.tex_coord = vertex.tex_coord;
-	output.dir_to_viewpoint_ws = -from_viewpoint_ws;
-	output.max_parallax_displacement = parallax_dir * g_parallax_step_scale * parallax_factor;
+	output.dir_to_viewpoint_ws = to_viewpoint_ws;
+	output.max_parallax_displacement = max_parallax_displacement;
 	return output;
 }
 
@@ -73,53 +71,41 @@ struct Parallax_result {
 	float4 debug;
 };
 
-Parallax_result calc_parallax_offset(float2 tex_coord, float2 max_parallax_displacement, int step_count)
+float2 calc_parallax_offset_simple(float2 tex_coord, float2 max_parallax_displacement)
+{
+	float height = 1.0f - g_tex_height_map.Sample(g_sampler, tex_coord).x;
+	return tex_coord - max_parallax_displacement * height;
+}
+
+float2 calc_parallax_offset(float2 tex_coord, float2 max_parallax_displacement, float step_count)
 {
 	const float2 dx = ddx(tex_coord);
 	const float2 dy = ddy(tex_coord);
 	const float step_size = 1.0f / step_count;
 	const float2 tc_offset = step_size * max_parallax_displacement;
 
-	Parallax_result result;
-	result.tex_coord = tex_coord;
-	result.debug = float4(0, 0, 0, 1);
+	float2 tc_curr = tex_coord;
+	float map_height_curr = g_tex_height_map.SampleGrad(g_sampler, tc_curr, dx, dy).x;
+	float ray_height_curr = 1.0f;
 
-	int step_index = 0;
-	float prev_ray_height = 1.0f;
-	float prev_map_height = 1.0f;
+	float2 tc_prev = tc_curr;
+	float map_height_prev = map_height_curr;
+	float ray_height_prev = ray_height_curr;
 
-	while (step_index < step_count) {
-		const float2 curr_tex_coord = tex_coord + step_index * tc_offset;
-		
-		const float curr_ray_height = 1.0f - step_index * step_size;
-		const float curr_map_height = g_tex_height_map.SampleGrad(g_sampler, curr_tex_coord, dx, dy).x;
+	while (ray_height_curr > map_height_curr) {
+		tc_prev = tc_curr;
+		ray_height_prev = ray_height_curr;
+		map_height_prev = map_height_curr;
 
-		if (curr_ray_height > curr_map_height) {
-			prev_map_height = curr_map_height;
-			prev_ray_height = curr_ray_height;
-		}
-		else {
-			/*const float2 pt1 = float2(curr_ray_height, curr_map_height);
-			const float2 pt2 = float2(curr_ray_height + step_size, prev_map_height);
-			const float fDelta2 = pt2.x - pt2.y;
-			const float fDelta1 = pt1.x - pt1.y;
-			const float fDenominator = fDelta2 - fDelta1;
-			float fParallaxAmount = 0.0f;
-			if (fDenominator != 0.0f)
-			{
-				fParallaxAmount = (pt1.x * fDelta2 - pt2.x * fDelta1) / fDenominator;
-			}
-			result.tex_coord = tex_coord + max_parallax_displacement * (1.0f - fParallaxAmount);*/
-
-			result.tex_coord = curr_tex_coord;
-			result.debug = float4(curr_tex_coord - tex_coord, tc_offset);
-			return result;
-		}
-
-		++step_index;
+		tc_curr -= tc_offset;
+		ray_height_curr -= step_size;
+		map_height_curr = g_tex_height_map.SampleGrad(g_sampler, tc_curr, dx, dy).x;
 	}
 
-	return result;
+	const float denominator = (map_height_prev - map_height_curr + ray_height_curr - ray_height_prev);
+	const float weight = (map_height_prev - ray_height_prev) / denominator;
+
+	return tc_prev - weight * tc_offset;
 }
 
 PS_output ps_main(VS_output pixel)
@@ -129,11 +115,12 @@ PS_output ps_main(VS_output pixel)
 	const float cos_nv = dot(normal_ws, dir_to_viewpoint_ws);
 	const float step_count = lerp(g_sample_min_count, g_sample_max_count, 1.0f - cos_nv);
 
-	const Parallax_result pr = calc_parallax_offset(pixel.tex_coord, pixel.max_parallax_displacement, (int)step_count);
-	const float4 diffuse_rgb = g_tex_diffuse_rgb.Sample(g_sampler, pr.tex_coord);
+	//const float2 parallax_tex_coord = calc_parallax_offset_simple(pixel.tex_coord, pixel.max_parallax_displacement);
+	const float2 parallax_tex_coord = calc_parallax_offset(pixel.tex_coord, pixel.max_parallax_displacement, step_count);
+	const float4 diffuse_rgb = g_tex_diffuse_rgb.Sample(g_sampler, parallax_tex_coord);
 
 	PS_output output;
 	output.rt_color_0 = diffuse_rgb;
-	output.rt_color_1 = pr.debug;
+	output.rt_color_1 = float4(step_count, 0, 0, 1);//pr.debug;
 	return output;
 }

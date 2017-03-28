@@ -39,14 +39,14 @@ void Displacement_mapping::int_cbuffers()
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	const float arr[Displacement_mapping::cb_displacement_component_count] = {
-		64.0f, 128.0f, 0.1f, 0.0f
+		16.0f, 32.0f, 0.1f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/rect_2x2.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/rect_1x1.obj");
 	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
