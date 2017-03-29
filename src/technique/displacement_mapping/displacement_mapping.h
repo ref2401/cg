@@ -39,7 +39,7 @@ public:
 private:
 
 	static constexpr size_t cb_displacement_component_count = 4;
-	static constexpr size_t cb_matrices_component_count = 3 * 16 + 4;
+	static constexpr size_t cb_matrices_component_count = 3 * 16 + 3 * 4;
 
 
 	void int_cbuffers();
@@ -52,7 +52,7 @@ private:
 
 	void init_textures();
 
-	void setup_cb_matrices(const cg::Viewpoint& viewpoint);
+	void setup_cb_vertex_shader(const cg::Viewpoint& viewpoint);
 
 	void setup_pipeline_state();
 
@@ -72,10 +72,13 @@ private:
 	cg::mat4 _projection_matrix;
 	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_matrices;
+	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_vertex_shader;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_displacement;
 	cg::rnd::dx11::Com_ptr<ID3D11SamplerState> _sampler_state;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
+	// light
+	cg::float3 _dlight_position_ws;
+	cg::float3 _dlight_velocity_ws;
 	// model
 	cg::float3 _model_scale;
 	cg::float3 _model_position;

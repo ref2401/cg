@@ -19,7 +19,9 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
 	_curr_viewpoint(float3(0, 2, 5), float3::zero, float3::unit_y),
-	_prev_viewpoint(_curr_viewpoint)
+	_prev_viewpoint(_curr_viewpoint),
+	_dlight_position_ws(100.0f, 100.0f, 100.0f),
+	_dlight_velocity_ws(0.5f, 0.25f, 0.0f)
 {
 	update_projection_matrix();
 	_model_position = float3(0.0f, -0.5f, 0.0f);
@@ -35,11 +37,11 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 
 void Displacement_mapping::int_cbuffers()
 {
-	_cb_matrices = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_matrices_component_count);
+	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_matrices_component_count);
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	const float arr[Displacement_mapping::cb_displacement_component_count] = {
-		16.0f, 32.0f, 0.0f, 0.0f
+		16.0f, 32.0f, 0.9f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
@@ -161,7 +163,6 @@ void Displacement_mapping::init_textures()
 	assert(hr == S_OK);
 
 	// normal map
-	// diffuse rgb
 	Image_2d normal_map("../data/displacement_mapping/rocks-normal.jpg", 4, true);
 
 	D3D11_TEXTURE2D_DESC normal_desc = {};
@@ -241,7 +242,7 @@ void Displacement_mapping::render(float interpolation_factor)
 {
 	auto viewpoint = lerp(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
 	viewpoint.up = normalize(viewpoint.up);
-	setup_cb_matrices(viewpoint);
+	setup_cb_vertex_shader(viewpoint);
 
 	_device_ctx->ClearRenderTargetView(_rhi_ctx.rtv_window(), float4::unit_xyzw.data);
 	_device_ctx->ClearDepthStencilView(_rhi_ctx.dsv_depth_stencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -250,8 +251,9 @@ void Displacement_mapping::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 }
 
-void Displacement_mapping::setup_cb_matrices(const Viewpoint& viewpoint)
+void Displacement_mapping::setup_cb_vertex_shader(const Viewpoint& viewpoint)
 {
+	const float3 dlight_dir_ws = normalize(-_dlight_position_ws);
 	const mat4 model_matrix = ts_matrix(_model_position, _model_scale);
 	const mat4 normal_matrix = mat4::identity;
 	const mat4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
@@ -264,7 +266,15 @@ void Displacement_mapping::setup_cb_matrices(const Viewpoint& viewpoint)
 	arr[49] = viewpoint.position.y;
 	arr[50] = viewpoint.position.z;
 	arr[51] = 0.1f;
-	_device_ctx->UpdateSubresource(_cb_matrices.ptr, 0, nullptr, arr, 0, 0);
+	arr[52] = _dlight_position_ws.x;
+	arr[53] = _dlight_position_ws.y;
+	arr[54] = _dlight_position_ws.z;
+	arr[55] = 0.0f;
+	arr[56] = dlight_dir_ws.x;
+	arr[57] = dlight_dir_ws.y;
+	arr[58] = dlight_dir_ws.z;
+	arr[59] = 0.0f;
+	_device_ctx->UpdateSubresource(_cb_vertex_shader.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::setup_pipeline_state()
@@ -276,7 +286,7 @@ void Displacement_mapping::setup_pipeline_state()
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
 
 	_device_ctx->VSSetShader(_pom_shader.vertex_shader(), nullptr, 0);
-	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_matrices.ptr);
+	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_vertex_shader.ptr);
 	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
 	_device_ctx->PSSetConstantBuffers(0, 1, &_cb_displacement.ptr);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
@@ -294,6 +304,11 @@ void Displacement_mapping::setup_pipeline_state()
 
 void Displacement_mapping::update(float dt_msec) 
 {
+	_dlight_position_ws += _dlight_velocity_ws;
+	if (abs(_dlight_position_ws.x) > 100.0f) {
+		_dlight_velocity_ws *= -1.0f;
+	}
+
 	if (_view_roll_angles != float2::zero) {
 		float dist = distance(_curr_viewpoint);
 		float3 ox = cross(forward(_curr_viewpoint), _curr_viewpoint.up);
