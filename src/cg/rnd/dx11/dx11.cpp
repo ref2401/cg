@@ -153,6 +153,7 @@ void DX11_rhi_context::resize_viewport(const uint2& viewport_size)
 	if (viewport_size == uint2(uint32_t(_viewport.Width), uint32_t(_viewport.Height))) return;
 
 	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
+	_rtv_window.dispose();
 
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
 	_swap_chain->GetDesc(&swap_chain_desc);

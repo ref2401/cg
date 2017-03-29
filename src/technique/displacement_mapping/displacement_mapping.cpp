@@ -39,7 +39,7 @@ void Displacement_mapping::int_cbuffers()
 
 	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
 	const float arr[Displacement_mapping::cb_displacement_component_count] = {
-		16.0f, 32.0f, 0.1f, 0.0f
+		16.0f, 32.0f, 0.0f, 0.0f
 	};
 	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
 }
@@ -263,6 +263,7 @@ void Displacement_mapping::setup_cb_matrices(const Viewpoint& viewpoint)
 	arr[48] = viewpoint.position.x;
 	arr[49] = viewpoint.position.y;
 	arr[50] = viewpoint.position.z;
+	arr[51] = 0.1f;
 	_device_ctx->UpdateSubresource(_cb_matrices.ptr, 0, nullptr, arr, 0, 0);
 }
 

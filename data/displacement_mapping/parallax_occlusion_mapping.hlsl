@@ -5,6 +5,7 @@ cbuffer CB_matrices : register(b0) {
 	float4x4 g_model_matrix				: packoffset(c4);
 	float4x4 g_normal_matrix			: packoffset(c8);
 	float3 g_viewpoint_position_ws		: packoffset(c12);
+	float g_parallax_step_scale			: packoffset(c12.w);
 };
 
 struct Vertex {
@@ -24,14 +25,12 @@ struct VS_output {
 
 VS_output vs_main(in Vertex vertex) 
 {
-	const float g_parallax_step_scale = 0.1f;
-
 	// tangent space matrix
 	const float3 normal_ws = (mul(g_normal_matrix, float4(vertex.normal, 1.0f))).xyz;
 	const float3 tangent_ws = (mul(g_normal_matrix, float4(vertex.tangent_space.xyz, 1.0f))).xyz;
 	const float3 bitangent_ws = vertex.tangent_space.w * cross(normal_ws, tangent_ws);
 	const float3x3 world_to_tbn_matrix = float3x3(tangent_ws, bitangent_ws, normal_ws);
-	// ??unnormalized direction from viewpoint in tangent space
+	// unnormalized direction from viewpoint in tangent space
 	const float4 p_ws = mul(g_model_matrix, float4(vertex.position, 1.0f));
 	const float3 to_viewpoint_ws = (g_viewpoint_position_ws - p_ws.xyz);
 	const float3 to_viewpoint_ts = (mul(world_to_tbn_matrix, to_viewpoint_ws));
@@ -52,7 +51,6 @@ VS_output vs_main(in Vertex vertex)
 cbuffer CB_displacement_mapping : register(b0) {
 	float g_sample_min_count	: packoffset(c0.x);
 	float g_sample_max_count	: packoffset(c0.y);
-	float g_height_scale		: packoffset(c0.z);
 };
 
 Texture2D g_tex_diffuse_rgb	: register(t0);
@@ -66,17 +64,6 @@ struct PS_output {
 	float4 rt_color_1 : SV_Target1;
 };
 
-struct Parallax_result {
-	float2 tex_coord;
-	float4 debug;
-};
-
-float2 calc_parallax_offset_simple(float2 tex_coord, float2 max_parallax_displacement)
-{
-	float height = 1.0f - g_tex_height_map.Sample(g_sampler, tex_coord).x;
-	return tex_coord - max_parallax_displacement * height;
-}
-
 float2 calc_parallax_offset(float2 tex_coord, float2 max_parallax_displacement, float step_count)
 {
 	const float2 dx = ddx(tex_coord);
@@ -85,27 +72,23 @@ float2 calc_parallax_offset(float2 tex_coord, float2 max_parallax_displacement, 
 	const float2 tc_offset = step_size * max_parallax_displacement;
 
 	float2 tc_curr = tex_coord;
+	float ray_height = 1.0f;
 	float map_height_curr = g_tex_height_map.SampleGrad(g_sampler, tc_curr, dx, dy).x;
-	float ray_height_curr = 1.0f;
-
-	float2 tc_prev = tc_curr;
 	float map_height_prev = map_height_curr;
-	float ray_height_prev = ray_height_curr;
 
-	while (ray_height_curr > map_height_curr) {
-		tc_prev = tc_curr;
-		ray_height_prev = ray_height_curr;
+	while (ray_height > map_height_curr) {
 		map_height_prev = map_height_curr;
 
 		tc_curr -= tc_offset;
-		ray_height_curr -= step_size;
+
+		ray_height -= step_size;
 		map_height_curr = g_tex_height_map.SampleGrad(g_sampler, tc_curr, dx, dy).x;
 	}
 
-	const float denominator = (map_height_prev - map_height_curr + ray_height_curr - ray_height_prev);
-	const float weight = (map_height_prev - ray_height_prev) / denominator;
+	const float denominator = (map_height_prev - map_height_curr - step_size);
+	const float weight = (map_height_prev - ray_height - step_size) / denominator;
 
-	return tc_prev - weight * tc_offset;
+	return tc_curr + (1.0f - weight) * tc_offset;
 }
 
 PS_output ps_main(VS_output pixel)
@@ -115,12 +98,15 @@ PS_output ps_main(VS_output pixel)
 	const float cos_nv = dot(normal_ws, dir_to_viewpoint_ws);
 	const float step_count = lerp(g_sample_min_count, g_sample_max_count, 1.0f - cos_nv);
 
-	//const float2 parallax_tex_coord = calc_parallax_offset_simple(pixel.tex_coord, pixel.max_parallax_displacement);
-	const float2 parallax_tex_coord = calc_parallax_offset(pixel.tex_coord, pixel.max_parallax_displacement, step_count);
-	const float4 diffuse_rgb = g_tex_diffuse_rgb.Sample(g_sampler, parallax_tex_coord);
+	const float2 ptc = calc_parallax_offset(pixel.tex_coord, pixel.max_parallax_displacement, step_count);
+	// discard if any component of ptc is out of the range [0 .. 1]
+	clip(ptc);
+	clip(1.0f - ptc);
+
+	const float4 diffuse_rgb = g_tex_diffuse_rgb.Sample(g_sampler, ptc);
 
 	PS_output output;
 	output.rt_color_0 = diffuse_rgb;
-	output.rt_color_1 = float4(step_count, 0, 0, 1);//pr.debug;
+	output.rt_color_1 = float4(ptc, 0.0, 1);//pr.debug;
 	return output;
 }
