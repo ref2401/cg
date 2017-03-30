@@ -122,14 +122,14 @@ Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::App_contex
 	_device(_rhi_ctx.device()),
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
-	_curr_viewpoint(float3(0, 2, 5), float3::zero, float3::unit_y),
+	_curr_viewpoint(float3(-1.0f, 0, 6.0f), float3::zero, float3::unit_y),
 	_prev_viewpoint(_curr_viewpoint),
 	_dlight_position_ws(100.0f, 100.0f, 100.0f),
 	_dlight_velocity_ws(0.0f, 0.0f, 0.0f)
 {
 	update_projection_matrix();
-	_model_position = float3(0.0f, -0.5f, 0.0f);
-	_model_scale = float3(4.0f);
+	_model_position = float3::zero;
+	_model_scale = float3(3.0f);
 
 	int_cbuffers();
 	init_shaders();
@@ -203,7 +203,7 @@ void Parallax_occlusion_mapping::init_materials()
 		"../data/parallax_occlusion_mapping/four_shapes_normal_map.png");
 
 
-	_curr_material = &_four_shapes_material;
+	_curr_material = &_rock_wall_material;
 
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
