@@ -8,7 +8,111 @@ using namespace cg::data;
 using namespace cg::rnd::dx11;
 
 
+namespace {
+
+using displacement_mapping::Material;
+
+void put_shader_recource_views(ID3D11ShaderResourceView** arr, const Material& material) noexcept
+{
+	assert(material.tex_srv_diffuse_rgb);
+	assert(material.tex_srv_height_map);
+	assert(material.tex_srv_normal_map);
+
+	arr[0] = material.tex_srv_diffuse_rgb.ptr;
+	arr[1] = material.tex_srv_height_map.ptr;
+	arr[2] = material.tex_srv_normal_map.ptr;
+}
+
+} // namespace
+
+
 namespace displacement_mapping {
+
+// ----- Material -----
+
+Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_sample_count,
+	float max_sample_count, float self_shadowing_factor, const char* diffuse_rgb_filename, 
+	const char* height_map_filename, const char* normal_map_height)
+	: tex_coord_step_scale(tex_coord_step_scale), min_sample_count(min_sample_count),
+		max_sample_count(max_sample_count), self_shadowing_factor(self_shadowing_factor)
+{
+	assert(device);
+	assert(diffuse_rgb_filename);
+	assert(height_map_filename);
+	assert(normal_map_height);
+
+	// diffuse rgb
+	{
+		Image_2d image(diffuse_rgb_filename, 4, true);
+
+		D3D11_TEXTURE2D_DESC diffuse_desc = {};
+		diffuse_desc.Width = image.size().width;
+		diffuse_desc.Height = image.size().height;
+		diffuse_desc.MipLevels = 1;
+		diffuse_desc.ArraySize = 1;
+		diffuse_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		diffuse_desc.SampleDesc.Count = 1;
+		diffuse_desc.SampleDesc.Quality = 0;
+		diffuse_desc.Usage = D3D11_USAGE_IMMUTABLE;
+		diffuse_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		D3D11_SUBRESOURCE_DATA diffuse_data = {};
+		diffuse_data.pSysMem = image.data();
+		diffuse_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		HRESULT hr = device->CreateTexture2D(&diffuse_desc, &diffuse_data, &tex_diffuse_rgb.ptr);
+		assert(hr == S_OK);
+
+		hr = device->CreateShaderResourceView(tex_diffuse_rgb.ptr, nullptr, &tex_srv_diffuse_rgb.ptr);
+		assert(hr == S_OK);
+	}
+
+	// height map
+	{
+		Image_2d image(height_map_filename, 1, true);
+
+		D3D11_TEXTURE2D_DESC displ_desc = {};
+		displ_desc.Width = image.size().width;
+		displ_desc.Height = image.size().height;
+		displ_desc.MipLevels = 1;
+		displ_desc.ArraySize = 1;
+		displ_desc.Format = DXGI_FORMAT_R8_UNORM;
+		displ_desc.SampleDesc.Count = 1;
+		displ_desc.SampleDesc.Quality = 0;
+		displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
+		displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		D3D11_SUBRESOURCE_DATA displ_data = {};
+		displ_data.pSysMem = image.data();
+		displ_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		HRESULT hr = device->CreateTexture2D(&displ_desc, &displ_data, &tex_height_map.ptr);
+		assert(hr == S_OK);
+
+		hr = device->CreateShaderResourceView(tex_height_map.ptr, nullptr, &tex_srv_height_map.ptr);
+		assert(hr == S_OK);
+	}
+
+	// normal map
+	{
+		Image_2d image(normal_map_height, 4, true);
+
+		D3D11_TEXTURE2D_DESC normal_desc = {};
+		normal_desc.Width = image.size().width;
+		normal_desc.Height = image.size().height;
+		normal_desc.MipLevels = 1;
+		normal_desc.ArraySize = 1;
+		normal_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		normal_desc.SampleDesc.Count = 1;
+		normal_desc.SampleDesc.Quality = 0;
+		normal_desc.Usage = D3D11_USAGE_IMMUTABLE;
+		normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		D3D11_SUBRESOURCE_DATA normal_data = {};
+		normal_data.pSysMem = image.data();
+		normal_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		HRESULT hr = device->CreateTexture2D(&normal_desc, &normal_data, &tex_normal_map.ptr);
+		assert(hr == S_OK);
+
+		hr = device->CreateShaderResourceView(tex_normal_map.ptr, nullptr, &tex_srv_normal_map.ptr);
+		assert(hr == S_OK);
+	}
+}
 
 // ----- Displacement_mapping -----
 
@@ -31,19 +135,15 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	init_shaders();
 	init_geometry();
 	init_pipeline_state();
-	init_textures();
+	init_materials();
+
 	setup_pipeline_state();
 }
 
 void Displacement_mapping::int_cbuffers()
 {
-	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_matrices_component_count);
-
-	_cb_displacement = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_displacement_component_count);
-	const float arr[Displacement_mapping::cb_displacement_component_count] = {
-		16.0f, 32.0f, 0.9f, 0.0f
-	};
-	_device_ctx->UpdateSubresource(_cb_displacement.ptr, 0, nullptr, arr, 0, 0);
+	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_vertex_shader_component_count);
+	_cb_pixel_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_pixel_shader_component_count);
 }
 
 void Displacement_mapping::init_geometry()
@@ -90,6 +190,30 @@ void Displacement_mapping::init_geometry()
 	assert(hr == S_OK);
 }
 
+void Displacement_mapping::init_materials()
+{
+	_rock_wall_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
+		"../data/displacement_mapping/rocks-diffuse.jpg",
+		"../data/displacement_mapping/rocks-displacement.jpg",
+		"../data/displacement_mapping/rocks-normal.jpg");
+
+	_four_shapes_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
+		"../data/displacement_mapping/four_shapes_diffuse_rgb.jpg",
+		"../data/displacement_mapping/four_shapes_height_map.png",
+		"../data/displacement_mapping/four_shapes_normal_map.png");
+
+
+	_curr_material = &_rock_wall_material;
+
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	HRESULT hr = _device->CreateSamplerState(&sampler_desc, &_sampler_state.ptr);
+	assert(hr == S_OK);
+}
+
 void Displacement_mapping::init_pipeline_state()
 {
 	D3D11_DEPTH_STENCIL_DESC ds_desc = {};
@@ -114,102 +238,6 @@ void Displacement_mapping::init_shaders()
 	pom_shader_desc.vertex_shader_entry_point = "vs_main";
 	pom_shader_desc.pixel_shader_entry_point = "ps_main";
 	_pom_shader = Hlsl_shader(_device, pom_shader_desc);
-}
-
-void Displacement_mapping::init_textures()
-{
-	// diffuse rgb
-	Image_2d diffuse_rgb("../data/displacement_mapping/rocks-diffuse.jpg", 4, true);
-
-	D3D11_TEXTURE2D_DESC diffuse_desc = {};
-	diffuse_desc.Width = diffuse_rgb.size().width;
-	diffuse_desc.Height = diffuse_rgb.size().height;
-	diffuse_desc.MipLevels = 1;
-	diffuse_desc.ArraySize = 1;
-	diffuse_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	diffuse_desc.SampleDesc.Count = 1;
-	diffuse_desc.SampleDesc.Quality = 0;
-	diffuse_desc.Usage = D3D11_USAGE_IMMUTABLE;
-	diffuse_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	D3D11_SUBRESOURCE_DATA diffuse_data = {};
-	diffuse_data.pSysMem = diffuse_rgb.data();
-	diffuse_data.SysMemPitch = diffuse_rgb.size().width * byte_count(diffuse_rgb.pixel_format());
-	HRESULT hr = _device->CreateTexture2D(&diffuse_desc, &diffuse_data, &_tex_diffuse_rgb.ptr);
-	assert(hr == S_OK);
-
-	hr = _device->CreateShaderResourceView(_tex_diffuse_rgb.ptr, nullptr, &_tex_srv_diffuse_rgb.ptr);
-	assert(hr == S_OK);
-
-	// displacement map
-	Image_2d displ_map("../data/displacement_mapping/rocks-displacement.jpg", 1, true);
-
-	D3D11_TEXTURE2D_DESC displ_desc = {};
-	displ_desc.Width = displ_map.size().width;
-	displ_desc.Height = displ_map.size().height;
-	displ_desc.MipLevels = 1;
-	displ_desc.ArraySize = 1;
-	displ_desc.Format = DXGI_FORMAT_R8_UNORM;
-	displ_desc.SampleDesc.Count = 1;
-	displ_desc.SampleDesc.Quality = 0;
-	displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
-	displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	D3D11_SUBRESOURCE_DATA displ_data = {};
-	displ_data.pSysMem = displ_map.data();
-	displ_data.SysMemPitch = displ_map.size().width * byte_count(displ_map.pixel_format());
-	hr = _device->CreateTexture2D(&displ_desc, &displ_data, &_tex_displacement_map.ptr);
-	assert(hr == S_OK);
-
-	hr = _device->CreateShaderResourceView(_tex_displacement_map.ptr, nullptr, &_tex_srv_displacement_map.ptr);
-	assert(hr == S_OK);
-
-	// normal map
-	Image_2d normal_map("../data/displacement_mapping/rocks-normal.jpg", 4, true);
-
-	D3D11_TEXTURE2D_DESC normal_desc = {};
-	normal_desc.Width = normal_map.size().width;
-	normal_desc.Height = normal_map.size().height;
-	normal_desc.MipLevels = 1;
-	normal_desc.ArraySize = 1;
-	normal_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	normal_desc.SampleDesc.Count = 1;
-	normal_desc.SampleDesc.Quality = 0;
-	normal_desc.Usage = D3D11_USAGE_IMMUTABLE;
-	normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	D3D11_SUBRESOURCE_DATA normal_data = {};
-	normal_data.pSysMem = normal_map.data();
-	normal_data.SysMemPitch = normal_map.size().width * byte_count(normal_map.pixel_format());
-	hr = _device->CreateTexture2D(&normal_desc, &normal_data, &_tex_normal_map.ptr);
-	assert(hr == S_OK);
-
-	hr = _device->CreateShaderResourceView(_tex_normal_map.ptr, nullptr, &_tex_srv_normal_map.ptr);
-	assert(hr == S_OK);
-
-	D3D11_SAMPLER_DESC sampler_desc = {};
-	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	hr = _device->CreateSamplerState(&sampler_desc, &_sampler_state.ptr);
-	assert(hr == S_OK);
-
-
-	const UINT debug_width(_rhi_ctx.viewport().Width);
-	const UINT debug_height(_rhi_ctx.viewport().Height);
-	D3D11_TEXTURE2D_DESC debug_desc = {};
-	debug_desc.Width = debug_width;
-	debug_desc.Height = debug_height;
-	debug_desc.MipLevels = 1;
-	debug_desc.ArraySize = 1;
-	debug_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	debug_desc.SampleDesc.Count = 1;
-	debug_desc.SampleDesc.Quality = 0;
-	debug_desc.Usage = D3D11_USAGE_DEFAULT;
-	debug_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-	hr = _device->CreateTexture2D(&debug_desc, nullptr, &_tex_debug.ptr);
-	assert(hr == S_OK);
-
-	hr = _device->CreateRenderTargetView(_tex_debug.ptr, nullptr, &_tex_rtv_debug.ptr);
-	assert(hr == S_OK);
 }
 
 void Displacement_mapping::on_mouse_move()
@@ -242,7 +270,7 @@ void Displacement_mapping::render(float interpolation_factor)
 {
 	auto viewpoint = lerp(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
 	viewpoint.up = normalize(viewpoint.up);
-	setup_cb_vertex_shader(viewpoint);
+	update_cb_vertex_shader(viewpoint);
 
 	_device_ctx->ClearRenderTargetView(_rhi_ctx.rtv_window(), float4::unit_xyzw.data);
 	_device_ctx->ClearDepthStencilView(_rhi_ctx.dsv_depth_stencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -251,21 +279,21 @@ void Displacement_mapping::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 }
 
-void Displacement_mapping::setup_cb_vertex_shader(const Viewpoint& viewpoint)
+void Displacement_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
 {
 	const float3 dlight_dir_ws = normalize(-_dlight_position_ws);
 	const mat4 model_matrix = ts_matrix(_model_position, _model_scale);
 	const mat4 normal_matrix = mat4::identity;
 	const mat4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
 	
-	float arr[Displacement_mapping::cb_matrices_component_count];
+	float arr[Displacement_mapping::cb_vertex_shader_component_count];
 	to_array_column_major_order(projection_view_matrix, arr);
 	to_array_column_major_order(model_matrix, arr + 16);
 	to_array_column_major_order(normal_matrix, arr + 32);
 	arr[48] = viewpoint.position.x;
 	arr[49] = viewpoint.position.y;
 	arr[50] = viewpoint.position.z;
-	arr[51] = 0.1f;
+	arr[51] = _curr_material->tex_coord_step_scale;
 	arr[52] = _dlight_position_ws.x;
 	arr[53] = _dlight_position_ws.y;
 	arr[54] = _dlight_position_ws.z;
@@ -275,6 +303,17 @@ void Displacement_mapping::setup_cb_vertex_shader(const Viewpoint& viewpoint)
 	arr[58] = dlight_dir_ws.z;
 	arr[59] = 0.0f;
 	_device_ctx->UpdateSubresource(_cb_vertex_shader.ptr, 0, nullptr, arr, 0, 0);
+}
+
+void Displacement_mapping::update_cb_pixel_shader()
+{
+	const float arr[Displacement_mapping::cb_pixel_shader_component_count] = {
+		_curr_material->min_sample_count,
+		_curr_material->max_sample_count,
+		_curr_material->self_shadowing_factor,
+		0.0f
+	};
+	_device_ctx->UpdateSubresource(_cb_pixel_shader.ptr, 0, nullptr, arr, 0, 0);
 }
 
 void Displacement_mapping::setup_pipeline_state()
@@ -288,15 +327,14 @@ void Displacement_mapping::setup_pipeline_state()
 	_device_ctx->VSSetShader(_pom_shader.vertex_shader(), nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_vertex_shader.ptr);
 	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
-	_device_ctx->PSSetConstantBuffers(0, 1, &_cb_displacement.ptr);
+	_device_ctx->PSSetConstantBuffers(0, 1, &_cb_pixel_shader.ptr);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
-	ID3D11ShaderResourceView* srv[3] = { _tex_srv_diffuse_rgb.ptr, _tex_srv_displacement_map.ptr, _tex_srv_normal_map.ptr };
-	_device_ctx->PSSetShaderResources(0, 3, srv);
+	ID3D11ShaderResourceView* views[3];
+	put_shader_recource_views(views, *_curr_material);
+	_device_ctx->PSSetShaderResources(0, 3, views);
 
 	_device_ctx->RSSetState(_rasterizer_state.ptr);
 	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
-	ID3D11RenderTargetView* rtvs[2] = { _rhi_ctx.rtv_window(), _tex_rtv_debug.ptr };
-	_device_ctx->OMSetRenderTargets(2, rtvs, _rhi_ctx.dsv_depth_stencil());
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);
@@ -308,6 +346,9 @@ void Displacement_mapping::update(float dt_msec)
 	if (abs(_dlight_position_ws.x) > 100.0f) {
 		_dlight_velocity_ws *= -1.0f;
 	}
+
+	update_cb_pixel_shader();
+
 
 	if (_view_roll_angles != float2::zero) {
 		float dist = distance(_curr_viewpoint);

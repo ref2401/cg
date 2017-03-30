@@ -60,7 +60,7 @@ VS_output vs_main(in Vertex vertex)
 static const float3 ambient_up_rgb = (float3)0.6f;
 static const float3 ambient_down_rgb = (float3)0.4f;
 
-cbuffer CB_displacement_mapping : register(b0) {
+cbuffer CB_pixel_shader : register(b0) {
 	float g_sample_min_count		: packoffset(c0.x);
 	float g_sample_max_count		: packoffset(c0.y);
 	float g_self_shadowing_factor	: packoffset(c0.z);
@@ -74,7 +74,6 @@ SamplerState g_sampler : register(s0);
 
 struct PS_output {
 	float4 rt_color_0 : SV_Target0;
-	float4 rt_color_1 : SV_Target1;
 };
 
 
@@ -148,6 +147,5 @@ PS_output ps_main(VS_output pixel)
 
 	PS_output output;
 	output.rt_color_0 = float4(final_rgb, 1.0f);
-	output.rt_color_1 = float4(cos_ti, cos_ti, cos_ti, 1.0f);//pr.debug;
 	return output;
 }

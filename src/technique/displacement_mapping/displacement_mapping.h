@@ -7,6 +7,33 @@
 
 namespace displacement_mapping {
 
+struct Material final {
+
+	Material() noexcept = default;
+
+	Material(ID3D11Device* device, float tex_coord_step_scale, float min_sample_count,
+		float max_sample_count, float self_shadowing_factor, const char* diffuse_rgb_filename,
+		const char* height_map_filename, const char* normal_map_height);
+
+	Material(const Material&) = delete;
+	Material(Material&& m) noexcept = default;
+
+	Material& operator=(const Material&) = delete;
+	Material& operator=(Material&& m) noexcept = default;
+
+
+	float tex_coord_step_scale = 1.0f;
+	float min_sample_count = 0.0f;
+	float max_sample_count = 0.0f;
+	float self_shadowing_factor = 1.0f;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_diffuse_rgb;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_height_map;
+	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_normal_map;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_diffuse_rgb;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_height_map;
+	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_normal_map;
+};
+
 class Displacement_mapping final : public virtual cg::sys::Example {
 public:
 
@@ -38,8 +65,8 @@ public:
 
 private:
 
-	static constexpr size_t cb_displacement_component_count = 4;
-	static constexpr size_t cb_matrices_component_count = 3 * 16 + 3 * 4;
+	static constexpr size_t cb_vertex_shader_component_count = 3 * 16 + 3 * 4;
+	static constexpr size_t cb_pixel_shader_component_count = 4;
 
 
 	void int_cbuffers();
@@ -50,9 +77,11 @@ private:
 
 	void init_shaders();
 
-	void init_textures();
+	void init_materials();
 
-	void setup_cb_vertex_shader(const cg::Viewpoint& viewpoint);
+	void update_cb_vertex_shader(const cg::Viewpoint& viewpoint);
+
+	void update_cb_pixel_shader();
 
 	void setup_pipeline_state();
 
@@ -73,7 +102,7 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_vertex_shader;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_displacement;
+	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_pixel_shader;
 	cg::rnd::dx11::Com_ptr<ID3D11SamplerState> _sampler_state;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
 	// light
@@ -85,17 +114,11 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11InputLayout> _pom_input_layout;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _vertex_buffer;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _index_buffer;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_diffuse_rgb;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_displacement_map;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_displacement_map;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_normal_map;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> _tex_srv_normal_map;
+	Material* _curr_material = nullptr;
+	Material _rock_wall_material;
+	Material _four_shapes_material;
 	UINT _vertex_stride;
 	UINT _index_count;
-	// debug
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> _tex_debug;
-	cg::rnd::dx11::Com_ptr<ID3D11RenderTargetView> _tex_rtv_debug;
 };
 
 } // displacement_mapping
