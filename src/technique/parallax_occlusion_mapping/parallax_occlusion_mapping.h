@@ -1,11 +1,11 @@
-#ifndef TECHNIQUE_DISPLACEMENT_MAPPING_DISPLACEMENT_MAPPING_H_
-#define TECHNIQUE_DISPLACEMENT_MAPPING_DISPLACEMENT_MAPPING_H_
+#ifndef TECHNIQUE_PARALLAX_OCCLUSION_MAPPING_PARALLAX_OCCLUSION_MAPPING_H_
+#define TECHNIQUE_PARALLAX_OCCLUSION_MAPPING_PARALLAX_OCCLUSION_MAPPING_H_
 
 #include "cg/rnd/dx11/dx11.h"
 #include "cg/sys/app.h"
 
 
-namespace displacement_mapping {
+namespace parallax_occlusion_mapping {
 
 struct Material final {
 
@@ -34,7 +34,7 @@ struct Material final {
 	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_normal_map;
 };
 
-class Displacement_mapping final : public virtual cg::sys::Example {
+class Parallax_occlusion_mapping final : public virtual cg::sys::Example {
 public:
 
 	static constexpr cg::sys::Example_desc example_desc = {
@@ -43,16 +43,16 @@ public:
 	};
 
 
-	Displacement_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
+	Parallax_occlusion_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
 
-	Displacement_mapping(const Displacement_mapping&) = delete;
+	Parallax_occlusion_mapping(const Parallax_occlusion_mapping&) = delete;
 
-	Displacement_mapping(Displacement_mapping&&) = delete;
+	Parallax_occlusion_mapping(Parallax_occlusion_mapping&&) = delete;
 
 
-	Displacement_mapping& operator=(const Displacement_mapping&) = delete;
+	Parallax_occlusion_mapping& operator=(const Parallax_occlusion_mapping&) = delete;
 
-	Displacement_mapping& operator=(Displacement_mapping&&) = delete;
+	Parallax_occlusion_mapping& operator=(Parallax_occlusion_mapping&&) = delete;
 
 
 	void on_mouse_move() override;
@@ -121,6 +121,6 @@ private:
 	UINT _index_count;
 };
 
-} // displacement_mapping
+} // parallax_occlusion_mapping
 
-#endif // TECHNIQUE_DISPLACEMENT_MAPPING_DISPLACEMENT_MAPPING_H_
+#endif // TECHNIQUE_PARALLAX_OCCLUSION_MAPPING_PARALLAX_OCCLUSION_MAPPING_H_

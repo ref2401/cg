@@ -39,7 +39,7 @@ VS_output vs_main(in Vertex vertex)
 	const float3 to_viewpoint_ws = (g_viewpoint_position_ws - p_ws.xyz);
 	const float3 to_viewpoint_ts = (mul(world_to_tbn_matrix, to_viewpoint_ws));
 	// max parallax offset
-	const float2 max_parallax_displacement = to_viewpoint_ts.xy / to_viewpoint_ts.z * g_parallax_step_scale;
+	const float2 max_parallax_displacement = g_parallax_step_scale * to_viewpoint_ts.xy / to_viewpoint_ts.z;
 	// light tex coord dir
 	const float3 to_light_ws = normalize(g_light_position_ws - p_ws.xyz);
 	const float2 light_tex_coord_dir = g_parallax_step_scale * mul(world_to_tbn_matrix, to_light_ws).xy;

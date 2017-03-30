@@ -1,4 +1,4 @@
-#include "technique/displacement_mapping/displacement_mapping.h"
+#include "technique/parallax_occlusion_mapping/parallax_occlusion_mapping.h"
 
 #include "cg/data/image.h"
 #include "cg/data/model.h"
@@ -10,7 +10,7 @@ using namespace cg::rnd::dx11;
 
 namespace {
 
-using displacement_mapping::Material;
+using parallax_occlusion_mapping::Material;
 
 void put_shader_recource_views(ID3D11ShaderResourceView** arr, const Material& material) noexcept
 {
@@ -26,7 +26,7 @@ void put_shader_recource_views(ID3D11ShaderResourceView** arr, const Material& m
 } // namespace
 
 
-namespace displacement_mapping {
+namespace parallax_occlusion_mapping {
 
 // ----- Material -----
 
@@ -114,9 +114,9 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 	}
 }
 
-// ----- Displacement_mapping -----
+// ----- Parallax_occlusion_mapping -----
 
-Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx)
+Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx)
 	: Example(app_ctx, rhi_ctx),
 	_rhi_ctx(dynamic_cast<cg::rnd::dx11::DX11_rhi_context&>(rhi_ctx)),
 	_device(_rhi_ctx.device()),
@@ -125,7 +125,7 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	_curr_viewpoint(float3(0, 2, 5), float3::zero, float3::unit_y),
 	_prev_viewpoint(_curr_viewpoint),
 	_dlight_position_ws(100.0f, 100.0f, 100.0f),
-	_dlight_velocity_ws(0.5f, 0.25f, 0.0f)
+	_dlight_velocity_ws(0.0f, 0.0f, 0.0f)
 {
 	update_projection_matrix();
 	_model_position = float3(0.0f, -0.5f, 0.0f);
@@ -140,13 +140,13 @@ Displacement_mapping::Displacement_mapping(const cg::sys::App_context& app_ctx, 
 	setup_pipeline_state();
 }
 
-void Displacement_mapping::int_cbuffers()
+void Parallax_occlusion_mapping::int_cbuffers()
 {
-	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_vertex_shader_component_count);
-	_cb_pixel_shader = constant_buffer(_device, sizeof(float) * Displacement_mapping::cb_pixel_shader_component_count);
+	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Parallax_occlusion_mapping::cb_vertex_shader_component_count);
+	_cb_pixel_shader = constant_buffer(_device, sizeof(float) * Parallax_occlusion_mapping::cb_pixel_shader_component_count);
 }
 
-void Displacement_mapping::init_geometry()
+void Parallax_occlusion_mapping::init_geometry()
 {
 	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/rect_1x1.obj");
 	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
@@ -190,20 +190,20 @@ void Displacement_mapping::init_geometry()
 	assert(hr == S_OK);
 }
 
-void Displacement_mapping::init_materials()
+void Parallax_occlusion_mapping::init_materials()
 {
 	_rock_wall_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
-		"../data/displacement_mapping/rocks-diffuse.jpg",
-		"../data/displacement_mapping/rocks-displacement.jpg",
-		"../data/displacement_mapping/rocks-normal.jpg");
+		"../data/parallax_occlusion_mapping/rocks-diffuse.jpg",
+		"../data/parallax_occlusion_mapping/rocks-displacement.jpg",
+		"../data/parallax_occlusion_mapping/rocks-normal.jpg");
 
 	_four_shapes_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
-		"../data/displacement_mapping/four_shapes_diffuse_rgb.jpg",
-		"../data/displacement_mapping/four_shapes_height_map.png",
-		"../data/displacement_mapping/four_shapes_normal_map.png");
+		"../data/parallax_occlusion_mapping/four_shapes_diffuse_rgb.jpg",
+		"../data/parallax_occlusion_mapping/four_shapes_height_map.png",
+		"../data/parallax_occlusion_mapping/four_shapes_normal_map.png");
 
 
-	_curr_material = &_rock_wall_material;
+	_curr_material = &_four_shapes_material;
 
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -214,7 +214,7 @@ void Displacement_mapping::init_materials()
 	assert(hr == S_OK);
 }
 
-void Displacement_mapping::init_pipeline_state()
+void Parallax_occlusion_mapping::init_pipeline_state()
 {
 	D3D11_DEPTH_STENCIL_DESC ds_desc = {};
 	ds_desc.DepthEnable = true;
@@ -231,16 +231,16 @@ void Displacement_mapping::init_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Displacement_mapping::init_shaders()
+void Parallax_occlusion_mapping::init_shaders()
 {
 	Hlsl_shader_desc pom_shader_desc = load_hlsl_shader_set_desc(
-		"../data/displacement_mapping/parallax_occlusion_mapping.hlsl");
+		"../data/parallax_occlusion_mapping/parallax_occlusion_mapping.hlsl");
 	pom_shader_desc.vertex_shader_entry_point = "vs_main";
 	pom_shader_desc.pixel_shader_entry_point = "ps_main";
 	_pom_shader = Hlsl_shader(_device, pom_shader_desc);
 }
 
-void Displacement_mapping::on_mouse_move()
+void Parallax_occlusion_mapping::on_mouse_move()
 {
 	const uint2 p = _app_ctx.mouse.position();
 	const float2 curr_pos(float(p.x), float(p.y));
@@ -261,12 +261,12 @@ void Displacement_mapping::on_mouse_move()
 		_view_roll_angles.x += (diff.y > 0.f) ? pi_128 : -pi_128;
 }
 
-void Displacement_mapping::on_window_resize()
+void Parallax_occlusion_mapping::on_window_resize()
 {
 	update_projection_matrix();
 }
 
-void Displacement_mapping::render(float interpolation_factor)
+void Parallax_occlusion_mapping::render(float interpolation_factor)
 {
 	auto viewpoint = lerp(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
 	viewpoint.up = normalize(viewpoint.up);
@@ -279,14 +279,14 @@ void Displacement_mapping::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 }
 
-void Displacement_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
+void Parallax_occlusion_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
 {
 	const float3 dlight_dir_ws = normalize(-_dlight_position_ws);
 	const mat4 model_matrix = ts_matrix(_model_position, _model_scale);
 	const mat4 normal_matrix = mat4::identity;
 	const mat4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
 	
-	float arr[Displacement_mapping::cb_vertex_shader_component_count];
+	float arr[Parallax_occlusion_mapping::cb_vertex_shader_component_count];
 	to_array_column_major_order(projection_view_matrix, arr);
 	to_array_column_major_order(model_matrix, arr + 16);
 	to_array_column_major_order(normal_matrix, arr + 32);
@@ -305,18 +305,18 @@ void Displacement_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
 	_device_ctx->UpdateSubresource(_cb_vertex_shader.ptr, 0, nullptr, arr, 0, 0);
 }
 
-void Displacement_mapping::update_cb_pixel_shader()
+void Parallax_occlusion_mapping::update_cb_pixel_shader()
 {
-	const float arr[Displacement_mapping::cb_pixel_shader_component_count] = {
+	const float arr[Parallax_occlusion_mapping::cb_pixel_shader_component_count] = {
 		_curr_material->min_sample_count,
 		_curr_material->max_sample_count,
 		_curr_material->self_shadowing_factor,
-		0.0f
+		_curr_material->tex_coord_step_scale
 	};
 	_device_ctx->UpdateSubresource(_cb_pixel_shader.ptr, 0, nullptr, arr, 0, 0);
 }
 
-void Displacement_mapping::setup_pipeline_state()
+void Parallax_occlusion_mapping::setup_pipeline_state()
 {
 	const UINT offset = 0;
 	_device_ctx->IASetInputLayout(_pom_input_layout.ptr);
@@ -340,7 +340,7 @@ void Displacement_mapping::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Displacement_mapping::update(float dt_msec) 
+void Parallax_occlusion_mapping::update(float dt_msec) 
 {
 	_dlight_position_ws += _dlight_velocity_ws;
 	if (abs(_dlight_position_ws.x) > 100.0f) {
@@ -376,9 +376,9 @@ void Displacement_mapping::update(float dt_msec)
 	_view_roll_angles = float2::zero;
 }
 
-void Displacement_mapping::update_projection_matrix()
+void Parallax_occlusion_mapping::update_projection_matrix()
 {
 	_projection_matrix = perspective_matrix_directx(pi_3, _rhi_ctx.viewport_aspect_ratio(), 0.1f, 1000.0f);
 }
 
-} // displacement_mapping
+} // parallax_occlusion_mapping
