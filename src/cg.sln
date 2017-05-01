@@ -79,9 +79,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "image_processing", "image_p
 		..\data\learn_dx11\image_processing\render_image.hlsl = ..\data\learn_dx11\image_processing\render_image.hlsl
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "displacement_mapping", "displacement_mapping", "{527CDA4E-977E-47B9-8A92-7871CBBF52B0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parallax_occlusion_mapping", "parallax_occlusion_mapping", "{527CDA4E-977E-47B9-8A92-7871CBBF52B0}"
 	ProjectSection(SolutionItems) = preProject
-		..\data\displacement_mapping\parallax_occlusion_mapping.hlsl = ..\data\displacement_mapping\parallax_occlusion_mapping.hlsl
+		..\data\parallax_occlusion_mapping\parallax_occlusion_mapping.hlsl = ..\data\parallax_occlusion_mapping\parallax_occlusion_mapping.hlsl
 	EndProjectSection
 EndProject
 Global

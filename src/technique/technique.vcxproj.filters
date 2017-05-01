@@ -29,8 +29,8 @@
     <ClCompile Include="deferred_lighting\filter_shader.cpp">
       <Filter>deferred_lighting</Filter>
     </ClCompile>
-    <ClCompile Include="displacement_mapping\displacement_mapping.cpp">
-      <Filter>displacement_mapping</Filter>
+    <ClCompile Include="parallax_occlusion_mapping\parallax_occlusion_mapping.cpp">
+      <Filter>parallax_occlusion_mapping</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -40,7 +40,7 @@
     <Filter Include="fur_simulation">
       <UniqueIdentifier>{4f121a48-8c26-4bf5-8298-e187f3d50862}</UniqueIdentifier>
     </Filter>
-    <Filter Include="displacement_mapping">
+    <Filter Include="parallax_occlusion_mapping">
       <UniqueIdentifier>{b43c4de9-0f44-4682-95ec-eea45be4b807}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -72,8 +72,8 @@
     <ClInclude Include="deferred_lighting\filter_shader.h">
       <Filter>deferred_lighting</Filter>
     </ClInclude>
-    <ClInclude Include="displacement_mapping\displacement_mapping.h">
-      <Filter>displacement_mapping</Filter>
+    <ClInclude Include="parallax_occlusion_mapping\parallax_occlusion_mapping.h">
+      <Filter>parallax_occlusion_mapping</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
