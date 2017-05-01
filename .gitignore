@@ -54,11 +54,14 @@ artifacts/
 *_p.c
 *_i.h
 *.ilk
+!extern/_lib/**/*.ilk
 *.meta
 *.obj
 !data/**/*.obj
 *.pch
 *.pdb
+!extern/_dll/**/*.pdb
+!extern/_lib/**/*.pdb
 *.pgc
 *.pgd
 *.rsp
