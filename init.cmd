@@ -14,7 +14,6 @@ echo:
 RD /S /Q %dir_bin_debug% %dir_bin_release% %dir_assimp_vs_solution% %dir_assimp_vs_solution%
 md %dir_bin_debug%
 md %dir_bin_release%
-md %dir_assimp_vs_solution%
 
 for %%i in (.\\%dir_extern_dll%\\debug\\*) do (
 	copy /Y /b %%i %dir_bin_debug%\\ >nul
@@ -32,6 +31,7 @@ sleep 2
 
 echo [init assimp: library]
 echo:
+md %dir_assimp_vs_solution%
 pushd %dir_assimp_vs_solution%
 	cmake ..
 popd
