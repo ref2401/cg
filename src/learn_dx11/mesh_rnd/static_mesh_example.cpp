@@ -49,11 +49,11 @@ void Static_mesh_example::init_cbuffers()
 void Static_mesh_example::init_geometry()
 {
 	auto model_geometry = cg::data::load_model<Vertex_attribs::p_n_tc>("../../data/cube.obj");
-	_model_index_count = model_geometry.index_count();
+	_model_index_count = UINT(model_geometry.index_count());
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = model_geometry.vertex_data_byte_count();
+	vb_desc.ByteWidth = UINT(model_geometry.vertex_data_byte_count());
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
@@ -78,7 +78,7 @@ void Static_mesh_example::init_geometry()
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ib_desc.ByteWidth = model_geometry.index_data_byte_count();
+	ib_desc.ByteWidth = UINT(model_geometry.index_data_byte_count());
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	D3D11_SUBRESOURCE_DATA ib_data = {};
 	ib_data.pSysMem = model_geometry.index_data().data();
@@ -105,8 +105,8 @@ void Static_mesh_example::init_material()
 	
 	D3D11_SUBRESOURCE_DATA data = {};
 	data.pSysMem = image.data();
-	data.SysMemPitch = image.size().width * cg::data::byte_count(image.pixel_format());
-	data.SysMemSlicePitch = image.byte_count();
+	data.SysMemPitch = UINT(image.size().width * cg::data::byte_count(image.pixel_format()));
+	data.SysMemSlicePitch = UINT(image.byte_count());
 
 	HRESULT hr = _device->CreateTexture2D(&tex_desc, &data, &_tex_diffuse_rgb.ptr);
 	assert(hr == S_OK);

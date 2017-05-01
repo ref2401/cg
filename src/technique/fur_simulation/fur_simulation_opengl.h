@@ -51,7 +51,7 @@ public:
 
 	GLsizei vertex_count() const noexcept
 	{
-		return _vertex_count;
+		return GLsizei(_vertex_count);
 	}
 
 	const Texture_buffer<Buffer_immut>& tbo_debug_slot_buffer() const noexcept

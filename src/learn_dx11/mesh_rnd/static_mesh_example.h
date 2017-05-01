@@ -60,7 +60,7 @@ private:
 	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
-	size_t _model_index_count;
+	UINT _model_index_count;
 	cg::mat4 _projection_matrix;
 	cg::mat4 _view_matrix;
 	cg::mat4 _model_matrix;

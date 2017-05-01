@@ -22,7 +22,7 @@ public:
 	static constexpr size_t vertex_component_count = 5;
 
 
-	Terrain_grid_model(size_t z_cell_count, size_t x_cell_count);
+	Terrain_grid_model(int64_t z_cell_count, int64_t x_cell_count);
 
 
 	size_t patch_count() const noexcept

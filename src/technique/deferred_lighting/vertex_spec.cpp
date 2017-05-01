@@ -94,14 +94,14 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 
 	GLuint vb_binding_index = 0;
 	glBindVertexArray(_vao_id);
-	glVertexArrayVertexBuffer(_vao_id, 0, vertex_buffer.id(), vb_binding_index, _format_desc.vertex_byte_count);
+	glVertexArrayVertexBuffer(_vao_id, 0, vertex_buffer.id(), vb_binding_index, GLsizei(_format_desc.vertex_byte_count));
 
 	// position
 	assert(attrib_layout.position_location != Blank::vertex_attrib_location);
 	glEnableVertexArrayAttrib(_vao_id, attrib_layout.position_location);
 	glVertexArrayAttribBinding(_vao_id, attrib_layout.position_location, vb_binding_index);
 	glVertexArrayAttribFormat(_vao_id, attrib_layout.position_location,
-		3, GL_FLOAT, false, _format_desc.position_byte_offset);
+		3, GL_FLOAT, false, GLsizei(_format_desc.position_byte_offset));
 
 	// normal
 	if (has_normal(_format_desc.attribs)) {
@@ -109,7 +109,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.normal_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.normal_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.normal_location,
-			3, GL_FLOAT, false, _format_desc.normal_byte_offset);
+			3, GL_FLOAT, false, GLsizei(_format_desc.normal_byte_offset));
 	}
 
 	// tex_coord
@@ -118,7 +118,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tex_coord_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.tex_coord_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.tex_coord_location,
-			2, GL_FLOAT, false, _format_desc.tex_coord_byte_offset);
+			2, GL_FLOAT, false, GLsizei(_format_desc.tex_coord_byte_offset));
 	}
 
 	// tangent_h
@@ -127,7 +127,7 @@ Static_vertex_spec Static_vertex_spec_builder::end(const Vertex_attrib_layout& a
 		glEnableVertexArrayAttrib(_vao_id, attrib_layout.tangent_h_location);
 		glVertexArrayAttribBinding(_vao_id, attrib_layout.tangent_h_location, vb_binding_index);
 		glVertexArrayAttribFormat(_vao_id, attrib_layout.tangent_h_location,
-			4, GL_FLOAT, false, _format_desc.tangent_space_byte_offset);
+			4, GL_FLOAT, false, GLsizei(_format_desc.tangent_space_byte_offset));
 	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer.id());

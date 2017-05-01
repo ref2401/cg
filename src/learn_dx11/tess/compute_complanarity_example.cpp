@@ -54,7 +54,7 @@ void Compute_complanarity_example::init_geometry()
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = terrain_model.vertex_buffer_byte_count();
+	vb_desc.ByteWidth = UINT(terrain_model.vertex_buffer_byte_count());
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
@@ -65,7 +65,7 @@ void Compute_complanarity_example::init_geometry()
 
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = terrain_model.index_buffer_byte_count();
+	ib_desc.ByteWidth = UINT(terrain_model.index_buffer_byte_count());
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA ib_data = {};
@@ -145,8 +145,8 @@ void Compute_complanarity_example::init_textures()
 	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
 	tex_displ_data.pSysMem = image_displ.data();
-	tex_displ_data.SysMemPitch = image_displ.size().width * byte_count(image_displ.pixel_format());
-	tex_displ_data.SysMemSlicePitch = image_displ.byte_count();
+	tex_displ_data.SysMemPitch = UINT(image_displ.size().width * byte_count(image_displ.pixel_format()));
+	tex_displ_data.SysMemSlicePitch = UINT(image_displ.byte_count());
 
 	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_displacement_map.ptr);
 	assert(hr == S_OK);
@@ -156,8 +156,8 @@ void Compute_complanarity_example::init_textures()
 
 	// lookup texture
 	D3D11_TEXTURE2D_DESC lookup_desc = {};
-	lookup_desc.Width = _terrain_z_cell_count;
-	lookup_desc.Height = _terrain_x_cell_count;
+	lookup_desc.Width = UINT(_terrain_z_cell_count);
+	lookup_desc.Height = UINT(_terrain_x_cell_count);
 	lookup_desc.MipLevels = 1;
 	lookup_desc.ArraySize = 1;
 	lookup_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -208,7 +208,7 @@ void Compute_complanarity_example::preprocess_displacement_map()
 	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_displacement_map.ptr);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_lookup.ptr, nullptr);
 	
-	_device_ctx->Dispatch(displ_desc.Width / _terrain_z_cell_count, displ_desc.Height / _terrain_x_cell_count, 1);
+	_device_ctx->Dispatch(displ_desc.Width / UINT(_terrain_z_cell_count), displ_desc.Height / UINT(_terrain_x_cell_count), 1);
 
 	_device_ctx->CSSetShader(nullptr, nullptr, 0);
 	ID3D11UnorderedAccessView* uav[1] = { nullptr };

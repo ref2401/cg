@@ -101,8 +101,8 @@ void Displacement_mapping_example::init_terrain_textures()
 	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
 	tex_displ_data.pSysMem = image_displ.data();
-	tex_displ_data.SysMemPitch = image_displ.size().width * byte_count(image_displ.pixel_format());
-	tex_displ_data.SysMemSlicePitch = image_displ.byte_count();
+	tex_displ_data.SysMemPitch = UINT(image_displ.size().width * byte_count(image_displ.pixel_format()));
+	tex_displ_data.SysMemSlicePitch = UINT(image_displ.byte_count());
 
 	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_terrain_displacement_map.ptr);
 	assert(hr == S_OK);
@@ -126,8 +126,8 @@ void Displacement_mapping_example::init_terrain_textures()
 	tex_normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_normal_data = {};
 	tex_normal_data.pSysMem = image_normal.data();
-	tex_normal_data.SysMemPitch = image_normal.size().width * byte_count(image_normal.pixel_format());
-	tex_normal_data.SysMemSlicePitch = image_normal.byte_count();
+	tex_normal_data.SysMemPitch = UINT(image_normal.size().width * byte_count(image_normal.pixel_format()));
+	tex_normal_data.SysMemSlicePitch = UINT(image_normal.byte_count());
 
 	hr = _device->CreateTexture2D(&tex_normal_desc, &tex_normal_data, &_tex_terrain_normal_map.ptr);
 	assert(hr == S_OK);

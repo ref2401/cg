@@ -58,7 +58,7 @@ void Terrain_tessellation_example::init_geometry()
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = terrain_model.vertex_buffer_byte_count();
+	vb_desc.ByteWidth = UINT(terrain_model.vertex_buffer_byte_count());
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
@@ -69,7 +69,7 @@ void Terrain_tessellation_example::init_geometry()
 
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = terrain_model.index_buffer_byte_count();
+	ib_desc.ByteWidth = UINT(terrain_model.index_buffer_byte_count());
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA ib_data = {};

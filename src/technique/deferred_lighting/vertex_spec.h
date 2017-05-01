@@ -109,15 +109,15 @@ public:
 	// Returns glDrawElementsBaseVertex compatible params.
 	DE_base_vertex_params get_base_vertex_params() const noexcept 
 	{
-		return DE_base_vertex_params(GL_TRIANGLES, _index_count, GL_UNSIGNED_INT,
-			reinterpret_cast<void*>(_offset_indices * sizeof(GL_UNSIGNED_INT)), _base_vertex);
+		return DE_base_vertex_params(GL_TRIANGLES, GLsizei(_index_count), GL_UNSIGNED_INT,
+			reinterpret_cast<void*>(_offset_indices * sizeof(GL_UNSIGNED_INT)), GLint(_base_vertex));
 	}
 
 	// Returns glDrawElementsIndirect compatible params.
 	DE_indirect_params get_indirect_params() const noexcept
 	{
-		return DE_indirect_params(_index_count, _instance_count, _offset_indices, 
-			_base_vertex, _base_instance);
+		return DE_indirect_params(GLuint(_index_count), GLuint(_instance_count), GLuint(_offset_indices),
+			GLuint(_base_vertex), GLuint(_base_instance));
 	}
 
 	// The number of indices to be rendered.

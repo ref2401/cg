@@ -62,7 +62,7 @@ Bone::Bone(const char* name, size_t parent_index, const cg::mat4& bp_matrix) :
 
 // ----- Vertex -----
 
-void Vertex::register_bone(size_t bone_index, float bone_weight) noexcept
+void Vertex::register_bone(uint32_t bone_index, float bone_weight) noexcept
 {
 	assert(bone_index != Bone::blank_parent_index);
 	assert(bone_weight >= 0.0f);
@@ -314,10 +314,10 @@ void Bob_lamp_md5_model::init_vertices(const aiScene* scene,
 			// find bone index by its name
 			auto it = bone_mapping.find(bone->mName.C_Str());
 			assert(it != mapping_end_it);
-			const size_t bone_index = it->second;
+			const uint32_t bone_index = uint32_t(it->second);
 
-			for (size_t wi = 0; wi < bone->mNumWeights; ++wi) {
-				size_t vertex_id = base_vertex + bone->mWeights[wi].mVertexId;
+			for (uint32_t wi = 0; wi < bone->mNumWeights; ++wi) {
+				const size_t vertex_id = base_vertex + bone->mWeights[wi].mVertexId;
 				_vertices[vertex_id].register_bone(bone_index, bone->mWeights[wi].mWeight);
 			}
 		}

@@ -112,8 +112,8 @@ void Gbuffer_pass::set_uniform_arrays(size_t rnd_offset, size_t rnd_count,
 	const std::vector<float>& uniform_array_smoothness,
 	const std::vector<GLuint>& uniform_array_tex_normal_map) noexcept
 {
-	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, rnd_count);
-	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, rnd_count);
+	_prog.set_uniform_array_model_matrix(uniform_array_model_matrix.data() + rnd_offset * 16, GLsizei(rnd_count));
+	_prog.set_uniform_array_smoothness(uniform_array_smoothness.data() + rnd_offset, GLsizei(rnd_count));
 
 	for (GLuint curr_unit = 0; curr_unit < rnd_count; ++curr_unit) {
 		glBindSampler(curr_unit, Blank::sampler_id);
@@ -420,7 +420,7 @@ void Renderer::perform_gbuffer_pass(const Frame& frame) noexcept
 		// draw indirect
 		unsigned char* draw_indirect_ptr = nullptr;
 		draw_indirect_ptr += rnd_offset * sizeof(DE_indirect_params);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, rnd_count, 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, GLsizei(rnd_count), 0);
 	}
 
 	_gbuffer_pass.end();
@@ -456,7 +456,7 @@ void Renderer::perform_material_lighting_pass(const Frame& frame) noexcept
 		// draw indirect
 		unsigned char* draw_indirect_ptr = nullptr;
 		draw_indirect_ptr += rnd_offset * sizeof(DE_indirect_params);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, rnd_count, 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, GLsizei(rnd_count), 0);
 	}
 
 	_material_lighting_pass.end();
@@ -484,7 +484,7 @@ void Renderer::perform_shadow_map_pass(const Frame& frame) noexcept
 		// draw indirect
 		unsigned char* draw_indirect_ptr = nullptr;
 		draw_indirect_ptr += rnd_offset * sizeof(DE_indirect_params);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, rnd_count, 0);
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, draw_indirect_ptr, GLsizei(rnd_count), 0);
 	}
 
 	_shadow_map_pass.end();

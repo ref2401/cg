@@ -28,12 +28,12 @@ Gbuffer_pass_shader_program::Gbuffer_pass_shader_program(const Glsl_program_desc
 	_u_arr_tex_normal_map_location(uniform_location(_prog, "u_arr_tex_normal_map"))
 {}
 
-void Gbuffer_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
+void Gbuffer_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, GLsizei count) noexcept
 {
 	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, count);
 }
 
-void Gbuffer_pass_shader_program::set_uniform_array_smoothness(const float* ptr, size_t count) noexcept
+void Gbuffer_pass_shader_program::set_uniform_array_smoothness(const float* ptr, GLsizei count) noexcept
 {
 	set_uniform_array_float(_u_arr_smoothness_location, ptr, count);
 }
@@ -67,7 +67,7 @@ void Lighting_pass_dir_shader_program::set_uniform_array_far_plane_coords(
 		far_plane_coords[3].x, far_plane_coords[3].y, far_plane_coords[3].z,
 	};
 
-	set_uniform_array_float3(_u_arr_far_pane_coords_location, arr, far_plane_coords.size());
+	set_uniform_array_float3(_u_arr_far_pane_coords_location, arr, GLsizei(far_plane_coords.size()));
 }
 
 void Lighting_pass_dir_shader_program::use(const Directional_light_params& dl_params) noexcept
@@ -94,7 +94,7 @@ Material_lighting_pass_shader_program::Material_lighting_pass_shader_program(con
 
 void Material_lighting_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
 {
-	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, count);
+	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, GLsizei(count));
 }
 
 void Material_lighting_pass_shader_program::use(const mat4& projection_matrix, const mat4& view_matrix,
@@ -118,7 +118,7 @@ Shadow_map_pass_shader_program::Shadow_map_pass_shader_program(const Glsl_progra
 
 void Shadow_map_pass_shader_program::set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept
 {
-	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, count);
+	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, GLsizei(count));
 }
 
 void Shadow_map_pass_shader_program::use(const Directional_light_params& dir_light) noexcept
@@ -142,10 +142,10 @@ void Ssao_pass_shader_program::use(const std::vector<float3>& sample_rays_and_no
 	glUseProgram(_prog.id());
 
 	set_uniform_array_float3(_u_arr_sample_ray_location,
-		reinterpret_cast<const float*>(sample_rays_and_normals.data()), sample_ray_count);
+		reinterpret_cast<const float*>(sample_rays_and_normals.data()), GLsizei(sample_ray_count));
 
 	set_uniform_array_float3(_u_arr_random_normal_location,
-		reinterpret_cast<const float*>(sample_rays_and_normals.data() + sample_ray_count), random_normal_count);
+		reinterpret_cast<const float*>(sample_rays_and_normals.data() + sample_ray_count), GLsizei(random_normal_count));
 }
 
 // ----- Tone_mapping_pass_shader_program -----

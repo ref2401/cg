@@ -60,7 +60,7 @@ struct Vertex final {
 		position(position), normal(normal), tex_coord(tex_coord)
 	{}
 
-	void register_bone(size_t bone_index, float bone_weight) noexcept;
+	void register_bone(uint32_t bone_index, float bone_weight) noexcept;
 
 	cg::float3 position;
 	cg::float3 normal;

@@ -51,32 +51,32 @@ void Geometry_buffers::init_physics_simulation_0_vao(const Model_geometry_layout
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao.id(), position_buffer_binding_index, 
-		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+		_tbo_position_buffer.buffer().id(), 0, GLsizei(layout.position_buffer_byte_stride));
 
 	// p_base
 	glEnableVertexArrayAttrib(_physics_0_vao.id(), 0);
 	glVertexArrayAttribBinding(_physics_0_vao.id(), 0, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_0_vao.id(), 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+	glVertexArrayAttribFormat(_physics_0_vao.id(), 0, 3, GL_FLOAT, false, GLsizei(layout.p_base_byte_offset));
 
 	// p_rest
 	glEnableVertexArrayAttrib(_physics_0_vao.id(), 1);
 	glVertexArrayAttribBinding(_physics_0_vao.id(), 1, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_0_vao.id(), 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+	glVertexArrayAttribFormat(_physics_0_vao.id(), 1, 3, GL_FLOAT, false, GLsizei(layout.p_rest_byte_offset));
 	
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_0_vao.id(), simulation_buffer_binding_index,
-		_tbo_physics_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_0.buffer().id(), 0, GLsizei(layout.simulation_buffer_byte_stride));
 
 	// p_curr
 	glEnableVertexArrayAttrib(_physics_0_vao.id(), 2);
 	glVertexArrayAttribBinding(_physics_0_vao.id(), 2, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_0_vao.id(), 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+	glVertexArrayAttribFormat(_physics_0_vao.id(), 2, 3, GL_FLOAT, false, GLsizei(layout.p_curr_byte_offset));
 
 	// velocity
 	glEnableVertexArrayAttrib(_physics_0_vao.id(), 3);
 	glVertexArrayAttribBinding(_physics_0_vao.id(), 3, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_0_vao.id(), 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
+	glVertexArrayAttribFormat(_physics_0_vao.id(), 3, 3, GL_FLOAT, false, GLsizei(layout.velocity_byte_offset));
 }
 
 void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout& layout)
@@ -86,32 +86,32 @@ void Geometry_buffers::init_physics_simulation_1_vao(const Model_geometry_layout
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_physics_1_vao.id(), position_buffer_binding_index,
-		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+		_tbo_position_buffer.buffer().id(), 0, GLsizei(layout.position_buffer_byte_stride));
 
 	// p_base
 	glEnableVertexArrayAttrib(_physics_1_vao.id(), 0);
 	glVertexArrayAttribBinding(_physics_1_vao.id(), 0, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_1_vao.id(), 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+	glVertexArrayAttribFormat(_physics_1_vao.id(), 0, 3, GL_FLOAT, false, GLsizei(layout.p_base_byte_offset));
 
 	// p_rest
 	glEnableVertexArrayAttrib(_physics_1_vao.id(), 1);
 	glVertexArrayAttribBinding(_physics_1_vao.id(), 1, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_1_vao.id(), 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+	glVertexArrayAttribFormat(_physics_1_vao.id(), 1, 3, GL_FLOAT, false, GLsizei(layout.p_rest_byte_offset));
 
 	
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_physics_1_vao.id(), simulation_buffer_binding_index,
-		_tbo_physics_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_1.buffer().id(), 0, GLsizei(layout.simulation_buffer_byte_stride));
 
 	// p_curr
 	glEnableVertexArrayAttrib(_physics_1_vao.id(), 2);
 	glVertexArrayAttribBinding(_physics_1_vao.id(), 2, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_1_vao.id(), 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+	glVertexArrayAttribFormat(_physics_1_vao.id(), 2, 3, GL_FLOAT, false, GLsizei(layout.p_curr_byte_offset));
 
 	// velocity
 	glEnableVertexArrayAttrib(_physics_1_vao.id(), 3);
 	glVertexArrayAttribBinding(_physics_1_vao.id(), 3, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_physics_1_vao.id(), 3, 3, GL_FLOAT, false, layout.velocity_byte_offset);
+	glVertexArrayAttribFormat(_physics_1_vao.id(), 3, 3, GL_FLOAT, false, GLsizei(layout.velocity_byte_offset));
 }
 
 void Geometry_buffers::init_render_0_vao(const Model_geometry_layout& layout)
@@ -122,47 +122,47 @@ void Geometry_buffers::init_render_0_vao(const Model_geometry_layout& layout)
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_render_vao_0.id(), position_buffer_binding_index,
-		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+		_tbo_position_buffer.buffer().id(), 0, GLsizei(layout.position_buffer_byte_stride));
 
 	// p_base
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 0);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 0, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 0, 3, GL_FLOAT, false, GLuint(layout.p_base_byte_offset));
 
 	// p_rest
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 1);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 1, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 1, 3, GL_FLOAT, false, GLuint(layout.p_rest_byte_offset));
 
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_render_vao_0.id(), simulation_buffer_binding_index,
-		_tbo_physics_buffer_0.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_0.buffer().id(), 0, GLsizei(layout.simulation_buffer_byte_stride));
 
 	// p_curr
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 2);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 2, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 2, 3, GL_FLOAT, false, GLuint(layout.p_curr_byte_offset));
 
 
 	// model_attribs_buffer
 	glVertexArrayVertexBuffer(_render_vao_0.id(), model_attribs_buffer_binding_index,
-		_model_attribs_buffer.id(), 0, layout.model_attribs_byte_stride);
+		_model_attribs_buffer.id(), 0, GLsizei(layout.model_attribs_byte_stride));
 
 	// normal
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 3);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 3, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 3, 3, GL_FLOAT, false, layout.normal_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 3, 3, GL_FLOAT, false, GLuint(layout.normal_byte_offset));
 
 	// tex_coord
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 4);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 4, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 4, 2, GL_FLOAT, false, layout.tex_coord_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 4, 2, GL_FLOAT, false, GLuint(layout.tex_coord_byte_offset));
 
 	// tangent_h
 	glEnableVertexArrayAttrib(_render_vao_0.id(), 5);
 	glVertexArrayAttribBinding(_render_vao_0.id(), 5, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_0.id(), 5, 4, GL_FLOAT, false, layout.tangent_h_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_0.id(), 5, 4, GL_FLOAT, false, GLuint(layout.tangent_h_byte_offset));
 
 
 	// index_buffer
@@ -177,47 +177,47 @@ void Geometry_buffers::init_render_1_vao(const Model_geometry_layout& layout)
 
 	// position_buffer
 	glVertexArrayVertexBuffer(_render_vao_1.id(), position_buffer_binding_index,
-		_tbo_position_buffer.buffer().id(), 0, layout.position_buffer_byte_stride);
+		_tbo_position_buffer.buffer().id(), 0, GLsizei(layout.position_buffer_byte_stride));
 
 	// p_base
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 0);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 0, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 0, 3, GL_FLOAT, false, layout.p_base_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 0, 3, GL_FLOAT, false, GLuint(layout.p_base_byte_offset));
 
 	// p_rest
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 1);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 1, position_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 1, 3, GL_FLOAT, false, layout.p_rest_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 1, 3, GL_FLOAT, false, GLuint(layout.p_rest_byte_offset));
 
 
 	// simulation_buffer
 	glVertexArrayVertexBuffer(_render_vao_1.id(), simulation_buffer_binding_index,
-		_tbo_physics_buffer_1.buffer().id(), 0, layout.simulation_buffer_byte_stride);
+		_tbo_physics_buffer_1.buffer().id(), 0, GLsizei(layout.simulation_buffer_byte_stride));
 
 	// p_curr
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 2);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 2, simulation_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 2, 3, GL_FLOAT, false, layout.p_curr_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 2, 3, GL_FLOAT, false, GLuint(layout.p_curr_byte_offset));
 
 
 	// model_attribs_buffer
 	glVertexArrayVertexBuffer(_render_vao_1.id(), model_attribs_buffer_binding_index,
-		_model_attribs_buffer.id(), 0, layout.model_attribs_byte_stride);
+		_model_attribs_buffer.id(), 0, GLsizei(layout.model_attribs_byte_stride));
 
 	// normal
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 3);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 3, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 3, 3, GL_FLOAT, false, layout.normal_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 3, 3, GL_FLOAT, false, GLuint(layout.normal_byte_offset));
 
 	// tex_coord
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 4);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 4, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 4, 2, GL_FLOAT, false, layout.tex_coord_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 4, 2, GL_FLOAT, false, GLuint(layout.tex_coord_byte_offset));
 
 	// tangent_h
 	glEnableVertexArrayAttrib(_render_vao_1.id(), 5);
 	glVertexArrayAttribBinding(_render_vao_1.id(), 5, model_attribs_buffer_binding_index);
-	glVertexArrayAttribFormat(_render_vao_1.id(), 5, 4, GL_FLOAT, false, layout.tangent_h_byte_offset);
+	glVertexArrayAttribFormat(_render_vao_1.id(), 5, 4, GL_FLOAT, false, GLuint(layout.tangent_h_byte_offset));
 
 
 	// index_buffer
@@ -323,8 +323,8 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 	_program.bind(pvm_matrix, model_matrix, view_position_ws, material.strand_props(), light_dir_ws);
 
 	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
-			GL_UNSIGNED_INT, nullptr, material.strand_props().shell_count, geometry_buffers.meshes()[mi].base_vertex);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, GLsizei(geometry_buffers.meshes()[mi].index_count),
+			GL_UNSIGNED_INT, nullptr, GLsizei(material.strand_props().shell_count), GLint(geometry_buffers.meshes()[mi].base_vertex));
 	}
 
 	glBindTextureUnit(0, Blank::texture_id);
@@ -351,8 +351,8 @@ void Opaque_model_pass::perform(const Geometry_buffers& geometry_buffers, const 
 	_program.bind(projection_view_matrix, model_matrix, dir_to_light_ws);
 
 	for (size_t mi = 0; mi < geometry_buffers.meshes().size(); ++mi) {
-		glDrawElementsBaseVertex(GL_TRIANGLES, geometry_buffers.meshes()[mi].index_count,
-			GL_UNSIGNED_INT, nullptr, geometry_buffers.meshes()[mi].base_vertex);
+		glDrawElementsBaseVertex(GL_TRIANGLES, GLsizei(geometry_buffers.meshes()[mi].index_count),
+			GL_UNSIGNED_INT, nullptr, GLint(geometry_buffers.meshes()[mi].base_vertex));
 	}
 
 	glBindTextureUnit(0, Blank::texture_id);

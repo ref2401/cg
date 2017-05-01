@@ -57,7 +57,7 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		diffuse_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA diffuse_data = {};
 		diffuse_data.pSysMem = image.data();
-		diffuse_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		diffuse_data.SysMemPitch = UINT(image.size().width * byte_count(image.pixel_format()));
 		HRESULT hr = device->CreateTexture2D(&diffuse_desc, &diffuse_data, &tex_diffuse_rgb.ptr);
 		assert(hr == S_OK);
 
@@ -81,7 +81,7 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA displ_data = {};
 		displ_data.pSysMem = image.data();
-		displ_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		displ_data.SysMemPitch = UINT(image.size().width * byte_count(image.pixel_format()));
 		HRESULT hr = device->CreateTexture2D(&displ_desc, &displ_data, &tex_height_map.ptr);
 		assert(hr == S_OK);
 
@@ -105,7 +105,7 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA normal_data = {};
 		normal_data.pSysMem = image.data();
-		normal_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
+		normal_data.SysMemPitch = UINT(image.size().width * byte_count(image.pixel_format()));
 		HRESULT hr = device->CreateTexture2D(&normal_desc, &normal_data, &tex_normal_map.ptr);
 		assert(hr == S_OK);
 
@@ -155,7 +155,7 @@ void Parallax_occlusion_mapping::init_geometry()
 
 	// vertex buffer
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = model.vertex_data_byte_count();
+	vb_desc.ByteWidth = UINT(model.vertex_data_byte_count());
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
@@ -165,7 +165,7 @@ void Parallax_occlusion_mapping::init_geometry()
 
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = model.index_data_byte_count();
+	ib_desc.ByteWidth = UINT(model.index_data_byte_count());
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA ib_data = {};

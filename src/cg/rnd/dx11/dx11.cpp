@@ -345,7 +345,7 @@ Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count)
 	assert(byte_count > 0);
 
 	D3D11_BUFFER_DESC desc = {};
-	desc.ByteWidth = byte_count;
+	desc.ByteWidth = UINT(byte_count);
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 

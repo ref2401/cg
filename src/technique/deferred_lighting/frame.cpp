@@ -125,7 +125,7 @@ void Frame::push_back_renderable(const Renderable& rnd)
 
 	// indirect params -> _draw_indirect_buffer
 	auto params = rnd.cmd.get_indirect_params();
-	params.base_instance = _renderable_count % _batch_size; // base index is required to calculate an index to draw_index_buffer
+	params.base_instance = GLuint(_renderable_count % _batch_size); // base index is required to calculate an index to draw_index_buffer
 	_offset_draw_indirect = _draw_indirect_buffer.write(_offset_draw_indirect, &params);
 
 	// model matrix -> _uniform_arr_model_matrix

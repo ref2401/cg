@@ -61,7 +61,7 @@ private:
 namespace learn_dx11 {
 namespace tess {
 
-Terrain_grid_model::Terrain_grid_model(size_t z_cell_count, size_t x_cell_count)
+Terrain_grid_model::Terrain_grid_model(int64_t z_cell_count, int64_t x_cell_count)
 	: _patch_count(z_cell_count * x_cell_count)
 {
 	assert(z_cell_count > 0);

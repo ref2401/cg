@@ -72,7 +72,7 @@ void Gaussian_filter_example::init_textures()
 	source_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA source_data = {};
 	source_data.pSysMem = image.data();
-	source_data.SysMemPitch = image.size().width * cg::data::byte_count(image.pixel_format());
+	source_data.SysMemPitch = UINT(image.size().width * cg::data::byte_count(image.pixel_format()));
 	HRESULT hr = _device->CreateTexture2D(&source_desc, &source_data, &_tex_source.ptr);
 	assert(hr == S_OK);
 	hr = _device->CreateShaderResourceView(_tex_source.ptr, nullptr, &_tex_srv_source.ptr);

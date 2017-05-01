@@ -48,7 +48,7 @@ void Vertex_skinning_example::init_geometry()
 
 	// bone matrices buffer
 	D3D11_BUFFER_DESC bmb_desc = {};
-	bmb_desc.ByteWidth = _model_animation->bone_count() * sizeof(mat4);
+	bmb_desc.ByteWidth = UINT(_model_animation->bone_count() * sizeof(mat4));
 	bmb_desc.Usage = D3D11_USAGE_DEFAULT;
 	bmb_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	bmb_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
@@ -61,14 +61,14 @@ void Vertex_skinning_example::init_geometry()
 	srv_desc.Format = DXGI_FORMAT_UNKNOWN;
 	srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	srv_desc.Buffer.FirstElement = 0;
-	srv_desc.Buffer.NumElements = _model_animation->bone_count();
+	srv_desc.Buffer.NumElements = UINT(_model_animation->bone_count());
 
 	hr = _device->CreateShaderResourceView(_model_bone_matrices_buffer.ptr, &srv_desc, &_model_bone_matrices_buffer_srv.ptr);
 	assert(hr == S_OK);
 
 	// vertex buffer & input layout
 	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = model.vertex_count() * sizeof(Vertex);
+	vb_desc.ByteWidth = UINT(model.vertex_count() * sizeof(Vertex));
 	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vb_data = {};
@@ -93,7 +93,7 @@ void Vertex_skinning_example::init_geometry()
 
 	// index buffer
 	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = model.index_count() * sizeof(uint32_t);
+	ib_desc.ByteWidth = UINT(model.index_count() * sizeof(uint32_t));
 	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA ib_data = {};
@@ -132,8 +132,8 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		
 		D3D11_SUBRESOURCE_DATA tex_data = {};
 		tex_data.pSysMem = image.data();
-		tex_data.SysMemPitch = image.size().width * byte_count(image.pixel_format());
-		tex_data.SysMemSlicePitch = image.byte_count();
+		tex_data.SysMemPitch = UINT(image.size().width * byte_count(image.pixel_format()));
+		tex_data.SysMemSlicePitch = UINT(image.byte_count());
 
 		HRESULT hr = _device->CreateTexture2D(&tex_desc, &tex_data, 
 			&_draw_indexed_params[i]._tex_diffuse_rgb.ptr);
@@ -239,7 +239,7 @@ void Vertex_skinning_example::render()
 
 	for (const auto& dp : _draw_indexed_params) {
 		_device_ctx->PSSetShaderResources(1, 1, &dp._tex_diffuse_rgb_srv.ptr);
-		_device_ctx->DrawIndexed(dp.index_count, dp.index_offset, dp.base_vertex);
+		_device_ctx->DrawIndexed(UINT(dp.index_count), UINT(dp.index_offset), INT(dp.base_vertex));
 	}
 }
 

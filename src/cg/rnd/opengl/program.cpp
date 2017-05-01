@@ -61,7 +61,7 @@ Glsl_program::Glsl_program(const cg::data::Glsl_program_desc& prog_desc)
 
 		// transform feedback
 		if (prog_desc.transform_feedback_is_used()) {
-			const size_t varying_count = prog_desc.tf_varying_names.size();
+			const GLsizei varying_count = GLsizei(prog_desc.tf_varying_names.size());
 			const GLenum buffer_mode = (prog_desc.tf_interleaved_buffer_mode)
 				? (GL_INTERLEAVED_ATTRIBS) : (GL_SEPARATE_ATTRIBS);
 
@@ -390,7 +390,7 @@ void set_uniform(GLint location, const mat4& mat) noexcept
 	glUniformMatrix4fv(location, 1, false, arr);
 }
 
-void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexcept
+void set_uniform_array_int(GLint location, const GLint* ptr, GLsizei count) noexcept
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -398,7 +398,7 @@ void set_uniform_array_int(GLint location, const GLint* ptr, size_t count) noexc
 	glUniform1iv(location, count, ptr);
 }
 
-void set_uniform_array_float(GLint location, const float* ptr, size_t count) noexcept
+void set_uniform_array_float(GLint location, const float* ptr, GLsizei count) noexcept
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -406,7 +406,7 @@ void set_uniform_array_float(GLint location, const float* ptr, size_t count) noe
 	glUniform1fv(location, count, ptr);
 }
 
-void set_uniform_array_float3(GLint location, const float* ptr, size_t count) noexcept
+void set_uniform_array_float3(GLint location, const float* ptr, GLsizei count) noexcept
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -414,7 +414,7 @@ void set_uniform_array_float3(GLint location, const float* ptr, size_t count) no
 	glUniform3fv(location, count, ptr);
 }
 
-void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count)
+void set_uniform_array_mat3(GLint location, const mat3* ptr, GLsizei count)
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -428,7 +428,7 @@ void set_uniform_array_mat3(GLint location, const mat3* ptr, size_t count)
 	glUniformMatrix3fv(location, count, false, arr.data());
 }
 
-void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count)
+void set_uniform_array_mat4(GLint location, const mat4* ptr, GLsizei count)
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -442,7 +442,7 @@ void set_uniform_array_mat4(GLint location, const mat4* ptr, size_t count)
 	glUniformMatrix4fv(location, count, false, arr.data());
 }
 
-void set_uniform_array_mat4(GLint location, const float* ptr, size_t count) noexcept
+void set_uniform_array_mat4(GLint location, const float* ptr, GLsizei count) noexcept
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
