@@ -6,7 +6,8 @@ Required tools
 - Vulkan SDK
 - Visual Studio Community 2017
 - Git
-- Make sure that ```git``` command is available from the command line.
+- CMake
+- Make sure that ```git``` and ```cmake``` commands are available from the command line.
 
 Clone the repository as usual and then execute `init.cmd` script. The script creates all the required folders, uploads submodules and copies all the dependencies. After the script has successfully completed you can open the project in VS2017 ```src/cg.sln```.
 
