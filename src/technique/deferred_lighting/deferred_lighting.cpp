@@ -44,13 +44,13 @@ Renderer_config make_render_config(uint2 viewport_size)
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../data/common_data/rect-1x1.obj");
-	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("gbuffer-pass-shader", "../data/deferred_lighting_shaders/gbuffer_pass");
-	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("lighting-pass-dir-shader", "../data/deferred_lighting_shaders/lighting_pass_dir");
-	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("shadow-map-pass-shader", "../data/deferred_lighting_shaders/shadow_map_pass");
-	config.ssao_pass_code = cg::data::load_glsl_program_desc("ssao-pass-shader", "../data/deferred_lighting_shaders/ssao_pass");
-	config.material_lighting_pass_code = cg::data::load_glsl_program_desc("material-pass-shader", "../data/deferred_lighting_shaders/material_pass");
-	config.tone_mapping_pass_code = cg::data::load_glsl_program_desc("tone-mapping-pass-shader", "../data/deferred_lighting_shaders/tone_mapping_pass");
+	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../../data/common_data/rect-1x1.obj");
+	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("gbuffer-pass-shader", "../../data/deferred_lighting_shaders/gbuffer_pass");
+	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("lighting-pass-dir-shader", "../../data/deferred_lighting_shaders/lighting_pass_dir");
+	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("shadow-map-pass-shader", "../../data/deferred_lighting_shaders/shadow_map_pass");
+	config.ssao_pass_code = cg::data::load_glsl_program_desc("ssao-pass-shader", "../../data/deferred_lighting_shaders/ssao_pass");
+	config.material_lighting_pass_code = cg::data::load_glsl_program_desc("material-pass-shader", "../../data/deferred_lighting_shaders/material_pass");
+	config.tone_mapping_pass_code = cg::data::load_glsl_program_desc("tone-mapping-pass-shader", "../../data/deferred_lighting_shaders/tone_mapping_pass");
 	return config;
 }
 
@@ -84,12 +84,12 @@ Material_library::Material_library()
 	Sampler_desc bilinear_repeat(GL_LINEAR, GL_LINEAR, GL_REPEAT);
 
 
-	Image_2d material_default_normal_map("../data/common_data/material-default-normal-map.png");
-	Image_2d specular_intensity_0_18_image("../data/common_data/material-specular-intensity-0.18f.png");
-	Image_2d specular_intensity_1_00_image("../data/common_data/material-specular-intensity-1.00f.png");
+	Image_2d material_default_normal_map("../../data/common_data/material-default-normal-map.png");
+	Image_2d specular_intensity_0_18_image("../../data/common_data/material-specular-intensity-0.18f.png");
+	Image_2d specular_intensity_1_00_image("../../data/common_data/material-specular-intensity-1.00f.png");
 
 	{ // default material
-		Image_2d diffuse_rgb_image("../data/common_data/material-default-diffuse-rgb.png");
+		Image_2d diffuse_rgb_image("../../data/common_data/material-default-diffuse-rgb.png");
 
 		_default_material.smoothness = 10.0f;
 		_default_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -98,9 +98,9 @@ Material_library::Material_library()
 	}
 
 	{ // brick wall
-		Image_2d diffuse_rgb_image("../data/bricks-red-diffuse-rgb.png");
-		Image_2d normal_map_image("../data/bricks-red-normal-map.png");
-		Image_2d specular_image("../data/bricks-red-specular-intensity.png");
+		Image_2d diffuse_rgb_image("../../data/bricks-red-diffuse-rgb.png");
+		Image_2d normal_map_image("../../data/bricks-red-normal-map.png");
+		Image_2d specular_image("../../data/bricks-red-specular-intensity.png");
 
 		_brick_wall_material.smoothness = 5.0f;
 		_brick_wall_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -109,7 +109,7 @@ Material_library::Material_library()
 	}
 
 	{ // chess board
-		Image_2d diffuse_rgb_image("../data/chess-board-diffuse-rgb.png");
+		Image_2d diffuse_rgb_image("../../data/chess-board-diffuse-rgb.png");
 
 		_chess_board_material.smoothness = 1.0f;
 		_chess_board_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_repeat, diffuse_rgb_image);
@@ -118,8 +118,8 @@ Material_library::Material_library()
 	}
 
 	{ // teapot material
-		Image_2d diffuse_rgb_image("../data/teapot-diffuse-rgb.png");
-		Image_2d normal_map_image("../data/teapot-normal-map.png");
+		Image_2d diffuse_rgb_image("../../data/teapot-diffuse-rgb.png");
+		Image_2d normal_map_image("../../data/teapot-normal-map.png");
 
 		_teapot_material.smoothness = 10.0f;
 		_teapot_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, nearest_clamp_to_edge, diffuse_rgb_image);
@@ -128,9 +128,9 @@ Material_library::Material_library()
 	}
 
 	{ // wooden box
-		Image_2d diffuse_rgb_image("../data/wooden-box-diffuse-rgb.png");
-		Image_2d normal_map_image("../data/wooden-box-normal-map.png");
-		Image_2d specular_image("../data/wooden-box-specular-intensity.png");
+		Image_2d diffuse_rgb_image("../../data/wooden-box-diffuse-rgb.png");
+		Image_2d normal_map_image("../../data/wooden-box-normal-map.png");
+		Image_2d specular_image("../../data/wooden-box-specular-intensity.png");
 
 		_wooden_box_material.smoothness = 4.0f;
 		_wooden_box_material.tex_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, bilinear_clamp_to_edge, diffuse_rgb_image);
@@ -203,9 +203,9 @@ void Deferred_lighting::init_geometry()
 	};
 
 	Load_info load_info_list[3] = {
-		Load_info("../data/models/teapot.obj", &_cmd_teapot),
-		Load_info("../data/cube.obj", &_cmd_cube),
-		Load_info("../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
+		Load_info("../../data/models/teapot.obj", &_cmd_teapot),
+		Load_info("../../data/cube.obj", &_cmd_cube),
+		Load_info("../../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};
 
 	_vs_builder.begin<Vertex_attribs::p_n_tc_ts>(megabytes(4));

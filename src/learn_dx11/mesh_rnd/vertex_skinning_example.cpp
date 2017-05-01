@@ -176,7 +176,7 @@ void Vertex_skinning_example::init_render_states()
 
 void Vertex_skinning_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../data/learn_dx11/mesh_rnd/vertex_skinning.hlsl");
+	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/vertex_skinning.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
@@ -190,8 +190,8 @@ void Vertex_skinning_example::update_projection_matrix(float wh_aspect_ratio)
 
 void Vertex_skinning_example::setup_pipeline_state()
 {
-	size_t offset = 0;
-	size_t stride = sizeof(Vertex);
+	UINT offset = 0;
+	UINT stride = sizeof(Vertex);
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &stride, &offset);
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);

@@ -1,15 +1,14 @@
 Implementation of various CG algorithms/techniques using OpenGL 4.5 & DirectX 11.
 
-## Clone, init & build (x86 only)
+## Clone, init & build (x64 only)
 Required tools
 - DirectX SDK (install it before Visual Studio)
 - Vulkan SDK
 - Visual Studio Community 2017
-- CMake
 - Git
-- Make sure that cmake, git & devenv commands are available from the command line.
+- Make sure that ```git``` command is available from the command line.
 
-Clone the repository as usual and then execute `init.cmd` script. The script creates all the required folders, uploads submodules and builds all the dependencies. After the script has successfully completed you can open the project in VS2015 ```src/cg.sln```. Don't forget to switch configuration to x86.
+Clone the repository as usual and then execute `init.cmd` script. The script creates all the required folders, uploads submodules and copies all the dependencies. After the script has successfully completed you can open the project in VS2017 ```src/cg.sln```.
 
 ## Techniques (new ones go first)
 1. [Parallax Occlusion Mapping](https://github.com/ref2401/cg/wiki/Parallax-Occlusion-Mapping) (DirectX 11)

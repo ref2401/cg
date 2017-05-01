@@ -113,10 +113,8 @@ void DX11_rhi_context::init_device(HWND hwnd, const uint2& viewport_size)
 	assert(hr == S_OK);
 	assert(actual_feature_level == expected_feature_level);
 
-#if !defined(NDEBUG)
 	hr = _device->QueryInterface<ID3D11Debug>(&_debug.ptr);
 	assert(hr == S_OK);
-#endif
 }
 
 void DX11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,

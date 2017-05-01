@@ -12,7 +12,7 @@ namespace fur_simulation {
 
 Fur_pass_program::Fur_pass_program()
 {
-	auto prog_desc = load_glsl_program_desc("fur-pass", "../data/fur_simulation/fur_pass");
+	auto prog_desc = load_glsl_program_desc("fur-pass", "../../data/fur_simulation/fur_pass");
 	_program = Glsl_program(prog_desc);
 
 	_g_pvm_matrix_location = uniform_location(_program, "g_pvm_matrix");
@@ -47,7 +47,7 @@ void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
 
 Opaque_model_pass_program::Opaque_model_pass_program()
 {
-	auto prog_desc = load_glsl_program_desc("opaque-model-pass", "../data/fur_simulation/opaque_model");
+	auto prog_desc = load_glsl_program_desc("opaque-model-pass", "../../data/fur_simulation/opaque_model");
 	_program = Glsl_program(prog_desc);
 
 	_g_projection_view_matrix_location = uniform_location(_program, "g_projection_view_matrix");
@@ -70,7 +70,7 @@ void Opaque_model_pass_program::bind(const cg::mat4& projection_view_matrix,
 Physics_simulation_pass_program::Physics_simulation_pass_program()
 {
 	auto program_desc = load_glsl_program_desc("physics-simulation-pass",
-		"../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr);
+		"../../data/fur_simulation/physics_simulation_pass.vertex.glsl", nullptr);
 	program_desc.tf_interleaved_buffer_mode = true;
 	push_back(program_desc.tf_varying_names, "tf_p_curr", "tf_velocity", "gl_NextBuffer", "tf_debug_slot");
 
@@ -94,7 +94,7 @@ void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms,
 
 Strand_debug_pass_program::Strand_debug_pass_program()
 {
-	auto program_desc = load_glsl_program_desc("strand-debug-pass", "../data/fur_simulation/strand_debug_pass");
+	auto program_desc = load_glsl_program_desc("strand-debug-pass", "../../data/fur_simulation/strand_debug_pass");
 	_program = Glsl_program(program_desc);
 	_g_pvm_matrix_location = uniform_location(_program, "g_pvm_matrix");
 }

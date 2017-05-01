@@ -70,7 +70,7 @@ void Displacement_mapping_example::init_render_states()
 void Displacement_mapping_example::init_shaders()
 {
 	auto hlsl_data = cg::data::load_hlsl_shader_set_desc(
-		"../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
+		"../../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
 	
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.hull_shader_entry_point = "hs_main";
@@ -87,7 +87,7 @@ void Displacement_mapping_example::init_terrain_textures()
 	using cg::data::byte_count;
 
 	// displacement map
-	Image_2d image_displ("../data/learn_dx11/terrain_displacement_map.png", 1, false);
+	Image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
 
 	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
 	tex_displ_desc.Width = image_displ.size().width;
@@ -112,7 +112,7 @@ void Displacement_mapping_example::init_terrain_textures()
 	assert(hr == S_OK);
 
 	// normal map
-	Image_2d image_normal ("../data/learn_dx11/terrain_normal_map.png", 4, false);
+	Image_2d image_normal ("../../data/learn_dx11/terrain_normal_map.png", 4, false);
 
 	D3D11_TEXTURE2D_DESC tex_normal_desc = {};
 	tex_normal_desc.Width = image_normal.size().width;

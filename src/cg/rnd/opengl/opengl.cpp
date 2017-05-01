@@ -27,6 +27,12 @@ namespace {
 typedef HGLRC(APIENTRYP PFNWGLCREATECONTEXTATTRIBSARB)(HDC hDC, HGLRC hshareContext, const int *attribList);
 
 extern "C" using Extern_func_ptr_t = void(*);
+extern "C" {
+	HGLRC(WINAPI *wglCreateContext_dyn)(HDC);
+	BOOL(WINAPI *wglDeleteContext_dyn)(HGLRC);
+	BOOL(WINAPI *wglMakeCurrent_dyn)(HDC, HGLRC);
+	PROC(WINAPI *wglGetProcAddress_dyn)(LPCSTR);
+}
 
 Extern_func_ptr_t load_dll_func(HMODULE dll, const char* func_name)
 {
@@ -43,11 +49,12 @@ Extern_func_ptr_t load_opengl_func(const char* func_name)
 {
 	assert(func_name);
 
-	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(wglGetProcAddress(func_name));
+	Extern_func_ptr_t f = static_cast<Extern_func_ptr_t>(wglGetProcAddress_dyn(func_name));
 	ENFORCE(f, "Failed to load Opengl func: ", func_name);
 
 	return f;
 }
+
 }
 
 namespace cg {
@@ -55,13 +62,13 @@ namespace rnd {
 namespace opengl {
 
 Opengl_rhi_context::Opengl_rhi_context(HWND hwnd, cg::rnd::Depth_stencil_format depth_stencil_format)
-	: _hwnd(hwnd)
+	: _hwnd(hwnd),
+	_opengl_dll(LoadLibrary("opengl32.dll"))
 {
 	assert(_hwnd);
 	assert(depth_stencil_format == cg::rnd::Depth_stencil_format::depth_32); // NOTE(ref2401): the other options are not implementd
+	
 	inti_context();
-
-	_opengl_dll = LoadLibrary("opengl32.dll");
 	load_opengl_11();
 
 	glGetIntegerv(GL_MAJOR_VERSION, &_version_major);
@@ -88,8 +95,8 @@ Opengl_rhi_context::~Opengl_rhi_context() noexcept
 	}
 
 	if (_hglrc) {
-		wglMakeCurrent(_hdc, nullptr);
-		wglDeleteContext(_hglrc);
+		wglMakeCurrent_dyn(_hdc, nullptr);
+		wglDeleteContext_dyn(_hglrc);
 		_hglrc = nullptr;
 	}
 
@@ -118,9 +125,14 @@ void Opengl_rhi_context::inti_context()
 	assert(pixel_format > 0);
 	SetPixelFormat(_hdc, pixel_format, &pixel_fmt_desc);
 
-	HGLRC temp_hglrc = wglCreateContext(_hdc);
+	wglCreateContext_dyn = static_cast<decltype(wglCreateContext_dyn)>(load_dll_func(_opengl_dll, "wglCreateContext"));
+	wglDeleteContext_dyn = static_cast<decltype(wglDeleteContext_dyn)>(load_dll_func(_opengl_dll, "wglDeleteContext"));
+	wglMakeCurrent_dyn = static_cast<decltype(wglMakeCurrent_dyn)>(load_dll_func(_opengl_dll, "wglMakeCurrent"));
+	wglGetProcAddress_dyn = static_cast<decltype(wglGetProcAddress_dyn)>(load_dll_func(_opengl_dll, "wglGetProcAddress"));
+
+	HGLRC temp_hglrc = wglCreateContext_dyn(_hdc);
 	assert(temp_hglrc);
-	wglMakeCurrent(_hdc, temp_hglrc);
+	wglMakeCurrent_dyn(_hdc, temp_hglrc);
 	PFNWGLCREATECONTEXTATTRIBSARB wglCreateContextAttribsARB = 
 		static_cast<PFNWGLCREATECONTEXTATTRIBSARB>(load_opengl_func("wglCreateContextAttribsARB"));
 
@@ -133,8 +145,8 @@ void Opengl_rhi_context::inti_context()
 
 	_hglrc = wglCreateContextAttribsARB(_hdc, nullptr, context_attribs);
 	ENFORCE(_hglrc, "wglCreateContextAttribsARB failed to create Opengl context.");
-	wglMakeCurrent(_hdc, _hglrc);
-	wglDeleteContext(temp_hglrc);
+	wglMakeCurrent_dyn(_hdc, _hglrc);
+	wglDeleteContext_dyn(temp_hglrc);
 	wglCreateContextAttribsARB = nullptr;
 }
 

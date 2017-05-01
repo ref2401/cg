@@ -48,7 +48,7 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto model_geometry = cg::data::load_model<Vertex_attribs::p_n_tc>("../data/cube.obj");
+	auto model_geometry = cg::data::load_model<Vertex_attribs::p_n_tc>("../../data/cube.obj");
 	_model_index_count = model_geometry.index_count();
 
 	// vertex buffer
@@ -89,7 +89,7 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_material()
 {
-	Image_2d image("../data/bricks-red-diffuse-rgb.png", 4);
+	Image_2d image("../../data/bricks-red-diffuse-rgb.png", 4);
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};
@@ -153,7 +153,7 @@ void Static_mesh_example::init_render_states()
 
 void Static_mesh_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
+	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 
@@ -163,8 +163,8 @@ void Static_mesh_example::init_shaders()
 void Static_mesh_example::setup_pipeline_state()
 {
 	// input assembler
-	size_t offset = 0;
-	size_t stride = sizeof(float2) + 2 * sizeof(float3);
+	UINT offset = 0;
+	UINT stride = sizeof(float2) + 2 * sizeof(float3);
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &stride, &offset);
 	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);

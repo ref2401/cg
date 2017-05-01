@@ -148,8 +148,8 @@ void Parallax_occlusion_mapping::int_cbuffers()
 
 void Parallax_occlusion_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/rect_1x1.obj");
-	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../data/models/bunny.obj");
+	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../../data/models/rect_1x1.obj");
+	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
 
@@ -193,14 +193,14 @@ void Parallax_occlusion_mapping::init_geometry()
 void Parallax_occlusion_mapping::init_materials()
 {
 	_rock_wall_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
-		"../data/parallax_occlusion_mapping/rocks-diffuse.jpg",
-		"../data/parallax_occlusion_mapping/rocks-displacement.jpg",
-		"../data/parallax_occlusion_mapping/rocks-normal.jpg");
+		"../../data/parallax_occlusion_mapping/rocks-diffuse.jpg",
+		"../../data/parallax_occlusion_mapping/rocks-displacement.jpg",
+		"../../data/parallax_occlusion_mapping/rocks-normal.jpg");
 
 	_four_shapes_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
-		"../data/parallax_occlusion_mapping/four_shapes_diffuse_rgb.jpg",
-		"../data/parallax_occlusion_mapping/four_shapes_height_map.png",
-		"../data/parallax_occlusion_mapping/four_shapes_normal_map.png");
+		"../../data/parallax_occlusion_mapping/four_shapes_diffuse_rgb.jpg",
+		"../../data/parallax_occlusion_mapping/four_shapes_height_map.png",
+		"../../data/parallax_occlusion_mapping/four_shapes_normal_map.png");
 
 
 	_curr_material = &_rock_wall_material;
@@ -234,7 +234,7 @@ void Parallax_occlusion_mapping::init_pipeline_state()
 void Parallax_occlusion_mapping::init_shaders()
 {
 	Hlsl_shader_desc pom_shader_desc = load_hlsl_shader_set_desc(
-		"../data/parallax_occlusion_mapping/parallax_occlusion_mapping.hlsl");
+		"../../data/parallax_occlusion_mapping/parallax_occlusion_mapping.hlsl");
 	pom_shader_desc.vertex_shader_entry_point = "vs_main";
 	pom_shader_desc.pixel_shader_entry_point = "ps_main";
 	_pom_shader = Hlsl_shader(_device, pom_shader_desc);

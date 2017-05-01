@@ -107,7 +107,7 @@ TEST_CLASS(cg_data_file_File) {
 
 			char ch;
 			size_t count = f.read_bytes(&ch, 1);
-			Assert::AreEqual(0u, count);
+			Assert::AreEqual<size_t>(0, count);
 			Assert::IsTrue(f.eof());
 		}
 
@@ -119,7 +119,7 @@ TEST_CLASS(cg_data_file_File) {
 			unsigned char buffer_id[8];
 			size_t count = f.read_bytes(buffer_id, std::extent<decltype(buffer_id)>::value);
 			buffer_id[count] = '\0';
-			Assert::AreEqual(6u, count);
+			Assert::AreEqual<size_t>(6, count);
 			Assert::IsTrue(f.eof());
 			Assert::AreEqual("abc123", reinterpret_cast<char*>(buffer_id));
 		}

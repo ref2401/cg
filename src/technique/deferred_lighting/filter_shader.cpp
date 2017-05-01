@@ -20,20 +20,20 @@ Glsl_program_desc load_gaussina_filter_source_code(Filter_kernel_radius kernel_r
 {
 	assert(kernel_radius != Filter_kernel_radius::none);
 
-	const char* vertex_filename = "../data/utility_shaders/filter.vertex.glsl";
+	const char* vertex_filename = "../../data/utility_shaders/filter.vertex.glsl";
 	char* pixel_filename = "";
 
 	switch (kernel_radius) {
 		case Filter_kernel_radius::radius_03:
-			pixel_filename = "../data/utility_shaders/gaussian_filter_r03.pixel.glsl";
+			pixel_filename = "../../data/utility_shaders/gaussian_filter_r03.pixel.glsl";
 			break;
 
 		case Filter_kernel_radius::radius_05:
-			pixel_filename = "../data/utility_shaders/gaussian_filter_r05.pixel.glsl";
+			pixel_filename = "../../data/utility_shaders/gaussian_filter_r05.pixel.glsl";
 			break;
 
 		case Filter_kernel_radius::radius_11:
-			pixel_filename = "../data/utility_shaders/gaussian_filter_r11.pixel.glsl";
+			pixel_filename = "../../data/utility_shaders/gaussian_filter_r11.pixel.glsl";
 			break;
 	}
 
@@ -56,7 +56,7 @@ Filter_shader_program::Filter_shader_program(Filter_type filter_type, Filter_ker
 
 	cg::data::Glsl_program_desc src_code = cg::data::load_glsl_program_desc(
 		"filter-shader",
-		"../data/utility_shaders/filter.vertex.glsl", 
+		"../../data/utility_shaders/filter.vertex.glsl", 
 		get_filter_pixel_shader_filename(_filter_type, _kernel_radius));
 
 	_prog = cg::rnd::opengl::Glsl_program(src_code);
@@ -190,8 +190,8 @@ std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_ker
 
 	assert(!kernel_radius_name.empty());
 
-	// ../data/utility_shaders/{filter_type_name}_filter_{kernel_radius_name}.pixel.glsl
-	std::string filename = "../data/utility_shaders/";
+	// ../../data/utility_shaders/{filter_type_name}_filter_{kernel_radius_name}.pixel.glsl
+	std::string filename = "../../data/utility_shaders/";
 	filename.reserve(19 + filter_type_name.size() + kernel_radius_name.size());
 	filename.append(filter_type_name);
 	filename.append("_filter_");

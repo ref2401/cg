@@ -115,7 +115,7 @@ void Compute_complanarity_example::init_pipeline_state()
 void Compute_complanarity_example::init_shaders()
 {
 	auto shader_desc = cg::data::load_hlsl_shader_set_desc(
-		"../data/learn_dx11/tess/compute_complanarity.hlsl");
+		"../../data/learn_dx11/tess/compute_complanarity.hlsl");
 
 	shader_desc.vertex_shader_entry_point = "vs_main";
 	shader_desc.hull_shader_entry_point = "hs_main";
@@ -131,7 +131,7 @@ void Compute_complanarity_example::init_textures()
 	using cg::data::byte_count;
 
 	// displacement map
-	Image_2d image_displ("../data/learn_dx11/terrain_displacement_map.png", 1, false);
+	Image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
 
 	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
 	tex_displ_desc.Width = image_displ.size().width;
@@ -196,7 +196,7 @@ void Compute_complanarity_example::preprocess_displacement_map()
 	assert(_tex_uav_lookup.ptr);
 
 	auto compute_desc = cg::data::load_hlsl_compute_desc(
-		"../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
+		"../../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
 
 
@@ -228,8 +228,8 @@ void Compute_complanarity_example::render()
 void Compute_complanarity_example::setup_pipeline_state()
 {
 	// input assembler
-	constexpr size_t offset = 0;
-	constexpr size_t vertex_byte_count = sizeof(float) * Terrain_grid_model::vertex_component_count;
+	constexpr UINT offset = 0;
+	constexpr UINT vertex_byte_count = sizeof(float) * Terrain_grid_model::vertex_component_count;
 	_device_ctx->IASetInputLayout(_input_layout.ptr);
 	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &vertex_byte_count, &offset);

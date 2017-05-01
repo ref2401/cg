@@ -243,13 +243,13 @@ Material_gallery::Material_gallery()
 	const Sampler_desc fur_mask_sampler(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_CLAMP_TO_EDGE);
 	
 	{ // fur mask
-		Image_2d image_fur_mask("../data/fur_simulation/noise-texture.png");
+		Image_2d image_fur_mask("../../data/fur_simulation/noise-texture.png");
 		_tex_fur_mask = Texture_2d_immut(GL_R8, 1, fur_mask_sampler, image_fur_mask);
 	}
 
 	const Sampler_desc diffuse_rgb_sampler(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
 	{ // cat material
-		Image_2d image_diffuse_rgb("../data/fur_simulation/cat-diffuse-rgb.png");
+		Image_2d image_diffuse_rgb("../../data/fur_simulation/cat-diffuse-rgb.png");
 		_tex_car_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 		
 		_cat_material = std::make_unique<Material>(_tex_car_diffuse_rgb, _tex_fur_mask,
@@ -267,7 +267,7 @@ Material_gallery::Material_gallery()
 	}
 
 	{ // curly red material
-		Image_2d image_diffuse_rgb("../data/fur_simulation/red-diffuse-rgb.png");
+		Image_2d image_diffuse_rgb("../../data/fur_simulation/red-diffuse-rgb.png");
 		_tex_red_curl_material = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 
 		_curly_red_material = std::make_unique<Material>(_tex_red_curl_material, _tex_fur_mask,
@@ -285,7 +285,7 @@ Material_gallery::Material_gallery()
 	}
 
 	{ // bunny material
-		Image_2d image_diffuse_rgb("../data/fur_simulation/bunny-diffuse-rgb.png");
+		Image_2d image_diffuse_rgb("../../data/fur_simulation/bunny-diffuse-rgb.png");
 		_tex_bunny_diffuse_rgb = Texture_2d_immut(GL_RGB8, 1, diffuse_rgb_sampler, image_diffuse_rgb);
 
 		_bunny_material = std::make_unique<Material>(_tex_bunny_diffuse_rgb, _tex_fur_mask,
@@ -415,9 +415,9 @@ Fur_simulation_opengl_example::Fur_simulation_opengl_example(const cg::sys::App_
 	_curr_viewpoint(float3(0, 3, 7), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),
 	_model_transform(float3(0, -0.5, 0), normalize(float3(0, 1, 0)), float3(2.0f)),
-	//_geometry_buffers(0.3f, "../data/rect_2x2.obj"),
-	//_geometry_buffers(0.3f, "../data/sphere-20x20.obj"),
-	_geometry_buffers(0.1f, "../data/models/bunny.obj"),
+	//_geometry_buffers(0.3f, "../../data/rect_2x2.obj"),
+	//_geometry_buffers(0.3f, "../../data/sphere-20x20.obj"),
+	_geometry_buffers(0.1f, "../../data/models/bunny.obj"),
 	_dir_to_light_ws(normalize(float3(50, 1, 100.0)))
 {
 	update_projection_matrix();
