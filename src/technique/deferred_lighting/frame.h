@@ -2,7 +2,7 @@
 #define TECHNIQUE_DEFERRED_LIGHTING_FRAME_H_
 
 #include <array>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "technique/deferred_lighting/render_pass_shader.h"
 #include "technique/deferred_lighting/vertex_spec.h"
@@ -106,29 +106,29 @@ struct Directional_light final {
 
 	Directional_light() noexcept = default;
 
-	Directional_light(const cg::float3& position, const cg::float3& target,
-		const cg::float3& rgb, float intensity, float ambient_intensity) noexcept;
+	Directional_light(const float3& position, const float3& target,
+		const float3& rgb, float intensity, float ambient_intensity) noexcept;
 	
 
 	// Projection matrix of the light that is used in shadow mapping.
-	cg::mat4 projection_matrix;
+	float4x4 projection_matrix;
 
 	// Position of the light. 
 	// The value is required in shadow mapping computations.
-	cg::float3 position = cg::float3::unit_z;
+	float3 position = float3::unit_z;
 
 	// The point at which light's direction points to.
 	// The value is required in shadow mapping computations.
-	cg::float3 target = cg::float3::zero;
+	float3 target = float3::zero;
 
 	// The color of the light.
-	cg::float3 rgb = cg::float3::unit_xyz;
+	float3 rgb = float3::unit_xyz;
 
 	// The value represents factor of the light's irradiance.
-	float intensity = 1.f;
+	float intensity = 1.0f;
 
 	// The value represents factor of the light's ambient irradiance.
-	float ambient_intensity = 1.f;
+	float ambient_intensity = 1.0f;
 };
 
 struct Material_instance final {
@@ -150,10 +150,10 @@ struct Material_instance final {
 
 struct Renderable final {
 
-	Renderable(const DE_cmd& cmd, const cg::mat4& model_matrix, const Material_instance& material) noexcept;
+	Renderable(const DE_cmd& cmd, const float4x4& model_matrix, const Material_instance& material) noexcept;
 
 	DE_cmd cmd;
-	cg::mat4 model_matrix;
+	float4x4 model_matrix;
 	Material_instance material;
 };
 
@@ -191,7 +191,7 @@ public:
 
 
 	// Returns result of projection_matrix * view_matrix
-	cg::mat4 projection_view_matrix() const noexcept
+	float4x4 projection_view_matrix() const noexcept
 	{
 		return projection_matrix * view_matrix;
 	}
@@ -244,13 +244,13 @@ public:
 	// Viewpoint(camera) far plane coordinaces.
 	// left-bottom, right-bottom, right-top, left-top.
 	// All the coordinates are in the view space.
-	std::array<cg::float3, 4> far_plane_coords;
+	std::array<float3, 4> far_plane_coords;
 
 	// Viewpoint(camera) projection matrix
-	cg::mat4 projection_matrix = cg::mat4::identity;
+	float4x4 projection_matrix = float4x4::identity;
 
 	// Viewpoint(camera) view matrix.
-	cg::mat4 view_matrix = cg::mat4::identity;
+	float4x4 view_matrix = float4x4::identity;
 
 private:
 	// The method adds additional bindings to the specified vao object hence makeing it sutable for rendering.

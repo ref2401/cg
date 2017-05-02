@@ -1,7 +1,7 @@
 #ifndef UNITTEST_MATH_COMMON_MATH_H_
 #define UNITTEST_MATH_COMMON_MATH_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -9,16 +9,15 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<cg::float2>(const cg::float2& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::float3>(const cg::float3& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::float4>(const cg::float4& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::mat3>(const cg::mat3& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::mat4>(const cg::mat4& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::quat>(const cg::quat& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::ubyte4>(const cg::ubyte4& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::uint3>(const cg::uint3& t) { RETURN_WIDE_STRING(t); }
-template<> inline std::wstring ToString<cg::uint4>(const cg::uint4& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::float2>(const math::float2& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::float3>(const math::float3& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::float4>(const math::float4& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::float3x3>(const math::float3x3& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::float4x4>(const math::float4x4& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::quat>(const math::quat& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::ubyte4>(const math::ubyte4& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::uint2>(const math::uint2& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<math::uint4>(const math::uint4& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 

@@ -8,7 +8,7 @@ namespace cg {
 namespace rnd {
 
 std::unique_ptr<Rhi_context_i> rhi_context(Render_api render_api, HWND hwnd,
-	const cg::uint2& viewport_size, Depth_stencil_format depth_stencil_format)
+	const uint2& viewport_size, Depth_stencil_format depth_stencil_format)
 {
 	switch (render_api) {
 		case Render_api::dx_11:

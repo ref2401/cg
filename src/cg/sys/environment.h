@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <ratio>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/sys/input.h"
 #include <windows.h>
 

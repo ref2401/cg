@@ -829,7 +829,7 @@ void Opengl_rhi_context::load_opengl_45() const
 	glTextureBarrier = static_cast<PFNGLTEXTUREBARRIERPROC>(load_opengl_func("glTextureBarrier"));
 }
 
-void Opengl_rhi_context::resize_viewport(const cg::uint2& viewport_size)
+void Opengl_rhi_context::resize_viewport(const uint2& viewport_size)
 {
 }
 

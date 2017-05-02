@@ -6,11 +6,6 @@
 #include "cg/data/model.h"
 #include <DirectXMath.h>
 
-using cg::float2;
-using cg::float3;
-using cg::float4;
-using cg::mat4;
-using cg::uint2;
 using cg::data::Image_2d;
 using cg::data::Vertex_attribs;
 
@@ -28,19 +23,17 @@ Static_mesh_example::Static_mesh_example(Render_context& rnd_ctx)
 	init_cbuffers();
 	init_material();
 	init_render_states();
-	update_projection_view_matrices(_rnd_ctx.viewport_size().aspect_ratio());
+	update_projection_view_matrices(aspect_ratio(_rnd_ctx.viewport_size()));
 	setup_pipeline_state();
 }
 
 void Static_mesh_example::init_cbuffers()
 {
-	using cg::to_array_column_major_order;
-
-	_scene_cbuffer = make_cbuffer(_device, 2 * sizeof(mat4));
-	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_scene_cbuffer = make_cbuffer(_device, 2 * sizeof(float4x4));
+	_model_cbuffer = make_cbuffer(_device, sizeof(float4x4));
 	
 	// model matrix
-	_model_matrix = cg::scale_matrix<mat4>(float3(2));
+	_model_matrix = scale_matrix<float4x4>(float3(2));
 	float matrix_data[16];
 	to_array_column_major_order(_model_matrix, matrix_data);
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
@@ -93,8 +86,8 @@ void Static_mesh_example::init_material()
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};
-	tex_desc.Width = image.size().width;
-	tex_desc.Height = image.size().height;
+	tex_desc.Width = image.size().x;
+	tex_desc.Height = image.size().y;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
 	tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -105,7 +98,7 @@ void Static_mesh_example::init_material()
 	
 	D3D11_SUBRESOURCE_DATA data = {};
 	data.pSysMem = image.data();
-	data.SysMemPitch = UINT(image.size().width * cg::data::byte_count(image.pixel_format()));
+	data.SysMemPitch = UINT(image.size().x * cg::data::byte_count(image.pixel_format()));
 	data.SysMemSlicePitch = UINT(image.byte_count());
 
 	HRESULT hr = _device->CreateTexture2D(&tex_desc, &data, &_tex_diffuse_rgb.ptr);
@@ -192,11 +185,9 @@ void Static_mesh_example::setup_pipeline_state()
 
 void Static_mesh_example::update_projection_view_matrices(float wh_aspect_ratio)
 {
-	using cg::perspective_matrix_directx;
-	using cg::to_array_column_major_order;
 	using cg::view_matrix;
 
-	_projection_matrix = perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 0.1f, 10.0f);
+	_projection_matrix = perspective_matrix_directx(pi_3, wh_aspect_ratio, 0.1f, 10.0f);
 	_view_matrix = view_matrix(float3(2.5f, 3.0f, 1.7f), float3::zero);
 
 	float matrix_data[32];
@@ -206,14 +197,14 @@ void Static_mesh_example::update_projection_view_matrices(float wh_aspect_ratio)
 	_device_ctx->UpdateSubresource(_scene_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 }
 
-void Static_mesh_example::on_viewport_resize(const cg::uint2& viewport_size)
+void Static_mesh_example::on_viewport_resize(const uint2& viewport_size)
 {
-	update_projection_view_matrices(viewport_size.aspect_ratio());
+	update_projection_view_matrices(aspect_ratio(viewport_size));
 }
 
 void Static_mesh_example::render()
 {
-	static const float4 clear_color = cg::rgba(0xbca8ffff);
+	static const float4 clear_color = rgba(0xbca8ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);

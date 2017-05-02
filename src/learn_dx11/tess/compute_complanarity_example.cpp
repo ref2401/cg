@@ -16,7 +16,7 @@ Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_c
 	_terrain_x_cell_count(16),
 	_viewpoint_position(0, 24, 0)
 {
-	_model_matrix = scale_matrix<mat4>(float3(25.0f));
+	_model_matrix = scale_matrix<float4x4>(float3(25.0f));
 	_view_matrix = view_matrix(_viewpoint_position, float3::zero, -float3::unit_z);
 
 	init_cbuffers();
@@ -32,7 +32,7 @@ Compute_complanarity_example::Compute_complanarity_example(Render_context& rnd_c
 
 void Compute_complanarity_example::init_cbuffers()
 {
-	_pvm_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_pvm_matrix_cbuffer = make_cbuffer(_device, sizeof(float4x4));
 
 	// tess control cbuffer
 	// 8 = 3 (camera position) + 2 (lod_min_max) + 2(distance_min_max) + 1 (stub float)
@@ -134,8 +134,8 @@ void Compute_complanarity_example::init_textures()
 	Image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
 
 	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
-	tex_displ_desc.Width = image_displ.size().width;
-	tex_displ_desc.Height = image_displ.size().height;
+	tex_displ_desc.Width = image_displ.size().x;
+	tex_displ_desc.Height = image_displ.size().y;
 	tex_displ_desc.MipLevels = 1;
 	tex_displ_desc.ArraySize = 1;
 	tex_displ_desc.Format = DXGI_FORMAT_R8_UNORM;
@@ -145,7 +145,7 @@ void Compute_complanarity_example::init_textures()
 	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
 	tex_displ_data.pSysMem = image_displ.data();
-	tex_displ_data.SysMemPitch = UINT(image_displ.size().width * byte_count(image_displ.pixel_format()));
+	tex_displ_data.SysMemPitch = UINT(image_displ.size().x * byte_count(image_displ.pixel_format()));
 	tex_displ_data.SysMemSlicePitch = UINT(image_displ.byte_count());
 
 	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_displacement_map.ptr);
@@ -184,9 +184,9 @@ void Compute_complanarity_example::init_textures()
 	assert(hr == S_OK);
 }
 	
-void Compute_complanarity_example::on_viewport_resize(const cg::uint2& viewport_size)
+void Compute_complanarity_example::on_viewport_resize(const uint2& viewport_size)
 {
-	update_projection_matrix(viewport_size.aspect_ratio());
+	update_projection_matrix(aspect_ratio(viewport_size));
 	setup_pvm_matrix();
 }
 
@@ -217,7 +217,7 @@ void Compute_complanarity_example::preprocess_displacement_map()
 
 void Compute_complanarity_example::render()
 {
-	const float4 clear_color = cg::rgba(0xd1d7ffff);
+	const float4 clear_color = rgba(0xd1d7ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);
@@ -261,7 +261,7 @@ void Compute_complanarity_example::setup_pipeline_state()
 
 void Compute_complanarity_example::setup_pvm_matrix()
 {
-	const mat4 pvm_matrix = _projection_matrix * _view_matrix * _model_matrix;
+	const float4x4 pvm_matrix = _projection_matrix * _view_matrix * _model_matrix;
 
 	float arr[16];
 	to_array_column_major_order(pvm_matrix, arr);
@@ -271,7 +271,7 @@ void Compute_complanarity_example::setup_pvm_matrix()
 void Compute_complanarity_example::update_projection_matrix(float aspect_ratio)
 {
 	assert(aspect_ratio > 0.0f);
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, aspect_ratio, 0.1f, 100.0f);
+	_projection_matrix = perspective_matrix_directx(pi_3, aspect_ratio, 0.1f, 100.0f);
 }
 
 

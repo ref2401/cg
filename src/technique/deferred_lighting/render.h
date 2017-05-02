@@ -5,7 +5,7 @@
 #include <limits>
 #include <vector>
 #include "cg/base/base.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/data/image.h"
 #include "cg/data/shader.h"
 #include "cg/rnd/opengl/opengl.h"
@@ -19,7 +19,7 @@ namespace deferred_lighting {
 class Gbuffer final {
 public:
 
-	Gbuffer(const cg::uint2& viewport_size,
+	Gbuffer(const uint2& viewport_size,
 		const Vertex_attrib_layout& vertex_attrib_layout,
 		const cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc>& rect_1x1_mesh_data);
 
@@ -63,7 +63,7 @@ public:
 	}
 
 	// Resizes all the render target textures.
-	void resize(const cg::uint2& viewport_size) noexcept;
+	void resize(const uint2& viewport_size) noexcept;
 
 	// Auxiliary texture that can be used by any render pass.
 	// The texture is not supposed to transfer rendering results from pass to pass.
@@ -135,7 +135,7 @@ public:
 	}
 
 	// The current size of all the render target textures.
-	const cg::uint2& viewport_size() const noexcept
+	const uint2& viewport_size() const noexcept
 	{
 		return _viewport_size;
 	}
@@ -146,7 +146,7 @@ private:
 	cg::rnd::opengl::Sampler _nearest_sampler;
 	Static_vertex_spec _aux_geometry_vertex_spec;
 	DE_base_vertex_params _aux_geometry_rect_1x1_params;
-	cg::uint2 _viewport_size;
+	uint2 _viewport_size;
 	cg::rnd::opengl::Renderbuffer _aux_depth_renderbuffer;
 	cg::rnd::opengl::Texture_2d _tex_aux_render_target;
 	cg::rnd::opengl::Texture_2d _tex_lighting_ambient_term;
@@ -172,7 +172,7 @@ public:
 
 
 	// Performs various preparations before rendering using this pass.
-	void begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+	void begin(const float4x4& projection_matrix, const float4x4& view_matrix) noexcept;
 
 	// Clears renderer states after rendring using this pass.
 	void end() noexcept;
@@ -206,11 +206,11 @@ public:
 
 	void end() noexcept;
 
-	void perform_directional_light_pass(const std::array<cg::float3, 4>& far_plane_coords, 
+	void perform_directional_light_pass(const std::array<float3, 4>& far_plane_coords, 
 		const Directional_light_params& dir_light) noexcept;
 
 private:
-	const cg::float4 _clear_value_color = cg::float4::zero;
+	const float4 _clear_value_color = float4::zero;
 	Gbuffer& _gbuffer;
 	cg::rnd::opengl::Framebuffer _fbo;
 	Lighting_pass_dir_shader_program _dir_prog;
@@ -229,7 +229,7 @@ public:
 
 
 	// Performs various preparations before rendering using this pass.
-	void begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix,
+	void begin(const float4x4& projection_matrix, const float4x4& view_matrix,
 		const Directional_light_params& dir_light) noexcept;
 
 	// Clears renderer states after rendring using this pass.
@@ -241,7 +241,7 @@ public:
 		const std::vector<GLuint>& uniform_array_tex_specular_intensity) noexcept;
 
 private:
-	const cg::float4 _clear_value_color = -cg::float4::unit_xyzw;
+	const float4 _clear_value_color = -float4::unit_xyzw;
 	Gbuffer& _gbuffer;
 	cg::rnd::opengl::Framebuffer _fbo;
 	Material_lighting_pass_shader_program _prog;
@@ -302,12 +302,12 @@ private:
 
 	const size_t sample_ray_count = 8;
 	const size_t random_normal_count = 8;
-	const cg::float4 _clear_value_ssao_map = cg::float4::zero;
+	const float4 _clear_value_ssao_map;
 	Gbuffer& _gbuffer;
 	cg::rnd::opengl::Framebuffer _fbo;
 	Ssao_pass_shader_program _prog;
 	// [0.. 7] sample rays, [8 .. 15] random normals
-	const std::vector<cg::float3> _sample_rays;
+	const std::vector<float3> _sample_rays;
 	Filter_shader_program _filter_shader_program;
 };
 
@@ -326,7 +326,7 @@ public:
 	void perform() noexcept;
 
 private:
-	const cg::float4 _clear_value_color = cg::rgba(0x9f9dcaff);
+	const float4 _clear_value_color = rgba(0x9f9dcaff);
 
 	Gbuffer& _gbuffer;
 	Tone_mapping_pass_shader_program _prog;
@@ -335,7 +335,7 @@ private:
 struct Renderer_config final {
 
 	Vertex_attrib_layout vertex_attrib_layout;
-	cg::uint2 viewport_size;
+	uint2 viewport_size;
 	cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc> rect_1x1_mesh_data;
 	cg::data::Glsl_program_desc gbuffer_pass_code;
 	cg::data::Glsl_program_desc lighting_pass_dir_code;
@@ -359,7 +359,7 @@ public:
 
 	void render(const Frame& frame) noexcept;
 
-	void resize_viewport(const cg::uint2& size) noexcept;
+	void resize_viewport(const uint2& size) noexcept;
 
 	const Vertex_attrib_layout& vertex_attrib_layout() const noexcept
 	{

@@ -3,7 +3,7 @@
 #include <utility>
 #include <windows.h>
 #include "cg/base/base.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/deferred_lighting.h"
 #include "technique/fur_simulation/fur_simulation_opengl.h"
@@ -31,7 +31,6 @@ std::string get_report_message(const Clock_report& report)
 
 int main(int argc, char* argv[])
 {
-	using cg::uint2;
 	using cg::sys::Application;
 	using cg::sys::Application_desc;
 

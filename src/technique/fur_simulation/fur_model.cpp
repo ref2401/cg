@@ -31,7 +31,7 @@ Model_geometry_data::Model_geometry_data(float strand_length, const char* geomet
 		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
 			float3 p_base = make_cg_vector(mesh->mVertices[vi]);
 			float3 normal = normalize(make_cg_vector(mesh->mNormals[vi]));
-			float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vi]).uv();
+			float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vi]).xy();
 			float3 tangent = normalize(make_cg_vector(mesh->mTangents[vi]));
 			float3 bitangent = normalize(make_cg_vector(mesh->mBitangents[vi]));
 
@@ -69,7 +69,7 @@ Model_geometry_data::Model_geometry_data(float strand_length, const char* geomet
 	layout.tangent_h_byte_offset = layout.tex_coord_byte_offset + sizeof(float) * 2;
 }
 
-void Model_geometry_data::push_back_position_buffer_data(const cg::float3& p_base, const cg::float3& p_rest)
+void Model_geometry_data::push_back_position_buffer_data(const float3& p_base, const float3& p_rest)
 {
 	position_buffer.push_back(p_base.x);
 	position_buffer.push_back(p_base.y);
@@ -79,7 +79,7 @@ void Model_geometry_data::push_back_position_buffer_data(const cg::float3& p_bas
 	position_buffer.push_back(p_rest.z);
 }
 
-void Model_geometry_data::push_back_simulation_buffer_data(const cg::float3& p_curr, const cg::float3& velocity)
+void Model_geometry_data::push_back_simulation_buffer_data(const float3& p_curr, const float3& velocity)
 {
 	simulation_buffer.push_back(p_curr.x);
 	simulation_buffer.push_back(p_curr.y);
@@ -89,14 +89,14 @@ void Model_geometry_data::push_back_simulation_buffer_data(const cg::float3& p_c
 	simulation_buffer.push_back(velocity.z);
 }
 
-void Model_geometry_data::push_back_model_attribs_buffer_data(const cg::float3& normal,
-	const cg::float2& tex_coord, const cg::float4& tangent_h)
+void Model_geometry_data::push_back_model_attribs_buffer_data(const float3& normal,
+	const float2& tex_coord, const float4& tangent_h)
 {
 	model_attribs_buffer.push_back(normal.x);
 	model_attribs_buffer.push_back(normal.y);
 	model_attribs_buffer.push_back(normal.z);
-	model_attribs_buffer.push_back(tex_coord.u);
-	model_attribs_buffer.push_back(tex_coord.v);
+	model_attribs_buffer.push_back(tex_coord.x);
+	model_attribs_buffer.push_back(tex_coord.y);
 	model_attribs_buffer.push_back(tangent_h.x);
 	model_attribs_buffer.push_back(tangent_h.y);
 	model_attribs_buffer.push_back(tangent_h.z);

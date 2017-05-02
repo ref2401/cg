@@ -1,7 +1,7 @@
 #ifndef TECHNIQUE_FUR_SIMULATION_FUR_GLSL_PROGRAM_H_
 #define TECHNIQUE_FUR_SIMULATION_FUR_GLSL_PROGRAM_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "technique/fur_simulation/fur_model.h"
 
@@ -25,9 +25,9 @@ public:
 	Fur_pass_program& operator=(Fur_pass_program&&) = delete;
 
 
-	void bind(const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
-		const cg::float3& view_position_ws, const Strand_properties& strand_props,
-		const cg::float3& light_dir_ws) const noexcept;
+	void bind(const float4x4& pvm_matrix, const float4x4& model_matrix,
+		const float3& view_position_ws, const Strand_properties& strand_props,
+		const float3& light_dir_ws) const noexcept;
 
 	void set_shell_index(GLuint index) const noexcept;
 
@@ -58,8 +58,8 @@ public:
 	Physics_simulation_pass_program& operator=(Physics_simulation_pass_program&&) = delete;
 
 
-	void bind(const cg::float4& gravity_ms, const cg::float3& angular_velocity_ms, 
-		const cg::float4& strand_props) noexcept;
+	void bind(const float4& gravity_ms, const float3& angular_velocity_ms, 
+		const float4& strand_props) noexcept;
 
 private:
 
@@ -84,8 +84,8 @@ public:
 	Opaque_model_pass_program operator=(Opaque_model_pass_program&&) = delete;
 
 
-	void bind(const cg::mat4& projection_view_matrix, 
-		const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept;
+	void bind(const float4x4& projection_view_matrix, 
+		const float4x4& model_matrix, const float3& dir_to_light_ws) noexcept;
 
 private:
 
@@ -110,7 +110,7 @@ public:
 	Strand_debug_pass_program& operator=(Strand_debug_pass_program&&) = delete;
 
 
-	void bind(const cg::mat4& pvm_matrix) noexcept;
+	void bind(const float4x4& pvm_matrix) noexcept;
 
 private:
 

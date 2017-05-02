@@ -18,11 +18,11 @@ Bilateral_filter_example::Bilateral_filter_example(Render_context& rnd_ctx)
 	_model_matrix_0 = ts_matrix(float3(-0.43f, 0.0f, 0.0f), float3(0.4f));
 	_model_matrix_1 = ts_matrix(float3(0.43f, 0.0f, 0.0f), float3(0.4f));
 
-	_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_matrix_cbuffer = make_cbuffer(_device, sizeof(float4x4));
 	init_pipeline_state();
 	init_shaders();
 	init_textures();
-	update_pvm_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	update_pvm_matrix(aspect_ratio(rnd_ctx.viewport_size()));
 
 	perform_filtering();
 
@@ -61,8 +61,8 @@ void Bilateral_filter_example::init_textures()
 	Image_2d image("../../data/learn_dx11/image_processing/chessboard_marble.png", 4);
 
 	D3D11_TEXTURE2D_DESC source_desc = {};
-	source_desc.Width = image.size().width;
-	source_desc.Height = image.size().height;
+	source_desc.Width = image.size().x;
+	source_desc.Height = image.size().y;
 	source_desc.MipLevels = 1;
 	source_desc.ArraySize = 1;
 	source_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -72,7 +72,7 @@ void Bilateral_filter_example::init_textures()
 	source_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA source_data = {};
 	source_data.pSysMem = image.data();
-	source_data.SysMemPitch = UINT(image.size().width * cg::data::byte_count(image.pixel_format()));
+	source_data.SysMemPitch = UINT(image.size().x * cg::data::byte_count(image.pixel_format()));
 	HRESULT hr = _device->CreateTexture2D(&source_desc, &source_data, &_tex_source.ptr);
 	assert(hr == S_OK);
 	hr = _device->CreateShaderResourceView(_tex_source.ptr, nullptr, &_tex_srv_source.ptr);
@@ -123,28 +123,28 @@ void Bilateral_filter_example::perform_filtering()
 	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_intermediate.ptr, nullptr);
 	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_source.ptr);
-	_device_ctx->Dispatch(size.width / compute_kernel_width, size.height, 1);
+	_device_ctx->Dispatch(size.x / compute_kernel_width, size.y, 1);
 
 	// filter vertically
 	offset_arr[0] = uint2(0, 1);
 	_device_ctx->UpdateSubresource(offset_cbuffer.ptr, 0, nullptr, offset_arr, 0, 0);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, &_tex_uav_final.ptr, nullptr);
 	_device_ctx->CSSetShaderResources(0, 1, &_tex_srv_intermediate.ptr);
-	_device_ctx->Dispatch(size.width / compute_kernel_width, size.height, 1);
+	_device_ctx->Dispatch(size.x / compute_kernel_width, size.y, 1);
 
 	ID3D11UnorderedAccessView* uavs[1] = { nullptr };
 	_device_ctx->CSSetShader(nullptr, nullptr, 0);
 	_device_ctx->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
 }
 
-void Bilateral_filter_example::on_viewport_resize(const cg::uint2& viewport_size)
+void Bilateral_filter_example::on_viewport_resize(const uint2& viewport_size)
 {
-	update_pvm_matrix(viewport_size.aspect_ratio());
+	update_pvm_matrix(aspect_ratio(viewport_size));
 }
 
 void Bilateral_filter_example::render()
 {
-	const float4 clear_color = cg::rgba(0xd1d7ffff);
+	const float4 clear_color = rgba(0xd1d7ffff);
 
 	clear_color_buffer(clear_color);
 
@@ -182,7 +182,7 @@ void Bilateral_filter_example::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Bilateral_filter_example::update_matrix_cbuffer(const cg::mat4& matrix)
+void Bilateral_filter_example::update_matrix_cbuffer(const float4x4& matrix)
 {
 	float arr[16];
 	to_array_column_major_order(matrix, arr);
@@ -194,7 +194,7 @@ void Bilateral_filter_example::update_pvm_matrix(float aspect_ratio)
 	assert(aspect_ratio > 0.0f);
 	assert(_matrix_cbuffer.ptr);
 
-	const mat4 projection_matrix = cg::orthographic_matrix_directx(aspect_ratio, 1.0f, 0.1f, 100.0f);
+	const float4x4 projection_matrix = orthographic_matrix_directx(aspect_ratio, 1.0f, 0.1f, 100.0f);
 	_pvm_matrix_0 = projection_matrix * _model_matrix_0;
 	_pvm_matrix_1 = projection_matrix * _model_matrix_1;
 }

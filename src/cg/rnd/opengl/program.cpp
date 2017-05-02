@@ -372,7 +372,7 @@ void set_uniform(GLint location, const float4& v) noexcept
 	glUniform4f(location, v.x, v.y, v.z, v.w);
 }
 
-void set_uniform(GLint location, const mat3& mat) noexcept
+void set_uniform(GLint location, const float3x3& mat) noexcept
 {
 	assert(location != Blank::uniform_location);
 
@@ -381,7 +381,7 @@ void set_uniform(GLint location, const mat3& mat) noexcept
 	glUniformMatrix3fv(location, 1, false, arr);
 }
 
-void set_uniform(GLint location, const mat4& mat) noexcept
+void set_uniform(GLint location, const float4x4& mat) noexcept
 {
 	assert(location != Blank::uniform_location);
 
@@ -414,7 +414,7 @@ void set_uniform_array_float3(GLint location, const float* ptr, GLsizei count) n
 	glUniform3fv(location, count, ptr);
 }
 
-void set_uniform_array_mat3(GLint location, const mat3* ptr, GLsizei count)
+void set_uniform_array_mat3(GLint location, const float3x3* ptr, GLsizei count)
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -423,12 +423,12 @@ void set_uniform_array_mat3(GLint location, const mat3* ptr, GLsizei count)
 
 	std::vector<float> arr(count * component_count);
 	for (size_t i = 0; i < count; ++i)
-		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
+		to_array_column_major_order(ptr[i], arr.data() + i * component_count);
 
 	glUniformMatrix3fv(location, count, false, arr.data());
 }
 
-void set_uniform_array_mat4(GLint location, const mat4* ptr, GLsizei count)
+void set_uniform_array_mat4(GLint location, const float4x4* ptr, GLsizei count)
 {
 	assert(location != Blank::uniform_location);
 	assert(count > 0);
@@ -437,7 +437,7 @@ void set_uniform_array_mat4(GLint location, const mat4* ptr, GLsizei count)
 	
 	std::vector<float> arr(count * component_count);
 	for (size_t i = 0; i < count; ++i)
-		cg::to_array_column_major_order(ptr[i], arr.data() + i * component_count);
+		to_array_column_major_order(ptr[i], arr.data() + i * component_count);
 
 	glUniformMatrix4fv(location, count, false, arr.data());
 }

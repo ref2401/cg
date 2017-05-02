@@ -1,10 +1,8 @@
 #include "cg/sys/input.h"
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "CppUnitTest.h"
 
-using cg::float2;
-using cg::uint2;
 using cg::sys::Key;
 using cg::sys::Key_state;
 using cg::sys::Keyboard;

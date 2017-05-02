@@ -20,7 +20,7 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 	: Example(rnd_ctx),
 	_viewpoint_position(-8, 8, 16)
 {
-	_model_matrix = scale_matrix<mat4>(float3(20.0f));
+	_model_matrix = scale_matrix<float4x4>(float3(20.0f));
 	_view_matrix = view_matrix(_viewpoint_position, float3::zero);
 	
 	init_cbuffers();
@@ -28,7 +28,7 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_pipeline_state();
 
-	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	update_projection_matrix(aspect_ratio(rnd_ctx.viewport_size()));
 	setup_pvm_matrix();
 	setup_pipeline_state();
 }
@@ -36,7 +36,7 @@ Terrain_tessellation_example::Terrain_tessellation_example(Render_context& rnd_c
 void Terrain_tessellation_example::init_cbuffers()
 {
 	// pvm_matrix_cbuffer
-	_pvm_matrix_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_pvm_matrix_cbuffer = make_cbuffer(_device, sizeof(float4x4));
 
 	// tess control cbuffer
 	// 8 = 3 (camera position) + 2 (lod_min_max) + 2(distance_min_max) + 1 (stub float)
@@ -131,13 +131,13 @@ void Terrain_tessellation_example::init_shaders()
 
 void Terrain_tessellation_example::on_viewport_resize(const uint2& viewport_size)
 {
-	update_projection_matrix(viewport_size.aspect_ratio());
+	update_projection_matrix(aspect_ratio(viewport_size));
 	setup_pvm_matrix();
 }
 
 void Terrain_tessellation_example::render()
 {
-	const float4 clear_color = cg::rgba(0xd1d7ffff);
+	const float4 clear_color = rgba(0xd1d7ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);
@@ -178,7 +178,7 @@ void Terrain_tessellation_example::setup_pipeline_state()
 
 void Terrain_tessellation_example::setup_pvm_matrix()
 {
-	const mat4 mat = _projection_matrix * _view_matrix * _model_matrix;
+	const float4x4 mat = _projection_matrix * _view_matrix * _model_matrix;
 
 	float arr[16];
 	to_array_column_major_order(mat, arr);
@@ -189,7 +189,7 @@ void Terrain_tessellation_example::update_projection_matrix(float aspect_ratio)
 {
 	assert(aspect_ratio > 0.0f);
 
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, aspect_ratio, 0.1f, 100.0f);
+	_projection_matrix = perspective_matrix_directx(pi_3, aspect_ratio, 0.1f, 100.0f);
 }
 
 } // namespace tess

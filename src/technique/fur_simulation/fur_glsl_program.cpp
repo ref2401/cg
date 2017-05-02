@@ -23,7 +23,7 @@ Fur_pass_program::Fur_pass_program()
 	_g_fur_mask_uv_factors_location = uniform_location(_program, "g_fur_mask_uv_factors");
 }
 
-void Fur_pass_program::bind(const mat4& pvm_matrix, const mat4& model_matrix,
+void Fur_pass_program::bind(const float4x4& pvm_matrix, const float4x4& model_matrix,
 	const float3& view_position_ws, const Strand_properties& strand_props,
 	const float3& light_dir_ws) const noexcept
 {
@@ -55,8 +55,8 @@ Opaque_model_pass_program::Opaque_model_pass_program()
 	_g_dir_to_light_ws_location = uniform_location(_program, "g_dir_to_light_ws");
 }
 
-void Opaque_model_pass_program::bind(const cg::mat4& projection_view_matrix,
-	const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept
+void Opaque_model_pass_program::bind(const float4x4& projection_view_matrix,
+	const float4x4& model_matrix, const float3& dir_to_light_ws) noexcept
 {
 	glUseProgram(_program.id());
 
@@ -80,8 +80,8 @@ Physics_simulation_pass_program::Physics_simulation_pass_program()
 	_g_strand_props = uniform_location(_program, "g_strand_props");
 }
 
-void Physics_simulation_pass_program::bind(const cg::float4& gravity_ms, 
-	const cg::float3& angular_velocity_ms, const cg::float4& strand_props) noexcept
+void Physics_simulation_pass_program::bind(const float4& gravity_ms, 
+	const float3& angular_velocity_ms, const float4& strand_props) noexcept
 {
 	glUseProgram(_program.id());
 
@@ -99,7 +99,7 @@ Strand_debug_pass_program::Strand_debug_pass_program()
 	_g_pvm_matrix_location = uniform_location(_program, "g_pvm_matrix");
 }
 
-void Strand_debug_pass_program::bind(const cg::mat4& pvm_matrix) noexcept
+void Strand_debug_pass_program::bind(const float4x4& pvm_matrix) noexcept
 {
 	glUseProgram(_program.id());
 	set_uniform(_g_pvm_matrix_location, pvm_matrix);

@@ -1,7 +1,7 @@
 #ifndef LEARN_DX11_TESS_TERRAIN_TESSELLATION_EXAMPLE_H_
 #define LEARN_DX11_TESS_TERRAIN_TESSELLATION_EXAMPLE_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/app.h"
 
 
@@ -28,7 +28,7 @@ public:
 
 	void on_keypress() override {}
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -51,10 +51,10 @@ private:
 	void update_projection_matrix(float aspect_ratio);
 
 
-	cg::float3 _viewpoint_position;
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
+	float3 _viewpoint_position;
+	float4x4 _projection_matrix;
+	float4x4 _view_matrix;
+	float4x4 _model_matrix;
 
 	// pipeline state
 	Hlsl_shader_set _shader_set;

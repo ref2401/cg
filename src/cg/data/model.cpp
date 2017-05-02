@@ -6,9 +6,6 @@
 
 namespace {
 
-using cg::float2;
-using cg::float3;
-using cg::float4;
 using cg::data::Assimp_postprocess_flags;
 using cg::data::Model_geometry_data;
 using cg::data::Model_geometry_vertex;
@@ -84,7 +81,7 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc>& geometry_data,
 	Model_geometry_vertex<Vertex_attribs::p_n_tc> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
 		normalize(make_cg_vector(mesh->mNormals[vertex_index])),
-		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv());
+		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).xy());
 
 	geometry_data.push_back_vertex(vertex);
 }
@@ -97,7 +94,7 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_tc>& geometry_data,
 
 	Model_geometry_vertex<Vertex_attribs::p_tc> vertex(
 		make_cg_vector(mesh->mVertices[vertex_index]),
-		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv());
+		make_cg_vector(mesh->mTextureCoords[0][vertex_index]).xy());
 
 	geometry_data.push_back_vertex(vertex);
 }
@@ -112,7 +109,7 @@ void process_vertex(Model_geometry_data<Vertex_attribs::p_n_tc_ts>& geometry_dat
 
 	float3 position = make_cg_vector(mesh->mVertices[vertex_index]);
 	float3 normal = normalize(make_cg_vector(mesh->mNormals[vertex_index]));
-	float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vertex_index]).uv();
+	float2 tex_coord = make_cg_vector(mesh->mTextureCoords[0][vertex_index]).xy();
 	float3 tangent = normalize(make_cg_vector(mesh->mTangents[vertex_index]));
 	float3 bitangent = -normalize(make_cg_vector(mesh->mBitangents[vertex_index]));
 	float4 tangent_h = cg::data::compute_tangent_handedness(tangent, bitangent, normal);

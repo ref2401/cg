@@ -27,7 +27,7 @@ public:
 
 	void on_keypress() override {}
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -56,10 +56,10 @@ private:
 
 	const size_t _terrain_z_cell_count;
 	const size_t _terrain_x_cell_count;
-	cg::float3 _viewpoint_position;
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
+	float3 _viewpoint_position;
+	float4x4 _projection_matrix;
+	float4x4 _view_matrix;
+	float4x4 _model_matrix;
 	Com_ptr<ID3D11Buffer> _pvm_matrix_cbuffer;
 	Com_ptr<ID3D11Buffer> _tess_control_cbuffer;
 	Hlsl_shader_set _shader_set;

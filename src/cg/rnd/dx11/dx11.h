@@ -9,7 +9,7 @@
 #include <DirectXMath.h>
 #include <dxgi.h>
 #include "cg/data/shader.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/rnd.h"
 
 using namespace DirectX;
@@ -156,7 +156,7 @@ inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
 class DX11_rhi_context final : public virtual cg::rnd::Rhi_context_i {
 public:
 
-	DX11_rhi_context(HWND hwnd, const cg::uint2& viewport_size, cg::rnd::Depth_stencil_format depth_stencil_format);
+	DX11_rhi_context(HWND hwnd, const uint2& viewport_size, cg::rnd::Depth_stencil_format depth_stencil_format);
 
 	DX11_rhi_context(const DX11_rhi_context&) = delete;
 
@@ -207,29 +207,29 @@ public:
 
 	float viewport_aspect_ratio() const noexcept
 	{
-		assert(!cg::approx_equal(_viewport.Height, 0.0f));
+		assert(!approx_equal(_viewport.Height, 0.0f));
 		return _viewport.Width / _viewport.Height;
 	}
 
 
 	void bind_window_render_targets();
 
-	void resize_viewport(const cg::uint2& viewport_size) override;
+	void resize_viewport(const uint2& viewport_size) override;
 
 	void swap_color_buffers() override;
 
 private:
 
-	void init_device(HWND hwnd, const cg::uint2& viewport_size);
+	void init_device(HWND hwnd, const uint2& viewport_size);
 
-	void init_depth_stencil_buffer(const cg::uint2& viewport_size,
+	void init_depth_stencil_buffer(const uint2& viewport_size,
 		cg::rnd::Depth_stencil_format depth_stencil_format);
 
 	void update_depth_stencil_buffer(const uint2& viewport_size);
 
 	void update_render_target_buffer();
 
-	void update_viewport(const cg::uint2& viewport_size);
+	void update_viewport(const uint2& viewport_size);
 
 
 	Com_ptr<ID3D11Device> _device;

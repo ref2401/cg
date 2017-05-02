@@ -306,7 +306,7 @@ Material_gallery::Material_gallery()
 // ----- Fur_pass -----
 
 void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
-	const mat4& pvm_matrix, const mat4& model_matrix,
+	const float4x4& pvm_matrix, const float4x4& model_matrix,
 	const float3& view_position_ws, const float3& light_dir_ws) noexcept
 {
 	glEnable(GL_BLEND);
@@ -340,7 +340,7 @@ void Fur_pass::perform(const Geometry_buffers& geometry_buffers, const Material&
 // ----- Opaque_model_pass -----
 
 void Opaque_model_pass::perform(const Geometry_buffers& geometry_buffers, const Material& material,
-	const cg::mat4& projection_view_matrix, const cg::mat4& model_matrix, const cg::float3& dir_to_light_ws) noexcept
+	const float4x4& projection_view_matrix, const float4x4& model_matrix, const float3& dir_to_light_ws) noexcept
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -364,7 +364,7 @@ void Opaque_model_pass::perform(const Geometry_buffers& geometry_buffers, const 
 // ----- Physics_simulation_pass -----
 
 void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers, 
-	const cg::float4& extern_accel_ms, const cg::float3& angular_accel_ms,
+	const float4& extern_accel_ms, const float3& angular_accel_ms,
 	float strand_length, const Strand_properties& strand_props) noexcept
 {
 	glDisable(GL_DEPTH_TEST);
@@ -388,7 +388,7 @@ void Physics_simulation_pass::perform(Geometry_buffers& geometry_buffers,
 
 // ----- Strand_debug_pass -----
 
-void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept
+void Strand_debug_pass::perform(Geometry_buffers& geometry_buffers, const float4x4& pvm_matrix) noexcept
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -492,20 +492,20 @@ void Fur_simulation_opengl_example::on_mouse_move()
 void Fur_simulation_opengl_example::on_window_resize()
 {
 	auto vp_size = _app_ctx.window.viewport_size();
-	glViewport(0, 0, vp_size.width, vp_size.height);
+	glViewport(0, 0, vp_size.x, vp_size.y);
 	update_projection_matrix();
 }
 
 void Fur_simulation_opengl_example::render(float interpolation_factor)
 {
 	const float3 view_position = lerp(_prev_viewpoint.position, _curr_viewpoint.position, interpolation_factor);
-	const mat4 view_matrix = ::view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
-	const mat4 projection_view_matrix = _projection_matrix* view_matrix;
-	const mat4 pvm_matrix = projection_view_matrix * _model_matrix;
+	const float4x4 view_matrix = ::view_matrix(_prev_viewpoint, _curr_viewpoint, interpolation_factor);
+	const float4x4 projection_view_matrix = _projection_matrix* view_matrix;
+	const float4x4 pvm_matrix = projection_view_matrix * _model_matrix;
 	_prev_viewpoint = _curr_viewpoint;
 
 	static const float3 color = rgb(0x817c6e);
-	glClearColor(color.r, color.g, color.b, 1.0f);
+	glClearColor(color.x, color.y, color.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//_opaque_model_pass.perform(_geometry_buffers, *_curr_material,
@@ -529,7 +529,7 @@ void Fur_simulation_opengl_example::update(float dt_msec)
 		_model_transform.scale);
 
 	const float3 external_accelerations = float3(0.0f, -9.81f, 0.0f) - _movement_acceleration;
-	const mat3 inv_model_matrix(_model_matrix);
+	const float3x3 inv_model_matrix(_model_matrix);
 	const float4 extern_accel_ms(mul(inv_model_matrix, external_accelerations), dt);
 	const float3 angular_ms(mul(inv_model_matrix, -angular_velocity));
 
@@ -567,8 +567,8 @@ void Fur_simulation_opengl_example::update_curr_viewpoint()
 
 void Fur_simulation_opengl_example::update_projection_matrix()
 {
-	_projection_matrix = perspective_matrix_opengl(cg::pi_3,
-		_app_ctx.window.viewport_size().aspect_ratio(), 0.1f, 1000.0f);
+	_projection_matrix = perspective_matrix_opengl(pi_3,
+		aspect_ratio(_app_ctx.window.viewport_size()), 0.1f, 1000.0f);
 }
 
 } // fur_simulation

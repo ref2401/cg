@@ -7,15 +7,6 @@
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="math\utility_unittest_math.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\vector_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\matrix_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="data\common_file.cpp">
       <Filter>data</Filter>
     </ClCompile>

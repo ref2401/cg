@@ -6,9 +6,6 @@
 #include <utility>
 #include "CppUnitTest.h"
 
-using cg::float2;
-using cg::float3;
-using cg::float4;
 using cg::data::Model_geometry_data;
 using cg::data::Model_mesh_info;
 using cg::data::Vertex_attribs;

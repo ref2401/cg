@@ -11,24 +11,24 @@ namespace deferred_lighting {
 struct Directional_light_params final {
 
 	// Projection matrix is used in shadow mapping.
-	cg::mat4 projection_matrix;
+	float4x4 projection_matrix;
 
 	// View matrix is used in shadow mapping.
-	cg::mat4 view_matrix;
+	float4x4 view_matrix;
 
 	// The direction in which the light travels. 
 	// The value is normalized and in the view space.
-	cg::float3 direction_vs;
+	float3 direction_vs;
 
 	// Irradinace is computed as rgb * intensity and it's value can exceed float3::unit_xyz.
-	cg::float3 irradiance;
+	float3 irradiance;
 
 	// Ambient irradinace is computed as rgb * ambient_intensity and it's value can exceed float3::unit_xyz.
-	cg::float3 ambient_irradiance_up;
+	float3 ambient_irradiance_up;
 
 	// Additional ambient irradiance value that is used in the hemispheric ambient lighting.
 	// The value is a portion of the ambient_irradinace_up value.
-	cg::float3 ambient_irradiance_down;
+	float3 ambient_irradiance_down;
 };
 
 // Gbuffer_pass_shader_program is used by the Gbuffer_pass to populate Gbuffer's tex_normal_smoothness.
@@ -48,7 +48,7 @@ public:
 
 	void set_uniform_array_smoothness(const float* ptr, GLsizei count) noexcept;
 
-	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept;
+	void use(const float4x4& projection_matrix, const float4x4& view_matrix) noexcept;
 
 private:
 	cg::rnd::opengl::Glsl_program _prog;
@@ -71,7 +71,7 @@ public:
 	~Lighting_pass_dir_shader_program() noexcept = default;
 
 
-	void set_uniform_array_far_plane_coords(const std::array<cg::float3, 4>& far_plane_coords) noexcept;
+	void set_uniform_array_far_plane_coords(const std::array<float3, 4>& far_plane_coords) noexcept;
 
 	void use(const Directional_light_params& dl_params) noexcept;
 
@@ -98,7 +98,7 @@ public:
 
 	void set_uniform_array_model_matrix(const float* ptr, size_t count) noexcept;
 
-	void use(const cg::mat4& projection_matrix, const cg::mat4& view_matrix,
+	void use(const float4x4& projection_matrix, const float4x4& view_matrix,
 		const Directional_light_params& dir_light) noexcept;
 
 private:
@@ -147,7 +147,7 @@ public:
 	~Ssao_pass_shader_program() noexcept = default;
 
 
-	void use(const std::vector<cg::float3>& sample_rays_and_normals,
+	void use(const std::vector<float3>& sample_rays_and_normals,
 		size_t sample_ray_count, size_t random_normal_count) noexcept;
 
 private:

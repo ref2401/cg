@@ -2,7 +2,7 @@
 #define CG_RND_OPENGL_PROGRAM_H_
 
 #include "cg/data/shader.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"
 
@@ -137,9 +137,9 @@ void set_uniform(GLint location, const float3& v) noexcept;
 
 void set_uniform(GLint location, const float4& v) noexcept;
 
-void set_uniform(GLint location, const mat3& mat) noexcept;
+void set_uniform(GLint location, const float3x3& mat) noexcept;
 
-void set_uniform(GLint location, const mat4& mat) noexcept;
+void set_uniform(GLint location, const float4x4& mat) noexcept;
 
 void set_uniform_array_int(GLint location, const GLint* ptr, GLsizei count) noexcept;
 
@@ -147,9 +147,9 @@ void set_uniform_array_float(GLint location, const float* ptr, GLsizei count) no
 
 void set_uniform_array_float3(GLint location, const float* ptr, GLsizei count) noexcept;
 
-void set_uniform_array_mat3(GLint location, const mat3* ptr, GLsizei count);
+void set_uniform_array_mat3(GLint location, const float3x3* ptr, GLsizei count);
 
-void set_uniform_array_mat4(GLint location, const mat4* ptr, GLsizei count);
+void set_uniform_array_mat4(GLint location, const float4x4* ptr, GLsizei count);
 
 void set_uniform_array_mat4(GLint location, const float* ptr, GLsizei count) noexcept;
 

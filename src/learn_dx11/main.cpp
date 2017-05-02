@@ -14,8 +14,8 @@
 
 int main(int argc, char* argv[])
 {
-	cg::uint2 window_position(90, 50);
-	cg::uint2 window_size(960, 540);
+	uint2 window_position(90, 50);
+	uint2 window_size(960, 540);
 
 	try {
 		OutputDebugString("----------------\n");

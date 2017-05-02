@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <vector>
 #include "cg/data/vertex.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace cg {
@@ -22,13 +22,13 @@ struct Model_geometry_vertex<Vertex_attribs::p> final {
 
 	Model_geometry_vertex() noexcept {}
 
-	Model_geometry_vertex(const cg::float3& position) noexcept :
+	Model_geometry_vertex(const float3& position) noexcept :
 		position(position)
 	{}
 
 	union {
 		struct {
-			cg::float3 position;
+			float3 position;
 		};
 
 		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p>::vertex_byte_count];
@@ -40,14 +40,14 @@ struct Model_geometry_vertex<Vertex_attribs::p_n> final {
 
 	Model_geometry_vertex() noexcept {}
 
-	Model_geometry_vertex(const cg::float3& position, const cg::float3& normal) noexcept :
+	Model_geometry_vertex(const float3& position, const float3& normal) noexcept :
 		position(position), normal(normal)
 	{}
 
 	union {
 		struct {
-			cg::float3 position;
-			cg::float3 normal;
+			float3 position;
+			float3 normal;
 		};
 
 		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n>::vertex_byte_count];
@@ -59,16 +59,16 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc> final {
 
 	Model_geometry_vertex() noexcept {}
 
-	Model_geometry_vertex(const cg::float3& position, const cg::float3& normal,
-		const cg::float2& tex_coord) noexcept :
+	Model_geometry_vertex(const float3& position, const float3& normal,
+		const float2& tex_coord) noexcept :
 		position(position), normal(normal), tex_coord(tex_coord)
 	{}
 
 	union {
 		struct {
-			cg::float3 position;
-			cg::float3 normal;
-			cg::float2 tex_coord;
+			float3 position;
+			float3 normal;
+			float2 tex_coord;
 		};
 
 		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n_tc>::vertex_byte_count];
@@ -80,14 +80,14 @@ struct Model_geometry_vertex<Vertex_attribs::p_tc> final {
 
 	Model_geometry_vertex() noexcept {}
 
-	Model_geometry_vertex(const cg::float3& position, const cg::float2& tex_coord) noexcept :
+	Model_geometry_vertex(const float3& position, const float2& tex_coord) noexcept :
 		position(position), tex_coord(tex_coord)
 	{}
 
 	union {
 		struct {
-			cg::float3 position;
-			cg::float2 tex_coord;
+			float3 position;
+			float2 tex_coord;
 		};
 
 		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_tc>::vertex_byte_count];
@@ -99,17 +99,17 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> final {
 	
 	Model_geometry_vertex() noexcept {}
 
-	Model_geometry_vertex(const cg::float3& position, const cg::float3& normal,
-		const cg::float2& tex_coord, const cg::float4& tangent_h) noexcept :
+	Model_geometry_vertex(const float3& position, const float3& normal,
+		const float2& tex_coord, const float4& tangent_h) noexcept :
 		position(position), normal(normal), tex_coord(tex_coord), tangent_h(tangent_h)
 	{}
 
 	union {
 		struct {
-			cg::float3 position;
-			cg::float3 normal;
-			cg::float2 tex_coord;
-			cg::float4 tangent_h;
+			float3 position;
+			float3 normal;
+			float2 tex_coord;
+			float4 tangent_h;
 		};
 
 		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>::vertex_byte_count];

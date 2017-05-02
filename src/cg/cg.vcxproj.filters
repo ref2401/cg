@@ -7,15 +7,6 @@
     <ClCompile Include="sys\input.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="math\transform.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\vector.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\matrix.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="data\vertex.cpp">
       <Filter>data</Filter>
     </ClCompile>
@@ -67,14 +58,11 @@
     <ClCompile Include="rnd\rnd.cpp">
       <Filter>rnd</Filter>
     </ClCompile>
-    <ClCompile Include="math\math.cpp">
-      <Filter>math</Filter>
+    <ClCompile Include="base\math.cpp">
+      <Filter>base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="math">
-      <UniqueIdentifier>{e8106177-098e-4ac0-9905-2150be8ad417}</UniqueIdentifier>
-    </Filter>
     <Filter Include="data">
       <UniqueIdentifier>{3d601f46-1122-4c45-97a4-7a12c6a802a9}</UniqueIdentifier>
     </Filter>
@@ -95,17 +83,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\math.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\transform.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="base\base.h">
       <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="math\utility.h">
-      <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="data\shader.h">
       <Filter>data</Filter>
@@ -115,12 +94,6 @@
     </ClInclude>
     <ClInclude Include="sys\input.h">
       <Filter>sys</Filter>
-    </ClInclude>
-    <ClInclude Include="math\vector.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\matrix.h">
-      <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="data\vertex.h">
       <Filter>data</Filter>
@@ -172,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="rnd\opengl\texture.h">
       <Filter>rnd\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="base\math.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

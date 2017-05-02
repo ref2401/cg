@@ -64,7 +64,7 @@ Directional_light::Directional_light(const float3& position, const float3& targe
 
 // ----- Renderable -----
 
-Renderable::Renderable(const DE_cmd& cmd, const mat4& model_matrix, const Material_instance& material) noexcept :
+Renderable::Renderable(const DE_cmd& cmd, const float4x4& model_matrix, const Material_instance& material) noexcept :
 	cmd(cmd),
 	model_matrix(model_matrix),
 	material(material)
@@ -176,8 +176,8 @@ void Frame::reset(const Static_vertex_spec& vertex_spec) noexcept
 	glDeleteSync(sync_obj);
 	_sync_objects[_draw_indirect_buffer.current_partition_index()] = nullptr;
 
-	projection_matrix = mat4::identity;
-	view_matrix = mat4::identity;
+	projection_matrix = float4x4::identity;
+	view_matrix = float4x4::identity;
 
 	// prepare frame_packet
 	prepare_vao(vertex_spec.vao_id(), vertex_spec.vertex_buffer_binding_index() + 1);

@@ -24,12 +24,12 @@ using deferred_lighting::Renderer_config;
 using deferred_lighting::Vertex_attrib_layout;
 
 
-Directional_light_params get_directional_light_params(const mat4& view_matrix, const Directional_light& dir_light) noexcept
+Directional_light_params get_directional_light_params(const float4x4& view_matrix, const Directional_light& dir_light) noexcept
 {
 	Directional_light_params p;
 	p.projection_matrix = dir_light.projection_matrix;
-	p.view_matrix = cg::view_matrix(dir_light.position, dir_light.target, float3::unit_y);
-	p.direction_vs = normalize(mul(static_cast<mat3>(view_matrix), (dir_light.target - dir_light.position)));
+	p.view_matrix = math::view_matrix(dir_light.position, dir_light.target, float3::unit_y);
+	p.direction_vs = normalize(mul(static_cast<float3x3>(view_matrix), (dir_light.target - dir_light.position)));
 	p.irradiance = dir_light.rgb * dir_light.intensity;
 	p.ambient_irradiance_up = dir_light.rgb * dir_light.ambient_intensity;
 	p.ambient_irradiance_down = 0.7f * p.ambient_irradiance_up;
@@ -157,7 +157,7 @@ Deferred_lighting::Deferred_lighting(const cg::sys::App_context& app_ctx, cg::rn
 	_dir_light.intensity = 2.0f;
 	_dir_light.ambient_intensity = 0.35f;
 	float width = 30.0f;
-	float height = width / _app_ctx.window.viewport_size().aspect_ratio<float>();
+	float height = width / aspect_ratio(_app_ctx.window.viewport_size());
 	float distance_to_light = len(_dir_light.position - _dir_light.target);
 	_dir_light.projection_matrix = orthographic_matrix_opengl(width, height, -1, 1.5f * distance_to_light);
 
@@ -320,9 +320,9 @@ void Deferred_lighting::update_viewpoint_projection()
 {
 	float near_z = 0.1f;
 	float far_z = 50;
-	float vert_fov = cg::pi_3;
-	float wh_ratio = _app_ctx.window.viewport_size().aspect_ratio();
-	_projection_matrix = cg::perspective_matrix_opengl(vert_fov, wh_ratio, near_z, far_z);
+	float vert_fov = pi_3;
+	float wh_ratio = aspect_ratio(_app_ctx.window.viewport_size());
+	_projection_matrix = perspective_matrix_opengl(vert_fov, wh_ratio, near_z, far_z);
 
 	float far_y = far_z * std::tan(vert_fov * 0.5f);
 	float far_x = far_y * wh_ratio;

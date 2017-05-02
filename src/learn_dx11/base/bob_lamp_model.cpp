@@ -11,20 +11,12 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
-using cg::float2;
-using cg::float3;
-using cg::mat4;
-using cg::quat;
-using cg::approx_equal;
-using cg::inverse;
-using cg::to_array_column_major_order;
-
 
 namespace {
 
-inline mat4 make_cg_matrix(const aiMatrix4x4& m) noexcept
+inline float4x4 make_cg_matrix(const aiMatrix4x4& m) noexcept
 {
-	return mat4(
+	return float4x4(
 		m.a1, m.a2, m.a3, m.a4,
 		m.b1, m.b2, m.b3, m.b4,
 		m.c1, m.c2, m.c3, m.c4,
@@ -53,7 +45,7 @@ namespace learn_dx11 {
 
 // ----- Bone -----
 
-Bone::Bone(const char* name, size_t parent_index, const cg::mat4& bp_matrix) :
+Bone::Bone(const char* name, size_t parent_index, const float4x4& bp_matrix) :
 	name(name),
 	parent_index(parent_index),
 	bp_matrix(bp_matrix),
@@ -68,9 +60,9 @@ void Vertex::register_bone(uint32_t bone_index, float bone_weight) noexcept
 	assert(bone_weight >= 0.0f);
 
 	for (size_t i = 0; i < 4; ++i) {
-		if (approx_equal(bone_weights.data[i], 0.0f)) {
-			bone_indices.data[i] = bone_index;
-			bone_weights.data[i] = bone_weight;
+		if (approx_equal((&bone_weights.x)[i], 0.0f)) {
+			(&bone_indices.x)[i] = bone_index;
+			(&bone_weights.x)[i] = bone_weight;
 			return;
 		}
 	}
@@ -190,7 +182,7 @@ void Model_animation::init_bones(size_t bone_count, const aiNode* root_node)
 		for (size_t i = 0; i < info.node->mNumChildren; ++i) {
 			aiNode* child = info.node->mChildren[i];
 			size_t child_index = _bones.size();
-			mat4 tm = _bones[info.index].bp_matrix * make_cg_matrix(child->mTransformation);
+			float4x4 tm = _bones[info.index].bp_matrix * make_cg_matrix(child->mTransformation);
 
 			_bones.emplace_back(child->mName.C_Str(), info.index, tm);
 
@@ -225,9 +217,9 @@ void Model_animation::update_bone_matrices(float milliseconds, std::vector<float
 		float3 pos = lerp(frame0.transforms[i].position, frame1.transforms[i].position, interpolatio_factor);
 		quat rot = slerp(frame0.transforms[i].rotation, frame1.transforms[i].rotation, interpolatio_factor);
 
-		curr_transform.position = cg::rotate(parent_transform.rotation, pos) + parent_transform.position;
-		curr_transform.rotation = cg::normalize(parent_transform.rotation * rot);
-		mat4 tm = cg::tr_matrix(curr_transform.position, curr_transform.rotation) * _bones[i].bp_matrix_inv;
+		curr_transform.position = rotate(parent_transform.rotation, pos) + parent_transform.position;
+		curr_transform.rotation = normalize(parent_transform.rotation * rot);
+		float4x4 tm = tr_matrix(curr_transform.position, curr_transform.rotation) * _bones[i].bp_matrix_inv;
 		to_array_column_major_order(tm, ptr);
 		ptr += 16;
 	}
@@ -304,7 +296,7 @@ void Bob_lamp_md5_model::init_vertices(const aiScene* scene,
 		// position, normal & tex_coord
 		for (size_t vi = 0; vi < mesh->mNumVertices; ++vi) {
 			_vertices.emplace_back(make_cg_vector(mesh->mVertices[vi]),
-				make_cg_vector(mesh->mNormals[vi]), make_cg_vector(mesh->mTextureCoords[0][vi]).uv());
+				make_cg_vector(mesh->mNormals[vi]), make_cg_vector(mesh->mTextureCoords[0][vi]).xy());
 		}
 
 		// bone index & weight

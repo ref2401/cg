@@ -4,7 +4,7 @@
 #include <cassert>
 #include <type_traits>
 #include "cg/data/shader.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/dx11/dx11.h"
 #include <windows.h>
 #include <d3d11.h>
@@ -134,7 +134,7 @@ private:
 class Render_context final {
 public:
 
-	Render_context(HWND hwnd, const cg::uint2& window_size, bool init_depth_stencil_view);
+	Render_context(HWND hwnd, const uint2& window_size, bool init_depth_stencil_view);
 
 	Render_context(const Render_context&) = delete;
 
@@ -175,9 +175,9 @@ public:
 	// and sets up the default viewport.
 	void bind_default_render_targets();
 
-	void resize_viewport(const cg::uint2& viewport_size);
+	void resize_viewport(const uint2& viewport_size);
 
-	cg::uint2 viewport_size() const noexcept
+	uint2 viewport_size() const noexcept
 	{
 		return _viewport_size;
 	}
@@ -186,13 +186,13 @@ public:
 
 private:
 
-	void init_device(HWND hwnd, const cg::uint2& window_size);
+	void init_device(HWND hwnd, const uint2& window_size);
 
 	void update_depth_stencil_view(bool force_refresh = false);
 
 	void update_render_target_view();
 
-	cg::uint2 _viewport_size;
+	uint2 _viewport_size;
 	Com_ptr<ID3D11Device> _device;
 	Com_ptr<ID3D11Debug> _debug;
 	Com_ptr<ID3D11DeviceContext> _device_ctx;
@@ -216,7 +216,7 @@ inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device)
 // Creates a new 2D texture which has the same configuration as tex_origin but differs in size.
 // The contents of the texture is uninitialized.
 Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
-	ID3D11Texture2D* tex_origin, const cg::uint2& size);
+	ID3D11Texture2D* tex_origin, const uint2& size);
 
 } // namespace learn_dx11
 

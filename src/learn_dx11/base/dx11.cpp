@@ -5,8 +5,6 @@
 #include <utility>
 #include "cg/base/base.h"
 
-using cg::uint2;
-using cg::greater_than;
 using cg::data::Hlsl_shader_desc;
 
 
@@ -189,10 +187,10 @@ void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_
 
 // ----- Render_context -----
 
-Render_context::Render_context(HWND hwnd, const cg::uint2& window_size, bool init_depth_stencil_view)
+Render_context::Render_context(HWND hwnd, const uint2& window_size, bool init_depth_stencil_view)
 	: _viewport_size(window_size)
 {
-	assert(greater_than(window_size, 0));
+	assert(window_size > 0);
 	assert(hwnd);
 
 	init_device(hwnd, window_size);
@@ -209,8 +207,8 @@ void Render_context::bind_default_render_targets()
 	D3D11_VIEWPORT viewport_desc;
 	viewport_desc.TopLeftX = 0;
 	viewport_desc.TopLeftY = 0;
-	viewport_desc.Width = float(_viewport_size.width);
-	viewport_desc.Height = float(_viewport_size.height);
+	viewport_desc.Width = float(_viewport_size.x);
+	viewport_desc.Height = float(_viewport_size.y);
 	viewport_desc.MinDepth = 0.0;
 	viewport_desc.MaxDepth = 1.0f;
 	_device_ctx->RSSetViewports(1, &viewport_desc);
@@ -223,8 +221,8 @@ void Render_context::init_device(HWND hwnd, const uint2& window_size)
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
 	swap_chain_desc.BufferCount = 2;
 	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swap_chain_desc.BufferDesc.Width = window_size.width;
-	swap_chain_desc.BufferDesc.Height = window_size.height;
+	swap_chain_desc.BufferDesc.Width = window_size.x;
+	swap_chain_desc.BufferDesc.Height = window_size.y;
 	swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swap_chain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -260,8 +258,8 @@ void Render_context::update_depth_stencil_view(bool force_refresh)
 	_depth_stencil_view.dispose();
 
 	D3D11_TEXTURE2D_DESC tex_desc = {};
-	tex_desc.Width = _viewport_size.width;
-	tex_desc.Height = _viewport_size.height;
+	tex_desc.Width = _viewport_size.x;
+	tex_desc.Height = _viewport_size.y;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
 	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -294,9 +292,9 @@ void Render_context::update_render_target_view()
 	assert(hr == S_OK);
 }
 
-void Render_context::resize_viewport(const cg::uint2& viewport_size)
+void Render_context::resize_viewport(const uint2& viewport_size)
 {
-	assert(greater_than(viewport_size, 0));
+	assert(viewport_size > 0);
 
 	const bool update_depth_stencil = !!_depth_stencil_view;
 	
@@ -310,7 +308,7 @@ void Render_context::resize_viewport(const cg::uint2& viewport_size)
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
 	_swap_chain->GetDesc(&swap_chain_desc);
 	_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount,
-		viewport_size.width, viewport_size.height,
+		viewport_size.x, viewport_size.y,
 		swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
 
 	update_render_target_view();
@@ -342,15 +340,15 @@ Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
 }
 
 Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
-	ID3D11Texture2D* tex_origin, const cg::uint2& size)
+	ID3D11Texture2D* tex_origin, const uint2& size)
 {
 	assert(tex_origin);
-	assert(greater_than(size, 0));
+	assert(size > 0);
 
 	D3D11_TEXTURE2D_DESC desc;
 	tex_origin->GetDesc(&desc);
-	desc.Width = size.width;
-	desc.Height = size.height;
+	desc.Width = size.x;
+	desc.Height = size.y;
 	
 	Com_ptr<ID3D11Texture2D> tex;
 	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &tex.ptr);

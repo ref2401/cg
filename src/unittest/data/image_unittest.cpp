@@ -6,18 +6,17 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "unittest/data/common_file.h"
 #include "CppUnitTest.h"
 
-using cg::uint2;
 using cg::data::Pixel_format;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<cg::uint2>(const cg::uint2& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<uint2>(const uint2& t) { RETURN_WIDE_STRING(t); }
 template<> inline std::wstring ToString<cg::data::Pixel_format>(const cg::data::Pixel_format& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramewor

@@ -1,11 +1,6 @@
 #include "technique/deferred_lighting/render_pass_shader.h"
 
 
-using cg::mat3;
-using cg::mat4;
-using cg::float2;
-using cg::float3;
-using cg::uint2;
 using cg::data::Glsl_program_desc;
 using cg::rnd::opengl::set_uniform;
 using cg::rnd::opengl::set_uniform_array_int;
@@ -38,7 +33,7 @@ void Gbuffer_pass_shader_program::set_uniform_array_smoothness(const float* ptr,
 	set_uniform_array_float(_u_arr_smoothness_location, ptr, count);
 }
 
-void Gbuffer_pass_shader_program::use(const mat4& projection_matrix, const mat4& view_matrix) noexcept
+void Gbuffer_pass_shader_program::use(const float4x4& projection_matrix, const float4x4& view_matrix) noexcept
 {
 	glUseProgram(_prog.id());
 	set_uniform(_u_projection_matrix_location, projection_matrix);
@@ -58,7 +53,7 @@ Lighting_pass_dir_shader_program::Lighting_pass_dir_shader_program(
 {}
 
 void Lighting_pass_dir_shader_program::set_uniform_array_far_plane_coords(
-	const std::array<cg::float3, 4>& far_plane_coords) noexcept
+	const std::array<float3, 4>& far_plane_coords) noexcept
 {
 	float arr[12] = {
 		far_plane_coords[0].x, far_plane_coords[0].y, far_plane_coords[0].z,
@@ -97,7 +92,7 @@ void Material_lighting_pass_shader_program::set_uniform_array_model_matrix(const
 	set_uniform_array_mat4(_u_arr_model_matrix_location, ptr, GLsizei(count));
 }
 
-void Material_lighting_pass_shader_program::use(const mat4& projection_matrix, const mat4& view_matrix,
+void Material_lighting_pass_shader_program::use(const float4x4& projection_matrix, const float4x4& view_matrix,
 	const Directional_light_params& dir_light) noexcept
 {
 	glUseProgram(_prog.id());

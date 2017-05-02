@@ -5,7 +5,6 @@
 
 namespace {
 
-using cg::uint2;
 using cg::sys::Key;
 using cg::sys::Key_state;
 using cg::sys::Mouse_buttons;
@@ -349,7 +348,7 @@ void Application::process_sys_messages(cg::rnd::Rhi_context_i& rhi_ctx, Sys_mess
 			{
 				_mouse.set_position(uint2(
 					msg.point.x,
-					_window.viewport_size().height - msg.point.y - 1));
+					_window.viewport_size().y - msg.point.y - 1));
 
 				listener.on_mouse_move();
 				break;
@@ -386,12 +385,12 @@ void Application::refresh_device_state() noexcept
 	POINT cp;
 	GetCursorPos(&cp);
 	ScreenToClient(_window.hwnd(), &cp);
-	bool is_out = (cp.x < 0) || (static_cast<uint32_t>(cp.x) >= _window.viewport_size().width)
-		|| (cp.y < 0) || (static_cast<uint32_t>(cp.y) >= _window.viewport_size().height);
+	bool is_out = (cp.x < 0) || (static_cast<uint32_t>(cp.x) >= _window.viewport_size().x)
+		|| (cp.y < 0) || (static_cast<uint32_t>(cp.y) >= _window.viewport_size().y);
 	_mouse.set_is_out(is_out);
 
 	if (!is_out)
-		_mouse.set_position(uint2(cp.x, _window.viewport_size().height - cp.y - 1));
+		_mouse.set_position(uint2(cp.x, _window.viewport_size().y - cp.y - 1));
 }
 
 Clock_report Application::run_main_loop(cg::rnd::Rhi_context_i& rhi_ctx, Example& example)

@@ -1,7 +1,7 @@
 #ifndef TECHNIQUE_DEFERRED_LIGHTING_FILTER_SHADER_H_
 #define TECHNIQUE_DEFERRED_LIGHTING_FILTER_SHADER_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl.h"
 
 
@@ -43,18 +43,18 @@ public:
 	// Sets shader program ready to make the horizontal filter pass.
 	void use_for_horizontal_pass() noexcept
 	{
-		use_for_pass(cg::uint2::unit_x);
+		use_for_pass(uint2::unit_x);
 	}
 
 	// Sets shader program ready to make the vertical filter pass.
 	void use_for_vertical_pass() noexcept
 	{
-		use_for_pass(cg::uint2::unit_y);
+		use_for_pass(uint2::unit_y);
 	}
 
 
 private:
-	void use_for_pass(const cg::uint2& direction) noexcept;
+	void use_for_pass(const uint2& direction) noexcept;
 
 	Filter_type _filter_type = Filter_type::none;
 	Filter_kernel_radius _kernel_radius = Filter_kernel_radius::none;
@@ -65,9 +65,9 @@ private:
 
 // Generates random vectors within a unit hemisphere.
 // The hemisphere is located at (0, 0, 0) and oriendted along the positive OZ axis.
-std::vector<cg::float3> generate_hemispherical_sample_kernel(size_t sample_count);
+std::vector<float3> generate_hemispherical_sample_kernel(size_t sample_count);
 
-std::vector<cg::float3> generate_sphere_normalized_sample_kernel(size_t sample_count);
+std::vector<float3> generate_sphere_normalized_sample_kernel(size_t sample_count);
 
 std::string get_filter_pixel_shader_filename(Filter_type filter_type, Filter_kernel_radius kernel_radius) noexcept;
 

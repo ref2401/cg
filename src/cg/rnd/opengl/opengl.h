@@ -38,7 +38,7 @@ public:
 		return Render_api::opengl_45;
 	}
 
-	void resize_viewport(const cg::uint2& viewport_size) override;
+	void resize_viewport(const uint2& viewport_size) override;
 
 	void swap_color_buffers() override;
 

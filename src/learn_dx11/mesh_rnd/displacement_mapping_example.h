@@ -1,7 +1,7 @@
 #ifndef LEARN_DX11_DISPLACEMENT_MAPPING_EXAMPLE_H_
 #define LEARN_DX11_DISPLACEMENT_MAPPING_EXAMPLE_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/app.h"
 
 
@@ -26,7 +26,7 @@ public:
 	Displacement_mapping_example& operator=(Displacement_mapping_example&&) noexcept = delete;
 
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -62,9 +62,9 @@ private:
 	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_normal_map_srv;
 	Com_ptr<ID3D11SamplerState> _linear_sampler;
 
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
+	float4x4 _projection_matrix;
+	float4x4 _view_matrix;
+	float4x4 _model_matrix;
 };
 
 } // namespace mesh_rnd

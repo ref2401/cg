@@ -2,7 +2,7 @@
 #define CG_DATA_MODEL_ASSIMP_H_
 
 #include <utility>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"

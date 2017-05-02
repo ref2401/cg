@@ -5,7 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/rnd.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "cg/rnd/dx11/dx11.h"
@@ -140,7 +140,7 @@ private:
 
 		// type = Type::mouse_move.	Mouse position within the window's client area. 
 		//							The value is relative to the upper-left corner.
-		cg::uint2 point = cg::uint2::zero;
+		uint2 point;
 	};
 
 

@@ -4,7 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/data/image.h"
 #include "assimp/scene.h"
 
@@ -15,7 +15,7 @@ struct Bone final {
 	static constexpr size_t blank_parent_index = std::numeric_limits<size_t>::max();
 
 
-	explicit Bone(const char* name, size_t parent_index, const cg::mat4& bp_matrix);
+	explicit Bone(const char* name, size_t parent_index, const float4x4& bp_matrix);
 
 
 	// Name of the bone specified by an artist.
@@ -26,10 +26,10 @@ struct Bone final {
 	size_t parent_index = Bone::blank_parent_index;
 
 	// Bind pose matrix.
-	cg::mat4 bp_matrix;
+	float4x4 bp_matrix;
 
 	// Inverse of the bind pose matrix.
-	cg::mat4 bp_matrix_inv;
+	float4x4 bp_matrix_inv;
 };
 
 struct Mesh_draw_params final {
@@ -44,29 +44,29 @@ struct Mesh_draw_params final {
 struct Transform final {
 	Transform() noexcept = default;
 
-	Transform(const cg::float3& position, const cg::quat& rotation) noexcept :
+	Transform(const float3& position, const quat& rotation) noexcept :
 		position(position), rotation(rotation)
 	{}
 
-	cg::float3 position = cg::float3::zero;
-	cg::quat rotation = cg::quat::identity;
+	float3 position = float3::zero;
+	quat rotation = quat::identity;
 };
 
 struct Vertex final {
 
 	Vertex() noexcept = default;
 
-	Vertex(const cg::float3& position, const cg::float3& normal, const cg::float2& tex_coord) :
+	Vertex(const float3& position, const float3& normal, const float2& tex_coord) :
 		position(position), normal(normal), tex_coord(tex_coord)
 	{}
 
 	void register_bone(uint32_t bone_index, float bone_weight) noexcept;
 
-	cg::float3 position;
-	cg::float3 normal;
-	cg::float2 tex_coord;
-	cg::uint4 bone_indices;
-	cg::float4 bone_weights;
+	float3 position;
+	float3 normal;
+	float2 tex_coord;
+	uint4 bone_indices;
+	float4 bone_weights;
 };
 
 class Skeleton_animation final {

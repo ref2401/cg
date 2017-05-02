@@ -3,7 +3,7 @@
 
 #include <array>
 #include <vector>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl.h"
 #include "cg/sys/app.h"
 #include "technique/deferred_lighting/frame.h"
@@ -135,10 +135,10 @@ private:
 	Directional_light _dir_light;
 	std::vector<Renderable> _rednerable_objects;
 	// scene viewpoint (camera)
-	cg::mat4 _projection_matrix;
+	float4x4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
-	std::array<cg::float3, 4> _far_plane_coords; // left-bottom, right-bottom, right-top, left-top
+	std::array<float3, 4> _far_plane_coords; // left-bottom, right-bottom, right-top, left-top
 	// renderer stuff
 	Renderer _renderer;
 	Frame _frame;
@@ -150,8 +150,8 @@ private:
 	DE_cmd _cmd_teapot;
 	Material_library _material_library;
 	// viewpoint mouse rotation stuff
-	cg::float2 _view_roll_angles;
-	cg::float2 _prev_mouse_pos_ndc;
+	float2 _view_roll_angles;
+	float2 _prev_mouse_pos_ndc;
 };
 
 } // namespace deferred_lighting

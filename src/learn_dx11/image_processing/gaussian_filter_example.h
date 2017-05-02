@@ -1,7 +1,7 @@
 #ifndef LEARN_DX11_IMAGE_PROCESSNG_GAUSSIAN_FILTER_EXAMPLE_H_
 #define LEARN_DX11_IMAGE_PROCESSNG_GAUSSIAN_FILTER_EXAMPLE_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/app.h"
 
 
@@ -28,7 +28,7 @@ public:
 
 	void on_keypress() override {}
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -46,7 +46,7 @@ private:
 
 	void setup_pipeline_state();
 
-	void update_matrix_cbuffer(const cg::mat4& matrix);
+	void update_matrix_cbuffer(const float4x4& matrix);
 
 	void update_pvm_matrix(float aspect_ratio);
 
@@ -68,10 +68,10 @@ private:
 	Hlsl_compute _gaussian_filter_compute;
 	Hlsl_shader_set _render_image_shader;
 
-	cg::mat4 _pvm_matrix_0;
-	cg::mat4 _pvm_matrix_1;
-	cg::mat4 _model_matrix_0;
-	cg::mat4 _model_matrix_1;
+	float4x4 _pvm_matrix_0;
+	float4x4 _pvm_matrix_1;
+	float4x4 _model_matrix_0;
+	float4x4 _model_matrix_1;
 };
 
 } // namespace image_processing

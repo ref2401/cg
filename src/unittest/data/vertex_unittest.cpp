@@ -3,9 +3,6 @@
 #include "unittest/math/common_math.h"
 #include "CppUnitTest.h"
 
-using cg::float2;
-using cg::float3;
-using cg::float4;
 using cg::data::Vertex_attribs;
 using cg::data::Vertex_interleaved_format;
 using cg::data::Vertex_interleaved_format_desc;
@@ -191,7 +188,6 @@ public:
 
 	TEST_METHOD(compute_tangent_bitangent)
 	{
-		using cg::normalize;
 		using cg::data::compute_tangent_bitangent;
 
 		float3 lb_pos0(-1, -1, 0);	float2 lb_tc0 = float2::zero;		// left-bottom
@@ -206,7 +202,6 @@ public:
 
 	TEST_METHOD(compute_tangent_handedness)
 	{
-		using cg::normalize;
 		using cg::data::compute_tangent_handedness;
 
 		float3 tangent = normalize(float3(1, 0, 1)); // z component is set to 1 to check Gram-Schmidt orthogonalization

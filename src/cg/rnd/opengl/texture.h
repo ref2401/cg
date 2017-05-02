@@ -4,7 +4,7 @@
 #include <ostream>
 #include <utility>
 #include "cg/data/image.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/buffer.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"

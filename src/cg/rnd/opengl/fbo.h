@@ -1,7 +1,7 @@
 #ifndef CG_RND_OPENGL_FBO_H_
 #define CG_RND_OPENGL_FBO_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "cg/rnd/opengl/opengl_def.h"
 #include "cg/rnd/opengl/opengl_utility.h"
 #include "cg/rnd/opengl/texture.h"
@@ -16,7 +16,7 @@ public:
 
 	Renderbuffer() noexcept = default;
 
-	Renderbuffer(GLenum internal_format, const cg::uint2& size) noexcept;
+	Renderbuffer(GLenum internal_format, const uint2& size) noexcept;
 
 	Renderbuffer(const Renderbuffer&) = delete;
 
@@ -44,23 +44,23 @@ public:
 	}
 
 	// Reallocates a new storage for the renderbuffer object.
-	void reallocate_storage(GLenum internal_format, const cg::uint2& size) noexcept;
+	void reallocate_storage(GLenum internal_format, const uint2& size) noexcept;
 
 	//  Size of the renderbuffer in pixels.
-	cg::uint2 size() const noexcept
+	uint2 size() const noexcept
 	{
 		return _size;
 	}
 
 	// Sets the new size of the renderbuffer. 
 	// Calls the reallocate storage method.
-	void set_size(const cg::uint2& size) noexcept;
+	void set_size(const uint2& size) noexcept;
 
 private:
 
 	GLuint _id = Blank::renderbuffer_id;
 	GLenum _internal_format = GL_NONE;
-	cg::uint2 _size = cg::uint2::zero;
+	uint2 _size;
 };
 
 // Framebuffer object supports 8 simultaneous color attachments.

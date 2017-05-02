@@ -1,12 +1,9 @@
-#ifndef CG_MATH_MATH_H_
-#define CG_MATH_MATH_H_
-
-#include "cg/math/matrix.h"
-#include "cg/math/transform.h"
-#include "cg/math/utility.h"
-#include "cg/math/vector.h"
+#ifndef CG_BASE_MATH_H_
+#define CG_BASE_MATH_H_
 
 #include "math/math.h"
+
+using namespace math;
 
 
 namespace cg {
@@ -45,7 +42,7 @@ std::wostream& operator<<(std::wostream& out, const Viewpoint& vp);
 // Returns distance bitween position and target.
 inline float distance(const Viewpoint& vp) noexcept
 {
-	return cg::len(vp.target - vp.position);
+	return len(vp.target - vp.position);
 }
 
 // Direction in which this viewpoint(camera) points to.
@@ -59,13 +56,13 @@ Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept;
 
 // Calculates a matrix that cam be used to transform from world space to this view space.
 // Make sure that up is normalized before calling this method.
-inline mat4 view_matrix(const Viewpoint& vp) noexcept
+inline float4x4 view_matrix(const Viewpoint& vp) noexcept
 {
-	return cg::view_matrix(vp.position, vp.target, vp.up);
+	return view_matrix(vp.position, vp.target, vp.up);
 }
 
 // Linearly interpolates between two viewpoints and calculates a view matrix using the interpolation result.
-inline mat4 view_matrix(const Viewpoint& l, const Viewpoint& r, float lerp_factor) noexcept
+inline float4x4 view_matrix(const Viewpoint& l, const Viewpoint& r, float lerp_factor) noexcept
 {
 	assert(0.0f <= lerp_factor && lerp_factor <= 1.0f);
 
@@ -76,4 +73,4 @@ inline mat4 view_matrix(const Viewpoint& l, const Viewpoint& r, float lerp_facto
 
 } // namespace cg
 
-#endif // CG_MATH_MATH_H_
+#endif // CG_BASE_MATH_H_

@@ -3,11 +3,6 @@
 #include <type_traits>
 #include "cg/data/shader.h"
 
-using cg::float2;
-using cg::float3;
-using cg::float4;
-using cg::mat4;
-
 
 namespace learn_dx11 {
 namespace mesh_rnd {
@@ -20,8 +15,8 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx)
 	init_geometry(); // vertex shader bytecode is required to create vertex input layout
 	init_render_states();
 	
-	_view_matrix = cg::view_matrix(float3(0, 2, 8.0f), float3::zero);
-	update_projection_matrix(rnd_ctx.viewport_size().aspect_ratio());
+	_view_matrix = view_matrix(float3(0, 2, 8.0f), float3::zero);
+	update_projection_matrix(aspect_ratio(rnd_ctx.viewport_size()));
 	update_projection_view_matrices();
 
 	setup_pipeline_state();
@@ -29,11 +24,11 @@ Vertex_skinning_example::Vertex_skinning_example(Render_context& rnd_ctx)
 
 void Vertex_skinning_example::init_cbuffers()
 {
-	_scene_cbuffer = make_cbuffer(_device, sizeof(mat4));
-	_model_cbuffer = make_cbuffer(_device, sizeof(mat4));
+	_scene_cbuffer = make_cbuffer(_device, sizeof(float4x4));
+	_model_cbuffer = make_cbuffer(_device, sizeof(float4x4));
 
 	float matrix_data[16];
-	_model_matrix = cg::translation_matrix(float3(0, -3.4f, 0)) * cg::rotation_matrix_ox<mat4>(-cg::pi_2);
+	_model_matrix = translation_matrix(float3(0, -3.4f, 0)) * rotation_matrix_ox<float4x4>(-pi_2);
 	to_array_column_major_order(_model_matrix, matrix_data);
 
 	_device_ctx->UpdateSubresource(_model_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
@@ -48,11 +43,11 @@ void Vertex_skinning_example::init_geometry()
 
 	// bone matrices buffer
 	D3D11_BUFFER_DESC bmb_desc = {};
-	bmb_desc.ByteWidth = UINT(_model_animation->bone_count() * sizeof(mat4));
+	bmb_desc.ByteWidth = UINT(_model_animation->bone_count() * sizeof(float4x4));
 	bmb_desc.Usage = D3D11_USAGE_DEFAULT;
 	bmb_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	bmb_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	bmb_desc.StructureByteStride = sizeof(mat4);
+	bmb_desc.StructureByteStride = sizeof(float4x4);
 
 	HRESULT hr = _device->CreateBuffer(&bmb_desc, nullptr, &_model_bone_matrices_buffer.ptr);
 	assert(hr == S_OK);
@@ -120,8 +115,8 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		const auto& image = mesh_draw_params[i].diffuse_rgb_image;
 
 		D3D11_TEXTURE2D_DESC tex_desc = {};
-		tex_desc.Width = image.size().width;
-		tex_desc.Height = image.size().height;
+		tex_desc.Width = image.size().x;
+		tex_desc.Height = image.size().y;
 		tex_desc.MipLevels = 1;
 		tex_desc.ArraySize = 1;
 		tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -132,7 +127,7 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		
 		D3D11_SUBRESOURCE_DATA tex_data = {};
 		tex_data.pSysMem = image.data();
-		tex_data.SysMemPitch = UINT(image.size().width * byte_count(image.pixel_format()));
+		tex_data.SysMemPitch = UINT(image.size().x * byte_count(image.pixel_format()));
 		tex_data.SysMemSlicePitch = UINT(image.byte_count());
 
 		HRESULT hr = _device->CreateTexture2D(&tex_desc, &tex_data, 
@@ -185,7 +180,7 @@ void Vertex_skinning_example::init_shaders()
 
 void Vertex_skinning_example::update_projection_matrix(float wh_aspect_ratio)
 {
-	_projection_matrix = cg::perspective_matrix_directx(cg::pi_3, wh_aspect_ratio, 1.0f, 100.0f);
+	_projection_matrix = perspective_matrix_directx(pi_3, wh_aspect_ratio, 1.0f, 100.0f);
 }
 
 void Vertex_skinning_example::setup_pipeline_state()
@@ -218,21 +213,21 @@ void Vertex_skinning_example::setup_pipeline_state()
 void Vertex_skinning_example::update_projection_view_matrices()
 {
 	float matrix_data[16];
-	mat4 proj_view_matrix = _projection_matrix * _view_matrix;
+	float4x4 proj_view_matrix = _projection_matrix * _view_matrix;
 	to_array_column_major_order(proj_view_matrix, matrix_data);
 
 	_device_ctx->UpdateSubresource(_scene_cbuffer.ptr, 0, nullptr, &matrix_data, 0, 0);
 }
 
-void Vertex_skinning_example::on_viewport_resize(const cg::uint2& viewport_size)
+void Vertex_skinning_example::on_viewport_resize(const uint2& viewport_size)
 {
-	update_projection_matrix(viewport_size.aspect_ratio());
+	update_projection_matrix(aspect_ratio(viewport_size));
 	update_projection_view_matrices();
 }
 
 void Vertex_skinning_example::render()
 {
-	static const float4 clear_color = cg::rgba(0xbca8ffff);
+	static const float4 clear_color = rgba(0xbca8ffff);
 
 	clear_color_buffer(clear_color);
 	clear_depth_stencil_buffer(1.0f);

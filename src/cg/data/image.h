@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace cg {
@@ -50,7 +50,7 @@ public:
 	// Total number of bytes occupied by this image.
 	size_t byte_count() const noexcept
 	{
-		return _size.square<size_t>();
+		return square(_size);
 	}
 
 	// Returns pointer to the underlying buffer serving as pixel storage.

@@ -31,8 +31,8 @@ Image_2d::Image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 		throw std::runtime_error(EXCEPTION_MSG("Loading ", filename, " image error. ", stb_error));
 	}
 
-	_size.width = width;
-	_size.height = height;
+	_size.x = width;
+	_size.y = height;
 	uint8_t cc = (channel_count) ? channel_count : uint8_t(actual_channel_count);
 	switch (cc) {
 		case 1: _pixel_format = Pixel_format::red_8; break;

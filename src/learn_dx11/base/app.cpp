@@ -3,8 +3,6 @@
 #include <cassert>
 #include <chrono>
 
-using cg::uint2;
-using cg::greater_than;
 
 namespace {
 
@@ -48,8 +46,8 @@ HWND make_window(HINSTANCE hinstance, const uint2& position, const uint2& size)
 	RECT wnd_rect;
 	wnd_rect.left = position.x;
 	wnd_rect.top = position.y;
-	wnd_rect.right = position.x + size.width;
-	wnd_rect.bottom = position.y + size.height;
+	wnd_rect.right = position.x + size.x;
+	wnd_rect.bottom = position.y + size.y;
 	AdjustWindowRectEx(&wnd_rect, WS_OVERLAPPEDWINDOW, false, WS_EX_APPWINDOW);
 
 	HWND hwnd = CreateWindowEx(WS_EX_APPWINDOW, wnd_class_name, "Learn DirectX 11",
@@ -109,9 +107,9 @@ namespace learn_dx11 {
 
 // ----- Example -----
 
-void Example::clear_color_buffer(const cg::float4& clear_color)
+void Example::clear_color_buffer(const float4& clear_color)
 {
-	_device_ctx->ClearRenderTargetView(_rnd_ctx.render_target_view(), clear_color.data);
+	_device_ctx->ClearRenderTargetView(_rnd_ctx.render_target_view(), &clear_color.x);
 }
 
 void Example::clear_depth_stencil_buffer(float clear_depth)
@@ -134,7 +132,7 @@ void Example::clear_depth_stencil_buffer(float clear_depth)
 
 // ----- Application -----
 
-Application::Application(cg::uint2 window_position, cg::uint2 window_size) :
+Application::Application(const uint2& window_position, const uint2& window_size) :
 	_hinstance(GetModuleHandle(nullptr)),
 	_hwnd(make_window(_hinstance, window_position, window_size))
 {
@@ -156,7 +154,7 @@ void Application::on_keypress()
 
 void Application::on_window_resize(const uint2& window_size)
 {
-	assert(greater_than(window_size, 0));
+	assert(window_size > 0);
 
 	if (window_size == _rnd_ctx->viewport_size()) return;
 

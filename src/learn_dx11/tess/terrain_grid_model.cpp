@@ -1,7 +1,7 @@
 #include "learn_dx11/tess/terrain_grid_model.h"
 
 #include <cassert>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace {
@@ -19,32 +19,32 @@ public:
 
 	uint32_t bottom_left_index(int64_t row, int64_t column) noexcept
 	{
-		int64_t r = cg::clamp(row, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column, int64_t(0), _column_count);
+		int64_t r = clamp(row, int64_t(0), _row_count);
+		int64_t c = clamp(column, int64_t(0), _column_count);
 
 		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t bottom_right_index(int64_t row, int64_t column) noexcept
 	{
-		int64_t r = cg::clamp(row, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
+		int64_t r = clamp(row, int64_t(0), _row_count);
+		int64_t c = clamp(column + 1, int64_t(0), _column_count);
 
 		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t top_left_index(int64_t row, int64_t column) noexcept
 	{
-		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column, int64_t(0), _column_count);
+		int64_t r = clamp(row + 1, int64_t(0), _row_count);
+		int64_t c = clamp(column, int64_t(0), _column_count);
 
 		return uint32_t(r * (_column_count + 1) + c);
 	}
 
 	uint32_t top_right_index(int64_t row, int64_t column) noexcept
 	{
-		int64_t r = cg::clamp(row + 1, int64_t(0), _row_count);
-		int64_t c = cg::clamp(column + 1, int64_t(0), _column_count);
+		int64_t r = clamp(row + 1, int64_t(0), _row_count);
+		int64_t c = clamp(column + 1, int64_t(0), _column_count);
 
 		return uint32_t(r * (_column_count + 1) + c);
 	}

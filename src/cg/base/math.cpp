@@ -1,5 +1,4 @@
-#include "cg/math/math.h"
-
+#include "cg/base/math.h"
 
 
 namespace cg {
@@ -21,9 +20,9 @@ Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept
 	assert(0.0f <= factor && factor <= 1.0f);
 
 	return Viewpoint(
-		cg::lerp(l.position, r.position, factor),
-		cg::lerp(l.target, r.target, factor),
-		cg::lerp(l.up, r.up, factor)
+		lerp(l.position, r.position, factor),
+		lerp(l.target, r.target, factor),
+		lerp(l.up, r.up, factor)
 	);
 }
 

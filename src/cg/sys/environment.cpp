@@ -58,7 +58,7 @@ Window::Window(HINSTANCE hinstance, WNDPROC window_proc, uint2 position, uint2 v
 {
 	assert(hinstance);
 	assert(window_proc);
-	assert(greater_than(viewport_size, 0));
+	assert(viewport_size > uint32_t(0));
 
 	// register the window's class
 	WNDCLASSEX wnd_class = {};
@@ -81,8 +81,8 @@ Window::Window(HINSTANCE hinstance, WNDPROC window_proc, uint2 position, uint2 v
 	RECT wnd_rect;
 	wnd_rect.left = position.x;
 	wnd_rect.top = position.y;
-	wnd_rect.right = position.x + viewport_size.width;
-	wnd_rect.bottom = position.y + viewport_size.height;
+	wnd_rect.right = position.x + viewport_size.x;
+	wnd_rect.bottom = position.y + viewport_size.y;
 	AdjustWindowRectEx(&wnd_rect, WS_OVERLAPPEDWINDOW, false, WS_EX_APPWINDOW);
 
 	_hwnd = CreateWindowEx(WS_EX_APPWINDOW, Window::wnd_class_name, "cg project",

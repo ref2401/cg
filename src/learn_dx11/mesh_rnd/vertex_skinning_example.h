@@ -2,7 +2,7 @@
 #define LEARN_DX11_MESH_RND_VERTEX_SKINNING_EXAMPLE_H_
 
 #include <memory>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/app.h"
 #include "learn_dx11/base/dx11.h"
 #include "learn_dx11/base/bob_lamp_model.h"
@@ -29,7 +29,7 @@ public:
 	Vertex_skinning_example& operator=(Vertex_skinning_example&&) noexcept = delete;
 
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -77,9 +77,9 @@ private:
 	std::vector<Draw_indexed_params> _draw_indexed_params;
 	std::unique_ptr<Model_animation> _model_animation;
 	std::vector<float> _curr_bone_matrices_data;
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
+	float4x4 _projection_matrix;
+	float4x4 _view_matrix;
+	float4x4 _model_matrix;
 };
 
 } // namespace mesh_rnd

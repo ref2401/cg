@@ -1,7 +1,7 @@
 #ifndef LEARN_DX11_MESH_RND_STATIC_MESH_EXAMPLE_H_
 #define LEARN_DX11_MESH_RND_STATIC_MESH_EXAMPLE_H_
 
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/app.h"
 #include "learn_dx11/base/dx11.h"
 
@@ -27,7 +27,7 @@ public:
 	Static_mesh_example& operator=(Static_mesh_example&&) noexcept = delete;
 
 
-	void on_viewport_resize(const cg::uint2& viewport_size) override;
+	void on_viewport_resize(const uint2& viewport_size) override;
 
 	void render() override;
 
@@ -61,9 +61,9 @@ private:
 	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
 	UINT _model_index_count;
-	cg::mat4 _projection_matrix;
-	cg::mat4 _view_matrix;
-	cg::mat4 _model_matrix;
+	float4x4 _projection_matrix;
+	float4x4 _view_matrix;
+	float4x4 _model_matrix;
 	Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
 	Com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_view;
 	Com_ptr<ID3D11SamplerState> _sampler_state;

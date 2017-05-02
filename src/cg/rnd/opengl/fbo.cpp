@@ -86,12 +86,12 @@ void Renderbuffer::reallocate_storage(GLenum internal_format, const uint2& size)
 {
 	assert(_id != Blank::renderbuffer_id);
 	assert(is_valid_texture_internal_format(internal_format));
-	assert(greater_than(size, 0));
+	assert(size >  0);
 
 	_internal_format = internal_format;
 	_size = size;
 
-	glNamedRenderbufferStorage(_id, _internal_format, _size.width, _size.height);
+	glNamedRenderbufferStorage(_id, _internal_format, _size.x, _size.y);
 }
 
 void Renderbuffer::set_size(const uint2& size) noexcept

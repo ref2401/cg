@@ -182,10 +182,7 @@
     <ClCompile Include="data\model_unittest.cpp" />
     <ClCompile Include="data\shader_unittest.cpp" />
     <ClCompile Include="data\vertex_unittest.cpp" />
-    <ClCompile Include="math\matrix_unittest.cpp" />
     <ClCompile Include="math\transform_unittest.cpp" />
-    <ClCompile Include="math\utility_unittest_math.cpp" />
-    <ClCompile Include="math\vector_unittest.cpp" />
     <ClCompile Include="rnd\dx11\dx11_unittest.cpp" />
     <ClCompile Include="rnd\opengl\buffer_unittest.cpp" />
     <ClCompile Include="rnd\opengl\fbo_unittest.cpp" />

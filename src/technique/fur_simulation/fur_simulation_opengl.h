@@ -196,8 +196,8 @@ public:
 
 
 	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
-		const cg::mat4& pvm_matrix, const cg::mat4& model_matrix,
-		const cg::float3& view_position_ws, const cg::float3& light_dir_ws) noexcept;
+		const float4x4& pvm_matrix, const float4x4& model_matrix,
+		const float3& view_position_ws, const float3& light_dir_ws) noexcept;
 
 private:
 
@@ -220,8 +220,8 @@ public:
 
 
 	void perform(const Geometry_buffers& geometry_buffers, const Material& material,
-		const cg::mat4& projection_view_matrix, const cg::mat4& model_matrix, 
-		const cg::float3& dir_to_light_ws) noexcept;
+		const float4x4& projection_view_matrix, const float4x4& model_matrix,
+		const float3& dir_to_light_ws) noexcept;
 
 private:
 
@@ -243,8 +243,8 @@ public:
 	Physics_simulation_pass& operator=(Physics_simulation_pass&&) = delete;
 
 
-	void perform(Geometry_buffers& geometry_buffers, const cg::float4& extern_accel_ms,
-		const cg::float3& angular_velocity_ms, float strand_length, 
+	void perform(Geometry_buffers& geometry_buffers, const float4& extern_accel_ms,
+		const float3& angular_velocity_ms, float strand_length, 
 		const Strand_properties& strand_props) noexcept;
 
 private:
@@ -267,7 +267,7 @@ public:
 	Strand_debug_pass& operator=(Strand_debug_pass&&) = delete;
 
 
-	void perform(Geometry_buffers& geometry_buffers, const cg::mat4& pvm_matrix) noexcept;
+	void perform(Geometry_buffers& geometry_buffers, const float4x4& pvm_matrix) noexcept;
 
 private:
 
@@ -301,16 +301,16 @@ private:
 	struct Model_transform {
 		Model_transform() noexcept = default;
 
-		Model_transform(const cg::float3& position, const cg::float3& rotation_axis,
-			const cg::float3& scale) noexcept
+		Model_transform(const float3& position, const float3& rotation_axis,
+			const float3& scale) noexcept
 			: position(position), rotation_axis(rotation_axis), scale(scale)
 		{}
 			
-		cg::float3 position;
-		cg::float3 rotation_axis;
+		float3 position;
+		float3 rotation_axis;
 		float rotation_angle_total = 0.0f;
 		float rotation_angle = 0.0f;
-		cg::float3 scale;
+		float3 scale;
 	};
 
 	void update_curr_viewpoint();
@@ -318,21 +318,21 @@ private:
 	void update_projection_matrix();
 
 	// camera
-	cg::mat4 _projection_matrix;
+	float4x4 _projection_matrix;
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
-	cg::float2 _view_roll_angles;
-	cg::float2 _prev_mouse_pos_ndc;
+	float2 _view_roll_angles;
+	float2 _prev_mouse_pos_ndc;
 	// model
 	Model_transform _model_transform;
-	cg::float3 _movement_speed;
-	cg::float3 _movement_acceleration;
+	float3 _movement_speed;
+	float3 _movement_acceleration;
 	//cg::float3 _wind_acceleration;
-	cg::mat4 _model_matrix;
+	float4x4 _model_matrix;
 	Material_gallery _material_gallery;
 	const Material* _curr_material = nullptr;
 	Geometry_buffers _geometry_buffers;
-	cg::float3 _dir_to_light_ws;
+	float3 _dir_to_light_ws;
 	// render
 	Fur_pass _fur_pass;
 	Opaque_model_pass _opaque_model_pass;

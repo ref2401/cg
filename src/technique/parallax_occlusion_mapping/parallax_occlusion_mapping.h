@@ -94,11 +94,11 @@ private:
 	ID3D11Debug* _debug = nullptr;
 	ID3D11DeviceContext* _device_ctx = nullptr;
 	// rendering
-	cg::float2 _view_roll_angles;
-	cg::float2 _prev_mouse_position;
+	float2 _view_roll_angles;
+	float2 _prev_mouse_position;
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
-	cg::mat4 _projection_matrix;
+	float4x4 _projection_matrix;
 	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
 	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_vertex_shader;
@@ -106,11 +106,11 @@ private:
 	cg::rnd::dx11::Com_ptr<ID3D11SamplerState> _sampler_state;
 	cg::rnd::dx11::Hlsl_shader _pom_shader;
 	// light
-	cg::float3 _dlight_position_ws;
-	cg::float3 _dlight_velocity_ws;
+	float3 _dlight_position_ws;
+	float3 _dlight_velocity_ws;
 	// model
-	cg::float3 _model_scale;
-	cg::float3 _model_position;
+	float3 _model_scale;
+	float3 _model_position;
 	cg::rnd::dx11::Com_ptr<ID3D11InputLayout> _pom_input_layout;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _vertex_buffer;
 	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _index_buffer;

@@ -17,8 +17,8 @@ uint2 get_scaled_viewport_size(const uint2& viewport_size, float scale) noexcept
 {
 	assert(scale > 0.0f);
 
-	float width = viewport_size.width * scale;
-	float height = viewport_size.height * scale;
+	float width = viewport_size.x * scale;
+	float height = viewport_size.y * scale;
 	return uint2(uint32_t(width), uint32_t(height));
 }
 
@@ -86,14 +86,14 @@ Gbuffer_pass::Gbuffer_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc& 
 	validate(_fbo);
 }
 
-void Gbuffer_pass::begin(const cg::mat4& projection_matrix, const cg::mat4& view_matrix) noexcept
+void Gbuffer_pass::begin(const float4x4& projection_matrix, const float4x4& view_matrix) noexcept
 {
 	glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glViewport(0, 0, _gbuffer.viewport_size().x, _gbuffer.viewport_size().y);
 	glClearBufferfv(GL_COLOR, 0, _clear_value_nds);
 	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth_map);
 
@@ -138,7 +138,7 @@ Lighting_pass::Lighting_pass(Gbuffer& gbuffer, const cg::data::Glsl_program_desc
 void Lighting_pass::begin() noexcept
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glViewport(0, 0, _gbuffer.viewport_size().x, _gbuffer.viewport_size().y);
 	glClearColor(_clear_value_color.x, _clear_value_color.y, _clear_value_color.z, _clear_value_color.y);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -173,13 +173,13 @@ Material_lighting_pass::Material_lighting_pass(Gbuffer& gbuffer, const cg::data:
 	validate(_fbo);
 }
 
-void Material_lighting_pass::begin(const mat4& projection_matrix, const mat4& view_matrix,
+void Material_lighting_pass::begin(const float4x4& projection_matrix, const float4x4& view_matrix,
 	const Directional_light_params& dir_light) noexcept
 {
 	glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glViewport(0, 0, _gbuffer.viewport_size().x, _gbuffer.viewport_size().x);
 	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
 
 
@@ -254,7 +254,7 @@ void Shadow_map_pass::begin(const Directional_light_params& dir_light) noexcept
 	glColorMask(true, true, false, false);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glViewport(0, 0, _gbuffer.viewport_size().x, _gbuffer.viewport_size().y);
 	glClearBufferfv(GL_COLOR, 0, _clear_value_shadow_occlusion);
 	glClearBufferfv(GL_DEPTH, 0, &_clear_value_depth);
 
@@ -317,8 +317,8 @@ void Ssao_pass::perform() noexcept
 {
 	// begin
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo.id());
-	glViewport(0, 0, _gbuffer.tex_ssao_map().size().width, _gbuffer.tex_ssao_map().size().height);
-	glClearBufferfv(GL_COLOR, 0, &_clear_value_ssao_map.r);
+	glViewport(0, 0, _gbuffer.tex_ssao_map().size().x, _gbuffer.tex_ssao_map().size().y);
+	glClearBufferfv(GL_COLOR, 0, &_clear_value_ssao_map.x);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
 	glBindTextureUnit(0, _gbuffer.tex_nds().id());
@@ -373,7 +373,7 @@ Tone_mapping_pass::Tone_mapping_pass(Gbuffer& gbuffer, const cg::data::Glsl_prog
 void Tone_mapping_pass::perform() noexcept
 {
 	// renders directly into the back buffer.
-	glViewport(0, 0, _gbuffer.viewport_size().width, _gbuffer.viewport_size().height);
+	glViewport(0, 0, _gbuffer.viewport_size().x, _gbuffer.viewport_size().y);
 	glClearBufferfv(GL_COLOR, 0, &_clear_value_color.x);
 
 	glBindSampler(0, _gbuffer.nearest_sampler().id());
@@ -505,7 +505,7 @@ void Renderer::render(const Frame& frame) noexcept
 
 void Renderer::resize_viewport(const uint2& size) noexcept
 {
-	assert(cg::greater_than(size, 0));
+	assert(size > 0);
 	if (_gbuffer.viewport_size() == size) return;
 
 	_gbuffer.resize(size);

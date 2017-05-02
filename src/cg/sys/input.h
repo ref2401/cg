@@ -3,7 +3,7 @@
 
 #include <ostream>
 #include <type_traits>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace cg {
@@ -254,7 +254,7 @@ public:
 	}
 
 	// Calculates mouse's position as normalized device coordinates.
-	cg::float2 get_ndc_position(const cg::uint2& window_size) const noexcept;
+	float2 get_ndc_position(const uint2& window_size) const noexcept;
 
 	// True if cursor left the client area of the window.
 	bool is_out() const noexcept
@@ -288,18 +288,19 @@ public:
 	// Mouse position within the window's client area. 
 	// The value is relative to the bottom-left corner.
 	// The value is undefined if is_out() returns true.
-	const cg::uint2& position() const noexcept
+	const uint2& position() const noexcept
 	{
 		return _position;
 	}
 
-	void set_position(const cg::uint2& position) noexcept
+	void set_position(const uint2& position) noexcept
 	{
 		_position = position;
 	}
 
 private:
-	cg::uint2 _position = cg::uint2::zero;
+
+	uint2 _position = uint2::zero;
 	Mouse_buttons _buttons = Mouse_buttons::none;
 	bool _is_out = true;
 };

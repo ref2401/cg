@@ -6,7 +6,7 @@
 #include <vector>
 #include "cg/data/image.h"
 #include "cg/data/model.h"
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace fur_simulation {
@@ -70,12 +70,12 @@ struct Model_geometry_data final {
 
 private:
 
-	void push_back_position_buffer_data(const cg::float3& p_base, const cg::float3& p_rest);
+	void push_back_position_buffer_data(const float3& p_base, const float3& p_rest);
 
-	void push_back_simulation_buffer_data(const cg::float3& p_curr, const cg::float3& velocity);
+	void push_back_simulation_buffer_data(const float3& p_curr, const float3& velocity);
 
-	void push_back_model_attribs_buffer_data(const cg::float3& normal,
-		const cg::float2& tex_coord, const cg::float4& tangent_h);
+	void push_back_model_attribs_buffer_data(const float3& normal,
+		const float2& tex_coord, const float4& tangent_h);
 
 	void push_back_index_buffer_data(uint32_t i0, uint32_t i1, uint32_t i2);
 };

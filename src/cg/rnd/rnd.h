@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <windows.h>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 
 
 namespace cg {
@@ -29,13 +29,13 @@ public:
 
 	virtual Render_api render_api() const noexcept = 0;
 
-	virtual void resize_viewport(const cg::uint2& viewport_size) = 0;
+	virtual void resize_viewport(const uint2& viewport_size) = 0;
 
 	virtual void swap_color_buffers() = 0;
 };
 
 std::unique_ptr<Rhi_context_i> rhi_context(Render_api render_api, HWND hwnd, 
-	const cg::uint2& viewport_size, Depth_stencil_format depth_stencil_format);
+	const uint2& viewport_size, Depth_stencil_format depth_stencil_format);
 
 } // namepsace rnd
 } // namespace cg

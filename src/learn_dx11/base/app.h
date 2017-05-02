@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <type_traits>
-#include "cg/math/math.h"
+#include "cg/base/math.h"
 #include "learn_dx11/base/dx11.h"
 #include <windows.h>
 
@@ -25,7 +25,7 @@ public:
 
 	virtual void on_keypress() {}
 
-	virtual void on_viewport_resize(const cg::uint2& viewport_size) = 0;
+	virtual void on_viewport_resize(const uint2& viewport_size) = 0;
 
 	virtual void render() = 0;
 
@@ -33,7 +33,7 @@ public:
 
 protected:
 
-	void clear_color_buffer(const cg::float4& clear_color);
+	void clear_color_buffer(const float4& clear_color);
 
 	void clear_depth_stencil_buffer(float clear_depth);
 
@@ -49,7 +49,7 @@ protected:
 class Application final {
 public:
 
-	Application(cg::uint2 window_position, cg::uint2 window_size);
+	Application(const uint2& window_position, const uint2& window_size);
 
 	Application(const Application&) = delete;
 
@@ -65,7 +65,7 @@ public:
 
 	void on_keypress();
 
-	void on_window_resize(const cg::uint2& window_size);
+	void on_window_resize(const uint2& window_size);
 
 	// The method instantiates the specified example T and runs it.
 	template<typename T>
@@ -96,7 +96,7 @@ void Application::run()
 	{
 		RECT rect;
 		GetClientRect(_hwnd, &rect);
-		cg::uint2 viewport_size(rect.right - rect.left, rect.bottom - rect.top);
+		uint2 viewport_size(rect.right - rect.left, rect.bottom - rect.top);
 
 		_rnd_ctx = std::make_unique<Render_context>(_hwnd, viewport_size, T::init_depth_stencil_view);
 		debug = _rnd_ctx->debug();

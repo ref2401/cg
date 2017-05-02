@@ -65,11 +65,11 @@ namespace dx11 {
 
 // ----- DX11_rhi_context -----
 
-DX11_rhi_context::DX11_rhi_context(HWND hwnd, const cg::uint2& viewport_size, 
+DX11_rhi_context::DX11_rhi_context(HWND hwnd, const uint2& viewport_size, 
 	Depth_stencil_format depth_stencil_format)
 {
 	assert(hwnd);
-	assert(greater_than(viewport_size, 0));
+	assert(viewport_size > 0);
 	assert(depth_stencil_format == Depth_stencil_format::none
 		|| depth_stencil_format == Depth_stencil_format::depth_24_stencil_8); // NOTE(ref2401): the other options are not implemented
 
@@ -91,8 +91,8 @@ void DX11_rhi_context::init_device(HWND hwnd, const uint2& viewport_size)
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
 	swap_chain_desc.BufferCount = 2;
 	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swap_chain_desc.BufferDesc.Width = viewport_size.width;
-	swap_chain_desc.BufferDesc.Height = viewport_size.height;
+	swap_chain_desc.BufferDesc.Width = viewport_size.x;
+	swap_chain_desc.BufferDesc.Height = viewport_size.y;
 	swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swap_chain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -123,8 +123,8 @@ void DX11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,
 	if (depth_stencil_format == cg::rnd::Depth_stencil_format::none) return;
 
 	D3D11_TEXTURE2D_DESC tex_desc = {};
-	tex_desc.Width = viewport_size.width;
-	tex_desc.Height = viewport_size.height;
+	tex_desc.Width = viewport_size.x;
+	tex_desc.Height = viewport_size.y;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
 	tex_desc.Format = dxgi_format(depth_stencil_format);
@@ -147,7 +147,7 @@ void DX11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,
 
 void DX11_rhi_context::resize_viewport(const uint2& viewport_size)
 {
-	assert(greater_than(viewport_size, 0));
+	assert(viewport_size > 0);
 	if (viewport_size == uint2(uint32_t(_viewport.Width), uint32_t(_viewport.Height))) return;
 
 	_device_ctx->OMSetRenderTargets(0, nullptr, nullptr);
@@ -156,7 +156,7 @@ void DX11_rhi_context::resize_viewport(const uint2& viewport_size)
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc;
 	_swap_chain->GetDesc(&swap_chain_desc);
 	_swap_chain->ResizeBuffers(swap_chain_desc.BufferCount,
-		viewport_size.width, viewport_size.height,
+		viewport_size.x, viewport_size.y,
 		swap_chain_desc.BufferDesc.Format, swap_chain_desc.Flags);
 
 	update_viewport(viewport_size);
@@ -177,8 +177,8 @@ void DX11_rhi_context::update_depth_stencil_buffer(const uint2& viewport_size)
 
 	D3D11_TEXTURE2D_DESC tex_desc;
 	_tex_depth_stencil->GetDesc(&tex_desc);
-	tex_desc.Width = viewport_size.width;
-	tex_desc.Height = viewport_size.height;
+	tex_desc.Width = viewport_size.x;
+	tex_desc.Height = viewport_size.y;
 
 
 	_tex_depth_stencil.dispose();
@@ -212,8 +212,8 @@ void DX11_rhi_context::update_viewport(const uint2& viewport_size)
 {
 	_viewport.TopLeftX = 0;
 	_viewport.TopLeftY = 0;
-	_viewport.Width = float(viewport_size.width);
-	_viewport.Height = float(viewport_size.height);
+	_viewport.Width = float(viewport_size.x);
+	_viewport.Height = float(viewport_size.y);
 	_viewport.MinDepth = 0.0;
 	_viewport.MaxDepth = 1.0f;
 }

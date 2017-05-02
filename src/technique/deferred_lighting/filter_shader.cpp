@@ -6,7 +6,6 @@
 #include <utility>
 #include "cg/data/shader.h"
 
-using cg::float3;
 using namespace deferred_lighting;
 
 
@@ -91,7 +90,7 @@ Filter_shader_program& Filter_shader_program::operator=(
 	return *this;
 }
 
-void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
+void Filter_shader_program::use_for_pass(const uint2& direction) noexcept
 {
 	assert(_kernel_radius != Filter_kernel_radius::none);
 	assert(_prog.id() != cg::rnd::opengl::Blank::program_id);
@@ -104,10 +103,6 @@ void Filter_shader_program::use_for_pass(const cg::uint2& direction) noexcept
 
 std::vector<float3> generate_hemispherical_sample_kernel(size_t sample_count)
 {
-	using cg::lerp;
-	using cg::normalize;
-
-
 	assert(sample_count > 0);
 	auto rnd = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::minstd_rand{});
 
@@ -131,10 +126,6 @@ std::vector<float3> generate_hemispherical_sample_kernel(size_t sample_count)
 
 std::vector<float3> generate_sphere_normalized_sample_kernel(size_t sample_count)
 {
-	using cg::lerp;
-	using cg::normalize;
-
-
 	assert(sample_count > 0);
 	auto rnd = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::minstd_rand{});
 

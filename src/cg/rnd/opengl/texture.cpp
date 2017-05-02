@@ -142,7 +142,7 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 {
 	assert(_id != Blank::texture_id);
 	assert(is_valid_texture_internal_format(internal_format));
-	assert(greater_than(size, 0));
+	assert(size > 0);
 	assert(mipmap_level_count > 0);
 
 	_internal_format = internal_format;
@@ -154,7 +154,7 @@ void Texture_2d::reallocate_storage(GLenum internal_format, GLuint mipmap_level_
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internal_format,
-		_size.width, _size.height, 0,
+		_size.x, _size.y, 0,
 		texture_sub_image_format(_internal_format),
 		texture_sub_image_type(_internal_format),
 		nullptr);
@@ -178,10 +178,10 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 {
 	assert(is_valid_texture_internal_format(internal_format));
 	assert(mipmap_level_count > 0);
-	assert(greater_than(size, 0));
+	assert(size > 0);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, GLsizei(_size.width), GLsizei(_size.height));
+	glTextureStorage2D(_id, _mipmap_level_count, _internal_format, GLsizei(_size.x), GLsizei(_size.y));
 	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
@@ -257,11 +257,10 @@ Texture_3d_immut::Texture_3d_immut(GLenum internal_format, GLuint mipmap_level_c
 {
 	assert(is_valid_texture_internal_format(internal_format));
 	assert(mipmap_level_count > 0);
-	assert(greater_than(size, 0));
+	assert(size > 0);
 
 	glCreateTextures(GL_TEXTURE_3D, 1, &_id);
-	glTextureStorage3D(_id, _mipmap_level_count, _internal_format, 
-		_size.width, _size.height, _size.depth);
+	glTextureStorage3D(_id, _mipmap_level_count, _internal_format, _size.x, _size.y, _size.z);
 	glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
@@ -490,13 +489,13 @@ void write(const Texture_2d_i& texture, GLint mipmap_level, const uint2& offset,
 	assert(mipmap_level < texture.mipmap_level_count());
 	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(offset.width + image.size().width <= texture.size().width);
-	assert(offset.height + image.size().height <= texture.size().height);
+	assert(offset.x + image.size().x <= texture.size().x);
+	assert(offset.y + image.size().y <= texture.size().y);
 
 	if (image.size() == uint2::zero) return;
 
 	glTextureSubImage2D(texture.id(), mipmap_level, offset.x, offset.y,
-		image.size().width, image.size().height,
+		image.size().x, image.size().y,
 		texture_sub_image_format(image.pixel_format()),
 		texture_sub_image_type(image.pixel_format()),
 		image.data());
@@ -509,13 +508,13 @@ void write(const Texture_3d_i& texture, GLint mipmap_level, const uint3& offset,
 	assert(mipmap_level < texture.mipmap_level_count());
 	assert(image.pixel_format() != Pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(offset.width + image.size().width <= texture.size().width);
-	assert(offset.height + image.size().height <= texture.size().height);
+	assert(offset.x + image.size().x <= texture.size().x);
+	assert(offset.y + image.size().y <= texture.size().y);
 
 	if (image.size() == uint2::zero) return;
 
 	glTextureSubImage3D(texture.id(), mipmap_level, offset.x, offset.y, offset.z,
-		image.size().width, image.size().height, 1,
+		image.size().x, image.size().y, 1,
 		texture_sub_image_format(image.pixel_format()),
 		texture_sub_image_type(image.pixel_format()),
 		image.data());
