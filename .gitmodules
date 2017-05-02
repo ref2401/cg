@@ -5,3 +5,6 @@
 [submodule "extern/stb"]
 	path = extern/stb
 	url = https://github.com/nothings/stb.git
+[submodule "extern/math"]
+	path = extern/math
+	url = https://github.com/ref2401/math.git

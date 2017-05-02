@@ -38,48 +38,7 @@ constexpr float pi_32 = pi / 32.f;
 constexpr float pi_64 = pi / 64.f;
 constexpr float pi_128 = pi / 128.f;
 
-// Represents camera position, and orientation in the word.
-struct Viewpoint final {
-	Viewpoint() noexcept = default;
 
-	Viewpoint(float3 position, float3 target, float3 up = float3::unit_y) noexcept
-		: position(position), target(target), up(up)
-	{}
-
-
-	float3 position;
-	float3 target;
-	float3 up;
-};
-
-
-inline bool operator==(const Viewpoint& l, const Viewpoint& r) noexcept
-{
-	return (l.position == r.position)
-		&& (l.target == r.target)
-		&& (l.up == r.up);
-}
-
-inline bool operator!=(const Viewpoint& l, const Viewpoint& r) noexcept
-{
-	return !(l == r);
-}
-
-std::ostream& operator<<(std::ostream& out, const Viewpoint& vp);
-
-std::wostream& operator<<(std::wostream& out, const Viewpoint& vp);
-
-// Returns distance bitween position and target.
-inline float distance(const Viewpoint& vp) noexcept
-{
-	return cg::len(vp.target - vp.position);
-}
-
-// Direction in which this viewpoint(camera) points to.
-inline float3 forward(const Viewpoint& vp) noexcept
-{
-	return normalize(vp.target - vp.position);
-}
 
 // Create a quaternion from the axis-angle respresentation.
 //	Params:
@@ -140,9 +99,6 @@ quat from_rotation_matrix(const TMat& m) noexcept
 
 	return res;
 }
-
-// Linearly interpolates between two viewpoints.
-Viewpoint lerp(const Viewpoint& l, const Viewpoint& r, float factor) noexcept;
 
 // Creates a right-handed DirectX compatible orthographic projection matrix.
 // right = -left, top = -bottom, near < far.
@@ -433,24 +389,6 @@ inline mat4 ts_matrix(const float3& p, const float3& s) noexcept
 //		target = a point of interest.
 //		up = the direction that is considered to be upward.
 mat4 view_matrix(const float3& position, const float3& target, const float3& up = float3::unit_y) noexcept;
-
-// Calculates a matrix that cam be used to transform from world space to this view space.
-// Make sure that up is normalized before calling this method.
-inline mat4 view_matrix(const Viewpoint& vp) noexcept
-{
-	return cg::view_matrix(vp.position, vp.target, vp.up);
-}
-
-// Linearly interpolates between two viewpoints and calculates a view matrix using the interpolation result.
-inline mat4 view_matrix(const Viewpoint& l, const Viewpoint& r, float lerp_factor) noexcept
-{
-	assert(0.0f <= lerp_factor && lerp_factor <= 1.0f);
-
-	auto vp = lerp(l, r, lerp_factor);
-	vp.up = normalize(vp.up);
-	return view_matrix(vp);
-}
-
 
 } // namespace cg
 

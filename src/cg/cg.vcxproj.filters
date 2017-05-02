@@ -67,6 +67,9 @@
     <ClCompile Include="rnd\rnd.cpp">
       <Filter>rnd</Filter>
     </ClCompile>
+    <ClCompile Include="math\math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
