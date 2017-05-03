@@ -58,11 +58,11 @@ void Gaussian_filter_example::init_shaders()
 
 void Gaussian_filter_example::init_textures()
 {
-	Image_2d image("../../data/learn_dx11/image_processing/chessboard_marble.png", 4);
+	image_2d image("../../data/learn_dx11/image_processing/chessboard_marble.png", 4);
 
 	D3D11_TEXTURE2D_DESC source_desc = {};
-	source_desc.Width = image.size().x;
-	source_desc.Height = image.size().y;
+	source_desc.Width = image.size.x;
+	source_desc.Height = image.size.y;
 	source_desc.MipLevels = 1;
 	source_desc.ArraySize = 1;
 	source_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -71,8 +71,8 @@ void Gaussian_filter_example::init_textures()
 	source_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	source_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA source_data = {};
-	source_data.pSysMem = image.data();
-	source_data.SysMemPitch = UINT(image.size().x * cg::data::byte_count(image.pixel_format()));
+	source_data.pSysMem = image.data;
+	source_data.SysMemPitch = UINT(image.size.x * cg::data::byte_count(image.pixel_format));
 	HRESULT hr = _device->CreateTexture2D(&source_desc, &source_data, &_tex_source.ptr);
 	assert(hr == S_OK);
 	hr = _device->CreateShaderResourceView(_tex_source.ptr, nullptr, &_tex_srv_source.ptr);

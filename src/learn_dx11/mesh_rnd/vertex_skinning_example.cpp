@@ -115,8 +115,8 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		const auto& image = mesh_draw_params[i].diffuse_rgb_image;
 
 		D3D11_TEXTURE2D_DESC tex_desc = {};
-		tex_desc.Width = image.size().x;
-		tex_desc.Height = image.size().y;
+		tex_desc.Width = image.size.x;
+		tex_desc.Height = image.size.y;
 		tex_desc.MipLevels = 1;
 		tex_desc.ArraySize = 1;
 		tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -126,9 +126,9 @@ void Vertex_skinning_example::init_draw_indexed_params(
 		tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		
 		D3D11_SUBRESOURCE_DATA tex_data = {};
-		tex_data.pSysMem = image.data();
-		tex_data.SysMemPitch = UINT(image.size().x * byte_count(image.pixel_format()));
-		tex_data.SysMemSlicePitch = UINT(image.byte_count());
+		tex_data.pSysMem = image.data;
+		tex_data.SysMemPitch = UINT(image.size.x * byte_count(image.pixel_format));
+		tex_data.SysMemSlicePitch = UINT(byte_count(image));
 
 		HRESULT hr = _device->CreateTexture2D(&tex_desc, &tex_data, 
 			&_draw_indexed_params[i]._tex_diffuse_rgb.ptr);

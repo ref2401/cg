@@ -35,7 +35,7 @@ struct Bone final {
 struct Mesh_draw_params final {
 	Mesh_draw_params() noexcept = default;
 
-	cg::data::Image_2d diffuse_rgb_image;
+	cg::data::image_2d diffuse_rgb_image;
 	size_t index_count = 0;
 	size_t index_offset = 0;
 	size_t base_vertex = 0;

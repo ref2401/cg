@@ -168,7 +168,7 @@ public:
 		const Sampler_desc& sampler_desc, const uint2& size) noexcept;
 
 	Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
-		const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept;
+		const Sampler_desc& sampler_desc, const cg::data::image_2d& image) noexcept;
 
 	Texture_2d_immut(const Texture_2d_immut&) = delete;
 
@@ -427,8 +427,8 @@ bool is_valid_texture_wrap_mode(GLenum value) noexcept;
 
 // Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
-GLenum texture_sub_image_format(cg::data::Pixel_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to pixel_format::none.
+GLenum texture_sub_image_format(cg::data::pixel_format fmt) noexcept;
 
 // Infers an appropriate format value for the glTexImage/glTexSubImage/glTextureSubImage 
 // based on the specified texture internal format.
@@ -437,8 +437,8 @@ GLenum texture_sub_image_format(GLenum internal_format) noexcept;
 
 // Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified image format.
-// Returns GL_NONE if fmt value eqauls to Pixel_format::none.
-GLenum texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
+// Returns GL_NONE if fmt value eqauls to pixel_format::none.
+GLenum texture_sub_image_type(cg::data::pixel_format fmt) noexcept;
 
 // Infers an appropriate type value for the glTexImage/glTexSubImage/glTextureSubImage call 
 // based on the specified texture internal format.
@@ -446,10 +446,10 @@ GLenum texture_sub_image_type(cg::data::Pixel_format fmt) noexcept;
 GLenum texture_sub_image_type(GLenum internal_format) noexcept;
 
 void write(const Texture_2d_i& texture, GLint mipmap_level, const uint2& offset, 
-	const cg::data::Image_2d& image) noexcept;
+	const cg::data::image_2d& image) noexcept;
 
 void write(const Texture_3d_i& texture, GLint mipmap_level, const uint3& offset,
-	const cg::data::Image_2d& image) noexcept;
+	const cg::data::image_2d& image) noexcept;
 
 } // namespace opengl
 } // namespace rnd

@@ -1,7 +1,7 @@
 #include "cg/rnd/opengl/texture.h"
 
 #include <cassert>
-using cg::data::Pixel_format;
+using cg::data::pixel_format;
 
 
 namespace cg {
@@ -197,10 +197,10 @@ Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_c
 }
 
 Texture_2d_immut::Texture_2d_immut(GLenum internal_format, GLuint mipmap_level_count,
-	const Sampler_desc& sampler_desc, const cg::data::Image_2d& image) noexcept
-	: Texture_2d_immut(internal_format, mipmap_level_count, sampler_desc, image.size())
+	const Sampler_desc& sampler_desc, const cg::data::image_2d& image) noexcept
+	: Texture_2d_immut(internal_format, mipmap_level_count, sampler_desc, image.size)
 {
-	assert(image.pixel_format() != Pixel_format::none);
+	assert(image.pixel_format != pixel_format::none);
 	write(*this, 0, uint2::zero, image);
 }
 
@@ -414,16 +414,16 @@ bool is_valid_texture_wrap_mode(GLenum value) noexcept
 		|| (value == GL_MIRROR_CLAMP_TO_EDGE);
 }
 
-GLenum texture_sub_image_format(Pixel_format fmt) noexcept
+GLenum texture_sub_image_format(pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Pixel_format::none: return GL_NONE;
+		case pixel_format::none: return GL_NONE;
 
-		case Pixel_format::red_8: return GL_RED;
-		case Pixel_format::rg_8: return GL_RG;
-		case Pixel_format::rgb_8: return GL_RGB;
-		case Pixel_format::rgba_8: return GL_RGBA;
+		case pixel_format::red_8: return GL_RED;
+		case pixel_format::rg_8: return GL_RG;
+		case pixel_format::rgb_8: return GL_RGB;
+		case pixel_format::rgba_8: return GL_RGBA;
 	}
 }
 
@@ -448,16 +448,16 @@ GLenum texture_sub_image_format(GLenum internal_format) noexcept
 	}
 }
 
-GLenum texture_sub_image_type(Pixel_format fmt) noexcept
+GLenum texture_sub_image_type(pixel_format fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Pixel_format::none: return GL_NONE;
+		case pixel_format::none: return GL_NONE;
 
-		case Pixel_format::red_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rg_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
-		case Pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
+		case pixel_format::red_8: return GL_UNSIGNED_BYTE;
+		case pixel_format::rg_8: return GL_UNSIGNED_BYTE;
+		case pixel_format::rgb_8: return GL_UNSIGNED_BYTE;
+		case pixel_format::rgba_8: return GL_UNSIGNED_BYTE;
 	}
 }
 
@@ -483,41 +483,41 @@ GLenum texture_sub_image_type(GLenum internal_format) noexcept
 }
 
 void write(const Texture_2d_i& texture, GLint mipmap_level, const uint2& offset, 
-	const cg::data::Image_2d& image) noexcept
+	const cg::data::image_2d& image) noexcept
 {
 	assert(texture.id() != Blank::texture_id);
 	assert(mipmap_level < texture.mipmap_level_count());
-	assert(image.pixel_format() != Pixel_format::none);
+	assert(image.pixel_format != pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(offset.x + image.size().x <= texture.size().x);
-	assert(offset.y + image.size().y <= texture.size().y);
+	assert(offset.x + image.size.x <= texture.size().x);
+	assert(offset.y + image.size.y <= texture.size().y);
 
-	if (image.size() == uint2::zero) return;
+	if (image.size == uint2::zero) return;
 
 	glTextureSubImage2D(texture.id(), mipmap_level, offset.x, offset.y,
-		image.size().x, image.size().y,
-		texture_sub_image_format(image.pixel_format()),
-		texture_sub_image_type(image.pixel_format()),
-		image.data());
+		image.size.x, image.size.y,
+		texture_sub_image_format(image.pixel_format),
+		texture_sub_image_type(image.pixel_format),
+		image.data);
 }
 
 void write(const Texture_3d_i& texture, GLint mipmap_level, const uint3& offset, 
-	const cg::data::Image_2d& image) noexcept
+	const cg::data::image_2d& image) noexcept
 {
 	assert(texture.id() != Blank::texture_id);
 	assert(mipmap_level < texture.mipmap_level_count());
-	assert(image.pixel_format() != Pixel_format::none);
+	assert(image.pixel_format != pixel_format::none);
 	// TODO(ref2401): check offset + image.size() for the specified mipmap_level
-	assert(offset.x + image.size().x <= texture.size().x);
-	assert(offset.y + image.size().y <= texture.size().y);
+	assert(offset.x + image.size.x <= texture.size().x);
+	assert(offset.y + image.size.y <= texture.size().y);
 
-	if (image.size() == uint2::zero) return;
+	if (image.size == uint2::zero) return;
 
 	glTextureSubImage3D(texture.id(), mipmap_level, offset.x, offset.y, offset.z,
-		image.size().x, image.size().y, 1,
-		texture_sub_image_format(image.pixel_format()),
-		texture_sub_image_type(image.pixel_format()),
-		image.data());
+		image.size.x, image.size.y, 1,
+		texture_sub_image_format(image.pixel_format),
+		texture_sub_image_type(image.pixel_format),
+		image.data);
 }
 
 } // namespace opengl

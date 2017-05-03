@@ -6,7 +6,7 @@
 #include "cg/data/model.h"
 #include <DirectXMath.h>
 
-using cg::data::Image_2d;
+using cg::data::image_2d;
 using cg::data::Vertex_attribs;
 
 
@@ -82,12 +82,12 @@ void Static_mesh_example::init_geometry()
 
 void Static_mesh_example::init_material()
 {
-	Image_2d image("../../data/bricks-red-diffuse-rgb.png", 4);
+	image_2d image("../../data/bricks-red-diffuse-rgb.png", 4);
 
 	// texture
 	D3D11_TEXTURE2D_DESC tex_desc = {};
-	tex_desc.Width = image.size().x;
-	tex_desc.Height = image.size().y;
+	tex_desc.Width = image.size.x;
+	tex_desc.Height = image.size.y;
 	tex_desc.MipLevels = 1;
 	tex_desc.ArraySize = 1;
 	tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -97,9 +97,9 @@ void Static_mesh_example::init_material()
 	tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	
 	D3D11_SUBRESOURCE_DATA data = {};
-	data.pSysMem = image.data();
-	data.SysMemPitch = UINT(image.size().x * cg::data::byte_count(image.pixel_format()));
-	data.SysMemSlicePitch = UINT(image.byte_count());
+	data.pSysMem = image.data;
+	data.SysMemPitch = UINT(image.size.x * cg::data::byte_count(image.pixel_format));
+	data.SysMemSlicePitch = UINT(byte_count(image));
 
 	HRESULT hr = _device->CreateTexture2D(&tex_desc, &data, &_tex_diffuse_rgb.ptr);
 	assert(hr == S_OK);

@@ -127,15 +127,15 @@ void Compute_complanarity_example::init_shaders()
 
 void Compute_complanarity_example::init_textures()
 {
-	using cg::data::Image_2d;
+	using cg::data::image_2d;
 	using cg::data::byte_count;
 
 	// displacement map
-	Image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
+	image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
 
 	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
-	tex_displ_desc.Width = image_displ.size().x;
-	tex_displ_desc.Height = image_displ.size().y;
+	tex_displ_desc.Width = image_displ.size.x;
+	tex_displ_desc.Height = image_displ.size.y;
 	tex_displ_desc.MipLevels = 1;
 	tex_displ_desc.ArraySize = 1;
 	tex_displ_desc.Format = DXGI_FORMAT_R8_UNORM;
@@ -144,9 +144,9 @@ void Compute_complanarity_example::init_textures()
 	tex_displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
-	tex_displ_data.pSysMem = image_displ.data();
-	tex_displ_data.SysMemPitch = UINT(image_displ.size().x * byte_count(image_displ.pixel_format()));
-	tex_displ_data.SysMemSlicePitch = UINT(image_displ.byte_count());
+	tex_displ_data.pSysMem = image_displ.data;
+	tex_displ_data.SysMemPitch = UINT(image_displ.size.x * byte_count(image_displ.pixel_format));
+	tex_displ_data.SysMemSlicePitch = UINT(byte_count(image_displ));
 
 	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_displacement_map.ptr);
 	assert(hr == S_OK);

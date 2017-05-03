@@ -77,16 +77,16 @@ void Displacement_mapping_example::init_shaders()
 
 void Displacement_mapping_example::init_terrain_textures()
 {
-	using cg::data::Image_2d;
-	using cg::data::Pixel_format;
+	using cg::data::image_2d;
+	using cg::data::pixel_format;
 	using cg::data::byte_count;
 
 	// displacement map
-	Image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
+	image_2d image_displ("../../data/learn_dx11/terrain_displacement_map.png", 1, false);
 
 	D3D11_TEXTURE2D_DESC tex_displ_desc = {};
-	tex_displ_desc.Width = image_displ.size().x;
-	tex_displ_desc.Height = image_displ.size().y;
+	tex_displ_desc.Width = image_displ.size.x;
+	tex_displ_desc.Height = image_displ.size.y;
 	tex_displ_desc.MipLevels = 1;
 	tex_displ_desc.ArraySize = 1;
 	tex_displ_desc.Format = DXGI_FORMAT_R8_UNORM;
@@ -95,9 +95,9 @@ void Displacement_mapping_example::init_terrain_textures()
 	tex_displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	tex_displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_displ_data = {};
-	tex_displ_data.pSysMem = image_displ.data();
-	tex_displ_data.SysMemPitch = UINT(image_displ.size().x * byte_count(image_displ.pixel_format()));
-	tex_displ_data.SysMemSlicePitch = UINT(image_displ.byte_count());
+	tex_displ_data.pSysMem = image_displ.data;
+	tex_displ_data.SysMemPitch = UINT(image_displ.size.x * byte_count(image_displ.pixel_format));
+	tex_displ_data.SysMemSlicePitch = UINT(byte_count(image_displ));
 
 	HRESULT hr = _device->CreateTexture2D(&tex_displ_desc, &tex_displ_data, &_tex_terrain_displacement_map.ptr);
 	assert(hr == S_OK);
@@ -107,11 +107,11 @@ void Displacement_mapping_example::init_terrain_textures()
 	assert(hr == S_OK);
 
 	// normal map
-	Image_2d image_normal ("../../data/learn_dx11/terrain_normal_map.png", 4, false);
+	image_2d image_normal ("../../data/learn_dx11/terrain_normal_map.png", 4, false);
 
 	D3D11_TEXTURE2D_DESC tex_normal_desc = {};
-	tex_normal_desc.Width = image_normal.size().x;
-	tex_normal_desc.Height = image_normal.size().y;
+	tex_normal_desc.Width = image_normal.size.x;
+	tex_normal_desc.Height = image_normal.size.y;
 	tex_normal_desc.MipLevels = 1;
 	tex_normal_desc.ArraySize = 1;
 	tex_normal_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -120,9 +120,9 @@ void Displacement_mapping_example::init_terrain_textures()
 	tex_normal_desc.Usage = D3D11_USAGE_IMMUTABLE;
 	tex_normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	D3D11_SUBRESOURCE_DATA tex_normal_data = {};
-	tex_normal_data.pSysMem = image_normal.data();
-	tex_normal_data.SysMemPitch = UINT(image_normal.size().x * byte_count(image_normal.pixel_format()));
-	tex_normal_data.SysMemSlicePitch = UINT(image_normal.byte_count());
+	tex_normal_data.pSysMem = image_normal.data;
+	tex_normal_data.SysMemPitch = UINT(image_normal.size.x * byte_count(image_normal.pixel_format));
+	tex_normal_data.SysMemSlicePitch = UINT(byte_count(image_normal));
 
 	hr = _device->CreateTexture2D(&tex_normal_desc, &tex_normal_data, &_tex_terrain_normal_map.ptr);
 	assert(hr == S_OK);

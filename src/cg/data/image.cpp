@@ -15,7 +15,7 @@
 namespace cg {
 namespace data {
 
-Image_2d::Image_2d(const char* filename, uint8_t channel_count, bool flip_vertically)
+image_2d::image_2d(const char* filename, uint8_t channel_count, bool flip_vertically)
 {
 	assert(filename && std::strlen(filename));
 
@@ -24,94 +24,94 @@ Image_2d::Image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 	int width = 0;
 	int height = 0;
 	int actual_channel_count = 0;
-	_data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
+	data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
 	
-	if (!_data) {
+	if (!data) {
 		const char* stb_error = stbi_failure_reason();
 		throw std::runtime_error(EXCEPTION_MSG("Loading ", filename, " image error. ", stb_error));
 	}
 
-	_size.x = width;
-	_size.y = height;
+	size.x = width;
+	size.y = height;
 	uint8_t cc = (channel_count) ? channel_count : uint8_t(actual_channel_count);
 	switch (cc) {
-		case 1: _pixel_format = Pixel_format::red_8; break;
-		case 2: _pixel_format = Pixel_format::rg_8; break;
-		case 3: _pixel_format = Pixel_format::rgb_8; break;
-		case 4: _pixel_format = Pixel_format::rgba_8; break;
+		case 1: pixel_format = pixel_format::red_8; break;
+		case 2: pixel_format = pixel_format::rg_8; break;
+		case 3: pixel_format = pixel_format::rgb_8; break;
+		case 4: pixel_format = pixel_format::rgba_8; break;
 	}
 }
 
-Image_2d::Image_2d(const std::string& filename, uint8_t channel_count, bool flip_vertically)
-	: Image_2d(filename.c_str(), channel_count, flip_vertically)
+image_2d::image_2d(const std::string& filename, uint8_t channel_count, bool flip_vertically)
+	: image_2d(filename.c_str(), channel_count, flip_vertically)
 {}
 
-Image_2d::Image_2d(Image_2d&& image) noexcept
-	: _data(image._data),
-	_size(image._size),
-	_pixel_format(image._pixel_format)
+image_2d::image_2d(image_2d&& image) noexcept
+	: data(image.data),
+	size(image.size),
+	pixel_format(image.pixel_format)
 {
-	image._data = nullptr;
-	image._size = uint2::zero;
-	image._pixel_format = Pixel_format::none;
+	image.data = nullptr;
+	image.size = uint2::zero;
+	image.pixel_format = pixel_format::none;
 }
 
-Image_2d::~Image_2d() noexcept
+image_2d::~image_2d() noexcept
 {
 	dispose();
 }
 
-Image_2d& Image_2d::operator=(Image_2d&& image) noexcept
+image_2d& image_2d::operator=(image_2d&& image) noexcept
 {
 	if (this == &image) return *this;
 
 	dispose();
 
-	_data = image._data;
-	_size = image._size;
-	_pixel_format = image._pixel_format;
+	data = image.data;
+	size = image.size;
+	pixel_format = image.pixel_format;
 
-	image._data = nullptr;
-	image._size = uint2::zero;
-	image._pixel_format = Pixel_format::none;
+	image.data = nullptr;
+	image.size = uint2::zero;
+	image.pixel_format = pixel_format::none;
 
 	return *this;
 }
 
-void Image_2d::dispose() noexcept
+void image_2d::dispose() noexcept
 {
-	if (!_data) return;
+	if (!data) return;
 
-	stbi_image_free(_data);
-	_data = nullptr;
-	_size = uint2::zero;
-	_pixel_format = Pixel_format::none;
+	stbi_image_free(data);
+	data = nullptr;
+	size = uint2::zero;
+	pixel_format = pixel_format::none;
 }
 
 // ----- funcs -----
 
-std::ostream& operator<<(std::ostream& out, const Pixel_format& fmt)
+std::ostream& operator<<(std::ostream& out, const pixel_format& fmt)
 {
 	out << "Image_format::";
 
 	switch (fmt) {
-		case Pixel_format::none:
+		case pixel_format::none:
 			out << "none";
 			break;
 
-		case Pixel_format::red_8:
+		case pixel_format::red_8:
 			out << "red_8";
 			break;
 
-		case Pixel_format::rg_8:
+		case pixel_format::rg_8:
 			out << "rg_8";
 			break;
 
-		case Pixel_format::rgb_8:
+		case pixel_format::rgb_8:
 			out << "rgb_8";
 			break;
 
-		case Pixel_format::rgba_8:
+		case pixel_format::rgba_8:
 			out << "rgba_8";
 			break;
 	}
@@ -119,28 +119,28 @@ std::ostream& operator<<(std::ostream& out, const Pixel_format& fmt)
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Pixel_format& fmt)
+std::wostream& operator<<(std::wostream& out, const pixel_format& fmt)
 {
 	out << "Image_format::";
 
 	switch (fmt) {
-		case Pixel_format::none:
+		case pixel_format::none:
 			out << "none";
 			break;
 
-		case Pixel_format::red_8:
+		case pixel_format::red_8:
 			out << "red_8";
 			break;
 
-		case Pixel_format::rg_8:
+		case pixel_format::rg_8:
 			out << "rg_8";
 			break;
 
-		case Pixel_format::rgb_8:
+		case pixel_format::rgb_8:
 			out << "rgb_8";
 			break;
 
-		case Pixel_format::rgba_8:
+		case pixel_format::rgba_8:
 			out << "rgba_8";
 			break;
 	}
@@ -148,34 +148,34 @@ std::wostream& operator<<(std::wostream& out, const Pixel_format& fmt)
 	return out;
 }
 
-size_t byte_count(const Pixel_format& fmt) noexcept
+size_t byte_count(const pixel_format& fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Pixel_format::none: return 0;
-		case Pixel_format::red_8: return 1;
-		case Pixel_format::rg_8: return 2;
-		case Pixel_format::rgb_8: return 3;
-		case Pixel_format::rgba_8: return 4;
+		case pixel_format::none: return 0;
+		case pixel_format::red_8: return 1;
+		case pixel_format::rg_8: return 2;
+		case pixel_format::rgb_8: return 3;
+		case pixel_format::rgba_8: return 4;
 	}
 }
 
-size_t channel_count(const Pixel_format& fmt) noexcept
+size_t channel_count(const pixel_format& fmt) noexcept
 {
 	switch (fmt) {
 		default:
-		case Pixel_format::none: return 0;
+		case pixel_format::none: return 0;
 		
-		case Pixel_format::red_8: 
+		case pixel_format::red_8: 
 			return 1;
 
-		case Pixel_format::rg_8:
+		case pixel_format::rg_8:
 			return 2;
 		
-		case Pixel_format::rgb_8:
+		case pixel_format::rgb_8:
 			return 3;
 
-		case Pixel_format::rgba_8:
+		case pixel_format::rgba_8:
 			return 4;
 	}
 }

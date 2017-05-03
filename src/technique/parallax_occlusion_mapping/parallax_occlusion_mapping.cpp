@@ -43,11 +43,11 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 
 	// diffuse rgb
 	{
-		Image_2d image(diffuse_rgb_filename, 4, true);
+		image_2d image(diffuse_rgb_filename, 4, true);
 
 		D3D11_TEXTURE2D_DESC diffuse_desc = {};
-		diffuse_desc.Width = image.size().x;
-		diffuse_desc.Height = image.size().y;
+		diffuse_desc.Width = image.size.x;
+		diffuse_desc.Height = image.size.y;
 		diffuse_desc.MipLevels = 1;
 		diffuse_desc.ArraySize = 1;
 		diffuse_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -56,8 +56,8 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		diffuse_desc.Usage = D3D11_USAGE_IMMUTABLE;
 		diffuse_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA diffuse_data = {};
-		diffuse_data.pSysMem = image.data();
-		diffuse_data.SysMemPitch = UINT(image.size().x * byte_count(image.pixel_format()));
+		diffuse_data.pSysMem = image.data;
+		diffuse_data.SysMemPitch = UINT(image.size.x * byte_count(image.pixel_format));
 		HRESULT hr = device->CreateTexture2D(&diffuse_desc, &diffuse_data, &tex_diffuse_rgb.ptr);
 		assert(hr == S_OK);
 
@@ -67,11 +67,11 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 
 	// height map
 	{
-		Image_2d image(height_map_filename, 1, true);
+		image_2d image(height_map_filename, 1, true);
 
 		D3D11_TEXTURE2D_DESC displ_desc = {};
-		displ_desc.Width = image.size().x;
-		displ_desc.Height = image.size().y;
+		displ_desc.Width = image.size.x;
+		displ_desc.Height = image.size.y;
 		displ_desc.MipLevels = 1;
 		displ_desc.ArraySize = 1;
 		displ_desc.Format = DXGI_FORMAT_R8_UNORM;
@@ -80,8 +80,8 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		displ_desc.Usage = D3D11_USAGE_IMMUTABLE;
 		displ_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA displ_data = {};
-		displ_data.pSysMem = image.data();
-		displ_data.SysMemPitch = UINT(image.size().x * byte_count(image.pixel_format()));
+		displ_data.pSysMem = image.data;
+		displ_data.SysMemPitch = UINT(image.size.x * byte_count(image.pixel_format));
 		HRESULT hr = device->CreateTexture2D(&displ_desc, &displ_data, &tex_height_map.ptr);
 		assert(hr == S_OK);
 
@@ -91,11 +91,11 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 
 	// normal map
 	{
-		Image_2d image(normal_map_height, 4, true);
+		image_2d image(normal_map_height, 4, true);
 
 		D3D11_TEXTURE2D_DESC normal_desc = {};
-		normal_desc.Width = image.size().x;
-		normal_desc.Height = image.size().y;
+		normal_desc.Width = image.size.x;
+		normal_desc.Height = image.size.y;
 		normal_desc.MipLevels = 1;
 		normal_desc.ArraySize = 1;
 		normal_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -104,8 +104,8 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		normal_desc.Usage = D3D11_USAGE_IMMUTABLE;
 		normal_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		D3D11_SUBRESOURCE_DATA normal_data = {};
-		normal_data.pSysMem = image.data();
-		normal_data.SysMemPitch = UINT(image.size().x * byte_count(image.pixel_format()));
+		normal_data.pSysMem = image.data;
+		normal_data.SysMemPitch = UINT(image.size.x * byte_count(image.pixel_format));
 		HRESULT hr = device->CreateTexture2D(&normal_desc, &normal_data, &tex_normal_map.ptr);
 		assert(hr == S_OK);
 
