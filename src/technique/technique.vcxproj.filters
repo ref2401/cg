@@ -32,6 +32,9 @@
     <ClCompile Include="parallax_occlusion_mapping\parallax_occlusion_mapping.cpp">
       <Filter>parallax_occlusion_mapping</Filter>
     </ClCompile>
+    <ClCompile Include="pbr\pbr.cpp">
+      <Filter>pbr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="deferred_lighting">
@@ -42,6 +45,9 @@
     </Filter>
     <Filter Include="parallax_occlusion_mapping">
       <UniqueIdentifier>{b43c4de9-0f44-4682-95ec-eea45be4b807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pbr">
+      <UniqueIdentifier>{67cc76b4-d084-4870-8cf5-b54870008f50}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="parallax_occlusion_mapping\parallax_occlusion_mapping.h">
       <Filter>parallax_occlusion_mapping</Filter>
+    </ClInclude>
+    <ClInclude Include="pbr\pbr.h">
+      <Filter>pbr</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

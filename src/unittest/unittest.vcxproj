@@ -176,13 +176,13 @@
   <ItemGroup>
     <ClCompile Include="base\base_unittest.cpp" />
     <ClCompile Include="base\container_unittest.cpp" />
+    <ClCompile Include="base\math_unittest.cpp" />
     <ClCompile Include="data\common_file.cpp" />
     <ClCompile Include="data\file_unittest.cpp" />
     <ClCompile Include="data\image_unittest.cpp" />
     <ClCompile Include="data\model_unittest.cpp" />
     <ClCompile Include="data\shader_unittest.cpp" />
     <ClCompile Include="data\vertex_unittest.cpp" />
-    <ClCompile Include="math\transform_unittest.cpp" />
     <ClCompile Include="rnd\dx11\dx11_unittest.cpp" />
     <ClCompile Include="rnd\opengl\buffer_unittest.cpp" />
     <ClCompile Include="rnd\opengl\fbo_unittest.cpp" />
@@ -196,8 +196,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\common_math.h" />
     <ClInclude Include="data\common_file.h" />
-    <ClInclude Include="math\common_math.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

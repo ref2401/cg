@@ -12,7 +12,7 @@
 // Convenient macro to format more readable cg::enforce message.
 // Prepends string arguments with __FILE__ & __LINE__ macro which.
 // Dont forget to write semicolon at the end.
-// Example:
+// example:
 // std::string msg = EXCEPTION_MSG("blah-blah")		<- compile time error
 // std::string msg = EXCEPTION_MSG("blah-blah");	<- ok.
 #define EXCEPTION_MSG(...) cg::concat(__FILE__, '(', __LINE__, "): ", __VA_ARGS__)

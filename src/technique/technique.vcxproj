@@ -163,6 +163,7 @@
     <ClCompile Include="fur_simulation\fur_glsl_program.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parallax_occlusion_mapping\parallax_occlusion_mapping.cpp" />
+    <ClCompile Include="pbr\pbr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cg\cg.vcxproj">
@@ -180,6 +181,7 @@
     <ClInclude Include="fur_simulation\fur_simulation_opengl.h" />
     <ClInclude Include="fur_simulation\fur_glsl_program.h" />
     <ClInclude Include="parallax_occlusion_mapping\parallax_occlusion_mapping.h" />
+    <ClInclude Include="pbr\pbr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

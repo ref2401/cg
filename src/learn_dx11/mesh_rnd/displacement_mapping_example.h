@@ -49,18 +49,18 @@ private:
 	void update_projection_matrix(float wh_aspect_ratio);
 
 	// renderer settings
-	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	Com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
-	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
+	com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
+	com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
 
 	Hlsl_shader_set _shader_set;
-	Com_ptr<ID3D11Buffer> _model_cbuffer;
-	Com_ptr<ID3D11Buffer> _projection_view_cbuffer;
-	Com_ptr<ID3D11Texture2D> _tex_terrain_displacement_map;
-	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_displacement_map_srv;
-	Com_ptr<ID3D11Texture2D> _tex_terrain_normal_map;
-	Com_ptr<ID3D11ShaderResourceView> _tex_terrain_normal_map_srv;
-	Com_ptr<ID3D11SamplerState> _linear_sampler;
+	com_ptr<ID3D11Buffer> _model_cbuffer;
+	com_ptr<ID3D11Buffer> _projection_view_cbuffer;
+	com_ptr<ID3D11Texture2D> _tex_terrain_displacement_map;
+	com_ptr<ID3D11ShaderResourceView> _tex_terrain_displacement_map_srv;
+	com_ptr<ID3D11Texture2D> _tex_terrain_normal_map;
+	com_ptr<ID3D11ShaderResourceView> _tex_terrain_normal_map_srv;
+	com_ptr<ID3D11SamplerState> _linear_sampler;
 
 	float4x4 _projection_matrix;
 	float4x4 _view_matrix;

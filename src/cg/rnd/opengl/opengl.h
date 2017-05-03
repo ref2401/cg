@@ -16,10 +16,10 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
-class Opengl_rhi_context final : public virtual Rhi_context_i {
+class Opengl_rhi_context final : public virtual rhi_context_i {
 public:
 
-	Opengl_rhi_context(HWND hwnd, cg::rnd::Depth_stencil_format depth_stencil_format);
+	Opengl_rhi_context(HWND hwnd, cg::rnd::depth_stencil_format depth_stencil_format);
 
 	Opengl_rhi_context(const Opengl_rhi_context&) = delete;
 
@@ -33,9 +33,9 @@ public:
 	Opengl_rhi_context& operator=(Opengl_rhi_context&&) = delete;
 
 
-	Render_api render_api() const noexcept override
+	cg::rnd::render_api render_api() const noexcept override
 	{
-		return Render_api::opengl_45;
+		return render_api::opengl_45;
 	}
 
 	void resize_viewport(const uint2& viewport_size) override;

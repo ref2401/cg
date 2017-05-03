@@ -38,8 +38,8 @@ public:
 private:
 
 	struct Draw_indexed_params final {
-		Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
-		Com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_srv;
+		com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
+		com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_srv;
 		size_t index_count = 0;
 		size_t index_offset = 0;
 		size_t base_vertex = 0;
@@ -62,17 +62,17 @@ private:
 	void update_projection_view_matrices();
 
 	Hlsl_shader_set _shader_set;
-	Com_ptr<ID3D11Buffer> _scene_cbuffer;
-	Com_ptr<ID3D11Buffer> _model_cbuffer;
-	Com_ptr<ID3D11Buffer> _model_bone_matrices_buffer;
-	Com_ptr<ID3D11ShaderResourceView> _model_bone_matrices_buffer_srv;
-	Com_ptr<ID3D11Buffer> _vertex_buffer;
-	Com_ptr<ID3D11Buffer> _index_buffer;
-	Com_ptr<ID3D11InputLayout> _input_layout;
-	Com_ptr<ID3D11SamplerState> _linear_sampler_state;
+	com_ptr<ID3D11Buffer> _scene_cbuffer;
+	com_ptr<ID3D11Buffer> _model_cbuffer;
+	com_ptr<ID3D11Buffer> _model_bone_matrices_buffer;
+	com_ptr<ID3D11ShaderResourceView> _model_bone_matrices_buffer_srv;
+	com_ptr<ID3D11Buffer> _vertex_buffer;
+	com_ptr<ID3D11Buffer> _index_buffer;
+	com_ptr<ID3D11InputLayout> _input_layout;
+	com_ptr<ID3D11SamplerState> _linear_sampler_state;
 	// renderer state
-	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
+	com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
 	std::vector<Draw_indexed_params> _draw_indexed_params;
 	std::unique_ptr<Model_animation> _model_animation;

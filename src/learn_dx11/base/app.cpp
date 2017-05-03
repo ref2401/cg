@@ -105,7 +105,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM w_param, LPARAM l_p
 
 namespace learn_dx11 {
 
-// ----- Example -----
+// ----- example -----
 
 void Example::clear_color_buffer(const float4& clear_color)
 {
@@ -120,10 +120,10 @@ void Example::clear_depth_stencil_buffer(float clear_depth)
 		D3D11_CLEAR_DEPTH, clear_depth, 1);
 }
 
-//void Example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
+//void example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
 //{
 //	ID3D11RasterizerState* state = nullptr;
-//	HRESULT hr = _device->CreateRasterizerState(&desc, &state);
+//	HRESULT hr = device_->CreateRasterizerState(&desc, &state);
 //	assert(hr == S_OK);
 //
 //	_device_ctx->RSSetState(state);

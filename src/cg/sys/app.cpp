@@ -302,7 +302,7 @@ void Application::enqueue_window_resize() noexcept
 	_window_resize_message = true;
 }
 
-void Application::process_sys_messages(cg::rnd::Rhi_context_i& rhi_ctx, Sys_message_listener_i& listener)
+void Application::process_sys_messages(cg::rnd::rhi_context_i& rhi_ctx, Sys_message_listener_i& listener)
 {
 	if (_sys_message_queue.empty()) return;
 
@@ -393,7 +393,7 @@ void Application::refresh_device_state() noexcept
 		_mouse.set_position(uint2(cp.x, _window.viewport_size().y - cp.y - 1));
 }
 
-Clock_report Application::run_main_loop(cg::rnd::Rhi_context_i& rhi_ctx, Example& example)
+Clock_report Application::run_main_loop(cg::rnd::rhi_context_i& rhi_ctx, example& example)
 {
 	_window.show();
 	refresh_device_state();

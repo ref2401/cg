@@ -58,15 +58,15 @@ private:
 
 	// pipeline state
 	Hlsl_shader_set _shader_set;
-	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	Com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
-	Com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
+	com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> _default_rasterizer_state;
+	com_ptr<ID3D11RasterizerState> _wireframe_rasterizer_state;
 	// resources
-	Com_ptr<ID3D11Buffer> _vertex_buffer;
-	Com_ptr<ID3D11Buffer> _index_buffer;
-	Com_ptr<ID3D11InputLayout> _input_layout;
-	Com_ptr<ID3D11Buffer> _pvm_matrix_cbuffer;
-	Com_ptr<ID3D11Buffer> _tess_control_cbuffer;
+	com_ptr<ID3D11Buffer> _vertex_buffer;
+	com_ptr<ID3D11Buffer> _index_buffer;
+	com_ptr<ID3D11InputLayout> _input_layout;
+	com_ptr<ID3D11Buffer> _pvm_matrix_cbuffer;
+	com_ptr<ID3D11Buffer> _tess_control_cbuffer;
 	UINT _index_count;
 };
 

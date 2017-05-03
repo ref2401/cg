@@ -42,28 +42,28 @@ protected:
 	~Sys_message_listener_i() noexcept = default;
 };
 
-struct Example_desc final {
-	cg::rnd::Render_api render_api;
-	cg::rnd::Depth_stencil_format depth_stencil_format;
+struct example_desc final {
+	cg::rnd::render_api render_api;
+	cg::rnd::depth_stencil_format depth_stencil_format;
 };
 
-class Example : public virtual Sys_message_listener_i {
+class example : public virtual Sys_message_listener_i {
 public:
 
-	Example(const App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx) 
+	example(const app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx) 
 		: _app_ctx(app_ctx) 
 	{}
 
-	Example(const Example&) = delete;
+	example(const example&) = delete;
 
-	Example(Example&&) = delete;
+	example(example&&) = delete;
 
-	virtual ~Example() noexcept = default;
+	virtual ~example() noexcept = default;
 
 
-	Example& operator=(const Example&) = delete;
+	example& operator=(const example&) = delete;
 
-	Example& operator=(Example&&) = delete;
+	example& operator=(example&&) = delete;
 
 
 	virtual void render(float interpolation_factor) = 0;
@@ -72,7 +72,7 @@ public:
 
 protected:
 
-	App_context _app_ctx;
+	app_context _app_ctx;
 };
 
 class Application final {
@@ -146,7 +146,7 @@ private:
 
 	void clear_message_queue() noexcept;
 
-	void process_sys_messages(cg::rnd::Rhi_context_i& rhi_ctx, Sys_message_listener_i& listener);
+	void process_sys_messages(cg::rnd::rhi_context_i& rhi_ctx, Sys_message_listener_i& listener);
 
 	// Processes all the system messages that are in the message queue at the moment.
 	// Returns true if the application has to terminate.
@@ -155,7 +155,7 @@ private:
 	// Refreshes state of mouse, keyboard etc.
 	void refresh_device_state() noexcept;
 
-	Clock_report run_main_loop(cg::rnd::Rhi_context_i& rhi_ctx, Example& example);
+	Clock_report run_main_loop(cg::rnd::rhi_context_i& rhi_ctx, example& example);
 
 
 	HINSTANCE _hinstance = nullptr;
@@ -172,22 +172,22 @@ private:
 template<typename T>
 Clock_report Application::run_dx11_example()
 {
-	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
-	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,
+	static_assert(std::is_base_of<example, T>::value, "T must be derived from cg::sys::example.");
+	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, example_desc>::value,
 		"T must declare public static constexpr Example_desc example_desc field.");
 
 	Clock_report report;
-	cg::rnd::dx11::Com_ptr<ID3D11Debug> debug_layer;
+	cg::rnd::dx11::com_ptr<ID3D11Debug> debug_layer;
 	
 	{
-		auto rhi_ctx = std::make_unique<cg::rnd::dx11::DX11_rhi_context>(
+		auto rhi_ctx = std::make_unique<cg::rnd::dx11::dx11_rhi_context>(
 			_window.hwnd(), _window.viewport_size(),
 			T::example_desc.depth_stencil_format);
 		
 		debug_layer = rhi_ctx->debug();
 		debug_layer->AddRef();
 
-		App_context app_ctx(_keyboard, _mouse, _window);
+		app_context app_ctx(_keyboard, _mouse, _window);
 		T example(app_ctx, *rhi_ctx);
 		report = run_main_loop(*rhi_ctx, example);
 	}
@@ -201,14 +201,14 @@ Clock_report Application::run_dx11_example()
 template<typename T>
 Clock_report Application::run_opengl_example()
 {
-	static_assert(std::is_base_of<Example, T>::value, "T must be derived from cg::sys::Example.");
-	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, Example_desc>::value,
+	static_assert(std::is_base_of<example, T>::value, "T must be derived from cg::sys::example.");
+	static_assert(std::is_same<std::remove_cv<decltype(T::example_desc)>::type, example_desc>::value,
 		"T must declare public static constexpr Example_desc example_desc field.");
 
 	auto rhi_ctx = std::make_unique<cg::rnd::opengl::Opengl_rhi_context>(_window.hwnd(), 
 		T::example_desc.depth_stencil_format);
 
-	App_context app_ctx(_keyboard, _mouse, _window);
+	app_context app_ctx(_keyboard, _mouse, _window);
 	T example(app_ctx, *rhi_ctx);
 	return run_main_loop(*rhi_ctx, example);
 }

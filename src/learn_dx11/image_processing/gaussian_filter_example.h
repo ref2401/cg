@@ -52,19 +52,19 @@ private:
 
 
 	// pipeline state
-	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
+	com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// example stuff
-	Com_ptr<ID3D11Buffer> _matrix_cbuffer;
-	Com_ptr<ID3D11SamplerState> _sampler_state;
-	Com_ptr<ID3D11Texture2D> _tex_source;
-	Com_ptr<ID3D11ShaderResourceView> _tex_srv_source;
-	Com_ptr<ID3D11Texture2D> _tex_intermediate;
-	Com_ptr<ID3D11ShaderResourceView> _tex_srv_intermediate;
-	Com_ptr<ID3D11UnorderedAccessView> _tex_uav_intermediate;
-	Com_ptr<ID3D11Texture2D> _tex_final;
-	Com_ptr<ID3D11ShaderResourceView> _tex_srv_final;
-	Com_ptr<ID3D11UnorderedAccessView> _tex_uav_final;
+	com_ptr<ID3D11Buffer> _matrix_cbuffer;
+	com_ptr<ID3D11SamplerState> _sampler_state;
+	com_ptr<ID3D11Texture2D> _tex_source;
+	com_ptr<ID3D11ShaderResourceView> _tex_srv_source;
+	com_ptr<ID3D11Texture2D> _tex_intermediate;
+	com_ptr<ID3D11ShaderResourceView> _tex_srv_intermediate;
+	com_ptr<ID3D11UnorderedAccessView> _tex_uav_intermediate;
+	com_ptr<ID3D11Texture2D> _tex_final;
+	com_ptr<ID3D11ShaderResourceView> _tex_srv_final;
+	com_ptr<ID3D11UnorderedAccessView> _tex_uav_final;
 	Hlsl_compute _gaussian_filter_compute;
 	Hlsl_shader_set _render_image_shader;
 

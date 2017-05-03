@@ -5,7 +5,7 @@
 
 using namespace cg;
 using cg::data::Hlsl_shader_desc;
-using cg::rnd::Depth_stencil_format;
+using cg::rnd::depth_stencil_format;
 
 
 namespace {
@@ -13,12 +13,12 @@ namespace {
 using namespace cg::rnd::dx11;
 
 
-Com_ptr<ID3DBlob> compile_shader(const std::string& source_code,
+com_ptr<ID3DBlob> compile_shader(const std::string& source_code,
 	const std::string& source_filename, const std::string& entry_point_name,
 	const char* shader_model, uint32_t compile_flags)
 {
-	Com_ptr<ID3DBlob> bytecode;
-	Com_ptr<ID3DBlob> error_blob;
+	com_ptr<ID3DBlob> bytecode;
+	com_ptr<ID3DBlob> error_blob;
 
 	HRESULT hr = D3DCompile(
 		source_code.c_str(),
@@ -42,15 +42,15 @@ Com_ptr<ID3DBlob> compile_shader(const std::string& source_code,
 	return bytecode;
 }
 
-DXGI_FORMAT dxgi_format(Depth_stencil_format format)
+DXGI_FORMAT dxgi_format(depth_stencil_format format)
 {
 	switch (format) {
 		default:
-		case Depth_stencil_format::none:				return DXGI_FORMAT_UNKNOWN;
-		case Depth_stencil_format::depth_24_stencil_8:	return DXGI_FORMAT_D24_UNORM_S8_UINT;
-		case Depth_stencil_format::depth_32f:			return DXGI_FORMAT_D32_FLOAT;
+		case depth_stencil_format::none:				return DXGI_FORMAT_UNKNOWN;
+		case depth_stencil_format::depth_24_stencil_8:	return DXGI_FORMAT_D24_UNORM_S8_UINT;
+		case depth_stencil_format::depth_32f:			return DXGI_FORMAT_D32_FLOAT;
 		
-		case Depth_stencil_format::depth_32:			
+		case depth_stencil_format::depth_32:			
 			assert(false); // format is not supported
 			return DXGI_FORMAT_UNKNOWN;
 	}
@@ -63,15 +63,15 @@ namespace cg {
 namespace rnd {
 namespace dx11 {
 
-// ----- DX11_rhi_context -----
+// ----- dx11_rhi_context -----
 
-DX11_rhi_context::DX11_rhi_context(HWND hwnd, const uint2& viewport_size, 
-	Depth_stencil_format depth_stencil_format)
+dx11_rhi_context::dx11_rhi_context(HWND hwnd, const uint2& viewport_size, 
+	depth_stencil_format depth_stencil_format)
 {
 	assert(hwnd);
 	assert(viewport_size > 0);
-	assert(depth_stencil_format == Depth_stencil_format::none
-		|| depth_stencil_format == Depth_stencil_format::depth_24_stencil_8); // NOTE(ref2401): the other options are not implemented
+	assert(depth_stencil_format == depth_stencil_format::none
+		|| depth_stencil_format == depth_stencil_format::depth_24_stencil_8); // NOTE(ref2401): the other options are not implemented
 
 	update_viewport(viewport_size);
 	init_device(hwnd, viewport_size);
@@ -80,13 +80,13 @@ DX11_rhi_context::DX11_rhi_context(HWND hwnd, const uint2& viewport_size,
 	bind_window_render_targets();
 }
 
-void DX11_rhi_context::bind_window_render_targets()
+void dx11_rhi_context::bind_window_render_targets()
 {
 	_device_ctx->OMSetRenderTargets(1, &_rtv_window.ptr, _dsv_depth_stencil.ptr);
 	_device_ctx->RSSetViewports(1, &_viewport);
 }
 
-void DX11_rhi_context::init_device(HWND hwnd, const uint2& viewport_size)
+void dx11_rhi_context::init_device(HWND hwnd, const uint2& viewport_size)
 {
 	DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
 	swap_chain_desc.BufferCount = 2;
@@ -117,10 +117,10 @@ void DX11_rhi_context::init_device(HWND hwnd, const uint2& viewport_size)
 	assert(hr == S_OK);
 }
 
-void DX11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,
-	Depth_stencil_format depth_stencil_format)
+void dx11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,
+	depth_stencil_format depth_stencil_format)
 {
-	if (depth_stencil_format == cg::rnd::Depth_stencil_format::none) return;
+	if (depth_stencil_format == cg::rnd::depth_stencil_format::none) return;
 
 	D3D11_TEXTURE2D_DESC tex_desc = {};
 	tex_desc.Width = viewport_size.x;
@@ -145,7 +145,7 @@ void DX11_rhi_context::init_depth_stencil_buffer(const uint2& viewport_size,
 	assert(hr == S_OK);
 }
 
-void DX11_rhi_context::resize_viewport(const uint2& viewport_size)
+void dx11_rhi_context::resize_viewport(const uint2& viewport_size)
 {
 	assert(viewport_size > 0);
 	if (viewport_size == uint2(uint32_t(_viewport.Width), uint32_t(_viewport.Height))) return;
@@ -165,12 +165,12 @@ void DX11_rhi_context::resize_viewport(const uint2& viewport_size)
 	bind_window_render_targets();
 }
 
-void DX11_rhi_context::swap_color_buffers()
+void dx11_rhi_context::swap_color_buffers()
 {
 	_swap_chain->Present(0, 0);
 }
 
-void DX11_rhi_context::update_depth_stencil_buffer(const uint2& viewport_size)
+void dx11_rhi_context::update_depth_stencil_buffer(const uint2& viewport_size)
 {
 	// if depth stencil view was not created then there is no point in updating it.
 	if (!_dsv_depth_stencil) return;
@@ -196,11 +196,11 @@ void DX11_rhi_context::update_depth_stencil_buffer(const uint2& viewport_size)
 	assert(hr == S_OK);
 }
 
-void DX11_rhi_context::update_render_target_buffer()
+void dx11_rhi_context::update_render_target_buffer()
 {
 	_rtv_window.dispose();
 
-	Com_ptr<ID3D11Texture2D> tex_back_buffer;
+	com_ptr<ID3D11Texture2D> tex_back_buffer;
 	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
 	assert(hr == S_OK);
 
@@ -208,7 +208,7 @@ void DX11_rhi_context::update_render_target_buffer()
 	assert(hr == S_OK);
 }
 
-void DX11_rhi_context::update_viewport(const uint2& viewport_size)
+void dx11_rhi_context::update_viewport(const uint2& viewport_size)
 {
 	_viewport.TopLeftX = 0;
 	_viewport.TopLeftY = 0;
@@ -218,9 +218,9 @@ void DX11_rhi_context::update_viewport(const uint2& viewport_size)
 	_viewport.MaxDepth = 1.0f;
 }
 
-// ----- Hlsl_shader -----
+// ----- hlsl_shader -----
 
-Hlsl_shader::Hlsl_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_desc)
+hlsl_shader::hlsl_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_desc)
 {
 	assert(hlsl_desc.has_vertex_shader());
 	assert(hlsl_desc.has_pixel_shader());
@@ -235,43 +235,43 @@ Hlsl_shader::Hlsl_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_desc
 	init_pixel_shader(device, hlsl_desc);
 }
 
-Hlsl_shader::Hlsl_shader(Hlsl_shader&& set) noexcept
-	: _vertex_shader(std::move(set._vertex_shader)),
-	_vertex_shader_bytecode(std::move(set._vertex_shader_bytecode)),
-	_hull_shader(std::move(set._hull_shader)),
-	_hull_shader_bytecode(std::move(set._hull_shader_bytecode)),
-	_domain_shader(std::move(set._domain_shader)),
-	_domain_shader_bytecode(std::move(set._domain_shader_bytecode)),
-	_pixel_shader(std::move(set._pixel_shader)),
-	_pixel_shader_bytecode(std::move(set._pixel_shader_bytecode))
+hlsl_shader::hlsl_shader(hlsl_shader&& set) noexcept
+	: vertex_shader(std::move(set.vertex_shader)),
+	vertex_shader_bytecode(std::move(set.vertex_shader_bytecode)),
+	hull_shader(std::move(set.hull_shader)),
+	hull_shader_bytecode(std::move(set.hull_shader_bytecode)),
+	domain_shader(std::move(set.domain_shader)),
+	domain_shader_bytecode(std::move(set.domain_shader_bytecode)),
+	pixel_shader(std::move(set.pixel_shader)),
+	pixel_shader_bytecode(std::move(set.pixel_shader_bytecode))
 {}
 
-Hlsl_shader& Hlsl_shader::operator=(Hlsl_shader&& set) noexcept
+hlsl_shader& hlsl_shader::operator=(hlsl_shader&& set) noexcept
 {
 	if (this == &set) return *this;
 
-	_vertex_shader = std::move(set._vertex_shader);
-	_vertex_shader_bytecode = std::move(set._vertex_shader_bytecode);
-	_hull_shader = std::move(set._hull_shader);
-	_hull_shader_bytecode = std::move(set._hull_shader_bytecode);
-	_domain_shader = std::move(set._domain_shader);
-	_domain_shader_bytecode = std::move(set._domain_shader_bytecode);
-	_pixel_shader = std::move(set._pixel_shader);
-	_pixel_shader_bytecode = std::move(set._pixel_shader_bytecode);
+	vertex_shader = std::move(set.vertex_shader);
+	vertex_shader_bytecode = std::move(set.vertex_shader_bytecode);
+	hull_shader = std::move(set.hull_shader);
+	hull_shader_bytecode = std::move(set.hull_shader_bytecode);
+	domain_shader = std::move(set.domain_shader);
+	domain_shader_bytecode = std::move(set.domain_shader_bytecode);
+	pixel_shader = std::move(set.pixel_shader);
+	pixel_shader_bytecode = std::move(set.pixel_shader_bytecode);
 
 	return *this;
 }
 
-void Hlsl_shader::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void hlsl_shader::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
 {
 	try {
-		_vertex_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+		vertex_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
 			hlsl_data.vertex_shader_entry_point, "vs_5_0", hlsl_data.compile_flags);
 
 		HRESULT hr = device->CreateVertexShader(
-			_vertex_shader_bytecode->GetBufferPointer(),
-			_vertex_shader_bytecode->GetBufferSize(),
-			nullptr, &_vertex_shader.ptr);
+			vertex_shader_bytecode->GetBufferPointer(),
+			vertex_shader_bytecode->GetBufferSize(),
+			nullptr, &vertex_shader.ptr);
 
 		ENFORCE(hr == S_OK, std::to_string(hr));
 	}
@@ -281,16 +281,16 @@ void Hlsl_shader::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_des
 	}
 }
 
-void Hlsl_shader::init_hull_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void hlsl_shader::init_hull_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
 {
 	try {
-		_hull_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+		hull_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
 			hlsl_data.hull_shader_entry_point, "hs_5_0", hlsl_data.compile_flags);
 
 		HRESULT hr = device->CreateHullShader(
-			_hull_shader_bytecode->GetBufferPointer(),
-			_hull_shader_bytecode->GetBufferSize(),
-			nullptr, &_hull_shader.ptr);
+			hull_shader_bytecode->GetBufferPointer(),
+			hull_shader_bytecode->GetBufferSize(),
+			nullptr, &hull_shader.ptr);
 
 		ENFORCE(hr == S_OK, std::to_string(hr));
 	}
@@ -300,16 +300,16 @@ void Hlsl_shader::init_hull_shader(ID3D11Device* device, const Hlsl_shader_desc&
 	}
 }
 
-void Hlsl_shader::init_domain_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void hlsl_shader::init_domain_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
 {
 	try {
-		_domain_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+		domain_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
 			hlsl_data.domain_shader_entry_point, "ds_5_0", hlsl_data.compile_flags);
 
 		HRESULT hr = device->CreateDomainShader(
-			_domain_shader_bytecode->GetBufferPointer(),
-			_domain_shader_bytecode->GetBufferSize(),
-			nullptr, &_domain_shader.ptr);
+			domain_shader_bytecode->GetBufferPointer(),
+			domain_shader_bytecode->GetBufferSize(),
+			nullptr, &domain_shader.ptr);
 
 		ENFORCE(hr == S_OK, std::to_string(hr));
 	}
@@ -319,16 +319,16 @@ void Hlsl_shader::init_domain_shader(ID3D11Device* device, const Hlsl_shader_des
 	}
 }
 
-void Hlsl_shader::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void hlsl_shader::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
 {
 	try {
-		_pixel_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
+		pixel_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
 			hlsl_data.pixel_shader_entry_point, "ps_5_0", hlsl_data.compile_flags);
 
 		HRESULT hr = device->CreatePixelShader(
-			_pixel_shader_bytecode->GetBufferPointer(),
-			_pixel_shader_bytecode->GetBufferSize(),
-			nullptr, &_pixel_shader.ptr);
+			pixel_shader_bytecode->GetBufferPointer(),
+			pixel_shader_bytecode->GetBufferSize(),
+			nullptr, &pixel_shader.ptr);
 
 		ENFORCE(hr == S_OK, std::to_string(hr));
 	}
@@ -340,7 +340,7 @@ void Hlsl_shader::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_desc
 
 // ----- funcs ------
 
-Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count)
+com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count)
 {
 	assert(byte_count > 0);
 
@@ -349,7 +349,7 @@ Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count)
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	Com_ptr<ID3D11Buffer> buffer;
+	com_ptr<ID3D11Buffer> buffer;
 	HRESULT hr = device->CreateBuffer(&desc, nullptr, &buffer.ptr);
 	assert(hr == S_OK);
 

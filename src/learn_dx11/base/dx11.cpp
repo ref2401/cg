@@ -10,12 +10,12 @@ using cg::data::Hlsl_shader_desc;
 
 namespace {
 
-Com_ptr<ID3DBlob> compile_shader(const std::string& source_code, 
+com_ptr<ID3DBlob> compile_shader(const std::string& source_code, 
 	const std::string& source_filename, const std::string& entry_point_name,
 	const char* shader_model, uint32_t compile_flags)
 {
-	Com_ptr<ID3DBlob> bytecode;
-	Com_ptr<ID3DBlob> error_blob;
+	com_ptr<ID3DBlob> bytecode;
+	com_ptr<ID3DBlob> error_blob;
 
 	HRESULT hr = D3DCompile(
 		source_code.c_str(),
@@ -284,7 +284,7 @@ void Render_context::update_render_target_view()
 {
 	_render_target_view.dispose();
 
-	Com_ptr<ID3D11Texture2D> tex_back_buffer;
+	com_ptr<ID3D11Texture2D> tex_back_buffer;
 	HRESULT hr = _swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&tex_back_buffer));
 	assert(hr == S_OK);
 
@@ -323,7 +323,7 @@ void Render_context::swap_color_buffers()
 
 // ----- funcs -----
 
-Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
+com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
 {
 	assert(byte_count > 0);
 
@@ -332,14 +332,14 @@ Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count)
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	Com_ptr<ID3D11Buffer> cbuffer;
+	com_ptr<ID3D11Buffer> cbuffer;
 	HRESULT hr = device->CreateBuffer(&desc, nullptr, &cbuffer.ptr);
 	assert(hr == S_OK);
 
 	return cbuffer;
 }
 
-Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
+com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
 	ID3D11Texture2D* tex_origin, const uint2& size)
 {
 	assert(tex_origin);
@@ -350,7 +350,7 @@ Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
 	desc.Width = size.x;
 	desc.Height = size.y;
 	
-	Com_ptr<ID3D11Texture2D> tex;
+	com_ptr<ID3D11Texture2D> tex;
 	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &tex.ptr);
 	assert(hr == S_OK);
 

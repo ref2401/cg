@@ -13,7 +13,7 @@
 #include <DirectXMath.h>
 #include <dxgi.h>
 
-using cg::rnd::dx11::Com_ptr;
+using cg::rnd::dx11::com_ptr;
 using namespace DirectX;
 
 
@@ -48,8 +48,8 @@ public:
 
 private:
 
-	Com_ptr<ID3D11ComputeShader> _shader;
-	Com_ptr<ID3DBlob> _bytecode;
+	com_ptr<ID3D11ComputeShader> _shader;
+	com_ptr<ID3DBlob> _bytecode;
 };
 
 class Hlsl_shader_set final {
@@ -121,14 +121,14 @@ private:
 
 	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
 
-	Com_ptr<ID3D11VertexShader> _vertex_shader;
-	Com_ptr<ID3DBlob> _vertex_shader_bytecode;
-	Com_ptr<ID3D11HullShader> _hull_shader;
-	Com_ptr<ID3DBlob> _hull_shader_bytecode;
-	Com_ptr<ID3D11DomainShader> _domain_shader;
-	Com_ptr<ID3DBlob> _domain_shader_bytecode;
-	Com_ptr<ID3D11PixelShader> _pixel_shader;
-	Com_ptr<ID3DBlob> _pixel_shader_bytecode;
+	com_ptr<ID3D11VertexShader> _vertex_shader;
+	com_ptr<ID3DBlob> _vertex_shader_bytecode;
+	com_ptr<ID3D11HullShader> _hull_shader;
+	com_ptr<ID3DBlob> _hull_shader_bytecode;
+	com_ptr<ID3D11DomainShader> _domain_shader;
+	com_ptr<ID3DBlob> _domain_shader_bytecode;
+	com_ptr<ID3D11PixelShader> _pixel_shader;
+	com_ptr<ID3DBlob> _pixel_shader_bytecode;
 };
 
 class Render_context final {
@@ -193,29 +193,29 @@ private:
 	void update_render_target_view();
 
 	uint2 _viewport_size;
-	Com_ptr<ID3D11Device> _device;
-	Com_ptr<ID3D11Debug> _debug;
-	Com_ptr<ID3D11DeviceContext> _device_ctx;
-	Com_ptr<IDXGISwapChain> _swap_chain;
-	Com_ptr<ID3D11RenderTargetView> _render_target_view;
-	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
-	Com_ptr<ID3D11DepthStencilView> _depth_stencil_view;
+	com_ptr<ID3D11Device> _device;
+	com_ptr<ID3D11Debug> _debug;
+	com_ptr<ID3D11DeviceContext> _device_ctx;
+	com_ptr<IDXGISwapChain> _swap_chain;
+	com_ptr<ID3D11RenderTargetView> _render_target_view;
+	com_ptr<ID3D11Texture2D> _tex_depth_stencil;
+	com_ptr<ID3D11DepthStencilView> _depth_stencil_view;
 };
 
 
 // Creates an unitialized constant buffer object.
-Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count);
+com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device, size_t byte_count);
 
 // Creates an unitialized constant buffer object.
 template<typename T_cbuffer_data>
-inline Com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device)
+inline com_ptr<ID3D11Buffer> make_cbuffer(ID3D11Device* device)
 {
 	return make_cbuffer(device, sizeof(T_cbuffer_data));
 }
 
 // Creates a new 2D texture which has the same configuration as tex_origin but differs in size.
 // The contents of the texture is uninitialized.
-Com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
+com_ptr<ID3D11Texture2D> make_texture_2d(ID3D11Device* device,
 	ID3D11Texture2D* tex_origin, const uint2& size);
 
 } // namespace learn_dx11

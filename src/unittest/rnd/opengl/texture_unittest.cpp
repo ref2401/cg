@@ -10,7 +10,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
 template<> inline std::wstring ToString<Sampler_desc>(const Sampler_desc& t) { RETURN_WIDE_STRING(t); }
-//template<> inline std::wstring ToString<Com_fake_class>(const Com_fake_class& t) { RETURN_WIDE_STRING(t); }
+//template<> inline std::wstring ToString<com_fake_class>(const com_fake_class& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 

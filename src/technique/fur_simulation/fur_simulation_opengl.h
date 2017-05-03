@@ -274,16 +274,16 @@ private:
 	Strand_debug_pass_program _program;
 };
 
-class Fur_simulation_opengl_example final : public cg::sys::Example {
+class Fur_simulation_opengl_example final : public cg::sys::example {
 public:
 
-	static constexpr cg::sys::Example_desc example_desc = {
-		cg::rnd::Render_api::opengl_45,
-		cg::rnd::Depth_stencil_format::depth_32
+	static constexpr cg::sys::example_desc example_desc = {
+		cg::rnd::render_api::opengl_45,
+		cg::rnd::depth_stencil_format::depth_32
 	};
 
 	
-	Fur_simulation_opengl_example(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
+	Fur_simulation_opengl_example(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx);
 
 
 	void on_keyboard() override;

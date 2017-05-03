@@ -134,7 +134,7 @@ inline Glsl_compute_desc load_glsl_compute_desc(const std::string& name, const s
 // Each file name is constructed as: filename + .<shader_type> + .glsl
 // Only vertex shader ia required. If vertex ource code file does not exist the function will throw.  
 // Won't throw if tesselation or geometry source code files do not exist.
-// Example:
+// example:
 //		load_glsl_program_source(../../data/shader/blinn_phong);
 //		The constructed filenames are:
 //		- ../../data/shader/blinn_phong.vertex.glsl

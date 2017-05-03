@@ -61,7 +61,7 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		HRESULT hr = device->CreateTexture2D(&diffuse_desc, &diffuse_data, &tex_diffuse_rgb.ptr);
 		assert(hr == S_OK);
 
-		hr = device->CreateShaderResourceView(tex_diffuse_rgb.ptr, nullptr, &tex_srv_diffuse_rgb.ptr);
+		hr = device->CreateShaderResourceView(tex_diffuse_rgb, nullptr, &tex_srv_diffuse_rgb.ptr);
 		assert(hr == S_OK);
 	}
 
@@ -85,7 +85,7 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		HRESULT hr = device->CreateTexture2D(&displ_desc, &displ_data, &tex_height_map.ptr);
 		assert(hr == S_OK);
 
-		hr = device->CreateShaderResourceView(tex_height_map.ptr, nullptr, &tex_srv_height_map.ptr);
+		hr = device->CreateShaderResourceView(tex_height_map, nullptr, &tex_srv_height_map.ptr);
 		assert(hr == S_OK);
 	}
 
@@ -109,16 +109,16 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 		HRESULT hr = device->CreateTexture2D(&normal_desc, &normal_data, &tex_normal_map.ptr);
 		assert(hr == S_OK);
 
-		hr = device->CreateShaderResourceView(tex_normal_map.ptr, nullptr, &tex_srv_normal_map.ptr);
+		hr = device->CreateShaderResourceView(tex_normal_map, nullptr, &tex_srv_normal_map.ptr);
 		assert(hr == S_OK);
 	}
 }
 
 // ----- Parallax_occlusion_mapping -----
 
-Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx)
-	: Example(app_ctx, rhi_ctx),
-	_rhi_ctx(dynamic_cast<cg::rnd::dx11::DX11_rhi_context&>(rhi_ctx)),
+Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
+	: example(app_ctx, rhi_ctx),
+	_rhi_ctx(dynamic_cast<cg::rnd::dx11::dx11_rhi_context&>(rhi_ctx)),
 	_device(_rhi_ctx.device()),
 	_debug(_rhi_ctx.debug()),
 	_device_ctx(_rhi_ctx.device_ctx()),
@@ -184,8 +184,8 @@ void Parallax_occlusion_mapping::init_geometry()
 	};
 
 	hr = _device->CreateInputLayout(layout_desc, 4,
-		_pom_shader.vertex_shader_bytecode()->GetBufferPointer(),
-		_pom_shader.vertex_shader_bytecode()->GetBufferSize(),
+		_pom_shader.vertex_shader_bytecode->GetBufferPointer(),
+		_pom_shader.vertex_shader_bytecode->GetBufferSize(),
 		&_pom_input_layout.ptr);
 	assert(hr == S_OK);
 }
@@ -237,7 +237,7 @@ void Parallax_occlusion_mapping::init_shaders()
 		"../../data/parallax_occlusion_mapping/parallax_occlusion_mapping.hlsl");
 	pom_shader_desc.vertex_shader_entry_point = "vs_main";
 	pom_shader_desc.pixel_shader_entry_point = "ps_main";
-	_pom_shader = Hlsl_shader(_device, pom_shader_desc);
+	_pom_shader = hlsl_shader(_device, pom_shader_desc);
 }
 
 void Parallax_occlusion_mapping::on_mouse_move()
@@ -302,7 +302,7 @@ void Parallax_occlusion_mapping::update_cb_vertex_shader(const Viewpoint& viewpo
 	arr[57] = dlight_dir_ws.y;
 	arr[58] = dlight_dir_ws.z;
 	arr[59] = 0.0f;
-	_device_ctx->UpdateSubresource(_cb_vertex_shader.ptr, 0, nullptr, arr, 0, 0);
+	_device_ctx->UpdateSubresource(_cb_vertex_shader, 0, nullptr, arr, 0, 0);
 }
 
 void Parallax_occlusion_mapping::update_cb_pixel_shader()
@@ -313,28 +313,28 @@ void Parallax_occlusion_mapping::update_cb_pixel_shader()
 		_curr_material->self_shadowing_factor,
 		_curr_material->tex_coord_step_scale
 	};
-	_device_ctx->UpdateSubresource(_cb_pixel_shader.ptr, 0, nullptr, arr, 0, 0);
+	_device_ctx->UpdateSubresource(_cb_pixel_shader, 0, nullptr, arr, 0, 0);
 }
 
 void Parallax_occlusion_mapping::setup_pipeline_state()
 {
 	const UINT offset = 0;
-	_device_ctx->IASetInputLayout(_pom_input_layout.ptr);
+	_device_ctx->IASetInputLayout(_pom_input_layout);
 	_device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	_device_ctx->IASetVertexBuffers(0, 1, &_vertex_buffer.ptr, &_vertex_stride, &offset);
-	_device_ctx->IASetIndexBuffer(_index_buffer.ptr, DXGI_FORMAT_R32_UINT, 0);
+	_device_ctx->IASetIndexBuffer(_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	_device_ctx->VSSetShader(_pom_shader.vertex_shader(), nullptr, 0);
+	_device_ctx->VSSetShader(_pom_shader.vertex_shader, nullptr, 0);
 	_device_ctx->VSSetConstantBuffers(0, 1, &_cb_vertex_shader.ptr);
-	_device_ctx->PSSetShader(_pom_shader.pixel_shader(), nullptr, 0);
+	_device_ctx->PSSetShader(_pom_shader.pixel_shader, nullptr, 0);
 	_device_ctx->PSSetConstantBuffers(0, 1, &_cb_pixel_shader.ptr);
 	_device_ctx->PSSetSamplers(0, 1, &_sampler_state.ptr);
 	ID3D11ShaderResourceView* views[3];
 	put_shader_recource_views(views, *_curr_material);
 	_device_ctx->PSSetShaderResources(0, 3, views);
 
-	_device_ctx->RSSetState(_rasterizer_state.ptr);
-	_device_ctx->OMSetDepthStencilState(_depth_stencil_state.ptr, 0);
+	_device_ctx->RSSetState(_rasterizer_state);
+	_device_ctx->OMSetDepthStencilState(_depth_stencil_state, 0);
 
 	HRESULT hr = _debug->ValidateContext(_device_ctx);
 	assert(hr == S_OK);

@@ -1,6 +1,6 @@
 #include "cg/data/vertex.h"
 
-#include "unittest/math/common_math.h"
+#include "unittest/base/common_math.h"
 #include "CppUnitTest.h"
 
 using cg::data::Vertex_attribs;
@@ -211,11 +211,11 @@ public:
 
 		// right-handed basis
 		auto th0 = compute_tangent_handedness(tangent, bitangnet, normal_positive);
-		Assert::AreEqual(float4(float3::unit_x, 1.0f), th0);
+		Assert::IsTrue(approx_equal(th0, float4(float3::unit_x, 1.0f)));
 
 		// left-handed basis
 		auto th1 = compute_tangent_handedness(tangent, bitangnet, normal_negative);
-		Assert::AreEqual(float4(float3::unit_x, -1.0f), th1);
+		Assert::IsTrue(approx_equal(th1, float4(float3::unit_x, -1.0f)));
 	}
 
 	TEST_METHOD(has_vertex_attribs)

@@ -29,7 +29,7 @@ public:
 
 };
 
-TEST_CLASS(cg_data_image_Image_format) {
+TEST_CLASS(cg_data_image_pixel_format) {
 public:
 
 	TEST_METHOD(byte_count)

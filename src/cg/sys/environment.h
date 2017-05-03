@@ -154,8 +154,8 @@ private:
 	HWND _hwnd = nullptr;
 };
 
-struct App_context final {
-	App_context(const Keyboard& keyboard, const Mouse& mouse, Window& window) noexcept :
+struct app_context final {
+	app_context(const Keyboard& keyboard, const Mouse& mouse, Window& window) noexcept :
 		keyboard(keyboard), mouse(mouse), window(window)
 	{}
 

@@ -141,8 +141,8 @@ Material_library::Material_library()
 
 // ----- Deferred_lighting -----
 
-Deferred_lighting::Deferred_lighting(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx) 
-	: Example(app_ctx, rhi_ctx),
+Deferred_lighting::Deferred_lighting(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx) 
+	: example(app_ctx, rhi_ctx),
 	//_curr_viewpoint(float3(4, 4, -3.5), float3(0, 1, 0)),
 	_curr_viewpoint(float3(2, 5, 4), float3(0, 0, 0)),
 	_prev_viewpoint(_curr_viewpoint),

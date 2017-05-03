@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <utility>
-#include "unittest/math/common_math.h"
+#include "unittest/base/common_math.h"
 
 using cg::Viewpoint;
 
@@ -16,7 +16,7 @@ template<> inline std::wstring ToString<Viewpoint>(const Viewpoint& t) { RETURN_
 
 namespace unittest {
 
-TEST_CLASS(cg_math_transform_Viewpoint) {
+TEST_CLASS(cg_base_math_viewpoint) {
 public:
 
 	TEST_METHOD(assigment_operators)
@@ -77,7 +77,7 @@ public:
 	}
 };
 
-TEST_CLASS(cg_math_transform_Funcs) {
+TEST_CLASS(cg_base_math_funcs) {
 
 	TEST_METHOD(distance_Viewpoint)
 	{

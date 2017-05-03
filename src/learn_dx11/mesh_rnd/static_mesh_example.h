@@ -53,22 +53,22 @@ private:
 
 	
 	Hlsl_shader_set _shader_set;
-	Com_ptr<ID3D11Buffer> _vertex_buffer;
-	Com_ptr<ID3D11InputLayout> _input_layout;
-	Com_ptr<ID3D11Buffer> _index_buffer;
+	com_ptr<ID3D11Buffer> _vertex_buffer;
+	com_ptr<ID3D11InputLayout> _input_layout;
+	com_ptr<ID3D11Buffer> _index_buffer;
 	// renderer settings
-	Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	Com_ptr<ID3D11RasterizerState> _rasterizer_state;
+	com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> _rasterizer_state;
 	// scene
 	UINT _model_index_count;
 	float4x4 _projection_matrix;
 	float4x4 _view_matrix;
 	float4x4 _model_matrix;
-	Com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
-	Com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_view;
-	Com_ptr<ID3D11SamplerState> _sampler_state;
-	Com_ptr<ID3D11Buffer> _scene_cbuffer;
-	Com_ptr<ID3D11Buffer> _model_cbuffer;
+	com_ptr<ID3D11Texture2D> _tex_diffuse_rgb;
+	com_ptr<ID3D11ShaderResourceView> _tex_diffuse_rgb_view;
+	com_ptr<ID3D11SamplerState> _sampler_state;
+	com_ptr<ID3D11Buffer> _scene_cbuffer;
+	com_ptr<ID3D11Buffer> _model_cbuffer;
 };
 
 } // mesh_rnd

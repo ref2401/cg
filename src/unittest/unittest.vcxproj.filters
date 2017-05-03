@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="math\transform_unittest.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="base\base_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -46,11 +43,11 @@
     <ClCompile Include="base\container_unittest.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="base\math_unittest.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="math">
-      <UniqueIdentifier>{2076d25b-fb36-4785-91fe-f46b6f01b7b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="data">
       <UniqueIdentifier>{b4d228fe-d11b-40f8-9c0b-52b577f506a5}</UniqueIdentifier>
     </Filter>
@@ -71,11 +68,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="math\common_math.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="data\common_file.h">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="base\common_math.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

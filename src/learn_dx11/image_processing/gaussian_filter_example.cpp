@@ -109,7 +109,7 @@ void Gaussian_filter_example::perform_filtering()
 	constexpr size_t compute_kernel_width = 128;
 
 	uint2 offset_arr[2];
-	Com_ptr<ID3D11Buffer> offset_cbuffer = make_cbuffer(_device, 2 * sizeof(offset_arr));
+	com_ptr<ID3D11Buffer> offset_cbuffer = make_cbuffer(_device, 2 * sizeof(offset_arr));
 
 	D3D11_TEXTURE2D_DESC tex_desc;
 	_tex_source->GetDesc(&tex_desc);

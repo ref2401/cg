@@ -61,12 +61,12 @@ namespace cg {
 namespace rnd {
 namespace opengl {
 
-Opengl_rhi_context::Opengl_rhi_context(HWND hwnd, cg::rnd::Depth_stencil_format depth_stencil_format)
+Opengl_rhi_context::Opengl_rhi_context(HWND hwnd, cg::rnd::depth_stencil_format depth_stencil_format)
 	: _hwnd(hwnd),
 	_opengl_dll(LoadLibrary("opengl32.dll"))
 {
 	assert(_hwnd);
-	assert(depth_stencil_format == cg::rnd::Depth_stencil_format::depth_32); // NOTE(ref2401): the other options are not implementd
+	assert(depth_stencil_format == cg::rnd::depth_stencil_format::depth_32); // NOTE(ref2401): the other options are not implementd
 	
 	inti_context();
 	load_opengl_11();

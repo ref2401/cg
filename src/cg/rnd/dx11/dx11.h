@@ -11,7 +11,7 @@
 #include "cg/data/shader.h"
 #include "cg/base/math.h"
 #include "cg/rnd/rnd.h"
-
+#include <wrl/client.h>
 using namespace DirectX;
 
 
@@ -22,37 +22,37 @@ namespace dx11 {
 // Unique_com_ptr is a smart pointer that owns and manages a COM object through a pointer 
 // and disposes of that object when the Unique_com_ptr goes out of scope.
 template<typename T>
-struct Com_ptr final {
+struct com_ptr final {
 
 	// Commented because unittests use fake COM interface.
 	//static_assert(std::is_base_of<IUnknown, T>::value, "T must be derived from IUnknown.");
 
 
-	Com_ptr() noexcept {}
+	com_ptr() noexcept {}
 
-	explicit Com_ptr(T* ptr) noexcept 
+	explicit com_ptr(T* ptr) noexcept 
 		: ptr(ptr)
 	{}
 
-	Com_ptr(nullptr_t) noexcept {}
+	com_ptr(nullptr_t) noexcept {}
 
-	Com_ptr(const Com_ptr&) = delete;
+	com_ptr(const com_ptr&) = delete;
 
-	Com_ptr(Com_ptr&& com_ptr) noexcept 
+	com_ptr(com_ptr&& com_ptr) noexcept 
 		: ptr(com_ptr.ptr)
 	{
 		com_ptr.ptr = nullptr;
 	}
 
-	~Com_ptr() noexcept
+	~com_ptr() noexcept
 	{
 		dispose();
 	}
 
 
-	Com_ptr& operator=(const Com_ptr&) = delete;
+	com_ptr& operator=(const com_ptr&) = delete;
 
-	Com_ptr& operator=(Com_ptr&& com_ptr) noexcept
+	com_ptr& operator=(com_ptr&& com_ptr) noexcept
 	{
 		if (this == &com_ptr) return *this;
 
@@ -62,22 +62,17 @@ struct Com_ptr final {
 		return *this;
 	}
 
-	Com_ptr& operator=(T* ptr) noexcept
+	com_ptr& operator=(T* ptr) noexcept
 	{
 		dispose();
 		this->ptr = ptr;
 		return *this;
 	}
 
-	Com_ptr& operator=(nullptr_t) noexcept
+	com_ptr& operator=(nullptr_t) noexcept
 	{
 		dispose();
 		return *this;
-	}
-
-	operator bool() const noexcept
-	{
-		return (ptr != nullptr);
 	}
 
 	T& operator*() const noexcept
@@ -86,6 +81,16 @@ struct Com_ptr final {
 	}
 
 	T* operator->() const noexcept
+	{
+		return ptr;
+	}
+
+	operator bool() const noexcept
+	{
+		return (ptr != nullptr);
+	}
+
+	operator T*() const noexcept
 	{
 		return ptr;
 	}
@@ -107,8 +112,9 @@ struct Com_ptr final {
 	T* ptr = nullptr;
 };
 
+
 template<typename T>
-void Com_ptr<T>::dispose() noexcept
+void com_ptr<T>::dispose() noexcept
 {
 	T* temp = ptr;
 	if (temp == nullptr) return;
@@ -118,56 +124,56 @@ void Com_ptr<T>::dispose() noexcept
 }
 
 template<typename T>
-inline bool operator==(const Com_ptr<T>& l, const Com_ptr<T>& r) noexcept
+inline bool operator==(const com_ptr<T>& l, const com_ptr<T>& r) noexcept
 {
 	return l.ptr == r.ptr;
 }
 
 template<typename T>
-inline bool operator==(const Com_ptr<T>& com_ptr, nullptr_t) noexcept
+inline bool operator==(const com_ptr<T>& com_ptr, nullptr_t) noexcept
 {
 	return com_ptr.ptr == nullptr;
 }
 
 template<typename T>
-inline bool operator==(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
+inline bool operator==(nullptr_t, const com_ptr<T>& com_ptr) noexcept
 {
 	return com_ptr.ptr == nullptr;
 }
 
 template<typename T>
-inline bool operator!=(const Com_ptr<T>& l, const Com_ptr<T>& r) noexcept
+inline bool operator!=(const com_ptr<T>& l, const com_ptr<T>& r) noexcept
 {
 	return l.ptr != r.ptr;
 }
 
 template<typename T>
-inline bool operator!=(const Com_ptr<T>& com_ptr, nullptr_t) noexcept
+inline bool operator!=(const com_ptr<T>& com_ptr, nullptr_t) noexcept
 {
 	return com_ptr.ptr != nullptr;
 }
 
 template<typename T>
-inline bool operator!=(nullptr_t, const Com_ptr<T>& com_ptr) noexcept
+inline bool operator!=(nullptr_t, const com_ptr<T>& com_ptr) noexcept
 {
 	return com_ptr.ptr != nullptr;
 }
 
-class DX11_rhi_context final : public virtual cg::rnd::Rhi_context_i {
+class dx11_rhi_context final : public virtual cg::rnd::rhi_context_i {
 public:
 
-	DX11_rhi_context(HWND hwnd, const uint2& viewport_size, cg::rnd::Depth_stencil_format depth_stencil_format);
+	dx11_rhi_context(HWND hwnd, const uint2& viewport_size, cg::rnd::depth_stencil_format depth_stencil_format);
 
-	DX11_rhi_context(const DX11_rhi_context&) = delete;
+	dx11_rhi_context(const dx11_rhi_context&) = delete;
 
-	DX11_rhi_context(DX11_rhi_context&&) = delete;
+	dx11_rhi_context(dx11_rhi_context&&) = delete;
 
-	~DX11_rhi_context() noexcept = default;
+	~dx11_rhi_context() noexcept = default;
 
 
-	DX11_rhi_context& operator=(const DX11_rhi_context&) = delete;
+	dx11_rhi_context& operator=(const dx11_rhi_context&) = delete;
 
-	DX11_rhi_context& operator=(DX11_rhi_context&&) = delete;
+	dx11_rhi_context& operator=(dx11_rhi_context&&) = delete;
 
 
 	ID3D11Debug* debug() noexcept
@@ -195,9 +201,9 @@ public:
 		return _rtv_window.ptr;
 	}
 
-	Render_api render_api() const noexcept override 
+	cg::rnd::render_api render_api() const noexcept override
 	{
-		return cg::rnd::Render_api::dx_11;
+		return cg::rnd::render_api::dx_11;
 	}
 
 	const D3D11_VIEWPORT& viewport() const noexcept
@@ -223,7 +229,7 @@ private:
 	void init_device(HWND hwnd, const uint2& viewport_size);
 
 	void init_depth_stencil_buffer(const uint2& viewport_size,
-		cg::rnd::Depth_stencil_format depth_stencil_format);
+		cg::rnd::depth_stencil_format depth_stencil_format);
 
 	void update_depth_stencil_buffer(const uint2& viewport_size);
 
@@ -232,74 +238,42 @@ private:
 	void update_viewport(const uint2& viewport_size);
 
 
-	Com_ptr<ID3D11Device> _device;
-	Com_ptr<ID3D11Debug> _debug;
-	Com_ptr<ID3D11DeviceContext> _device_ctx;
-	Com_ptr<IDXGISwapChain> _swap_chain;
-	Com_ptr<ID3D11RenderTargetView> _rtv_window;
-	Com_ptr<ID3D11Texture2D> _tex_depth_stencil;
-	Com_ptr<ID3D11DepthStencilView> _dsv_depth_stencil;
+	com_ptr<ID3D11Device> _device;
+	com_ptr<ID3D11Debug> _debug;
+	com_ptr<ID3D11DeviceContext> _device_ctx;
+	com_ptr<IDXGISwapChain> _swap_chain;
+	com_ptr<ID3D11RenderTargetView> _rtv_window;
+	com_ptr<ID3D11Texture2D> _tex_depth_stencil;
+	com_ptr<ID3D11DepthStencilView> _dsv_depth_stencil;
 	D3D11_VIEWPORT _viewport;
 };
 
-class Hlsl_shader final {
-public:
+struct hlsl_shader final {
 
-	Hlsl_shader() noexcept = default;
+	hlsl_shader() noexcept = default;
 
-	Hlsl_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_desc);
+	hlsl_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_desc);
 
-	Hlsl_shader(const Hlsl_shader&) = delete;
+	hlsl_shader(const hlsl_shader&) = delete;
 
-	Hlsl_shader(Hlsl_shader&& set) noexcept;
+	hlsl_shader(hlsl_shader&& set) noexcept;
 
-	~Hlsl_shader() noexcept = default;
-
-
-	Hlsl_shader& operator=(const Hlsl_shader&) = delete;
-
-	Hlsl_shader& operator=(Hlsl_shader&& set) noexcept;
+	~hlsl_shader() noexcept = default;
 
 
-	ID3D11VertexShader* vertex_shader() noexcept
-	{
-		return _vertex_shader.ptr;
-	}
+	hlsl_shader& operator=(const hlsl_shader&) = delete;
 
-	ID3DBlob* vertex_shader_bytecode() noexcept
-	{
-		return _vertex_shader_bytecode.ptr;
-	}
+	hlsl_shader& operator=(hlsl_shader&& set) noexcept;
 
-	ID3D11HullShader* hull_shader() noexcept
-	{
-		return _hull_shader.ptr;
-	}
 
-	ID3DBlob* hull_shader_bytecode() noexcept
-	{
-		return _hull_shader_bytecode.ptr;
-	}
-
-	ID3D11DomainShader* domain_shader() noexcept
-	{
-		return _domain_shader.ptr;
-	}
-
-	ID3DBlob* domain_shader_bytecode() noexcept
-	{
-		return _domain_shader_bytecode.ptr;
-	}
-
-	ID3D11PixelShader* pixel_shader() noexcept
-	{
-		return _pixel_shader.ptr;
-	}
-
-	ID3DBlob* pixel_shader_bytecode() noexcept
-	{
-		return _pixel_shader_bytecode.ptr;
-	}
+	com_ptr<ID3D11VertexShader> vertex_shader;
+	com_ptr<ID3DBlob> vertex_shader_bytecode;
+	com_ptr<ID3D11HullShader> hull_shader;
+	com_ptr<ID3DBlob> hull_shader_bytecode;
+	com_ptr<ID3D11DomainShader> domain_shader;
+	com_ptr<ID3DBlob> domain_shader_bytecode;
+	com_ptr<ID3D11PixelShader> pixel_shader;
+	com_ptr<ID3DBlob> pixel_shader_bytecode;
 
 private:
 
@@ -310,24 +284,15 @@ private:
 	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
 
 	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
-
-	Com_ptr<ID3D11VertexShader> _vertex_shader;
-	Com_ptr<ID3DBlob> _vertex_shader_bytecode;
-	Com_ptr<ID3D11HullShader> _hull_shader;
-	Com_ptr<ID3DBlob> _hull_shader_bytecode;
-	Com_ptr<ID3D11DomainShader> _domain_shader;
-	Com_ptr<ID3DBlob> _domain_shader_bytecode;
-	Com_ptr<ID3D11PixelShader> _pixel_shader;
-	Com_ptr<ID3DBlob> _pixel_shader_bytecode;
 };
 
 
 // Creates an unitialized constant buffer object.
-Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count);
+com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device, size_t byte_count);
 
 // Creates an unitialized constant buffer object.
 template<typename T_cbuffer_data>
-inline Com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device)
+inline com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device)
 {
 	return constant_buffer(device, sizeof(T_cbuffer_data));
 }

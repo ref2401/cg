@@ -26,24 +26,24 @@ struct Material final {
 	float min_sample_count = 0.0f;
 	float max_sample_count = 0.0f;
 	float self_shadowing_factor = 1.0f;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_diffuse_rgb;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_height_map;
-	cg::rnd::dx11::Com_ptr<ID3D11Texture2D> tex_normal_map;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_diffuse_rgb;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_height_map;
-	cg::rnd::dx11::Com_ptr<ID3D11ShaderResourceView> tex_srv_normal_map;
+	cg::rnd::dx11::com_ptr<ID3D11Texture2D> tex_diffuse_rgb;
+	cg::rnd::dx11::com_ptr<ID3D11Texture2D> tex_height_map;
+	cg::rnd::dx11::com_ptr<ID3D11Texture2D> tex_normal_map;
+	cg::rnd::dx11::com_ptr<ID3D11ShaderResourceView> tex_srv_diffuse_rgb;
+	cg::rnd::dx11::com_ptr<ID3D11ShaderResourceView> tex_srv_height_map;
+	cg::rnd::dx11::com_ptr<ID3D11ShaderResourceView> tex_srv_normal_map;
 };
 
-class Parallax_occlusion_mapping final : public virtual cg::sys::Example {
+class Parallax_occlusion_mapping final : public virtual cg::sys::example {
 public:
 
-	static constexpr cg::sys::Example_desc example_desc = {
-		cg::rnd::Render_api::dx_11,
-		cg::rnd::Depth_stencil_format::depth_24_stencil_8
+	static constexpr cg::sys::example_desc example_desc = {
+		cg::rnd::render_api::dx_11,
+		cg::rnd::depth_stencil_format::depth_24_stencil_8
 	};
 
 
-	Parallax_occlusion_mapping(const cg::sys::App_context& app_ctx, cg::rnd::Rhi_context_i& rhi_ctx);
+	Parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx);
 
 	Parallax_occlusion_mapping(const Parallax_occlusion_mapping&) = delete;
 
@@ -89,7 +89,7 @@ private:
 
 
 	// dx stuff
-	cg::rnd::dx11::DX11_rhi_context& _rhi_ctx;
+	cg::rnd::dx11::dx11_rhi_context& _rhi_ctx;
 	ID3D11Device* _device = nullptr;
 	ID3D11Debug* _debug = nullptr;
 	ID3D11DeviceContext* _device_ctx = nullptr;
@@ -99,21 +99,21 @@ private:
 	cg::Viewpoint _curr_viewpoint;
 	cg::Viewpoint _prev_viewpoint;
 	float4x4 _projection_matrix;
-	cg::rnd::dx11::Com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
-	cg::rnd::dx11::Com_ptr<ID3D11RasterizerState> _rasterizer_state;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_vertex_shader;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _cb_pixel_shader;
-	cg::rnd::dx11::Com_ptr<ID3D11SamplerState> _sampler_state;
-	cg::rnd::dx11::Hlsl_shader _pom_shader;
+	cg::rnd::dx11::com_ptr<ID3D11DepthStencilState> _depth_stencil_state;
+	cg::rnd::dx11::com_ptr<ID3D11RasterizerState> _rasterizer_state;
+	cg::rnd::dx11::com_ptr<ID3D11Buffer> _cb_vertex_shader;
+	cg::rnd::dx11::com_ptr<ID3D11Buffer> _cb_pixel_shader;
+	cg::rnd::dx11::com_ptr<ID3D11SamplerState> _sampler_state;
+	cg::rnd::dx11::hlsl_shader _pom_shader;
 	// light
 	float3 _dlight_position_ws;
 	float3 _dlight_velocity_ws;
 	// model
 	float3 _model_scale;
 	float3 _model_position;
-	cg::rnd::dx11::Com_ptr<ID3D11InputLayout> _pom_input_layout;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _vertex_buffer;
-	cg::rnd::dx11::Com_ptr<ID3D11Buffer> _index_buffer;
+	cg::rnd::dx11::com_ptr<ID3D11InputLayout> _pom_input_layout;
+	cg::rnd::dx11::com_ptr<ID3D11Buffer> _vertex_buffer;
+	cg::rnd::dx11::com_ptr<ID3D11Buffer> _index_buffer;
 	Material* _curr_material = nullptr;
 	Material _rock_wall_material;
 	Material _four_shapes_material;

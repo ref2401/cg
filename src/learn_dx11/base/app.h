@@ -91,7 +91,7 @@ void Application::run()
 	assert(!_rnd_ctx);
 	assert(!_example);
 
-	Com_ptr<ID3D11Debug> debug;
+	com_ptr<ID3D11Debug> debug;
 
 	{
 		RECT rect;
