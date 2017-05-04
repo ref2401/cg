@@ -3,7 +3,7 @@
 #include "unittest/base/common_math.h"
 #include "CppUnitTest.h"
 
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 using cg::data::Vertex_interleaved_format;
 using cg::data::Vertex_interleaved_format_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -11,7 +11,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
 
-template<> inline std::wstring ToString<Vertex_attribs>(const Vertex_attribs& t) { RETURN_WIDE_STRING(t); }
+template<> inline std::wstring ToString<vertex_attribs>(const vertex_attribs& t) { RETURN_WIDE_STRING(t); }
 
 }}} // namespace Microsoft::VisualStudio::CppUnitTestFramework
 
@@ -23,8 +23,8 @@ public:
 
 	TEST_METHOD(Vertex_attribs_p)
 	{
-		using Fmt = Vertex_interleaved_format<Vertex_attribs::p>;
-		Assert::AreEqual(Vertex_attribs::p, Fmt::attribs);
+		using Fmt = Vertex_interleaved_format<vertex_attribs::p>;
+		Assert::AreEqual(vertex_attribs::p, Fmt::attribs);
 
 		Assert::AreEqual(size_t(3), Fmt::position_component_count);
 		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
@@ -36,8 +36,8 @@ public:
 
 	TEST_METHOD(Vertex_attribs_p_n)
 	{
-		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n>;
-		Assert::AreEqual(Vertex_attribs::p_n, Fmt::attribs);
+		using Fmt = Vertex_interleaved_format<vertex_attribs::p_n>;
+		Assert::AreEqual(vertex_attribs::p_n, Fmt::attribs);
 
 		Assert::AreEqual(size_t(3), Fmt::position_component_count);
 		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
@@ -53,8 +53,8 @@ public:
 
 	TEST_METHOD(Vertex_attribs_p_n_tc)
 	{
-		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
-		Assert::AreEqual(Vertex_attribs::p_n_tc, Fmt::attribs);
+		using Fmt = Vertex_interleaved_format<vertex_attribs::p_n_tc>;
+		Assert::AreEqual(vertex_attribs::p_n_tc, Fmt::attribs);
 
 		Assert::AreEqual(size_t(3), Fmt::position_component_count);
 		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
@@ -74,8 +74,8 @@ public:
 
 	TEST_METHOD(Vertex_attrib_p_tc)
 	{
-		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_tc>;
-		Assert::AreEqual(Vertex_attribs::p_tc, Fmt::attribs);
+		using Fmt = Vertex_interleaved_format<vertex_attribs::p_tc>;
+		Assert::AreEqual(vertex_attribs::p_tc, Fmt::attribs);
 
 		Assert::AreEqual(size_t(3), Fmt::position_component_count);
 		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
@@ -91,8 +91,8 @@ public:
 
 	TEST_METHOD(Vertex_attribs_p_n_tc_ts)
 	{
-		using Fmt = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
-		Assert::AreEqual(Vertex_attribs::p_n_tc_ts, Fmt::attribs);
+		using Fmt = Vertex_interleaved_format<vertex_attribs::p_n_tc_ts>;
+		Assert::AreEqual(vertex_attribs::p_n_tc_ts, Fmt::attribs);
 
 		Assert::AreEqual(size_t(3), Fmt::position_component_count);
 		Assert::AreEqual(3 * sizeof(float), Fmt::position_byte_count);
@@ -120,7 +120,7 @@ public:
 
 	TEST_METHOD(ctors)
 	{
-		using Format_p = Vertex_interleaved_format<Vertex_attribs::p>;
+		using Format_p = Vertex_interleaved_format<vertex_attribs::p>;
 		Vertex_interleaved_format_desc format_p(Format_p::attribs);
 		Assert::AreEqual(Format_p::position_component_count,	format_p.position_component_count);
 		Assert::AreEqual(Format_p::position_byte_count,			format_p.position_byte_count);
@@ -128,7 +128,7 @@ public:
 		Assert::AreEqual(Format_p::vertex_component_count,		format_p.vertex_component_count);
 		Assert::AreEqual(Format_p::vertex_byte_count,			format_p.vertex_byte_count);
 
-		using Format_p_n = Vertex_interleaved_format<Vertex_attribs::p_n>;
+		using Format_p_n = Vertex_interleaved_format<vertex_attribs::p_n>;
 		Vertex_interleaved_format_desc format_p_n(Format_p_n::attribs);
 		Assert::AreEqual(Format_p_n::position_component_count,	format_p_n.position_component_count);
 		Assert::AreEqual(Format_p_n::position_byte_count,		format_p_n.position_byte_count);
@@ -139,7 +139,7 @@ public:
 		Assert::AreEqual(Format_p_n::vertex_component_count,	format_p_n.vertex_component_count);
 		Assert::AreEqual(Format_p_n::vertex_byte_count,			format_p_n.vertex_byte_count);
 
-		using Format_p_n_tc = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
+		using Format_p_n_tc = Vertex_interleaved_format<vertex_attribs::p_n_tc>;
 		Vertex_interleaved_format_desc format_p_n_tc(Format_p_n_tc::attribs);
 		Assert::AreEqual(Format_p_n_tc::position_component_count,	format_p_n_tc.position_component_count);
 		Assert::AreEqual(Format_p_n_tc::position_byte_count,		format_p_n_tc.position_byte_count);
@@ -153,7 +153,7 @@ public:
 		Assert::AreEqual(Format_p_n_tc::vertex_component_count,		format_p_n_tc.vertex_component_count);
 		Assert::AreEqual(Format_p_n_tc::vertex_byte_count,			format_p_n_tc.vertex_byte_count);
 
-		using Format_p_tc = Vertex_interleaved_format<Vertex_attribs::p_tc>;
+		using Format_p_tc = Vertex_interleaved_format<vertex_attribs::p_tc>;
 		Vertex_interleaved_format_desc format_p_tc(Format_p_tc::attribs);
 		Assert::AreEqual(Format_p_tc::position_component_count,		format_p_tc.position_component_count);
 		Assert::AreEqual(Format_p_tc::position_byte_count,			format_p_tc.position_byte_count);
@@ -164,7 +164,7 @@ public:
 		Assert::AreEqual(Format_p_tc::vertex_component_count,		format_p_tc.vertex_component_count);
 		Assert::AreEqual(Format_p_tc::vertex_byte_count,			format_p_tc.vertex_byte_count);
 
-		using Format_p_n_tc_ts = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+		using Format_p_n_tc_ts = Vertex_interleaved_format<vertex_attribs::p_n_tc_ts>;
 		Vertex_interleaved_format_desc format_p_n_tc_ts(Format_p_n_tc_ts::attribs);
 		Assert::AreEqual(Format_p_n_tc_ts::position_component_count,		format_p_n_tc_ts.position_component_count);
 		Assert::AreEqual(Format_p_n_tc_ts::position_byte_count,				format_p_n_tc_ts.position_byte_count);
@@ -224,60 +224,60 @@ public:
 		using cg::data::has_tangent_space;
 		using cg::data::has_tex_coord;
 
-		Assert::IsFalse(has_normal(Vertex_attribs::p));
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::p));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::p));
+		Assert::IsFalse(has_normal(vertex_attribs::p));
+		Assert::IsFalse(has_tex_coord(vertex_attribs::p));
+		Assert::IsFalse(has_tangent_space(vertex_attribs::p));
 
-		Assert::IsTrue(has_normal(Vertex_attribs::p_n));
-		Assert::IsFalse(has_tex_coord(Vertex_attribs::p_n));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_n));
+		Assert::IsTrue(has_normal(vertex_attribs::p_n));
+		Assert::IsFalse(has_tex_coord(vertex_attribs::p_n));
+		Assert::IsFalse(has_tangent_space(vertex_attribs::p_n));
 
-		Assert::IsFalse(has_normal(Vertex_attribs::p_tc));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_tc));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_tc));
+		Assert::IsFalse(has_normal(vertex_attribs::p_tc));
+		Assert::IsTrue(has_tex_coord(vertex_attribs::p_tc));
+		Assert::IsFalse(has_tangent_space(vertex_attribs::p_tc));
 
-		Assert::IsTrue(has_normal(Vertex_attribs::p_n_tc));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_n_tc));
-		Assert::IsFalse(has_tangent_space(Vertex_attribs::p_n_tc));
+		Assert::IsTrue(has_normal(vertex_attribs::p_n_tc));
+		Assert::IsTrue(has_tex_coord(vertex_attribs::p_n_tc));
+		Assert::IsFalse(has_tangent_space(vertex_attribs::p_n_tc));
 
-		Assert::IsTrue(has_normal(Vertex_attribs::p_n_tc_ts));
-		Assert::IsTrue(has_tex_coord(Vertex_attribs::p_n_tc_ts));
-		Assert::IsTrue(has_tangent_space(Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(has_normal(vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(has_tex_coord(vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(has_tangent_space(vertex_attribs::p_n_tc_ts));
 	}
 
 	TEST_METHOD(is_superset_of)
 	{
 		using cg::data::is_superset_of;
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p, Vertex_attribs::p));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p, Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p, vertex_attribs::p));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p, vertex_attribs::p_n));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p, vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p, vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p, vertex_attribs::p_n_tc_ts));
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n, Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n, vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n, vertex_attribs::p_n));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_n, vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_n, vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_n, vertex_attribs::p_n_tc_ts));
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_tc, Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_tc, vertex_attribs::p));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_tc, vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_tc, vertex_attribs::p_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_tc, vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_tc, vertex_attribs::p_n_tc_ts));
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_tc));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n_tc));
-		Assert::IsFalse(is_superset_of(Vertex_attribs::p_n_tc, Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc, vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc, vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc, vertex_attribs::p_tc));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc, vertex_attribs::p_n_tc));
+		Assert::IsFalse(is_superset_of(vertex_attribs::p_n_tc, vertex_attribs::p_n_tc_ts));
 
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_tc));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n_tc));
-		Assert::IsTrue(is_superset_of(Vertex_attribs::p_n_tc_ts, Vertex_attribs::p_n_tc_ts));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc_ts, vertex_attribs::p));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc_ts, vertex_attribs::p_n));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc_ts, vertex_attribs::p_tc));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc_ts, vertex_attribs::p_n_tc));
+		Assert::IsTrue(is_superset_of(vertex_attribs::p_n_tc_ts, vertex_attribs::p_n_tc_ts));
 	}
 
 };

@@ -8,7 +8,7 @@
 
 using cg::data::Model_geometry_data;
 using cg::data::Model_mesh_info;
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -26,7 +26,7 @@ public:
 
 	TEST_METHOD(push_back_indices)
 	{
-		Model_geometry_data<Vertex_attribs::p> geometry_data;
+		Model_geometry_data<vertex_attribs::p> geometry_data;
 		Assert::AreEqual<size_t>(0, geometry_data.index_count());
 		Assert::IsTrue(geometry_data.index_data().empty());
 
@@ -60,7 +60,7 @@ public:
 
 	TEST_METHOD(push_back_mesh)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t geometry_data;
@@ -92,7 +92,7 @@ public:
 
 	TEST_METHOD(push_back_vertex_p)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t::Vertex v0(float3(1, 2, 3));
@@ -121,7 +121,7 @@ public:
 
 	TEST_METHOD(push_back_vertex_p_n)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p_n>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p_n>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t::Vertex v0(float3(1, 2, 3), float3(4, 5, 6));
@@ -150,7 +150,7 @@ public:
 
 	TEST_METHOD(push_back_vertex_p_n_tc)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p_n_tc>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p_n_tc>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t::Vertex v0(float3(1, 2, 3), float3(4, 5, 6), float2(7, 8));
@@ -179,7 +179,7 @@ public:
 
 	TEST_METHOD(push_back_vertex_p_tc)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p_tc>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p_tc>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t::Vertex v0(float3(1, 2, 3), float2(4, 5));
@@ -208,7 +208,7 @@ public:
 
 	TEST_METHOD(push_back_vertex_p_n_tc_ts)
 	{
-		using Model_geometry_data_t = Model_geometry_data<Vertex_attribs::p_n_tc_ts>;
+		using Model_geometry_data_t = Model_geometry_data<vertex_attribs::p_n_tc_ts>;
 		constexpr size_t vertex_byte_count = Model_geometry_data_t::Format::vertex_byte_count;
 
 		Model_geometry_data_t::Vertex v0(float3(1, 2, 3), float3(4, 5, 6), float2(7, 8), float4(9, 10, 11, 12));

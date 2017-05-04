@@ -248,11 +248,50 @@ private:
 	D3D11_VIEWPORT _viewport;
 };
 
+struct hlsl_compute_desc final {
+	// Hlsl source code.
+	std::string source_code;
+
+	// Hlsl source code filename. Use in error messages.
+	std::string source_filename;
+
+	// The name of a function where vertex shader execution begins.
+	std::string compute_shader_entry_point = "cs_main";
+
+	// The D3DCOMPILE constants specify how the compiler compiles the HLSL code.
+	uint32_t compile_flags = 0;
+};
+
+// hlsl_shader_desc struct stores all required and optional params
+// which are used in hlsl shader creation process.
+struct hlsl_shader_desc final {
+	// Hlsl source code.
+	std::string source_code;
+
+	// Hlsl source code filename. Use in error messages.
+	std::string source_filename;
+
+	// The name of a function where vertex shader execution begins.
+	std::string vertex_shader_entry_point;
+
+	// The name of a function where hull shader execution begins.
+	std::string hull_shader_entry_point;
+
+	// The name of a function where domain shader execution begins.
+	std::string domain_shader_entry_point;
+
+	// The name of a function where pixel shader execution begins.
+	std::string pixel_shader_entry_point;
+
+	// The D3DCOMPILE constants specify how the compiler compiles the HLSL code.
+	uint32_t compile_flags = 0;
+};
+
 struct hlsl_shader final {
 
 	hlsl_shader() noexcept = default;
 
-	hlsl_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_desc);
+	hlsl_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_desc);
 
 	hlsl_shader(const hlsl_shader&) = delete;
 
@@ -277,13 +316,13 @@ struct hlsl_shader final {
 
 private:
 
-	void init_vertex_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+	void init_vertex_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data);
 
-	void init_hull_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+	void init_hull_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data);
 
-	void init_domain_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+	void init_domain_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data);
 
-	void init_pixel_shader(ID3D11Device* device, const cg::data::Hlsl_shader_desc& hlsl_data);
+	void init_pixel_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data);
 };
 
 
@@ -296,6 +335,49 @@ inline com_ptr<ID3D11Buffer> constant_buffer(ID3D11Device* device)
 {
 	return constant_buffer(device, sizeof(T_cbuffer_data));
 }
+
+// Returns true if vertex shader's entry point is specified.
+inline bool has_vertex_shader(const hlsl_shader_desc& hlsl_desc) noexcept
+{
+	return !hlsl_desc.vertex_shader_entry_point.empty();
+}
+
+// Returns true if hull shader's entry point is specified.
+inline bool has_hull_shader(const hlsl_shader_desc& hlsl_desc) noexcept
+{
+	return !hlsl_desc.hull_shader_entry_point.empty();
+}
+
+// Returns true if domain shader's entry point is specified.
+inline bool has_domain_shader(const hlsl_shader_desc& hlsl_desc) noexcept
+{
+	return !hlsl_desc.domain_shader_entry_point.empty();
+}
+
+// Returns true if pixel shader's entry point is specified.
+inline bool has_pixel_shader(const hlsl_shader_desc& hlsl_desc) noexcept
+{
+	return !hlsl_desc.pixel_shader_entry_point.empty();
+}
+
+hlsl_compute_desc load_hlsl_compute_desc(const char* filename);
+
+inline hlsl_compute_desc load_hlsl_compute_desc(const std::string& filename)
+{
+	return load_hlsl_compute_desc(filename.c_str());
+}
+
+// Loads the specified hlsl shader source code file.
+// If the specified file does not exist the function will throw. 
+hlsl_shader_desc load_hlsl_shader_set_desc(const char* filename);
+
+// Loads the specified hlsl shader source code file.
+// If the specified file does not exist the function will throw. 
+inline hlsl_shader_desc load_hlsl_shader_set_desc(const std::string& filename)
+{
+	return load_hlsl_shader_set_desc(filename.c_str());
+}
+
 
 } // namespace dx11
 } // namespace rnd

@@ -11,7 +11,7 @@
 
 
 using cg::data::image_2d;
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 using namespace cg;
 using namespace cg::rnd::opengl;
 
@@ -38,13 +38,13 @@ Directional_light_params get_directional_light_params(const float4x4& view_matri
 
 Renderer_config make_render_config(uint2 viewport_size)
 {
-	using cg::data::Vertex_attribs;
+	using cg::data::vertex_attribs;
 	using cg::kilobytes;
 
 	Renderer_config config;
 	config.vertex_attrib_layout = Vertex_attrib_layout(0, 1, 2, 3);
 	config.viewport_size = viewport_size;
-	config.rect_1x1_mesh_data = cg::data::load_model<Vertex_attribs::p_tc>("../../data/common_data/rect-1x1.obj");
+	config.rect_1x1_mesh_data = cg::data::load_model<vertex_attribs::p_tc>("../../data/common_data/rect-1x1.obj");
 	config.gbuffer_pass_code = cg::data::load_glsl_program_desc("gbuffer-pass-shader", "../../data/deferred_lighting_shaders/gbuffer_pass");
 	config.lighting_pass_dir_code = cg::data::load_glsl_program_desc("lighting-pass-dir-shader", "../../data/deferred_lighting_shaders/lighting_pass_dir");
 	config.shadow_map_pass_code = cg::data::load_glsl_program_desc("shadow-map-pass-shader", "../../data/deferred_lighting_shaders/shadow_map_pass");
@@ -208,10 +208,10 @@ void Deferred_lighting::init_geometry()
 		Load_info("../../data/rect_2x2_uv_repeat.obj", &_cmd_rect_2x2_repeat)
 	};
 
-	_vs_builder.begin<Vertex_attribs::p_n_tc_ts>(megabytes(4));
+	_vs_builder.begin<vertex_attribs::p_n_tc_ts>(megabytes(4));
 
 	for (size_t i = 0; i < std::extent<decltype(load_info_list)>::value; ++i) {
-		auto geometry_data = load_model<Vertex_attribs::p_n_tc_ts>(load_info_list[i].filename);
+		auto geometry_data = load_model<vertex_attribs::p_n_tc_ts>(load_info_list[i].filename);
 		*load_info_list[i].cmd = _vs_builder.push_back(geometry_data);
 	}
 

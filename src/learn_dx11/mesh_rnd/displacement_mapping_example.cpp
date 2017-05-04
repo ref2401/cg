@@ -64,8 +64,7 @@ void Displacement_mapping_example::init_render_states()
 
 void Displacement_mapping_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_desc(
-		"../../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
+	auto hlsl_data = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/displacement_mapping.hlsl");
 	
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.hull_shader_entry_point = "hs_main";

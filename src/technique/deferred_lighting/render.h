@@ -21,7 +21,7 @@ public:
 
 	Gbuffer(const uint2& viewport_size,
 		const Vertex_attrib_layout& vertex_attrib_layout,
-		const cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc>& rect_1x1_mesh_data);
+		const cg::data::Model_geometry_data<cg::data::vertex_attribs::p_tc>& rect_1x1_mesh_data);
 
 	Gbuffer(const Gbuffer& gbuffer) = delete;
 
@@ -336,7 +336,7 @@ struct Renderer_config final {
 
 	Vertex_attrib_layout vertex_attrib_layout;
 	uint2 viewport_size;
-	cg::data::Model_geometry_data<cg::data::Vertex_attribs::p_tc> rect_1x1_mesh_data;
+	cg::data::Model_geometry_data<cg::data::vertex_attribs::p_tc> rect_1x1_mesh_data;
 	cg::data::Glsl_program_desc gbuffer_pass_code;
 	cg::data::Glsl_program_desc lighting_pass_dir_code;
 	cg::data::Glsl_program_desc material_lighting_pass_code;

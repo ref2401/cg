@@ -9,7 +9,6 @@
 
 using cg::data::Glsl_compute_desc;
 using cg::data::Glsl_program_desc;
-using cg::data::Hlsl_shader_desc;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -142,94 +141,7 @@ public:
 	}
 };
 
-TEST_CLASS(cg_data_shader_Hlsl_shader_set_data) {
-public:
-
-	TEST_METHOD(assignment_operators)
-	{
-		Hlsl_shader_desc hd0;
-		hd0.source_code = "abc;";
-		hd0.source_filename = ".txt";
-		hd0.vertex_shader_entry_point = "vs";
-		hd0.pixel_shader_entry_point = "ps";
-		hd0.compile_flags = 42;
-
-		// copy assignment
-		Hlsl_shader_desc hd_c;
-		hd_c = hd0;
-		Assert::AreEqual(hd_c.source_code, hd0.source_code);
-		Assert::AreEqual(hd_c.source_filename, hd0.source_filename);
-		Assert::AreEqual(hd_c.vertex_shader_entry_point, hd0.vertex_shader_entry_point);
-		Assert::AreEqual(hd_c.pixel_shader_entry_point, hd0.pixel_shader_entry_point);
-		Assert::AreEqual(hd_c.compile_flags, hd0.compile_flags);
-
-		// move assignment
-		Hlsl_shader_desc hd_m;
-		hd_m = std::move(hd_c);
-		Assert::AreEqual(hd_m.source_code, hd0.source_code);
-		Assert::AreEqual(hd_m.source_filename, hd0.source_filename);
-		Assert::AreEqual(hd_m.vertex_shader_entry_point, hd0.vertex_shader_entry_point);
-		Assert::AreEqual(hd_m.pixel_shader_entry_point, hd0.pixel_shader_entry_point);
-		Assert::AreEqual(hd_m.compile_flags, hd0.compile_flags);
-		Assert::IsTrue(hd_c.source_code.empty());
-		Assert::IsTrue(hd_c.source_filename.empty());
-		Assert::IsTrue(hd_c.vertex_shader_entry_point.empty());
-		Assert::IsTrue(hd_c.pixel_shader_entry_point.empty());
-		//Assert::AreEqual<uint32_t>(0, hd_c.compile_flags); // default move assignment
-	}
-
-	TEST_METHOD(ctors)
-	{
-		Hlsl_shader_desc hd0;
-		Assert::IsTrue(hd0.source_code.empty());
-		Assert::IsTrue(hd0.source_filename.empty());
-		Assert::IsTrue(hd0.vertex_shader_entry_point.empty());
-		Assert::IsTrue(hd0.pixel_shader_entry_point.empty());
-		Assert::AreEqual<uint32_t>(0, hd0.compile_flags);
-
-		hd0.source_code = "abc;";
-		hd0.source_filename = ".txt";
-		hd0.vertex_shader_entry_point = "vs";
-		hd0.pixel_shader_entry_point = "ps";
-		hd0.compile_flags = 42;
-
-		// copy ctor
-		Hlsl_shader_desc hd_c = hd0;
-		Assert::AreEqual(hd_c.source_code, hd0.source_code);
-		Assert::AreEqual(hd_c.source_filename, hd0.source_filename);
-		Assert::AreEqual(hd_c.vertex_shader_entry_point, hd0.vertex_shader_entry_point);
-		Assert::AreEqual(hd_c.pixel_shader_entry_point, hd0.pixel_shader_entry_point);
-		Assert::AreEqual(hd_c.compile_flags, hd0.compile_flags);
-
-		// move ctor
-		Hlsl_shader_desc hd_m = std::move(hd_c);
-		Assert::AreEqual(hd_m.source_code, hd0.source_code);
-		Assert::AreEqual(hd_m.source_filename, hd0.source_filename);
-		Assert::AreEqual(hd_m.vertex_shader_entry_point, hd0.vertex_shader_entry_point);
-		Assert::AreEqual(hd_m.pixel_shader_entry_point, hd0.pixel_shader_entry_point);
-		Assert::AreEqual(hd_m.compile_flags, hd0.compile_flags);
-		Assert::IsTrue(hd_c.source_code.empty());
-		Assert::IsTrue(hd_c.source_filename.empty());
-		Assert::IsTrue(hd_c.vertex_shader_entry_point.empty());
-		Assert::IsTrue(hd_c.pixel_shader_entry_point.empty());
-		//Assert::AreEqual<uint32_t>(0, hd_c.compile_flags); // default move ctor
-	}
-
-	TEST_METHOD(has_xxx_shader)
-	{
-		Hlsl_shader_desc hd;
-		Assert::IsFalse(hd.has_vertex_shader());
-		Assert::IsFalse(hd.has_pixel_shader());
-
-		hd.vertex_shader_entry_point = "vs";
-		Assert::IsTrue(hd.has_vertex_shader());
-
-		hd.pixel_shader_entry_point = "ps";
-		Assert::IsTrue(hd.has_pixel_shader());
-	}
-};
-
-TEST_CLASS(cg_data_shader_Funcs) {
+TEST_CLASS(cg_data_shader_funcs) {
 public:
 
 	TEST_METHOD(load_glsl_compute_desc)
@@ -301,23 +213,6 @@ public:
 		Assert::IsTrue(pd1.fragment_shader_source_code.empty());
 		Assert::IsTrue(pd1.tf_interleaved_buffer_mode);
 		Assert::IsTrue(pd1.tf_varying_names.empty());
-	}
-
-	TEST_METHOD(load_hlsl_shader_set_desc)
-	{
-		using cg::data::load_hlsl_shader_set_desc;
-		using cg::data::load_text;
-
-		auto expected_source = load_text(Filenames::not_real_code_hlsl);
-
-		Assert::ExpectException<std::exception&>([] { load_hlsl_shader_set_desc("unknown_file0"); });
-
-		auto hd0 = load_hlsl_shader_set_desc(Filenames::not_real_code_hlsl);
-		Assert::AreEqual(expected_source, hd0.source_code);
-		Assert::AreEqual(Filenames::not_real_code_hlsl, hd0.source_filename);
-		Assert::IsTrue(hd0.vertex_shader_entry_point.empty());
-		Assert::IsTrue(hd0.pixel_shader_entry_point.empty());
-		Assert::AreEqual<uint32_t>(0, hd0.compile_flags);
 	}
 };
 

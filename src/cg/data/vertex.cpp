@@ -6,23 +6,23 @@ namespace data {
 
 // ----- Vertex_interleaved_format_desc -----
 
-Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs attribs) noexcept
+Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(vertex_attribs attribs) noexcept
 	: attribs(attribs)
 {
-	using Format_p = Vertex_interleaved_format<Vertex_attribs::p>;
-	using Format_p_n = Vertex_interleaved_format<Vertex_attribs::p_n>;
-	using Format_p_n_tc = Vertex_interleaved_format<Vertex_attribs::p_n_tc>;
-	using Format_p_tc = Vertex_interleaved_format<Vertex_attribs::p_tc>;
-	using Format_p_n_tc_ts = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+	using Format_p = Vertex_interleaved_format<vertex_attribs::p>;
+	using Format_p_n = Vertex_interleaved_format<vertex_attribs::p_n>;
+	using Format_p_n_tc = Vertex_interleaved_format<vertex_attribs::p_n_tc>;
+	using Format_p_tc = Vertex_interleaved_format<vertex_attribs::p_tc>;
+	using Format_p_n_tc_ts = Vertex_interleaved_format<vertex_attribs::p_n_tc_ts>;
 
-	if (attribs == Vertex_attribs::p) {
+	if (attribs == vertex_attribs::p) {
 		position_component_count =		Format_p::position_component_count;
 		position_byte_count =			Format_p::position_byte_count;
 		position_byte_offset =			Format_p::position_byte_offset;
 		vertex_component_count =		Format_p::vertex_component_count;
 		vertex_byte_count =				Format_p::vertex_byte_count;
 	}
-	else if (attribs == Vertex_attribs::p_n) {
+	else if (attribs == vertex_attribs::p_n) {
 		position_component_count =		Format_p_n::position_component_count;
 		position_byte_count =			Format_p_n::position_byte_count;
 		position_byte_offset =			Format_p_n::position_byte_offset;
@@ -32,7 +32,7 @@ Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs at
 		vertex_component_count =		Format_p_n::vertex_component_count;
 		vertex_byte_count =				Format_p_n::vertex_byte_count;
 	}
-	else if (attribs == Vertex_attribs::p_n_tc) {
+	else if (attribs == vertex_attribs::p_n_tc) {
 		position_component_count =		Format_p_n_tc::position_component_count;
 		position_byte_count =			Format_p_n_tc::position_byte_count;
 		position_byte_offset =			Format_p_n_tc::position_byte_offset;
@@ -45,7 +45,7 @@ Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs at
 		vertex_component_count =		Format_p_n_tc::vertex_component_count;
 		vertex_byte_count =				Format_p_n_tc::vertex_byte_count;
 	}
-	else if (attribs == Vertex_attribs::p_tc) {
+	else if (attribs == vertex_attribs::p_tc) {
 		position_component_count =		Format_p_tc::position_component_count;
 		position_byte_count =			Format_p_tc::position_byte_count;
 		position_byte_offset =			Format_p_tc::position_byte_offset;
@@ -55,7 +55,7 @@ Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs at
 		vertex_component_count =		Format_p_tc::vertex_component_count;
 		vertex_byte_count =				Format_p_tc::vertex_byte_count;
 	}
-	else if (attribs == Vertex_attribs::p_n_tc_ts) {
+	else if (attribs == vertex_attribs::p_n_tc_ts) {
 		position_component_count =		Format_p_n_tc_ts::position_component_count;
 		position_byte_count =			Format_p_n_tc_ts::position_byte_count;
 		position_byte_offset =			Format_p_n_tc_ts::position_byte_offset;
@@ -75,28 +75,28 @@ Vertex_interleaved_format_desc::Vertex_interleaved_format_desc(Vertex_attribs at
 
 // ----- funcs -----
 
-std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
+std::ostream& operator<<(std::ostream& out, const vertex_attribs& attribs)
 {
 	out << "Vertex_attribs(";
 
 	switch (attribs) {
-		case Vertex_attribs::p:
+		case vertex_attribs::p:
 			out << 'p';
 			break;
 
-		case Vertex_attribs::p_n:
+		case vertex_attribs::p_n:
 			out << "p_n";
 			break;
 
-		case Vertex_attribs::p_n_tc:
+		case vertex_attribs::p_n_tc:
 			out << "p_n_tc";
 			break;
 
-		case Vertex_attribs::p_tc:
+		case vertex_attribs::p_tc:
 			out << "p_tc";
 			break;
 
-		case Vertex_attribs::p_n_tc_ts:
+		case vertex_attribs::p_n_tc_ts:
 			out << "p_n_tc_ts";
 			break;
 	}
@@ -105,28 +105,28 @@ std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs)
 	return out;
 }
 
-std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs)
+std::wostream& operator<<(std::wostream& out, const vertex_attribs& attribs)
 {
 	out << "Vertex_attribs(";
 
 	switch (attribs) {
-		case Vertex_attribs::p:
+		case vertex_attribs::p:
 			out << 'p';
 			break;
 
-		case Vertex_attribs::p_n:
+		case vertex_attribs::p_n:
 			out << "p_n";
 			break;
 
-		case Vertex_attribs::p_n_tc:
+		case vertex_attribs::p_n_tc:
 			out << "p_n_tc";
 			break;
 
-		case Vertex_attribs::p_tc:
+		case vertex_attribs::p_tc:
 			out << "p_tc";
 			break;
 
-		case Vertex_attribs::p_n_tc_ts:
+		case vertex_attribs::p_n_tc_ts:
 			out << "p_n_tc_ts";
 			break;
 	}
@@ -176,22 +176,22 @@ float4 compute_tangent_handedness(const float3& tangent,
 }
 
 
-bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset) noexcept
+bool is_superset_of(vertex_attribs superset, vertex_attribs subset) noexcept
 {
 	switch (superset) {
 		default: assert(false); return false;
 
-		case Vertex_attribs::p:			return subset == Vertex_attribs::p;
+		case vertex_attribs::p:			return subset == vertex_attribs::p;
 
-		case Vertex_attribs::p_n:		return subset == Vertex_attribs::p
-											|| subset == Vertex_attribs::p_n;
+		case vertex_attribs::p_n:		return subset == vertex_attribs::p
+											|| subset == vertex_attribs::p_n;
 
-		case Vertex_attribs::p_tc:		return subset == Vertex_attribs::p
-											|| subset == Vertex_attribs::p_tc;
+		case vertex_attribs::p_tc:		return subset == vertex_attribs::p
+											|| subset == vertex_attribs::p_tc;
 
-		case Vertex_attribs::p_n_tc:	return subset != Vertex_attribs::p_n_tc_ts;
+		case vertex_attribs::p_n_tc:	return subset != vertex_attribs::p_n_tc_ts;
 
-		case Vertex_attribs::p_n_tc_ts: return true;
+		case vertex_attribs::p_n_tc_ts: return true;
 	}
 }
 	

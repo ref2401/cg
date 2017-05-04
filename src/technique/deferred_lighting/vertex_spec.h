@@ -233,7 +233,7 @@ public:
 	// Params:
 	// -	attribs: Describes required vertex attributes.
 	// -	vertex_bytes_limit: The memory threshold for the vertex buffer.
-	template<cg::data::Vertex_attribs attribs>
+	template<cg::data::vertex_attribs attribs>
 	void begin(size_t vertex_limit_bytes);
 
 	// Ends the building process and returns a Static_vertex_spec object 
@@ -248,7 +248,7 @@ public:
 		return _vao_id != cg::rnd::opengl::Blank::vao_id;
 	}
 
-	template<cg::data::Vertex_attribs attribs>
+	template<cg::data::vertex_attribs attribs>
 	DE_cmd push_back(const cg::data::Model_geometry_data<attribs>& mesh_data);
 
 private:
@@ -264,7 +264,7 @@ private:
 	size_t _base_vertex;
 };
 
-template<cg::data::Vertex_attribs attribs>
+template<cg::data::vertex_attribs attribs>
 void Static_vertex_spec_builder::begin(size_t vertex_limit_bytes)
 {
 	_format_desc = cg::data::Vertex_interleaved_format_desc(attribs);
@@ -276,7 +276,7 @@ void Static_vertex_spec_builder::begin(size_t vertex_limit_bytes)
 	glCreateVertexArrays(1, &_vao_id);
 }
 
-template<cg::data::Vertex_attribs attribs>
+template<cg::data::vertex_attribs attribs>
 DE_cmd Static_vertex_spec_builder::push_back(const cg::data::Model_geometry_data<attribs>& geometry_data)
 {
 	assert(building_process());

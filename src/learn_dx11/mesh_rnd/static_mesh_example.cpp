@@ -7,7 +7,7 @@
 #include <DirectXMath.h>
 
 using cg::data::image_2d;
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 
 
 namespace learn_dx11 {
@@ -41,7 +41,7 @@ void Static_mesh_example::init_cbuffers()
 
 void Static_mesh_example::init_geometry()
 {
-	auto model_geometry = cg::data::load_model<Vertex_attribs::p_n_tc>("../../data/cube.obj");
+	auto model_geometry = cg::data::load_model<vertex_attribs::p_n_tc>("../../data/cube.obj");
 	_model_index_count = UINT(model_geometry.index_count());
 
 	// vertex buffer
@@ -146,7 +146,7 @@ void Static_mesh_example::init_render_states()
 
 void Static_mesh_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
+	auto hlsl_data = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/static_mesh.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 

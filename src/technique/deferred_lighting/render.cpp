@@ -9,7 +9,7 @@ using namespace cg;
 using namespace cg::rnd::opengl;
 using cg::data::Model_geometry_data;
 using cg::data::Glsl_program_desc;
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 
 namespace {
 
@@ -31,7 +31,7 @@ namespace deferred_lighting {
 
 Gbuffer::Gbuffer(const uint2& viewport_size,
 	const Vertex_attrib_layout& vertex_attrib_layout,
-	const Model_geometry_data<Vertex_attribs::p_tc>& rect_1x1_mesh_data) :
+	const Model_geometry_data<vertex_attribs::p_tc>& rect_1x1_mesh_data) :
 	_vertex_attrib_layout(vertex_attrib_layout),
 	_bilinear_sampler(Sampler_desc(GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE)),
 	_nearest_sampler(Sampler_desc(GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE)),
@@ -48,7 +48,7 @@ Gbuffer::Gbuffer(const uint2& viewport_size,
 	_tex_ssao_map_aux(GL_R32F, 1, get_scaled_viewport_size(viewport_size, 0.5f))
 {
 	Static_vertex_spec_builder vs_builder(8, 8);
-	vs_builder.begin<Vertex_attribs::p_tc>(kilobytes(1));
+	vs_builder.begin<vertex_attribs::p_tc>(kilobytes(1));
 	{
 		auto rect_1x1_cmd = vs_builder.push_back(rect_1x1_mesh_data);
 		_aux_geometry_rect_1x1_params = rect_1x1_cmd.get_base_vertex_params();

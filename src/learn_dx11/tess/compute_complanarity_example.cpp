@@ -114,8 +114,7 @@ void Compute_complanarity_example::init_pipeline_state()
 
 void Compute_complanarity_example::init_shaders()
 {
-	auto shader_desc = cg::data::load_hlsl_shader_set_desc(
-		"../../data/learn_dx11/tess/compute_complanarity.hlsl");
+	auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/tess/compute_complanarity.hlsl");
 
 	shader_desc.vertex_shader_entry_point = "vs_main";
 	shader_desc.hull_shader_entry_point = "hs_main";
@@ -195,7 +194,7 @@ void Compute_complanarity_example::preprocess_displacement_map()
 	assert(_tex_srv_displacement_map.ptr);
 	assert(_tex_uav_lookup.ptr);
 
-	auto compute_desc = cg::data::load_hlsl_compute_desc(
+	auto compute_desc = cg::rnd::dx11::load_hlsl_compute_desc(
 		"../../data/learn_dx11/tess/compute_complanarity.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
 

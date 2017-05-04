@@ -84,6 +84,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "parallax_occlusion_mapping"
 		..\data\parallax_occlusion_mapping\parallax_occlusion_mapping.hlsl = ..\data\parallax_occlusion_mapping\parallax_occlusion_mapping.hlsl
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pbr", "pbr", "{3E3A6BD2-C9CC-4C4F-8C74-3C8B040962E9}"
+	ProjectSection(SolutionItems) = preProject
+		..\data\pbr\pbr.hlsl = ..\data\pbr\pbr.hlsl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -123,5 +128,6 @@ Global
 		{5844AD2D-91F5-46CB-91E8-EA6FEF50473C} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 		{F905F489-63ED-44B1-8611-A5643ACC8FCB} = {8766FCF4-6CDF-423B-8843-3BAA7C3E0180}
 		{527CDA4E-977E-47B9-8A92-7871CBBF52B0} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
+		{3E3A6BD2-C9CC-4C4F-8C74-3C8B040962E9} = {EB942D58-4D6F-4509-8542-770FBD3EAB36}
 	EndGlobalSection
 EndGlobal

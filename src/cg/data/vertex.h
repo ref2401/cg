@@ -15,7 +15,7 @@ namespace data {
 // n	- normal;
 // tc	- texture coordinates;
 // ts	- tangent space (tangent & bitangent or tangnet & handedness);
-enum class Vertex_attribs : unsigned char {
+enum class vertex_attribs : unsigned char {
 	p = 0,
 	p_n,
 	p_n_tc,
@@ -25,14 +25,14 @@ enum class Vertex_attribs : unsigned char {
 
 // Describes the order and byte offset of the specified vertex attributes.
 // The relative order of the attributes is: position, normal, tex_coord, tangent_h.
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 struct Vertex_interleaved_format;
 
-using Vertex_interleaved_format_all = Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>;
+using Vertex_interleaved_format_all = Vertex_interleaved_format<vertex_attribs::p_n_tc_ts>;
 
 template<>
-struct Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts> {
-	static constexpr Vertex_attribs attribs = Vertex_attribs::p_n_tc_ts;
+struct Vertex_interleaved_format<vertex_attribs::p_n_tc_ts> {
+	static constexpr vertex_attribs attribs = vertex_attribs::p_n_tc_ts;
 
 	static constexpr size_t position_component_count = 3;
 	static constexpr size_t position_byte_count = sizeof(float) * position_component_count;
@@ -57,8 +57,8 @@ struct Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts> {
 };
 
 template<>
-struct Vertex_interleaved_format<Vertex_attribs::p> {
-	static constexpr Vertex_attribs attribs = Vertex_attribs::p;
+struct Vertex_interleaved_format<vertex_attribs::p> {
+	static constexpr vertex_attribs attribs = vertex_attribs::p;
 
 	static constexpr size_t position_component_count = Vertex_interleaved_format_all::position_component_count;
 	static constexpr size_t position_byte_count = Vertex_interleaved_format_all::position_byte_count;
@@ -69,8 +69,8 @@ struct Vertex_interleaved_format<Vertex_attribs::p> {
 };
 
 template<>
-struct Vertex_interleaved_format<Vertex_attribs::p_n> {
-	static constexpr Vertex_attribs attribs = Vertex_attribs::p_n;
+struct Vertex_interleaved_format<vertex_attribs::p_n> {
+	static constexpr vertex_attribs attribs = vertex_attribs::p_n;
 
 	static constexpr size_t position_component_count = Vertex_interleaved_format_all::position_component_count;
 	static constexpr size_t position_byte_count = Vertex_interleaved_format_all::position_byte_count;
@@ -87,8 +87,8 @@ struct Vertex_interleaved_format<Vertex_attribs::p_n> {
 };
 
 template<>
-struct Vertex_interleaved_format<Vertex_attribs::p_n_tc> {
-	static constexpr Vertex_attribs attribs = Vertex_attribs::p_n_tc;
+struct Vertex_interleaved_format<vertex_attribs::p_n_tc> {
+	static constexpr vertex_attribs attribs = vertex_attribs::p_n_tc;
 
 	static constexpr size_t position_component_count = Vertex_interleaved_format_all::position_component_count;
 	static constexpr size_t position_byte_count = Vertex_interleaved_format_all::position_byte_count;
@@ -109,8 +109,8 @@ struct Vertex_interleaved_format<Vertex_attribs::p_n_tc> {
 };
 
 template<>
-struct Vertex_interleaved_format<Vertex_attribs::p_tc> {
-	static constexpr Vertex_attribs attribs = Vertex_attribs::p_tc;
+struct Vertex_interleaved_format<vertex_attribs::p_tc> {
+	static constexpr vertex_attribs attribs = vertex_attribs::p_tc;
 
 	static constexpr size_t position_component_count = Vertex_interleaved_format_all::position_component_count;
 	static constexpr size_t position_byte_count = Vertex_interleaved_format_all::position_byte_count;
@@ -129,9 +129,9 @@ struct Vertex_interleaved_format<Vertex_attribs::p_tc> {
 struct Vertex_interleaved_format_desc final {
 	Vertex_interleaved_format_desc() noexcept = default;
 
-	Vertex_interleaved_format_desc(Vertex_attribs attribs) noexcept;
+	Vertex_interleaved_format_desc(vertex_attribs attribs) noexcept;
 
-	Vertex_attribs attribs = Vertex_attribs::p;
+	vertex_attribs attribs = vertex_attribs::p;
 	size_t position_component_count = 0;
 	size_t position_byte_count = 0;
 	size_t position_byte_offset = 0;
@@ -148,9 +148,9 @@ struct Vertex_interleaved_format_desc final {
 	size_t vertex_byte_count = 0;
 };
 
-std::ostream& operator<<(std::ostream& out, const Vertex_attribs& attribs);
+std::ostream& operator<<(std::ostream& out, const vertex_attribs& attribs);
 
-std::wostream& operator<<(std::wostream& out, const Vertex_attribs& attribs);
+std::wostream& operator<<(std::wostream& out, const vertex_attribs& attribs);
 
 // Computes tangent and bitangent vectors for a triangle that is specified by 3 position, tex_coord attribures.
 // Returned vectors are not normalized.
@@ -165,22 +165,22 @@ std::pair<float3, float3> compute_tangent_bitangent(
 float4 compute_tangent_handedness(const float3& tangent,
 	const float3& bitangent, const float3& normal) noexcept;
 
-constexpr bool has_normal(Vertex_attribs attribs) noexcept
+constexpr bool has_normal(vertex_attribs attribs) noexcept
 {
-	return !(attribs == Vertex_attribs::p || attribs == Vertex_attribs::p_tc);
+	return !(attribs == vertex_attribs::p || attribs == vertex_attribs::p_tc);
 }
 
-constexpr bool has_tangent_space(Vertex_attribs attribs) noexcept
+constexpr bool has_tangent_space(vertex_attribs attribs) noexcept
 {
-	return attribs == Vertex_attribs::p_n_tc_ts;
+	return attribs == vertex_attribs::p_n_tc_ts;
 }
 
-constexpr bool has_tex_coord(Vertex_attribs attribs) noexcept
+constexpr bool has_tex_coord(vertex_attribs attribs) noexcept
 {
-	return !(attribs == Vertex_attribs::p || attribs == Vertex_attribs::p_n);
+	return !(attribs == vertex_attribs::p || attribs == vertex_attribs::p_n);
 }
 
-bool is_superset_of(Vertex_attribs superset, Vertex_attribs subset) noexcept;
+bool is_superset_of(vertex_attribs superset, vertex_attribs subset) noexcept;
 
 } // namespace data
 } // namespace cg

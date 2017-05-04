@@ -4,6 +4,8 @@
 #include "cg/rnd/dx11/dx11.h"
 #include "cg/sys/app.h"
 
+using namespace cg::rnd::dx11;
+
 
 namespace pbr {
 
@@ -34,10 +36,44 @@ public:
 
 private:
 
-	cg::rnd::dx11::dx11_rhi_context& rhi_ctx_;
+	static constexpr size_t cb_vertex_shader_component_count = 2 * 16;
+
+	void init_geometry();
+
+	void init_pipeline_state();
+
+	void init_shader();
+
+	void setup_pipeline_state();
+
+	void update_cb_vertex_shader(const cg::Viewpoint& viewpoint);
+
+	void update_projection_matrix();
+
+
+	dx11_rhi_context& rhi_ctx_;
 	ID3D11Device* device_ = nullptr;
 	ID3D11Debug* debug_ = nullptr;
 	ID3D11DeviceContext* device_ctx_ = nullptr;
+	// rendering
+	float2 view_roll_angles_;
+	float2 prev_mouse_position_;
+	cg::Viewpoint curr_viewpoint_;
+	cg::Viewpoint prev_viewpoint_;
+	float4x4 projection_matrix_;
+	com_ptr<ID3D11DepthStencilState> depth_stencil_state_;
+	com_ptr<ID3D11RasterizerState> rasterizer_state_;
+	com_ptr<ID3D11Buffer> cb_vertex_shader_;
+	com_ptr<ID3D11Buffer> cb_pixel_shader_;
+	hlsl_shader shader_;
+	// model
+	float3 model_scale_;
+	float3 model_position_;
+	com_ptr<ID3D11InputLayout> input_layout_;
+	com_ptr<ID3D11Buffer> vertex_buffer_;
+	com_ptr<ID3D11Buffer> index_buffer_;
+	UINT vertex_stride_;
+	UINT index_count_;
 };
 
 } // namespace pbr

@@ -14,11 +14,11 @@
 namespace cg {
 namespace data {
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 struct Model_geometry_vertex;
 
 template<> 
-struct Model_geometry_vertex<Vertex_attribs::p> final {
+struct Model_geometry_vertex<vertex_attribs::p> final {
 
 	Model_geometry_vertex() noexcept {}
 
@@ -31,12 +31,12 @@ struct Model_geometry_vertex<Vertex_attribs::p> final {
 			float3 position;
 		};
 
-		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p>::vertex_byte_count];
+		unsigned char data[Vertex_interleaved_format<vertex_attribs::p>::vertex_byte_count];
 	};
 };
 
 template<>
-struct Model_geometry_vertex<Vertex_attribs::p_n> final {
+struct Model_geometry_vertex<vertex_attribs::p_n> final {
 
 	Model_geometry_vertex() noexcept {}
 
@@ -50,12 +50,12 @@ struct Model_geometry_vertex<Vertex_attribs::p_n> final {
 			float3 normal;
 		};
 
-		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n>::vertex_byte_count];
+		unsigned char data[Vertex_interleaved_format<vertex_attribs::p_n>::vertex_byte_count];
 	};
 };
 
 template<>
-struct Model_geometry_vertex<Vertex_attribs::p_n_tc> final {
+struct Model_geometry_vertex<vertex_attribs::p_n_tc> final {
 
 	Model_geometry_vertex() noexcept {}
 
@@ -71,12 +71,12 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc> final {
 			float2 tex_coord;
 		};
 
-		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n_tc>::vertex_byte_count];
+		unsigned char data[Vertex_interleaved_format<vertex_attribs::p_n_tc>::vertex_byte_count];
 	};
 };
 
 template<>
-struct Model_geometry_vertex<Vertex_attribs::p_tc> final {
+struct Model_geometry_vertex<vertex_attribs::p_tc> final {
 
 	Model_geometry_vertex() noexcept {}
 
@@ -90,12 +90,12 @@ struct Model_geometry_vertex<Vertex_attribs::p_tc> final {
 			float2 tex_coord;
 		};
 
-		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_tc>::vertex_byte_count];
+		unsigned char data[Vertex_interleaved_format<vertex_attribs::p_tc>::vertex_byte_count];
 	};
 };
 
 template<>
-struct Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> final {
+struct Model_geometry_vertex<vertex_attribs::p_n_tc_ts> final {
 	
 	Model_geometry_vertex() noexcept {}
 
@@ -112,7 +112,7 @@ struct Model_geometry_vertex<Vertex_attribs::p_n_tc_ts> final {
 			float4 tangent_h;
 		};
 
-		unsigned char data[Vertex_interleaved_format<Vertex_attribs::p_n_tc_ts>::vertex_byte_count];
+		unsigned char data[Vertex_interleaved_format<vertex_attribs::p_n_tc_ts>::vertex_byte_count];
 	};
 };
 
@@ -134,7 +134,7 @@ struct Model_mesh_info final {
 // Any part of a model may require different material instance or different
 // renderer pipeline settings. Such parts of a model are called a mesh.
 // 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 class Model_geometry_data final {
 public:
 
@@ -213,13 +213,13 @@ private:
 	std::vector<uint32_t> _index_data;
 };
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 Model_geometry_data<attribs>::Model_geometry_data(size_t mesh_count)
 {
 	_meshes.reserve(mesh_count);
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 void Model_geometry_data<attribs>::push_back_mesh(size_t vertex_count, size_t base_vertex,
 	size_t index_count, size_t index_offset)
 {
@@ -233,13 +233,13 @@ void Model_geometry_data<attribs>::push_back_mesh(size_t vertex_count, size_t ba
 	_meshes.emplace_back(vertex_count, base_vertex, index_count, index_offset);
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 void Model_geometry_data<attribs>::push_back_index(uint32_t index)
 {
 	_index_data.push_back(index);
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 void Model_geometry_data<attribs>::push_back_indices(uint32_t i0, uint32_t i1, uint32_t i2)
 {
 	_index_data.push_back(i0);
@@ -247,28 +247,28 @@ void Model_geometry_data<attribs>::push_back_indices(uint32_t i0, uint32_t i1, u
 	_index_data.push_back(i2);
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 template<typename Container>
 void Model_geometry_data<attribs>::push_back_indices(const Container& container)
 {
 	_index_data.insert(_index_data.end(), container.cbegin(), container.cend());
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 template<size_t count>
 void Model_geometry_data<attribs>::push_back_indices(const uint32_t(&indices)[count])
 {
 	_index_data.insert(_index_data.end(), std::cbegin(indices), std::cend(indices));
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 template<typename Input_iterator>
 void Model_geometry_data<attribs>::push_back_indices(Input_iterator b, Input_iterator e)
 {
 	_index_data.insert(_index_data.end(), b, e);
 }
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 void Model_geometry_data<attribs>::push_back_vertex(const Vertex& vertex)
 {
 	_vertex_data.insert(_vertex_data.cend(), std::cbegin(vertex.data), std::cend(vertex.data));
@@ -292,10 +292,10 @@ std::ostream& operator<<(std::ostream& o, const Model_mesh_info& mi);
 
 std::wostream& operator<<(std::wostream& o, const Model_mesh_info& mi);
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 Model_geometry_data<attribs> load_model(const char* filename);
 
-template<Vertex_attribs attribs>
+template<vertex_attribs attribs>
 inline Model_geometry_data<attribs> load_model(const std::string& filename)
 {
 	return load_model<attribs>(filename.c_str());

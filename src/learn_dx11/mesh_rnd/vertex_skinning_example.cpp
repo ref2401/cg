@@ -171,7 +171,7 @@ void Vertex_skinning_example::init_render_states()
 
 void Vertex_skinning_example::init_shaders()
 {
-	auto hlsl_data = cg::data::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/vertex_skinning.hlsl");
+	auto hlsl_data = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/mesh_rnd/vertex_skinning.hlsl");
 	hlsl_data.vertex_shader_entry_point = "vs_main";
 	hlsl_data.pixel_shader_entry_point = "ps_main";
 

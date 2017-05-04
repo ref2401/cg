@@ -118,8 +118,7 @@ void Terrain_tessellation_example::init_pipeline_state()
 
 void Terrain_tessellation_example::init_shaders()
 {
-	auto shader_desc = cg::data::load_hlsl_shader_set_desc(
-		"../../data/learn_dx11/tess/terrain_tessellation.hlsl");
+	auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/tess/terrain_tessellation.hlsl");
 
 	shader_desc.vertex_shader_entry_point = "vs_main";
 	shader_desc.hull_shader_entry_point = "hs_main";

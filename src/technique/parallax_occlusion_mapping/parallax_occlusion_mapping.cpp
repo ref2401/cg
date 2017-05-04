@@ -114,9 +114,9 @@ Material::Material(ID3D11Device* device, float tex_coord_step_scale, float min_s
 	}
 }
 
-// ----- Parallax_occlusion_mapping -----
+// ----- parallax_occlusion_mapping -----
 
-Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
+parallax_occlusion_mapping::parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	: example(app_ctx, rhi_ctx),
 	_rhi_ctx(dynamic_cast<cg::rnd::dx11::dx11_rhi_context&>(rhi_ctx)),
 	_device(_rhi_ctx.device()),
@@ -140,16 +140,16 @@ Parallax_occlusion_mapping::Parallax_occlusion_mapping(const cg::sys::app_contex
 	setup_pipeline_state();
 }
 
-void Parallax_occlusion_mapping::int_cbuffers()
+void parallax_occlusion_mapping::int_cbuffers()
 {
-	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * Parallax_occlusion_mapping::cb_vertex_shader_component_count);
-	_cb_pixel_shader = constant_buffer(_device, sizeof(float) * Parallax_occlusion_mapping::cb_pixel_shader_component_count);
+	_cb_vertex_shader = constant_buffer(_device, sizeof(float) * parallax_occlusion_mapping::cb_vertex_shader_component_count);
+	_cb_pixel_shader = constant_buffer(_device, sizeof(float) * parallax_occlusion_mapping::cb_pixel_shader_component_count);
 }
 
-void Parallax_occlusion_mapping::init_geometry()
+void parallax_occlusion_mapping::init_geometry()
 {
-	auto model = load_model<Vertex_attribs::p_n_tc_ts>("../../data/models/rect_1x1.obj");
-	//auto model = load_model<Vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
+	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/rect_1x1.obj");
+	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
 	assert(model.mesh_count() == 1);
 	_index_count = UINT(model.meshes()[0].index_count);
 
@@ -190,7 +190,7 @@ void Parallax_occlusion_mapping::init_geometry()
 	assert(hr == S_OK);
 }
 
-void Parallax_occlusion_mapping::init_materials()
+void parallax_occlusion_mapping::init_materials()
 {
 	_rock_wall_material = Material(_device, 0.1f, 4.0f, 32.0f, 0.9f,
 		"../../data/parallax_occlusion_mapping/rocks-diffuse.jpg",
@@ -214,7 +214,7 @@ void Parallax_occlusion_mapping::init_materials()
 	assert(hr == S_OK);
 }
 
-void Parallax_occlusion_mapping::init_pipeline_state()
+void parallax_occlusion_mapping::init_pipeline_state()
 {
 	D3D11_DEPTH_STENCIL_DESC ds_desc = {};
 	ds_desc.DepthEnable = true;
@@ -231,16 +231,16 @@ void Parallax_occlusion_mapping::init_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Parallax_occlusion_mapping::init_shaders()
+void parallax_occlusion_mapping::init_shaders()
 {
-	Hlsl_shader_desc pom_shader_desc = load_hlsl_shader_set_desc(
+	hlsl_shader_desc pom_shader_desc = load_hlsl_shader_set_desc(
 		"../../data/parallax_occlusion_mapping/parallax_occlusion_mapping.hlsl");
 	pom_shader_desc.vertex_shader_entry_point = "vs_main";
 	pom_shader_desc.pixel_shader_entry_point = "ps_main";
 	_pom_shader = hlsl_shader(_device, pom_shader_desc);
 }
 
-void Parallax_occlusion_mapping::on_mouse_move()
+void parallax_occlusion_mapping::on_mouse_move()
 {
 	const uint2 p = _app_ctx.mouse.position();
 	const float2 curr_pos(float(p.x), float(p.y));
@@ -261,12 +261,12 @@ void Parallax_occlusion_mapping::on_mouse_move()
 		_view_roll_angles.x += (diff.y > 0.f) ? pi_128 : -pi_128;
 }
 
-void Parallax_occlusion_mapping::on_window_resize()
+void parallax_occlusion_mapping::on_window_resize()
 {
 	update_projection_matrix();
 }
 
-void Parallax_occlusion_mapping::render(float interpolation_factor)
+void parallax_occlusion_mapping::render(float interpolation_factor)
 {
 	auto viewpoint = lerp(_curr_viewpoint, _prev_viewpoint, interpolation_factor);
 	viewpoint.up = normalize(viewpoint.up);
@@ -279,14 +279,14 @@ void Parallax_occlusion_mapping::render(float interpolation_factor)
 	_prev_viewpoint = _curr_viewpoint;
 }
 
-void Parallax_occlusion_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
+void parallax_occlusion_mapping::update_cb_vertex_shader(const Viewpoint& viewpoint)
 {
 	const float3 dlight_dir_ws = normalize(-_dlight_position_ws);
 	const float4x4 model_matrix = ts_matrix(_model_position, _model_scale);
 	const float4x4 normal_matrix = float4x4::identity;
 	const float4x4 projection_view_matrix = _projection_matrix * view_matrix(viewpoint);
 	
-	float arr[Parallax_occlusion_mapping::cb_vertex_shader_component_count];
+	float arr[parallax_occlusion_mapping::cb_vertex_shader_component_count];
 	to_array_column_major_order(projection_view_matrix, arr);
 	to_array_column_major_order(model_matrix, arr + 16);
 	to_array_column_major_order(normal_matrix, arr + 32);
@@ -305,9 +305,9 @@ void Parallax_occlusion_mapping::update_cb_vertex_shader(const Viewpoint& viewpo
 	_device_ctx->UpdateSubresource(_cb_vertex_shader, 0, nullptr, arr, 0, 0);
 }
 
-void Parallax_occlusion_mapping::update_cb_pixel_shader()
+void parallax_occlusion_mapping::update_cb_pixel_shader()
 {
-	const float arr[Parallax_occlusion_mapping::cb_pixel_shader_component_count] = {
+	const float arr[parallax_occlusion_mapping::cb_pixel_shader_component_count] = {
 		_curr_material->min_sample_count,
 		_curr_material->max_sample_count,
 		_curr_material->self_shadowing_factor,
@@ -316,7 +316,7 @@ void Parallax_occlusion_mapping::update_cb_pixel_shader()
 	_device_ctx->UpdateSubresource(_cb_pixel_shader, 0, nullptr, arr, 0, 0);
 }
 
-void Parallax_occlusion_mapping::setup_pipeline_state()
+void parallax_occlusion_mapping::setup_pipeline_state()
 {
 	const UINT offset = 0;
 	_device_ctx->IASetInputLayout(_pom_input_layout);
@@ -340,7 +340,7 @@ void Parallax_occlusion_mapping::setup_pipeline_state()
 	assert(hr == S_OK);
 }
 
-void Parallax_occlusion_mapping::update(float dt_msec) 
+void parallax_occlusion_mapping::update(float dt_msec) 
 {
 	_dlight_position_ws += _dlight_velocity_ws;
 	if (abs(_dlight_position_ws.x) > 100.0f) {
@@ -376,7 +376,7 @@ void Parallax_occlusion_mapping::update(float dt_msec)
 	_view_roll_angles = float2::zero;
 }
 
-void Parallax_occlusion_mapping::update_projection_matrix()
+void parallax_occlusion_mapping::update_projection_matrix()
 {
 	_projection_matrix = perspective_matrix_directx(pi_3, _rhi_ctx.viewport_aspect_ratio(), 0.1f, 1000.0f);
 }

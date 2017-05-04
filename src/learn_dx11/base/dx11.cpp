@@ -5,7 +5,7 @@
 #include <utility>
 #include "cg/base/base.h"
 
-using cg::data::Hlsl_shader_desc;
+using cg::rnd::dx11::hlsl_shader_desc;
 
 
 namespace {
@@ -46,7 +46,7 @@ namespace learn_dx11 {
 
 // ----- Hlsl_compute -----
 
-Hlsl_compute::Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_desc& compute_desc)
+Hlsl_compute::Hlsl_compute(ID3D11Device* device, const cg::rnd::dx11::hlsl_compute_desc& compute_desc)
 {
 	assert(compute_desc.source_code.length() > 0);
 
@@ -67,18 +67,18 @@ Hlsl_compute::Hlsl_compute(ID3D11Device* device, const cg::data::Hlsl_compute_de
 
 // ----- Hlsl_shader_set -----
 
-Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const Hlsl_shader_desc& hlsl_desc)
+Hlsl_shader_set::Hlsl_shader_set(ID3D11Device* device, const hlsl_shader_desc& hlsl_desc)
 {
-	assert(hlsl_desc.has_vertex_shader());
-	assert(hlsl_desc.has_pixel_shader());
+	assert(has_vertex_shader(hlsl_desc));
+	assert(has_pixel_shader(hlsl_desc));
 	
-	if (hlsl_desc.has_hull_shader()) {
-		assert(hlsl_desc.has_domain_shader());
+	if (has_hull_shader(hlsl_desc)) {
+		assert(has_domain_shader(hlsl_desc));
 	}
 
 	init_vertex_shader(device, hlsl_desc);
-	if (hlsl_desc.has_hull_shader()) init_hull_shader(device, hlsl_desc);
-	if (hlsl_desc.has_domain_shader()) init_domain_shader(device, hlsl_desc);
+	if (has_hull_shader(hlsl_desc)) init_hull_shader(device, hlsl_desc);
+	if (has_domain_shader(hlsl_desc)) init_domain_shader(device, hlsl_desc);
 	init_pixel_shader(device, hlsl_desc);
 }
 
@@ -109,7 +109,7 @@ Hlsl_shader_set& Hlsl_shader_set::operator=(Hlsl_shader_set&& set) noexcept
 	return *this;
 }
 
-void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data)
 {
 	try {
 		_vertex_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -128,7 +128,7 @@ void Hlsl_shader_set::init_vertex_shader(ID3D11Device* device, const Hlsl_shader
 	}
 }
 
-void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data)
 {
 	try {
 		_hull_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -147,7 +147,7 @@ void Hlsl_shader_set::init_hull_shader(ID3D11Device* device, const Hlsl_shader_d
 	}
 }
 
-void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data)
 {
 	try {
 		_domain_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,
@@ -166,7 +166,7 @@ void Hlsl_shader_set::init_domain_shader(ID3D11Device* device, const Hlsl_shader
 	}
 }
 
-void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const Hlsl_shader_desc& hlsl_data)
+void Hlsl_shader_set::init_pixel_shader(ID3D11Device* device, const hlsl_shader_desc& hlsl_data)
 {
 	try {
 		_pixel_shader_bytecode = compile_shader(hlsl_data.source_code, hlsl_data.source_filename,

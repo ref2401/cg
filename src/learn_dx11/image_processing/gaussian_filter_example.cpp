@@ -46,11 +46,11 @@ void Gaussian_filter_example::init_pipeline_state()
 
 void Gaussian_filter_example::init_shaders()
 {
-	auto compute_desc = cg::data::load_hlsl_compute_desc("../../data/learn_dx11/image_processing/gaussian_filter.compute.hlsl");
+	auto compute_desc = cg::rnd::dx11::load_hlsl_compute_desc("../../data/learn_dx11/image_processing/gaussian_filter.compute.hlsl");
 	compute_desc.compute_shader_entry_point = "cs_main";
 	_gaussian_filter_compute = Hlsl_compute(_device, compute_desc);
 
-	auto hlsl_desc = cg::data::load_hlsl_shader_set_desc("../../data/learn_dx11/image_processing/render_image.hlsl");
+	auto hlsl_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/learn_dx11/image_processing/render_image.hlsl");
 	hlsl_desc.vertex_shader_entry_point = "vs_main";
 	hlsl_desc.pixel_shader_entry_point = "ps_main";
 	_render_image_shader = Hlsl_shader_set(_device, hlsl_desc);

@@ -5,7 +5,7 @@
 
 using cg::data::Model_geometry_data;
 using cg::data::Model_mesh_info;
-using cg::data::Vertex_attribs;
+using cg::data::vertex_attribs;
 using namespace cg::rnd::opengl;
 
 

@@ -34,7 +34,7 @@ struct Material final {
 	cg::rnd::dx11::com_ptr<ID3D11ShaderResourceView> tex_srv_normal_map;
 };
 
-class Parallax_occlusion_mapping final : public virtual cg::sys::example {
+class parallax_occlusion_mapping final : public virtual cg::sys::example {
 public:
 
 	static constexpr cg::sys::example_desc example_desc = {
@@ -43,16 +43,16 @@ public:
 	};
 
 
-	Parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx);
+	parallax_occlusion_mapping(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx);
 
-	Parallax_occlusion_mapping(const Parallax_occlusion_mapping&) = delete;
+	parallax_occlusion_mapping(const parallax_occlusion_mapping&) = delete;
 
-	Parallax_occlusion_mapping(Parallax_occlusion_mapping&&) = delete;
+	parallax_occlusion_mapping(parallax_occlusion_mapping&&) = delete;
 
 
-	Parallax_occlusion_mapping& operator=(const Parallax_occlusion_mapping&) = delete;
+	parallax_occlusion_mapping& operator=(const parallax_occlusion_mapping&) = delete;
 
-	Parallax_occlusion_mapping& operator=(Parallax_occlusion_mapping&&) = delete;
+	parallax_occlusion_mapping& operator=(parallax_occlusion_mapping&&) = delete;
 
 
 	void on_mouse_move() override;
