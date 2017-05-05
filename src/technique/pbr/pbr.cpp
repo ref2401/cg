@@ -14,7 +14,7 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	device_(rhi_ctx_.device()),
 	debug_(rhi_ctx_.debug()),
 	device_ctx_(rhi_ctx_.device_ctx()),
-	curr_viewpoint_(float3(-1.0f, 0, 12.0f), float3::zero, float3::unit_y)
+	curr_viewpoint_(float3(0.0f, 0, 12.0f), float3::zero, float3::unit_y)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;
@@ -32,7 +32,8 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 
 void pbr::init_geometry()
 {
-	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
+	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
+	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/sphere_64x32.obj");
 	assert(model.mesh_count() == 1);
 	index_count_ = UINT(model.meshes()[0].index_count);
 
@@ -191,13 +192,23 @@ void pbr::update(float dt_msec)
 
 void pbr::update_cb_vertex_shader(const cg::Viewpoint& viewpoint)
 {
+	static const float3 light_dir_to_ws = normalize(float3(10, 10, 10));
 	const float4x4 model_matrix = ts_matrix(model_position_, model_scale_);
 	const float4x4 normal_matrix = float4x4::identity;
 	const float4x4 pvm_matrix = projection_matrix_ * view_matrix(viewpoint) * model_matrix;
 
 	float arr[pbr::cb_vertex_shader_component_count];
 	to_array_column_major_order(pvm_matrix, arr);
-	to_array_column_major_order(normal_matrix, arr + 16);
+	to_array_column_major_order(model_matrix, arr + 16);
+	to_array_column_major_order(normal_matrix, arr + 32);
+	arr[48] = light_dir_to_ws.x;
+	arr[49] = light_dir_to_ws.y;
+	arr[50] = light_dir_to_ws.z;
+	arr[51] = 0;
+	arr[52] = viewpoint.position.x;
+	arr[53] = viewpoint.position.y;
+	arr[54] = viewpoint.position.z;
+	arr[55] = 0;
 	device_ctx_->UpdateSubresource(cb_vertex_shader_, 0, nullptr, arr, 0, 0);
 }
 

@@ -36,7 +36,7 @@ public:
 
 private:
 
-	static constexpr size_t cb_vertex_shader_component_count = 2 * 16;
+	static constexpr size_t cb_vertex_shader_component_count = 3 * 16 + 2 * 4;
 
 	void init_geometry();
 
