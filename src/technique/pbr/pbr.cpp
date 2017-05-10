@@ -32,8 +32,8 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 
 void pbr::init_geometry()
 {
-	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
-	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/sphere_64x32.obj");
+	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
+	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/sphere_64x32.obj");
 	assert(model.mesh_count() == 1);
 	index_count_ = UINT(model.meshes()[0].index_count);
 
