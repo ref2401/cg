@@ -9,7 +9,7 @@ using namespace cg::rnd::dx11;
 
 namespace pbr {
 
-class pbr final : public virtual cg::sys::example{
+class pbr final : public virtual cg::sys::example {
 public:
 
 	static constexpr cg::sys::example_desc example_desc = {
@@ -67,13 +67,17 @@ private:
 	com_ptr<ID3D11Buffer> cb_pixel_shader_;
 	hlsl_shader shader_;
 	// model
-	float3 model_scale_;
 	float3 model_position_;
+	quat model_rotation_;
+	float3 model_scale_;
 	com_ptr<ID3D11InputLayout> input_layout_;
 	com_ptr<ID3D11Buffer> vertex_buffer_;
 	com_ptr<ID3D11Buffer> index_buffer_;
 	UINT vertex_stride_;
 	UINT index_count_;
+	// debug
+	com_ptr<ID3D11Texture2D> tex_debug_;
+	com_ptr<ID3D11RenderTargetView> tex_debug_rtv_;
 };
 
 } // namespace pbr

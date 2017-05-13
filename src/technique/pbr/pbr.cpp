@@ -18,7 +18,8 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;
-	model_scale_ = float3(3.0f);
+	model_rotation_ = quat::identity;//from_axis_angle_rotation(float3::unit_x, pi_4);
+	model_scale_ = float3(4.0f);
 
 	cb_vertex_shader_ = constant_buffer(device_, sizeof(float) * pbr::cb_vertex_shader_component_count);
 	//cb_pixel_shader_ = constant_buffer(device_, sizeof(float) * parallax_occlusion_mapping::cb_pixel_shader_component_count);
@@ -32,8 +33,9 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 
 void pbr::init_geometry()
 {
-	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
-	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/sphere_64x32.obj");
+	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/bunny.obj");
+	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/models/sphere_64x32_1.obj");
+	//auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/rect_2x2.obj");
 	assert(model.mesh_count() == 1);
 	index_count_ = UINT(model.meshes()[0].index_count);
 
@@ -88,6 +90,22 @@ void pbr::init_pipeline_state()
 	rastr_desc.CullMode = D3D11_CULL_BACK;
 	rastr_desc.FrontCounterClockwise = true;
 	hr = device_->CreateRasterizerState(&rastr_desc, &rasterizer_state_.ptr);
+	assert(hr == S_OK);
+
+	D3D11_TEXTURE2D_DESC debug_desc = {};
+	debug_desc.Width = UINT(rhi_ctx_.viewport().Width);
+	debug_desc.Height = UINT(rhi_ctx_.viewport().Height);
+	debug_desc.MipLevels = 1;
+	debug_desc.ArraySize = 1;
+	debug_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	debug_desc.SampleDesc.Count = 1;
+	debug_desc.SampleDesc.Quality = 0;
+	debug_desc.Usage = D3D11_USAGE_DEFAULT;
+	debug_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+	hr = device_->CreateTexture2D(&debug_desc, nullptr, &tex_debug_.ptr);
+	assert(hr == S_OK);
+
+	hr = device_->CreateRenderTargetView(tex_debug_, nullptr, &tex_debug_rtv_.ptr);
 	assert(hr == S_OK);
 }
 
@@ -156,6 +174,8 @@ void pbr::setup_pipeline_state()
 	_device_ctx->PSSetShaderResources(0, 3, views);*/
 
 	device_ctx_->RSSetState(rasterizer_state_);
+	ID3D11RenderTargetView* rtv_list[2] = { rhi_ctx_.rtv_window(), tex_debug_rtv_.ptr };
+	device_ctx_->OMSetRenderTargets(2, rtv_list, rhi_ctx_.dsv_depth_stencil());
 	device_ctx_->OMSetDepthStencilState(depth_stencil_state_, 0);
 
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
@@ -192,9 +212,9 @@ void pbr::update(float dt_msec)
 
 void pbr::update_cb_vertex_shader(const cg::Viewpoint& viewpoint)
 {
-	static const float3 light_dir_to_ws = normalize(float3(10, 10, 10));
-	const float4x4 model_matrix = ts_matrix(model_position_, model_scale_);
-	const float4x4 normal_matrix = float4x4::identity;
+	static const float3 light_dir_to_ws = normalize(float3(10, 0, 10));
+	const float4x4 model_matrix = trs_matrix(model_position_, model_rotation_, model_scale_);
+	const float4x4 normal_matrix = rotation_matrix<float4x4>(model_rotation_);
 	const float4x4 pvm_matrix = projection_matrix_ * view_matrix(viewpoint) * model_matrix;
 
 	float arr[pbr::cb_vertex_shader_component_count];
