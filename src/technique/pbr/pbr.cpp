@@ -18,7 +18,8 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;
-	model_rotation_ = quat::identity;//from_axis_angle_rotation(float3::unit_x, pi_4);
+	model_rotation_ = quat::identity;
+	//model_rotation_ = from_axis_angle_rotation(float3::unit_y, pi_8) * from_axis_angle_rotation(float3::unit_x, pi_2);
 	model_scale_ = float3(4.0f);
 
 	cb_vertex_shader_ = constant_buffer(device_, sizeof(float) * pbr::cb_vertex_shader_component_count);
