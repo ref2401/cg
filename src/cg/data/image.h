@@ -13,6 +13,9 @@ namespace data {
 enum class pixel_format :unsigned char {
 	none = 0,
 
+	rgb_32f,
+	rgba_32f,
+
 	red_8,
 	rg_8,
 	rgb_8,
@@ -42,7 +45,7 @@ struct image_2d final {
 
 
 	// Pointer to the underlying buffer serving as pixel storage.
-	uint8_t* data = nullptr;
+	void* data = nullptr;
 
 	// Size of the image in pixels.
 	uint2 size;
@@ -64,7 +67,7 @@ size_t byte_count(const pixel_format& fmt) noexcept;
 // Total number of bytes occupied by this image.
 inline size_t byte_count(const image_2d& image) noexcept
 {
-	return square(image.size);
+	return square(image.size) * byte_count(image.pixel_format);
 }
 
 // Returns the number of color channels for the given image format.

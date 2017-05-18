@@ -27,6 +27,7 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 
 	init_shader();
 	init_geometry();
+	init_irradiance_map();
 	init_pipeline_state();
 
 	setup_pipeline_state();
@@ -74,6 +75,26 @@ void pbr::init_geometry()
 		shader_.vertex_shader_bytecode->GetBufferPointer(),
 		shader_.vertex_shader_bytecode->GetBufferSize(),
 		&input_layout_.ptr);
+	assert(hr == S_OK);
+}
+
+void pbr::init_irradiance_map()
+{
+	image_2d hdr_image("../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 4);
+	D3D11_TEXTURE2D_DESC env_map_desc = {};
+	env_map_desc.Width = hdr_image.size.x;
+	env_map_desc.Height = hdr_image.size.y;
+	env_map_desc.MipLevels = 1;
+	env_map_desc.ArraySize = 1;
+	env_map_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	env_map_desc.SampleDesc.Count = 1;
+	env_map_desc.SampleDesc.Quality = 0;
+	env_map_desc.Usage = D3D11_USAGE_IMMUTABLE;
+	env_map_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	D3D11_SUBRESOURCE_DATA env_map_data = {};
+	env_map_data.pSysMem = hdr_image.data;
+	env_map_data.SysMemPitch = UINT(hdr_image.size.x * byte_count(hdr_image.pixel_format));
+	HRESULT hr = device_->CreateTexture2D(&env_map_desc, &env_map_data, &tex_env_map_.ptr);
 	assert(hr == S_OK);
 }
 

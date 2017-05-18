@@ -37,6 +37,8 @@ public:
 		using cg::data::byte_count;
 
 		Assert::AreEqual<size_t>(0, byte_count(pixel_format::none));
+		Assert::AreEqual(3 * sizeof(float), byte_count(pixel_format::rgb_32f));
+		Assert::AreEqual(4 * sizeof(float), byte_count(pixel_format::rgba_32f));
 		Assert::AreEqual<size_t>(1, byte_count(pixel_format::red_8));
 		Assert::AreEqual<size_t>(2, byte_count(pixel_format::rg_8));
 		Assert::AreEqual<size_t>(3, byte_count(pixel_format::rgb_8));
@@ -48,6 +50,8 @@ public:
 		using cg::data::channel_count;
 
 		Assert::AreEqual<size_t>(0, channel_count(pixel_format::none));
+		Assert::AreEqual<size_t>(3, channel_count(pixel_format::rgb_32f));
+		Assert::AreEqual<size_t>(4, channel_count(pixel_format::rgba_32f));
 		Assert::AreEqual<size_t>(1, channel_count(pixel_format::red_8));
 		Assert::AreEqual<size_t>(2, channel_count(pixel_format::rg_8));
 		Assert::AreEqual<size_t>(3, channel_count(pixel_format::rgb_8));

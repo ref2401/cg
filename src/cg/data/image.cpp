@@ -24,7 +24,12 @@ image_2d::image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 	int width = 0;
 	int height = 0;
 	int actual_channel_count = 0;
-	data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
+	const bool is_hdr = stbi_is_hdr(filename);
+	
+	if (is_hdr)
+		data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
+	else
+		data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
 	
 	if (!data) {
 		const char* stb_error = stbi_failure_reason();
@@ -37,8 +42,8 @@ image_2d::image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 	switch (cc) {
 		case 1: pixel_format = pixel_format::red_8; break;
 		case 2: pixel_format = pixel_format::rg_8; break;
-		case 3: pixel_format = pixel_format::rgb_8; break;
-		case 4: pixel_format = pixel_format::rgba_8; break;
+		case 3: pixel_format = (is_hdr) ? (pixel_format::rgb_32f) : (pixel_format::rgb_8); break;
+		case 4: pixel_format = (is_hdr) ? (pixel_format::rgba_32f) : (pixel_format::rgba_8); break;
 	}
 }
 
@@ -99,6 +104,10 @@ std::ostream& operator<<(std::ostream& out, const pixel_format& fmt)
 			out << "none";
 			break;
 
+		case pixel_format::rgb_32f:
+			out << "rgb_32f";
+			break;
+
 		case pixel_format::red_8:
 			out << "red_8";
 			break;
@@ -128,6 +137,14 @@ std::wostream& operator<<(std::wostream& out, const pixel_format& fmt)
 			out << "none";
 			break;
 
+		case pixel_format::rgb_32f:
+			out << "rgb_32f";
+			break;
+
+		case pixel_format::rgba_32f:
+			out << "rgba_32f";
+			break;
+
 		case pixel_format::red_8:
 			out << "red_8";
 			break;
@@ -153,6 +170,8 @@ size_t byte_count(const pixel_format& fmt) noexcept
 	switch (fmt) {
 		default:
 		case pixel_format::none: return 0;
+		case pixel_format::rgb_32f: return 3 * sizeof(float);
+		case pixel_format::rgba_32f: return 4 * sizeof(float);
 		case pixel_format::red_8: return 1;
 		case pixel_format::rg_8: return 2;
 		case pixel_format::rgb_8: return 3;
@@ -172,9 +191,11 @@ size_t channel_count(const pixel_format& fmt) noexcept
 		case pixel_format::rg_8:
 			return 2;
 		
+		case pixel_format::rgb_32f:
 		case pixel_format::rgb_8:
 			return 3;
 
+		case pixel_format::rgba_32f:
 		case pixel_format::rgba_8:
 			return 4;
 	}

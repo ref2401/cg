@@ -40,6 +40,8 @@ private:
 
 	void init_geometry();
 
+	void init_irradiance_map();
+
 	void init_pipeline_state();
 
 	void init_shader();
@@ -75,6 +77,8 @@ private:
 	com_ptr<ID3D11Buffer> index_buffer_;
 	UINT vertex_stride_;
 	UINT index_count_;
+	// environment mao -> irradiance map
+	com_ptr<ID3D11Texture2D> tex_env_map_;
 	// debug
 	com_ptr<ID3D11Texture2D> tex_debug_;
 	com_ptr<ID3D11RenderTargetView> tex_debug_rtv_;
