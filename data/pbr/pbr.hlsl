@@ -54,9 +54,9 @@ static const float pi = 3.1415926535f;
 //static const float3 g_material_base_color = float3(0.75f, 0.75f, 0.75f);
 //static const float3 g_material_fresnel0 = float3(0.98738f, 0.98738f, 0.98738f);
 // cooper
-static const float g_material_roughness = 0.1f;
-static const float g_material_anisotropic = 0.0f;
-static const float g_material_metallic = 1.0;
+static const float g_material_roughness = 0.7f; // [0.03, 1.0]
+static const float g_material_anisotropic = 0.5f;
+static const float g_material_metallic = 0.0;
 static const float3 g_material_base_color = float3(0.85f, 0.53f, 0.4f);
 static const float3 g_material_fresnel0 = float3(0.32267f, 0.32267f, 0.32267f);
 
@@ -95,9 +95,9 @@ ps_output ps_main(in vs_output pixel)
 	float at = a;
 	float ab = a;
 	if (g_material_anisotropic < 0.0f)
-		at = abs(g_material_anisotropic);
+		at = pow(g_material_anisotropic, 2);
 	else if (g_material_anisotropic > 0.0f)
-		ab = g_material_anisotropic;
+		ab = pow(g_material_anisotropic, 2);
 
 	const float3 n_ts = float3(0, 0, 1);
 	const float3 l_ts = normalize(pixel.l_ts);
@@ -116,10 +116,7 @@ ps_output ps_main(in vs_output pixel)
 	const float3 specular_term = g_material_base_color * fresnel * distrib * masking / (4.0f * cos_theta_l * cos_theta_v);
 	
 	// diffuse term
-	const float fd_90 = 2.0f * g_material_roughness * cos_theta_d + 0.5f;
-	const float3 diffuse_term = g_material_base_color / pi
-		* (1 + (fd_90 - 1) * pow(1 - cos_theta_l, 5))
-		* (1 + (fd_90 - 1) * pow(1 - cos_theta_v, 5));
+	const float3 diffuse_term = g_material_base_color / pi;
 	const float3 final_color = cos_theta_l * ((1 - g_material_metallic) * diffuse_term + specular_term);
 
 	ps_output o;

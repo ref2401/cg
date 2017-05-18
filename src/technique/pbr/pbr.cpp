@@ -213,7 +213,7 @@ void pbr::update(float dt_msec)
 
 void pbr::update_cb_vertex_shader(const cg::Viewpoint& viewpoint)
 {
-	static const float3 light_dir_to_ws = normalize(float3(10, 0, 10));
+	static const float3 light_dir_to_ws = normalize(float3(0, 0, 10));
 	const float4x4 model_matrix = trs_matrix(model_position_, model_rotation_, model_scale_);
 	const float4x4 normal_matrix = rotation_matrix<float4x4>(model_rotation_);
 	const float4x4 pvm_matrix = projection_matrix_ * view_matrix(viewpoint) * model_matrix;
