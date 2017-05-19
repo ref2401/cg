@@ -80,7 +80,12 @@ void pbr::init_geometry()
 
 void pbr::init_irradiance_map()
 {
-	image_2d hdr_image("../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 4);
+	// load an hdr image to the gpu:
+	//
+	const image_2d hdr_image("../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 4);
+	com_ptr<ID3D11Texture2D> tex_env_map;
+	com_ptr<ID3D11ShaderResourceView> tex_env_map_srv;
+
 	D3D11_TEXTURE2D_DESC env_map_desc = {};
 	env_map_desc.Width = hdr_image.size.x;
 	env_map_desc.Height = hdr_image.size.y;
@@ -94,7 +99,27 @@ void pbr::init_irradiance_map()
 	D3D11_SUBRESOURCE_DATA env_map_data = {};
 	env_map_data.pSysMem = hdr_image.data;
 	env_map_data.SysMemPitch = UINT(hdr_image.size.x * byte_count(hdr_image.pixel_format));
-	HRESULT hr = device_->CreateTexture2D(&env_map_desc, &env_map_data, &tex_env_map_.ptr);
+	HRESULT hr = device_->CreateTexture2D(&env_map_desc, &env_map_data, &tex_env_map.ptr);
+	assert(hr == S_OK);
+	hr = device_->CreateShaderResourceView(tex_env_map, nullptr, &tex_env_map_srv.ptr);
+	assert(hr == S_OK);
+
+	// project hdr image to a cube map
+	D3D11_TEXTURE2D_DESC env_cube_map_desc = {};
+	env_cube_map_desc.Width = env_cube_map_desc.Height = std::min(hdr_image.size.x, hdr_image.size.y);
+	env_cube_map_desc.MipLevels = 1;
+	env_cube_map_desc.ArraySize = 6;
+	env_cube_map_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	env_cube_map_desc.SampleDesc.Count = 1;
+	env_cube_map_desc.SampleDesc.Quality = 0;
+	env_cube_map_desc.Usage = D3D11_USAGE_DEFAULT;
+	env_cube_map_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	env_cube_map_desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+	hr = device_->CreateTexture2D(&env_cube_map_desc, nullptr, &tex_env_cube_map_.ptr);
+	assert(hr == S_OK);
+	hr = device_->CreateShaderResourceView(tex_env_cube_map_, nullptr, &tex_env_cube_map_srv_.ptr);
+	assert(hr == S_OK);
+	hr = device_->CreateRenderTargetView(tex_env_cube_map_, nullptr, &tex_env_cube_map_rtv_.ptr);
 	assert(hr == S_OK);
 }
 
@@ -192,8 +217,8 @@ void pbr::setup_pipeline_state()
 	//device_ctx_->PSSetConstantBuffers(0, 1, &_cb_pixel_shader.ptr);
 	//device_ctx_->PSSetSamplers(0, 1, &_sampler_state.ptr);
 	/*ID3D11ShaderResourceView* views[3];
-	put_shader_recource_views(views, *_curr_material);
-	_device_ctx->PSSetShaderResources(0, 3, views);*/
+	put_shader_recource_views(views, *_curr_material);*/
+	//device_ctx_->PSSetShaderResources(0, 1, &tex_env_map_srv_.ptr);
 
 	device_ctx_->RSSetState(rasterizer_state_);
 	ID3D11RenderTargetView* rtv_list[2] = { rhi_ctx_.rtv_window(), tex_debug_rtv_.ptr };

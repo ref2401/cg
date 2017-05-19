@@ -60,6 +60,9 @@ static const float g_material_metallic = 0.0;
 static const float3 g_material_base_color = float3(0.85f, 0.53f, 0.4f);
 static const float3 g_material_fresnel0 = float3(0.32267f, 0.32267f, 0.32267f);
 
+Texture2D g_tex			: register(t0);
+SamplerState g_sampler	: register(s0);
+
 struct ps_output {
 	float4 rt_color_0	: SV_TARGET0;
 	float4 rt_color_1	: SV_TARGET1;
@@ -119,8 +122,10 @@ ps_output ps_main(in vs_output pixel)
 	const float3 diffuse_term = g_material_base_color / pi;
 	const float3 final_color = cos_theta_l * ((1 - g_material_metallic) * diffuse_term + specular_term);
 
+	float4 rgba = g_tex.Sample(g_sampler, pixel.uv);
 	ps_output o;
 	o.rt_color_0 = float4(final_color, 1);
+	o.rt_color_0 = rgba;
 	o.rt_color_1 = float4((float3)cos_theta_d, 1);
 	return o;
 }

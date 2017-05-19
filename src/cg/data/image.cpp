@@ -27,7 +27,7 @@ image_2d::image_2d(const char* filename, uint8_t channel_count, bool flip_vertic
 	const bool is_hdr = stbi_is_hdr(filename);
 	
 	if (is_hdr)
-		data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
+		data = stbi_loadf(filename, &width, &height, &actual_channel_count, channel_count);
 	else
 		data = stbi_load(filename, &width, &height, &actual_channel_count, channel_count);
 	

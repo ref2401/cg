@@ -77,8 +77,10 @@ private:
 	com_ptr<ID3D11Buffer> index_buffer_;
 	UINT vertex_stride_;
 	UINT index_count_;
-	// environment mao -> irradiance map
-	com_ptr<ID3D11Texture2D> tex_env_map_;
+	// environment map -> irradiance map
+	com_ptr<ID3D11Texture2D> tex_env_cube_map_;
+	com_ptr<ID3D11ShaderResourceView> tex_env_cube_map_srv_;
+	com_ptr<ID3D11RenderTargetView> tex_env_cube_map_rtv_;
 	// debug
 	com_ptr<ID3D11Texture2D> tex_debug_;
 	com_ptr<ID3D11RenderTargetView> tex_debug_rtv_;
