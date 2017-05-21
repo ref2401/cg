@@ -38,6 +38,8 @@ private:
 
 	static constexpr size_t cb_vertex_shader_component_count = 3 * 16 + 2 * 4;
 
+	void init_cube_envmap_data();
+
 	void init_geometry();
 
 	void init_irradiance_map();
@@ -53,37 +55,47 @@ private:
 	void update_projection_matrix();
 
 
-	dx11_rhi_context& rhi_ctx_;
-	ID3D11Device* device_ = nullptr;
-	ID3D11Debug* debug_ = nullptr;
-	ID3D11DeviceContext* device_ctx_ = nullptr;
+	dx11_rhi_context& rhi_ctx;
+	ID3D11Device* device = nullptr;
+	ID3D11Debug* debug = nullptr;
+	ID3D11DeviceContext* device_ctx = nullptr;
 	// rendering
-	float2 view_roll_angles_;
-	float2 prev_mouse_position_;
-	cg::Viewpoint curr_viewpoint_;
-	cg::Viewpoint prev_viewpoint_;
-	float4x4 projection_matrix_;
-	com_ptr<ID3D11DepthStencilState> depth_stencil_state_;
-	com_ptr<ID3D11RasterizerState> rasterizer_state_;
-	com_ptr<ID3D11Buffer> cb_vertex_shader_;
-	com_ptr<ID3D11Buffer> cb_pixel_shader_;
-	hlsl_shader shader_;
+	float2 view_roll_angles;
+	float2 prev_mouse_position;
+	cg::Viewpoint curr_viewpoint;
+	cg::Viewpoint prev_viewpoint;
+	float4x4 projection_matrix;
+	com_ptr<ID3D11DepthStencilState> depth_stencil_state;
+	com_ptr<ID3D11RasterizerState> rasterizer_state;
+	com_ptr<ID3D11Buffer> cb_vertex_shader;
+	com_ptr<ID3D11Buffer> cb_pixel_shader;
+	hlsl_shader shader;
+	com_ptr<ID3D11SamplerState> sampler_state;
 	// model
-	float3 model_position_;
-	quat model_rotation_;
-	float3 model_scale_;
-	com_ptr<ID3D11InputLayout> input_layout_;
-	com_ptr<ID3D11Buffer> vertex_buffer_;
-	com_ptr<ID3D11Buffer> index_buffer_;
-	UINT vertex_stride_;
-	UINT index_count_;
+	float3 model_position;
+	quat model_rotation;
+	float3 model_scale;
+	com_ptr<ID3D11InputLayout> input_layout;
+	com_ptr<ID3D11Buffer> vertex_buffer;
+	com_ptr<ID3D11Buffer> index_buffer;
+	UINT vertex_stride;
+	UINT index_count;
+	// cube model
+	com_ptr<ID3D11Buffer> cb_buffer_cube_envmap;
+	hlsl_shader cube_envmap_shader;
+	com_ptr<ID3D11RasterizerState> cube_envmap_rasterizer_state;
+	com_ptr<ID3D11InputLayout> cube_input_layout;
+	com_ptr<ID3D11Buffer> cube_vertex_buffer;
+	com_ptr<ID3D11Buffer> cube_index_buffer;
+	UINT cube_index_count;
+	UINT cube_vertex_stride;
+
 	// environment map -> irradiance map
-	com_ptr<ID3D11Texture2D> tex_env_cube_map_;
-	com_ptr<ID3D11ShaderResourceView> tex_env_cube_map_srv_;
-	com_ptr<ID3D11RenderTargetView> tex_env_cube_map_rtv_;
+	com_ptr<ID3D11Texture2D> tex_cube_envmap;
+	com_ptr<ID3D11ShaderResourceView> tex_cube_envmap_srv;
 	// debug
-	com_ptr<ID3D11Texture2D> tex_debug_;
-	com_ptr<ID3D11RenderTargetView> tex_debug_rtv_;
+	com_ptr<ID3D11Texture2D> tex_debug;
+	com_ptr<ID3D11RenderTargetView> tex_debug_rtv;
 };
 
 } // namespace pbr

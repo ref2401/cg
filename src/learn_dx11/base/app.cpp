@@ -123,7 +123,7 @@ void Example::clear_depth_stencil_buffer(float clear_depth)
 //void example::setup_rasterizer_state(const D3D11_RASTERIZER_DESC& desc)
 //{
 //	ID3D11RasterizerState* state = nullptr;
-//	HRESULT hr = device_->CreateRasterizerState(&desc, &state);
+//	HRESULT hr = device->CreateRasterizerState(&desc, &state);
 //	assert(hr == S_OK);
 //
 //	_device_ctx->RSSetState(state);
