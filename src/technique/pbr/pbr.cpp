@@ -14,7 +14,7 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	device(this->rhi_ctx.device()),
 	debug(this->rhi_ctx.debug()),
 	device_ctx(this->rhi_ctx.device_ctx()),
-	curr_viewpoint(float3(0.0f, 0, 12.0f), float3::zero, float3::unit_y)
+	curr_viewpoint(float3(0.0f, 0, 17.0f), float3::zero, float3::unit_y)
 {
 	update_projection_matrix();
 	model_position = float3::zero;
@@ -40,43 +40,14 @@ void pbr::init_cube_envmap_data()
 	shader_desc.pixel_shader_entry_point = "ps_main";
 	cube_envmap_shader = hlsl_shader(device, shader_desc);
 
-	auto model = load_model<vertex_attribs::p_n_tc_ts>("../../data/cube.obj");
-	assert(model.mesh_count() == 1);
-	cube_index_count = UINT(model.meshes()[0].index_count);
-	cube_vertex_stride = decltype(model)::Format::vertex_byte_count;
-	
-	// vertex buffer
-	D3D11_BUFFER_DESC vb_desc = {};
-	vb_desc.ByteWidth = UINT(model.vertex_data_byte_count());
-	vb_desc.Usage = D3D11_USAGE_IMMUTABLE;
-	vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	D3D11_SUBRESOURCE_DATA vb_data = {};
-	vb_data.pSysMem = model.vertex_data().data();
-	HRESULT hr = device->CreateBuffer(&vb_desc, &vb_data, &cube_vertex_buffer.ptr);
-	assert(hr == S_OK);
-
-	// index buffer
-	D3D11_BUFFER_DESC ib_desc = {};
-	ib_desc.ByteWidth = UINT(model.index_data_byte_count());
-	ib_desc.Usage = D3D11_USAGE_IMMUTABLE;
-	ib_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	D3D11_SUBRESOURCE_DATA ib_data = {};
-	ib_data.pSysMem = model.index_data().data();
-	hr = device->CreateBuffer(&ib_desc, &ib_data, &cube_index_buffer.ptr);
-	assert(hr == S_OK);
-
-	// input layout
-	using Vf = decltype(model)::Format;
-	vertex_stride = Vf::vertex_byte_count;
-	D3D11_INPUT_ELEMENT_DESC layout_desc = { "VERT_POSITION_MS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, Vf::position_byte_offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-
-	hr = device->CreateInputLayout(&layout_desc, 1,
-		cube_envmap_shader.vertex_shader_bytecode->GetBufferPointer(),
-		cube_envmap_shader.vertex_shader_bytecode->GetBufferSize(),
-		&cube_input_layout.ptr);
-	assert(hr == S_OK);
-
 	cb_buffer_cube_envmap = constant_buffer(device, sizeof(float4x4));
+
+	D3D11_DEPTH_STENCIL_DESC ds_desc = {};
+	ds_desc.DepthEnable = true;
+	ds_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	ds_desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	HRESULT hr = device->CreateDepthStencilState(&ds_desc, &cube_envmap_depth_stencil_state_.ptr);
+	assert(hr == S_OK);
 
 	D3D11_RASTERIZER_DESC rastr_desc = {};
 	rastr_desc.FillMode = D3D11_FILL_SOLID;
@@ -187,26 +158,17 @@ void pbr::init_irradiance_map()
 	gen_envmap_shader_desc.vertex_shader_entry_point = "vs_main";
 	gen_envmap_shader_desc.pixel_shader_entry_point = "ps_main";
 	hlsl_shader gen_envmap_shader = hlsl_shader(device, gen_envmap_shader_desc);
-	// gen envmap input layout
-	com_ptr<ID3D11InputLayout> cube_input_layout_gen_envmap;
-	const D3D11_INPUT_ELEMENT_DESC layout_desc { "VERT_POSITION_MS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, Vertex_interleaved_format<vertex_attribs::p>::position_byte_offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	hr = device->CreateInputLayout(&layout_desc, 1,
-		gen_envmap_shader.vertex_shader_bytecode->GetBufferPointer(),
-		gen_envmap_shader.vertex_shader_bytecode->GetBufferSize(),
-		&cube_input_layout_gen_envmap.ptr);
-	assert(hr == S_OK);
 
 	com_ptr<ID3D11Buffer> cb_vs_gen_envmap = constant_buffer(device, sizeof(float4x4));
 	const float4x4 view_matrices[face_count] = {
-		view_matrix(float3::zero,	float3(1.0f, 0.0f, 0.0f),	-float3::unit_y) * scale_matrix<float4x4>(float3(2.0f)),
-		view_matrix(float3::zero,	float3(-1.0f, 0.0f, 0.0f),	-float3::unit_y) * scale_matrix<float4x4>(float3(2.0f)),
-		view_matrix(float3::zero,	float3(0.0f, -1.0f, 0.0f),	-float3::unit_z) * scale_matrix<float4x4>(float3(2.0f)),
-		view_matrix(float3::zero,	float3(0.0f, 1.0f, 0.0f),	float3::unit_z) * scale_matrix<float4x4>(float3(2.0f)),
-		view_matrix(float3::zero,	float3(0.0f, 0.0f, 1.0f),	-float3::unit_y) * scale_matrix<float4x4>(float3(2.0f)),
-		view_matrix(float3::zero,	float3(0.0f, 0.0f, -1.0f),	-float3::unit_y) * scale_matrix<float4x4>(float3(2.0f))
+		view_matrix(float3::zero,	float3(1.0f, 0.0f, 0.0f),	-float3::unit_y),
+		view_matrix(float3::zero,	float3(-1.0f, 0.0f, 0.0f),	-float3::unit_y),
+		view_matrix(float3::zero,	float3(0.0f, -1.0f, 0.0f),	-float3::unit_z),
+		view_matrix(float3::zero,	float3(0.0f, 1.0f, 0.0f),	float3::unit_z),
+		view_matrix(float3::zero,	float3(0.0f, 0.0f, 1.0f),	-float3::unit_y),
+		view_matrix(float3::zero,	float3(0.0f, 0.0f, -1.0f),	-float3::unit_y)
 	};
 
-	
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
@@ -216,10 +178,10 @@ void pbr::init_irradiance_map()
 	vp.MaxDepth = 1.0f;
 
 	const UINT offset = 0;
-	device_ctx->IASetInputLayout(cube_input_layout_gen_envmap);
-	device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	device_ctx->IASetVertexBuffers(0, 1, &cube_vertex_buffer.ptr, &cube_vertex_stride, &offset);
-	device_ctx->IASetIndexBuffer(cube_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+	device_ctx->IASetInputLayout(nullptr);
+	device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	device_ctx->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+	device_ctx->IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
 	device_ctx->VSSetShader(gen_envmap_shader.vertex_shader, nullptr, 0);
 	device_ctx->VSSetConstantBuffers(0, 1, &cb_vs_gen_envmap.ptr);
 	device_ctx->PSSetShader(gen_envmap_shader.pixel_shader, nullptr, 0);
@@ -244,7 +206,7 @@ void pbr::init_irradiance_map()
 
 		const float4x4 proj_view_matrix = view_matrices[i];
 		device_ctx->UpdateSubresource(cb_vs_gen_envmap, 0, nullptr, &proj_view_matrix.m00, 0, 0);
-		device_ctx->DrawIndexed(cube_index_count, 0, 0);
+		device_ctx->Draw(cube_index_count_, 0);
 	}
 }
 
@@ -329,15 +291,19 @@ void pbr::render(float interpolation_factor)
 	viewpoint.up = normalize(viewpoint.up);
 	update_cb_vertex_shader(viewpoint);
 
+	//init_irradiance_map();
+
 	const UINT offset = 0;
 	device_ctx->RSSetViewports(1, &rhi_ctx.viewport());
 	ID3D11RenderTargetView* rtv_list[2] = { rhi_ctx.rtv_window(), tex_debug_rtv.ptr };
 	device_ctx->OMSetRenderTargets(2, rtv_list, rhi_ctx.dsv_depth_stencil());
-	device_ctx->OMSetDepthStencilState(depth_stencil_state, 0);
+	device_ctx->ClearRenderTargetView(rhi_ctx.rtv_window(), &float4::unit_xyzw.x);
+	device_ctx->ClearDepthStencilView(rhi_ctx.dsv_depth_stencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// render a model:
 	//
 	device_ctx->RSSetState(rasterizer_state);
+	device_ctx->OMSetDepthStencilState(depth_stencil_state, 0);
 	// input assembly
 	device_ctx->IASetInputLayout(input_layout);
 	device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -350,18 +316,17 @@ void pbr::render(float interpolation_factor)
 	
 	HRESULT hr = debug->ValidateContext(device_ctx);
 	assert(hr == S_OK);
-	device_ctx->ClearRenderTargetView(rhi_ctx.rtv_window(), &float4::unit_xyzw.x);
-	device_ctx->ClearDepthStencilView(rhi_ctx.dsv_depth_stencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	device_ctx->DrawIndexed(index_count, 0, 0);
 
 	// render cube envmap:
 	//
 	device_ctx->RSSetState(cube_envmap_rasterizer_state);
+	device_ctx->OMSetDepthStencilState(cube_envmap_depth_stencil_state_, 0);
 	// input assembly
-	device_ctx->IASetInputLayout(cube_input_layout);
-	device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	device_ctx->IASetVertexBuffers(0, 1, &cube_vertex_buffer.ptr, &cube_vertex_stride, &offset);
-	device_ctx->IASetIndexBuffer(cube_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+	device_ctx->IASetInputLayout(nullptr);
+	device_ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	device_ctx->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+	device_ctx->IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
 	// vertex & pixel shaders
 	device_ctx->VSSetShader(cube_envmap_shader.vertex_shader, nullptr, 0);
 	device_ctx->VSSetConstantBuffers(0, 1, &cb_buffer_cube_envmap.ptr);
@@ -370,7 +335,7 @@ void pbr::render(float interpolation_factor)
 	device_ctx->PSSetSamplers(0, 1, &sampler_state.ptr);
 	hr = debug->ValidateContext(device_ctx);
 	assert(hr == S_OK);
-	device_ctx->DrawIndexed(cube_index_count, 0, 0);
+	device_ctx->Draw(cube_index_count_, 0);
 
 	prev_viewpoint = curr_viewpoint;
 }
@@ -425,7 +390,7 @@ void pbr::update_cb_vertex_shader(const cg::Viewpoint& viewpoint)
 	device_ctx->UpdateSubresource(cb_vertex_shader, 0, nullptr, arr, 0, 0);
 
 	const cg::Viewpoint viewpoint_cube_envmap(float3::zero, forward(viewpoint), viewpoint.up);
-	const float4x4 cube_pvm_matrix = view_matrix(viewpoint_cube_envmap) * scale_matrix<float4x4>(float3(2.0f));
+	const float4x4 cube_pvm_matrix = projection_matrix * view_matrix(viewpoint_cube_envmap);
 	device_ctx->UpdateSubresource(cb_buffer_cube_envmap, 0, nullptr, &cube_pvm_matrix.m00, 0, 0);
 }
 

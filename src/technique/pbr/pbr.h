@@ -84,11 +84,8 @@ private:
 	com_ptr<ID3D11Buffer> cb_buffer_cube_envmap;
 	hlsl_shader cube_envmap_shader;
 	com_ptr<ID3D11RasterizerState> cube_envmap_rasterizer_state;
-	com_ptr<ID3D11InputLayout> cube_input_layout;
-	com_ptr<ID3D11Buffer> cube_vertex_buffer;
-	com_ptr<ID3D11Buffer> cube_index_buffer;
-	UINT cube_index_count;
-	UINT cube_vertex_stride;
+	com_ptr<ID3D11DepthStencilState> cube_envmap_depth_stencil_state_;
+	const UINT cube_index_count_ = 14;
 
 	// environment map -> irradiance map
 	com_ptr<ID3D11Texture2D> tex_cube_envmap;
