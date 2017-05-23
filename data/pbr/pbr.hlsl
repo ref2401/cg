@@ -16,11 +16,11 @@ struct vertex {
 };
 
 struct vs_output {
-	float4 position_cs			: SV_POSITION;
-	float3 l_ts					: PIX_L_TS;
-	float3 v_ts					: PIX_V_TS;
-	float2 uv					: PIX_UV;
-	float4 debug				: PIX_DEBUG;
+	float4 position_cs	: SV_POSITION;
+	float3 n_ms			: PIXEL_N_MS;
+	float3 l_ts			: PIXEL_L_TS;
+	float3 v_ts			: PIXEL_V_TS;
+	float2 uv			: PIXEL_UV;
 };
 
 vs_output vs_main(in vertex vertex)
@@ -37,10 +37,10 @@ vs_output vs_main(in vertex vertex)
 
 	vs_output o;
 	o.position_cs = mul(g_pvm_matrix, float4(vertex.position_ms, 1));
+	o.n_ms = vertex.normal_ms;
 	o.l_ts = mul(world_to_tbn_matrix, g_light_dir_to_ws);
 	o.v_ts = mul(world_to_tbn_matrix, v_ws);
 	o.uv = vertex.uv;
-	o.debug = float4(0, 0, 0, 1);
 	return o;
 }
 
@@ -60,6 +60,10 @@ static const float g_material_metallic = 0.0;
 static const float3 g_material_base_color = float3(0.85f, 0.53f, 0.4f);
 static const float3 g_material_fresnel0 = float3(0.32267f, 0.32267f, 0.32267f);
 
+
+TextureCube g_tex_irradiance_map	: register(t0);
+SamplerState g_sampler_state		: register(s0);
+
 struct ps_output {
 	float4 rt_color_0	: SV_TARGET0;
 	float4 rt_color_1	: SV_TARGET1;
@@ -72,6 +76,13 @@ float distribution(float3 h_ts, float at, float ab)
 		+ (h_ts.y * h_ts.y / (ab * ab));
 
 	return 1.0f / (pi * at * ab * denom * denom);
+}
+
+float3 ibl_result(float3 pixel_n_ms, float diffuse_factor)
+{
+	const float3 n_ms = normalize(pixel_n_ms);
+	const float3 irradiance = g_tex_irradiance_map.Sample(g_sampler_state, n_ms).rgb;
+	return diffuse_factor * irradiance * g_material_base_color;
 }
 
 float masking_shadowing(float3 l_ts, float3 v_ts, float at, float ab, float cos_theta_d)
@@ -116,11 +127,16 @@ ps_output ps_main(in vs_output pixel)
 	const float3 specular_term = g_material_base_color * fresnel * distrib * masking / (4.0f * cos_theta_l * cos_theta_v);
 	
 	// diffuse term
-	const float3 diffuse_term = g_material_base_color / pi;
-	const float3 final_color = cos_theta_l * ((1 - g_material_metallic) * diffuse_term + specular_term);
+	const float diffuse_factor = (1 - g_material_metallic) * (1 - fresnel);
+	const float3 diffuse_term = diffuse_factor * g_material_base_color / pi;
+	float3 final_color = ibl_result(pixel.n_ms, diffuse_factor) +  cos_theta_l * (diffuse_term + specular_term);
+
+	// tonemapping & gamma correct
+	final_color = final_color / (final_color + 1.0);
+	final_color = pow(final_color, 1.0 / 2.2);
 
 	ps_output o;
-	o.rt_color_0 = float4(final_color, 1);
-	o.rt_color_1 = float4((float3)cos_theta_d, 1);
+	o.rt_color_0 = float4(ibl_result(pixel.n_ms, 1.0f), 1);
+	o.rt_color_1 = float4(1, 1, 1, 1);
 	return o;
 }

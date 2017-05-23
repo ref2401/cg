@@ -253,7 +253,7 @@ void cube_envmap_pass::render_envmap(const float4x4& projection_view_matrix)
 	device_ctx_->VSSetShader(shader_.vertex_shader, nullptr, 0);
 	device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
 	device_ctx_->PSSetShader(shader_.pixel_shader, nullptr, 0);
-	device_ctx_->PSSetShaderResources(0, 1, &tex_irradiance_map_srv_.ptr);
+	device_ctx_->PSSetShaderResources(0, 1, &tex_cube_envmap_srv_.ptr);
 	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
@@ -433,6 +433,9 @@ void pbr::render(float interpolation_factor)
 	device_ctx_->VSSetShader(shader_.vertex_shader, nullptr, 0);
 	device_ctx_->VSSetConstantBuffers(0, 1, &cb_vertex_shader_.ptr);
 	device_ctx_->PSSetShader(shader_.pixel_shader, nullptr, 0);
+	ID3D11ShaderResourceView* srv = cube_envmap_pass_.tex_irradiance_map_srv();
+	device_ctx_->PSSetShaderResources(0, 1, &srv);
+	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
 	assert(hr == S_OK);
