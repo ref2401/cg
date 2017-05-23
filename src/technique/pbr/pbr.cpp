@@ -8,14 +8,6 @@ using namespace cg::data;
 
 namespace {
 
-void generate_cube_envmap(ID3D11Device* device, ID3D11DeviceContext* device_ctx, ID3D11Debug* debug,
-	ID3D11ShaderResourceView* tex_envmap_srv, ID3D11Texture2D* tex_cube_envmap,
-	const D3D11_VIEWPORT& viewport, ID3D11RasterizerState* rasterizer_state,
-	ID3D11DepthStencilState* depth_stencil_state, ID3D11SamplerState* sampler_state)
-{
-	
-}
-
 com_ptr<ID3D11Texture2D> load_envmap(ID3D11Device* device, const char* filename)
 {
 	const image_2d hdr_image(filename, 4);
@@ -49,7 +41,7 @@ namespace pbr {
 // ----- cube_envmap_pass -----
 
 cube_envmap_pass::cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* device_ctx, ID3D11Debug* debug,
-	const char* envmap_filename, size_t cube_side_size)
+	const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size)
 	: device_(device),
 	device_ctx_(device_ctx),
 	debug_(debug)
@@ -59,40 +51,48 @@ cube_envmap_pass::cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* de
 	assert(debug);
 	assert(envmap_filename);
 	assert(cube_side_size > 0);
+	assert(irradiance_side_size > 0);
 
-	// cube map texture
-	D3D11_TEXTURE2D_DESC cube_envmap_desc = {};
-	cube_envmap_desc.Width = cube_envmap_desc.Height = UINT(cube_side_size);
-	cube_envmap_desc.MipLevels = 1;
-	cube_envmap_desc.ArraySize = 6;
-	cube_envmap_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	cube_envmap_desc.SampleDesc.Count = 1;
-	cube_envmap_desc.SampleDesc.Quality = 0;
-	cube_envmap_desc.Usage = D3D11_USAGE_DEFAULT;
-	cube_envmap_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-	cube_envmap_desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
-	HRESULT hr = device->CreateTexture2D(&cube_envmap_desc, nullptr, &tex_cube_envmap_.ptr);
+	D3D11_TEXTURE2D_DESC tex_desc = {};
+	tex_desc.Width = tex_desc.Height = UINT(cube_side_size);
+	tex_desc.MipLevels = 1;
+	tex_desc.ArraySize = 6;
+	tex_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	tex_desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+	
+	// cube envmap
+	HRESULT hr = device->CreateTexture2D(&tex_desc, nullptr, &tex_cube_envmap_.ptr);
 	assert(hr == S_OK);
 	hr = device->CreateShaderResourceView(tex_cube_envmap_, nullptr, &tex_cube_envmap_srv_.ptr);
 	assert(hr == S_OK);
+	
+	// irradiance envmap
+	tex_desc.Width = tex_desc.Height = UINT(irradiance_side_size);
+	tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	hr = device->CreateTexture2D(&tex_desc, nullptr, &tex_irradiance_map_.ptr);
+	assert(hr == S_OK);
+	hr = device->CreateShaderResourceView(tex_irradiance_map_, nullptr, &tex_irradiance_map_srv_.ptr);
+	assert(hr == S_OK);
 
 	init_pipeline_state();
-
-	// load an epirectengular hdr image and project in onto a cube:
-	//
-	com_ptr<ID3D11Texture2D> tex_envmap = load_envmap(device, envmap_filename);
-	com_ptr<ID3D11ShaderResourceView> tex_envmap_srv;
-	hr = device->CreateShaderResourceView(tex_envmap, nullptr, &tex_envmap_srv.ptr);
-	assert(hr == S_OK);
-	generate_cube_envmap(tex_envmap_srv, cube_side_size);
+	init_cube_maps(envmap_filename, cube_side_size, irradiance_side_size);
 }
 
-void cube_envmap_pass::generate_cube_envmap(ID3D11ShaderResourceView* tex_envmap_srv, size_t cube_side_size)
+void cube_envmap_pass::init_cube_maps(const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size)
 {
+	// load an epirectengular hdr image:
+	//
+	com_ptr<ID3D11Texture2D> tex_envmap = load_envmap(device_, envmap_filename);
+	com_ptr<ID3D11ShaderResourceView> tex_envmap_srv;
+	HRESULT hr = device_->CreateShaderResourceView(tex_envmap, nullptr, &tex_envmap_srv.ptr);
+	assert(hr == S_OK);
+
 	// init pipeline state:
 	//
-	// constant buffer
-	com_ptr<ID3D11Buffer> constant_buffer = cg::rnd::dx11::constant_buffer(device_, sizeof(float4x4));
 	// input assembler
 	device_ctx_->IASetInputLayout(nullptr);
 	device_ctx_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -101,30 +101,11 @@ void cube_envmap_pass::generate_cube_envmap(ID3D11ShaderResourceView* tex_envmap
 	// depth stencil state
 	com_ptr<ID3D11DepthStencilState> depth_stencil_state;
 	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
-	HRESULT hr = device_->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state.ptr);
+	hr = device_->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state.ptr);
 	device_ctx_->OMSetDepthStencilState(depth_stencil_state, 0);
-	// shader_
-	auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/pbr/gen_envmap.hlsl");
-	shader_desc.vertex_shader_entry_point = "vs_main";
-	shader_desc.pixel_shader_entry_point = "ps_main";
-	hlsl_shader shader = hlsl_shader(device_, shader_desc);
-	device_ctx_->VSSetShader(shader.vertex_shader, nullptr, 0);
-	device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer.ptr);
-	device_ctx_->PSSetShader(shader.pixel_shader, nullptr, 0);
-	device_ctx_->PSSetShaderResources(0, 1, &tex_envmap_srv);
-	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	// rasterizer
 	device_ctx_->RSSetState(rasterizer_state_);
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = viewport.Height = float(cube_side_size);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	device_ctx_->RSSetViewports(1, &viewport);
 
-	// generate the cube envmap:
-	//
 	constexpr size_t face_count = 6;
 	const float4x4 view_matrices[face_count] = {
 		view_matrix(float3::zero,	float3(1.0f, 0.0f, 0.0f),	-float3::unit_y),
@@ -135,25 +116,90 @@ void cube_envmap_pass::generate_cube_envmap(ID3D11ShaderResourceView* tex_envmap
 		view_matrix(float3::zero,	float3(0.0f, 0.0f, -1.0f),	-float3::unit_y)
 	};
 
-	for (size_t i = 0; i < face_count; ++i) {
-		// render target view
-		com_ptr<ID3D11RenderTargetView> rtv;
-		D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
-		rtv_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-		rtv_desc.Texture2DArray.FirstArraySlice = UINT(i);
-		rtv_desc.Texture2DArray.ArraySize = 1;
-		HRESULT hr = device_->CreateRenderTargetView(tex_cube_envmap_, &rtv_desc, &rtv.ptr);
-		assert(hr == S_OK);
 
+	// generate tex_cube_envmap_:
+	//
+	{
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = viewport.Height = float(cube_side_size);
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		device_ctx_->RSSetViewports(1, &viewport);
 
-		device_ctx_->OMSetRenderTargets(1, &rtv.ptr, nullptr);
-		hr = debug_->ValidateContext(device_ctx_);
-		assert(hr == S_OK);
+		// shader
+		auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/pbr/gen_cube_envmap.hlsl");
+		shader_desc.vertex_shader_entry_point = "vs_main";
+		shader_desc.pixel_shader_entry_point = "ps_main";
+		hlsl_shader shader = hlsl_shader(device_, shader_desc);
+		device_ctx_->VSSetShader(shader.vertex_shader, nullptr, 0);
+		device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
+		device_ctx_->PSSetShader(shader.pixel_shader, nullptr, 0);
+		device_ctx_->PSSetShaderResources(0, 1, &tex_envmap_srv.ptr);
+		device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 
-		const float4x4 proj_view_matrix = view_matrices[i];
-		device_ctx_->UpdateSubresource(constant_buffer, 0, nullptr, &proj_view_matrix.m00, 0, 0);
-		device_ctx_->Draw(cube_envmap_pass::cube_index_count, 0);
+		for (size_t i = 0; i < face_count; ++i) {
+			// render target view
+			com_ptr<ID3D11RenderTargetView> rtv;
+			D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+			rtv_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			rtv_desc.Texture2DArray.FirstArraySlice = UINT(i);
+			rtv_desc.Texture2DArray.ArraySize = 1;
+			HRESULT hr = device_->CreateRenderTargetView(tex_cube_envmap_, &rtv_desc, &rtv.ptr);
+			assert(hr == S_OK);
+
+			device_ctx_->OMSetRenderTargets(1, &rtv.ptr, nullptr);
+			hr = debug_->ValidateContext(device_ctx_);
+			assert(hr == S_OK);
+			const float4x4 proj_view_matrix = view_matrices[i];
+			device_ctx_->UpdateSubresource(constant_buffer_, 0, nullptr, &proj_view_matrix.m00, 0, 0);
+			device_ctx_->Draw(cube_envmap_pass::cube_index_count, 0);
+		}
+	}
+
+	device_ctx_->OMSetRenderTargets(0, nullptr, nullptr);
+	// generate tex_irradiance_map_:
+	//
+	{
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = viewport.Height = float(irradiance_side_size);
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		device_ctx_->RSSetViewports(1, &viewport);
+
+		// shader
+		auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/pbr/gen_irradiance_map.hlsl");
+		shader_desc.vertex_shader_entry_point = "vs_main";
+		shader_desc.pixel_shader_entry_point = "ps_main";
+		hlsl_shader shader = hlsl_shader(device_, shader_desc);
+		device_ctx_->VSSetShader(shader.vertex_shader, nullptr, 0);
+		device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
+		device_ctx_->PSSetShader(shader.pixel_shader, nullptr, 0);
+		device_ctx_->PSSetShaderResources(0, 1, &tex_cube_envmap_srv_.ptr);
+		device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
+
+		for (size_t i = 0; i < face_count; ++i) {
+			// render target view
+			com_ptr<ID3D11RenderTargetView> rtv;
+			D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+			rtv_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			rtv_desc.Texture2DArray.FirstArraySlice = UINT(i);
+			rtv_desc.Texture2DArray.ArraySize = 1;
+			HRESULT hr = device_->CreateRenderTargetView(tex_irradiance_map_, &rtv_desc, &rtv.ptr);
+			assert(hr == S_OK);
+
+			device_ctx_->OMSetRenderTargets(1, &rtv.ptr, nullptr);
+			hr = debug_->ValidateContext(device_ctx_);
+			assert(hr == S_OK);
+			const float4x4 proj_view_matrix = view_matrices[i];
+			device_ctx_->UpdateSubresource(constant_buffer_, 0, nullptr, &proj_view_matrix.m00, 0, 0);
+			device_ctx_->Draw(cube_envmap_pass::cube_index_count, 0);
+		}
 	}
 }
 
@@ -207,7 +253,7 @@ void cube_envmap_pass::render_envmap(const float4x4& projection_view_matrix)
 	device_ctx_->VSSetShader(shader_.vertex_shader, nullptr, 0);
 	device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
 	device_ctx_->PSSetShader(shader_.pixel_shader, nullptr, 0);
-	device_ctx_->PSSetShaderResources(0, 1, &tex_cube_envmap_srv_.ptr);
+	device_ctx_->PSSetShaderResources(0, 1, &tex_irradiance_map_srv_.ptr);
 	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
@@ -225,7 +271,7 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	debug_(this->rhi_ctx_.debug()),
 	device_ctx_(this->rhi_ctx_.device_ctx()),
 	curr_viewpoint_(float3(0.0f, 0, 17.0f), float3::zero, float3::unit_y),
-	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 512)
+	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 512, 32)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;
