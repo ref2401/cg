@@ -1,4 +1,4 @@
-// projectcs an equirectangular mat to a cube map
+// projects an equirectangular map to a cube map
 
 // ----- vertex shader -----
 

@@ -9,6 +9,43 @@ using namespace cg::rnd::dx11;
 
 namespace pbr {
 
+class cube_envmap_pass final {
+public:
+
+	cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* device_ctx, ID3D11Debug* debug_,
+		const char* envmap_filename, size_t cube_side_size);
+
+	cube_envmap_pass(cube_envmap_pass&&) = delete;
+	cube_envmap_pass& operator=(cube_envmap_pass&&) = delete;
+
+
+	void render_envmap(const float4x4& projection_view_matrix);
+
+private:
+
+	static constexpr UINT cube_index_count = 14;
+
+	void generate_cube_envmap(ID3D11ShaderResourceView* tex_envmap_srv, size_t cube_side_size);
+
+	void init_pipeline_state();
+
+
+	ID3D11Device* device_;
+	ID3D11DeviceContext* device_ctx_;
+	ID3D11Debug* debug_;
+	// cube envmap data:
+	//
+	com_ptr<ID3D11Texture2D> tex_cube_envmap_;
+	com_ptr<ID3D11ShaderResourceView> tex_cube_envmap_srv_;
+	// rendering:
+	//
+	com_ptr<ID3D11Buffer> constant_buffer_;
+	hlsl_shader shader_;
+	com_ptr<ID3D11RasterizerState> rasterizer_state_;
+	com_ptr<ID3D11DepthStencilState> depth_stencil_state_;
+	com_ptr<ID3D11SamplerState> sampler_state_;
+};
+
 class pbr final : public virtual cg::sys::example {
 public:
 
@@ -38,61 +75,47 @@ private:
 
 	static constexpr size_t cb_vertex_shader_component_count = 3 * 16 + 2 * 4;
 
-	void init_cube_envmap_data();
-
 	void init_geometry();
-
-	void init_irradiance_map();
 
 	void init_pipeline_state();
 
 	void init_shader();
-
-	void setup_pipeline_state();
 
 	void update_cb_vertex_shader(const cg::Viewpoint& viewpoint);
 
 	void update_projection_matrix();
 
 
-	dx11_rhi_context& rhi_ctx;
-	ID3D11Device* device = nullptr;
-	ID3D11Debug* debug = nullptr;
-	ID3D11DeviceContext* device_ctx = nullptr;
+	dx11_rhi_context& rhi_ctx_;
+	ID3D11Device* device_ = nullptr;
+	ID3D11Debug* debug_ = nullptr;
+	ID3D11DeviceContext* device_ctx_ = nullptr;
 	// rendering
-	float2 view_roll_angles;
-	float2 prev_mouse_position;
-	cg::Viewpoint curr_viewpoint;
-	cg::Viewpoint prev_viewpoint;
-	float4x4 projection_matrix;
-	com_ptr<ID3D11DepthStencilState> depth_stencil_state;
-	com_ptr<ID3D11RasterizerState> rasterizer_state;
-	com_ptr<ID3D11Buffer> cb_vertex_shader;
-	com_ptr<ID3D11Buffer> cb_pixel_shader;
-	hlsl_shader shader;
-	com_ptr<ID3D11SamplerState> sampler_state;
+	float2 view_roll_angles_;
+	float2 prev_mouse_position_;
+	cg::Viewpoint curr_viewpoint_;
+	cg::Viewpoint prev_viewpoint_;
+	float4x4 projection_matrix_;
+	com_ptr<ID3D11DepthStencilState> depth_stencil_state_;
+	com_ptr<ID3D11RasterizerState> rasterizer_state_;
+	com_ptr<ID3D11Buffer> cb_vertex_shader_;
+	com_ptr<ID3D11Buffer> cb_pixel_shader_;
+	hlsl_shader shader_;
+	com_ptr<ID3D11SamplerState> sampler_state_;
 	// model
-	float3 model_position;
-	quat model_rotation;
-	float3 model_scale;
-	com_ptr<ID3D11InputLayout> input_layout;
-	com_ptr<ID3D11Buffer> vertex_buffer;
-	com_ptr<ID3D11Buffer> index_buffer;
-	UINT vertex_stride;
-	UINT index_count;
+	float3 model_position_;
+	quat model_rotation_;
+	float3 model_scale_;
+	com_ptr<ID3D11InputLayout> input_layout_;
+	com_ptr<ID3D11Buffer> vertex_buffer_;
+	com_ptr<ID3D11Buffer> index_buffer_;
+	UINT vertex_stride_;
+	UINT index_count_;
 	// cube model
-	com_ptr<ID3D11Buffer> cb_buffer_cube_envmap;
-	hlsl_shader cube_envmap_shader;
-	com_ptr<ID3D11RasterizerState> cube_envmap_rasterizer_state;
-	com_ptr<ID3D11DepthStencilState> cube_envmap_depth_stencil_state_;
-	const UINT cube_index_count_ = 14;
-
-	// environment map -> irradiance map
-	com_ptr<ID3D11Texture2D> tex_cube_envmap;
-	com_ptr<ID3D11ShaderResourceView> tex_cube_envmap_srv;
-	// debug
-	com_ptr<ID3D11Texture2D> tex_debug;
-	com_ptr<ID3D11RenderTargetView> tex_debug_rtv;
+	cube_envmap_pass cube_envmap_pass_;
+	// debug_
+	com_ptr<ID3D11Texture2D> tex_debug_;
+	com_ptr<ID3D11RenderTargetView> tex_debug_rtv_;
 };
 
 } // namespace pbr
