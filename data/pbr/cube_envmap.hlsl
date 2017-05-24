@@ -55,6 +55,5 @@ ps_output ps_main(vs_output pixel)
 
 	ps_output o;
 	o.rt_color_0 = float4(hdr, 1.0);
-
 	return o;
 }

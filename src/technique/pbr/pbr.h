@@ -19,6 +19,11 @@ public:
 	cube_envmap_pass& operator=(cube_envmap_pass&&) = delete;
 
 
+	ID3D11ShaderResourceView* tex_cube_envmap_srv() const noexcept
+	{
+		return tex_cube_envmap_srv_;
+	}
+
 	ID3D11ShaderResourceView* tex_irradiance_map_srv() const noexcept
 	{
 		return tex_irradiance_map_srv_;

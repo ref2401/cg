@@ -116,7 +116,6 @@ void cube_envmap_pass::init_cube_maps(const char* envmap_filename, size_t cube_s
 		view_matrix(float3::zero,	float3(0.0f, 0.0f, -1.0f),	-float3::unit_y)
 	};
 
-
 	// generate tex_cube_envmap_:
 	//
 	{
@@ -254,6 +253,7 @@ void cube_envmap_pass::render_envmap(const float4x4& projection_view_matrix)
 	device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
 	device_ctx_->PSSetShader(shader_.pixel_shader, nullptr, 0);
 	device_ctx_->PSSetShaderResources(0, 1, &tex_cube_envmap_srv_.ptr);
+	//device_ctx_->PSSetShaderResources(0, 1, &tex_irradiance_map_srv_.ptr);
 	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
@@ -271,7 +271,9 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	debug_(this->rhi_ctx_.debug()),
 	device_ctx_(this->rhi_ctx_.device_ctx()),
 	curr_viewpoint_(float3(0.0f, 0, 17.0f), float3::zero, float3::unit_y),
-	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr_ice_lake/Ice_Lake_Ref.hdr", 512, 32)
+	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/chelsea_stairs/Chelsea_Stairs_3k.hdr", 512, 32)
+	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/malibu_overlook/Malibu_Overlook_3k.hdr", 512, 64)
+	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/winter_forest/WinterForest_Ref.hdr", 512, 64)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;

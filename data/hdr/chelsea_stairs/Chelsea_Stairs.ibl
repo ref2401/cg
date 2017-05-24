@@ -1,0 +1,54 @@
+[Header]
+ICOfile = "Chelsea_Stairs_thumb.jpg"
+PREVIEWfile = "Chelsea_Stairs_preview.jpg"
+Name = "Chelsea Stairs"
+Author = "Blochi"
+Location = "New York"
+Comment = "Art gallery at the famous Chelsea Hotel, indoor with skylight far above"
+GEOlat = 40.744444
+GEOlong = -73.996667
+Link = "http://www.hdrlabs.com/sibl/archive.html"
+Date = "2010:09:24"
+Time = "17:30:00"
+Height = 1.800000
+
+[Background]
+; tonemapped with FDRTools and Picturenaut
+BGfile = "Chelsea_Stairs_8k.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 4096
+
+[Enviroment]
+EVfile = "Chelsea_Stairs_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 180
+EVmulti = 1.000000
+EVgamma = 2.200000
+
+[Reflection]
+REFfile = "Chelsea_Stairs_3k.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 1600
+REFmulti = 1.000000
+REFgamma = 2.200000
+
+[Light1]
+LIGHTname = "Skylight"
+LIGHTcolor = 166,186,255
+LIGHTmulti = 0.800000
+LIGHTu = 0.474000
+LIGHTv = 0.004000
+
+[Light2]
+LIGHTname = "Flourescent"
+LIGHTcolor = 255,240,247
+LIGHTmulti = 0.600000
+LIGHTu = 0.590000
+LIGHTv = 0.316000
+

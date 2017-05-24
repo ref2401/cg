@@ -55,7 +55,7 @@ static const float3 up_origin_ms = float3(0, 1, 0);
 
 ps_output ps_main(vs_output pixel)
 {
-	const float3 n_ms = normalize(pixel.position_ms);
+	const float3 n_ms = float3(1, -1, 1) * normalize(pixel.position_ms);
 	const float3 right_ms = cross(up_origin_ms, n_ms);
 	const float3 up_ms = cross(n_ms, right_ms);
 
