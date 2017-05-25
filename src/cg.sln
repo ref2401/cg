@@ -87,6 +87,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pbr", "pbr", "{3E3A6BD2-C9CC-4C4F-8C74-3C8B040962E9}"
 	ProjectSection(SolutionItems) = preProject
 		..\data\pbr\cube_envmap.hlsl = ..\data\pbr\cube_envmap.hlsl
+		..\data\pbr\gen_brdf_map.hlsl = ..\data\pbr\gen_brdf_map.hlsl
 		..\data\pbr\gen_cube_envmap.hlsl = ..\data\pbr\gen_cube_envmap.hlsl
 		..\data\pbr\gen_irradiance_map.hlsl = ..\data\pbr\gen_irradiance_map.hlsl
 		..\data\pbr\gen_reflection_map.hlsl = ..\data\pbr\gen_reflection_map.hlsl

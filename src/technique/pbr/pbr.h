@@ -30,12 +30,24 @@ public:
 		return tex_irradiance_map_srv_;
 	}
 
+	ID3D11ShaderResourceView* tex_reflection_map_srv() const noexcept
+	{
+		return tex_reflection_map_srv_;
+	}
+
+	ID3D11ShaderResourceView* tex_brdf_map_srv() const noexcept
+	{
+		return tex_brdf_map_srv_;
+	}
+
 	void render_envmap(const float4x4& projection_view_matrix);
 
 private:
 
 	static constexpr size_t reflection_mip_level_count = 5;
 	static constexpr UINT cube_index_count = 14;
+
+	void init_brdf_maps();
 
 	// Loads an epirectengular hdr image and projects in onto tex_cube_envmap_.
 	// Convolutes tex_cube_envmap_ and stores the result in tex_irradiance_map_
@@ -56,6 +68,8 @@ private:
 	com_ptr<ID3D11ShaderResourceView> tex_irradiance_map_srv_;
 	com_ptr<ID3D11Texture2D> tex_reflection_map_;
 	com_ptr<ID3D11ShaderResourceView> tex_reflection_map_srv_;
+	com_ptr<ID3D11Texture2D> tex_brdf_map_;
+	com_ptr<ID3D11ShaderResourceView> tex_brdf_map_srv_;
 	// rendering:
 	//
 	com_ptr<ID3D11Buffer> constant_buffer_;
