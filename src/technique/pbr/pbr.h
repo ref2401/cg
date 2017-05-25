@@ -13,7 +13,8 @@ class cube_envmap_pass final {
 public:
 
 	cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* device_ctx, ID3D11Debug* debug_,
-		const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size);
+		const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size,
+		size_t reflection_size_size);
 
 	cube_envmap_pass(cube_envmap_pass&&) = delete;
 	cube_envmap_pass& operator=(cube_envmap_pass&&) = delete;
@@ -33,11 +34,13 @@ public:
 
 private:
 
+	static constexpr size_t reflection_mip_level_count = 5;
 	static constexpr UINT cube_index_count = 14;
 
 	// Loads an epirectengular hdr image and projects in onto tex_cube_envmap_.
 	// Convolutes tex_cube_envmap_ and stores the result in tex_irradiance_map_
-	void init_cube_maps(const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size);
+	void init_cube_maps(const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size,
+		size_t reflection_size_size);
 
 	void init_pipeline_state();
 
@@ -51,6 +54,8 @@ private:
 	com_ptr<ID3D11ShaderResourceView> tex_cube_envmap_srv_;
 	com_ptr<ID3D11Texture2D> tex_irradiance_map_;
 	com_ptr<ID3D11ShaderResourceView> tex_irradiance_map_srv_;
+	com_ptr<ID3D11Texture2D> tex_reflection_map_;
+	com_ptr<ID3D11ShaderResourceView> tex_reflection_map_srv_;
 	// rendering:
 	//
 	com_ptr<ID3D11Buffer> constant_buffer_;
