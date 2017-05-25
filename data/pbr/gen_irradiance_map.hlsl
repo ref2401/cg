@@ -46,7 +46,6 @@ struct ps_output {
 	float4 rt_color_0 : SV_TARGET0;
 };
 
-static const float sample_step = 0.025f;
 static const float pi = 3.14159265;
 static const float v_2pi = 2 * pi;
 static const float v_pi_2 = pi * 0.5;
@@ -62,11 +61,11 @@ ps_output ps_main(vs_output pixel)
 	float counter = 0.0f;
 	float3 irradiance = (float3)0.0f;
 
-	for (float phi = 0.0; phi < v_2pi; phi += sample_step) {
+	for (float phi = 0.0; phi < v_2pi; phi += 0.025f) {
 		const float cos_phi = cos(phi);
 		const float sin_phi = sin(phi);
 
-		for (float theta = 0.0; theta < v_pi_2; theta += sample_step) {
+		for (float theta = 0.0; theta < v_pi_2; theta += 0.025f) {
 			const float cos_theta = cos(theta);
 			const float sin_theta = sin(theta);
 			const float3 sample_ts = float3(sin_theta * cos_phi, sin_theta * sin_phi, cos_theta);

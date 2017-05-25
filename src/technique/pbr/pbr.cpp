@@ -271,9 +271,9 @@ pbr::pbr(const cg::sys::app_context& app_ctx, cg::rnd::rhi_context_i& rhi_ctx)
 	debug_(this->rhi_ctx_.debug()),
 	device_ctx_(this->rhi_ctx_.device_ctx()),
 	curr_viewpoint_(float3(0.0f, 0, 17.0f), float3::zero, float3::unit_y),
-	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/chelsea_stairs/Chelsea_Stairs_3k.hdr", 512, 32)
-	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/malibu_overlook/Malibu_Overlook_3k.hdr", 512, 64)
-	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/winter_forest/WinterForest_Ref.hdr", 512, 64)
+	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/chelsea_stairs/Chelsea_Stairs_3k.hdr", 512, 32)
+	//cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/malibu_overlook/Malibu_Overlook_3k.hdr", 512, 32)
+	cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/winter_forest/WinterForest_Ref.hdr", 512, 32)
 {
 	update_projection_matrix();
 	model_position_ = float3::zero;
