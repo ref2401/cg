@@ -48,7 +48,7 @@ struct ps_output {
 
 static const float pi = 3.14159265;
 static const float v_2pi = 2 * pi;
-static const float v_pi_2 = pi * 0.5;
+static const float v_pi_2 = 0.5 * pi;
 static const float3 up_origin_ms = float3(0, 1, 0);
 
 

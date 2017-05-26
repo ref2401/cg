@@ -68,6 +68,7 @@ static const float3 g_material_fresnel0 = float3(0.7f, 0.7f, 0.7f);
 
 
 TextureCube g_tex_irradiance_map	: register(t0);
+Texture2D g_tex_brdf_map			: register(t1);
 SamplerState g_sampler_state		: register(s0);
 
 struct ps_output {
@@ -145,6 +146,6 @@ ps_output ps_main(in vs_output pixel)
 
 	ps_output o;
 	o.rt_color_0 = float4(final_color, 1);
-	o.rt_color_1 = float4(temp,  1);
+	o.rt_color_1 = float4(g_tex_brdf_map.Sample(g_sampler_state, pixel.uv).rgb,  1);
 	return o;
 }

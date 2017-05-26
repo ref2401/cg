@@ -50,8 +50,8 @@ struct ps_output {
 	float4 rt_color_0 : SV_TARGET0;
 };
 
-static const uint sample_count = 1024;
 static const float pi = 3.1415926535;
+static const uint sample_count = 1024;
 
 
 float2 hammersley(uint i, uint count)
@@ -97,7 +97,7 @@ ps_output ps_main(vs_output pixel)
 		const float3 h = importance_sample_ggx(xi, n, g_roughness);
 		const float3 l = normalize(2.0 * dot(v, h) * h - v);
 
-		const float cos_theta_l = max(dot(n, l), 0.0);
+		const float cos_theta_l = max(0.0, dot(n, l));
 		if (cos_theta_l > 0.0)
 		{
 			final_color += g_tex_cube_envmap.Sample(g_sampler_state, l).rgb * cos_theta_l;

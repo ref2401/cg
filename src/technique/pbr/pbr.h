@@ -20,6 +20,11 @@ public:
 	cube_envmap_pass& operator=(cube_envmap_pass&&) = delete;
 
 
+	ID3D11ShaderResourceView* tex_brdf_map_srv() const noexcept
+	{
+		return tex_brdf_map_srv_;
+	}
+
 	ID3D11ShaderResourceView* tex_cube_envmap_srv() const noexcept
 	{
 		return tex_cube_envmap_srv_;
@@ -35,17 +40,13 @@ public:
 		return tex_reflection_map_srv_;
 	}
 
-	ID3D11ShaderResourceView* tex_brdf_map_srv() const noexcept
-	{
-		return tex_brdf_map_srv_;
-	}
-
 	void render_envmap(const float4x4& projection_view_matrix);
 
 private:
 
 	static constexpr size_t reflection_mip_level_count = 5;
 	static constexpr UINT cube_index_count = 14;
+
 
 	void init_brdf_maps();
 
