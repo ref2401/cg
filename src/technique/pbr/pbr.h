@@ -12,6 +12,9 @@ namespace pbr {
 class cube_envmap_pass final {
 public:
 
+	static constexpr size_t reflection_mip_level_count = 5;
+
+
 	cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* device_ctx, ID3D11Debug* debug_,
 		const char* envmap_filename, size_t cube_side_size, size_t irradiance_side_size,
 		size_t reflection_size_size);
@@ -44,7 +47,6 @@ public:
 
 private:
 
-	static constexpr size_t reflection_mip_level_count = 5;
 	static constexpr UINT cube_index_count = 14;
 
 
@@ -107,7 +109,7 @@ public:
 
 private:
 
-	static constexpr size_t cb_vertex_shader_component_count = 3 * 16 + 2 * 4;
+	static constexpr size_t cb_vertex_shader_component_count = 4 * 16 + 2 * 4;
 
 	void init_geometry();
 

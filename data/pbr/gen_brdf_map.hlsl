@@ -45,9 +45,8 @@ float2 hammersley(uint i, uint count)
 
 float3 importance_sample_ggx(float2 xi, float3 n, float roughness)
 {
-	const float a = roughness*roughness;
 	const float phi = 2.0 * pi * xi.x;
-	const float cos_theta = sqrt((1.0 - xi.y) / (1.0 + (a * a - 1.0) * xi.y));
+	const float cos_theta = sqrt((1.0 - xi.y) / (1.0 + (roughness * roughness - 1.0) * xi.y));
 	const float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
 	// from spherical coordinates to cartesian coordinates

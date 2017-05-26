@@ -3,9 +3,10 @@
 cbuffer cb_vertex_shader : register(b0) {
 	float4x4 g_pvm_matrix		: packoffset(c0);
 	float4x4 g_model_matrix		: packoffset(c4);
-	float4x4 g_normal_matrix	: packoffset(c8);
-	float3 g_light_dir_to_ws	: packoffset(c12);
-	float3 g_view_position_ws	: packoffset(c13);
+	float4x4 g_model_matrix_inv	: packoffset(c8);
+	float4x4 g_normal_matrix	: packoffset(c12);
+	float3 g_light_dir_to_ws	: packoffset(c16);
+	float3 g_view_position_ws	: packoffset(c17);
 };
 
 struct vertex {
@@ -20,6 +21,7 @@ struct vs_output {
 	float3 n_ms			: PIXEL_N_MS;
 	float3 l_ts			: PIXEL_L_TS;
 	float3 v_ts			: PIXEL_V_TS;
+	float3 v_ms			: PIXEL_V_MS;
 	float2 uv			: PIXEL_UV;
 };
 
@@ -40,6 +42,7 @@ vs_output vs_main(in vertex vertex)
 	o.n_ms = vertex.normal_ms;
 	o.l_ts = mul(world_to_tbn_matrix, g_light_dir_to_ws);
 	o.v_ts = mul(world_to_tbn_matrix, v_ws);
+	o.v_ms = mul(g_model_matrix_inv, float4(v_ws, 1.0)).xyz;
 	o.uv = vertex.uv;
 	return o;
 }
@@ -54,21 +57,22 @@ static const float pi = 3.1415926535f;
 //static const float3 g_material_base_color = float3(0.75f, 0.75f, 0.75f);
 //static const float3 g_material_fresnel0 = float3(0.98738f, 0.98738f, 0.98738f);
 //// cooper
-//static const float g_material_roughness = 0.7f; // [0.03, 1.0]
-//static const float g_material_anisotropic = 0.5f;
-//static const float g_material_metallic = 0.0;
-//static const float3 g_material_base_color = float3(0.85f, 0.53f, 0.4f);
+//static const float g_material_roughness = 0.99f; // [0.03, 1.0]
+//static const float g_material_anisotropic = 0.0f;
+//static const float g_material_metallic = 1.0;
+//static const float3 g_material_base_color = float3(0.955f, 0.637f, 0.538f);
 //static const float3 g_material_fresnel0 = float3(0.32267f, 0.32267f, 0.32267f);
 // plastic
-static const float g_material_roughness = 0.4f; // [0.03, 1.0]
+static const float g_material_roughness = 0.9f; // [0.03, 1.0]
 static const float g_material_anisotropic = 0.0f;
 static const float g_material_metallic = 0.0;
-static const float3 g_material_base_color = float3(1, 1, 1);
+static const float3 g_material_base_color = float3(0, 0, 1);
 static const float3 g_material_fresnel0 = float3(0.7f, 0.7f, 0.7f);
 
 
 TextureCube g_tex_irradiance_map	: register(t0);
-Texture2D g_tex_brdf_map			: register(t1);
+TextureCube g_tex_reflection_map	: register(t1);
+Texture2D g_tex_brdf_map			: register(t2);
 SamplerState g_sampler_state		: register(s0);
 
 struct ps_output {
@@ -85,14 +89,24 @@ float distribution(float3 h_ts, float at, float ab)
 	return 1.0f / (pi * at * ab * denom * denom);
 }
 
-float3 ibl_result(float3 pixel_n_ms, float3 f0, float cos_theta_v)
+float3 ibl_result(float3 pixel_n_ms, float3 pixel_v_ms, float3 f0, float cos_theta_v)
 {
+	const float a = g_material_roughness * g_material_roughness;
 	const float3 n_ms = normalize(pixel_n_ms);
-	const float3 irradiance = g_tex_irradiance_map.Sample(g_sampler_state, n_ms).rgb;
+	const float3 v_ms = normalize(pixel_v_ms);
+	const float3 r_ms = reflect(-v_ms, n_ms);
 
-	const float3 gloss = (float3)(1.0f - g_material_roughness);
+	const float3 irradiance = g_tex_irradiance_map.Sample(g_sampler_state, n_ms).rgb;
+	const float3 reflection = g_tex_reflection_map.SampleLevel(g_sampler_state, r_ms, 4 * a).rgb;
+	const float2 brdf = g_tex_brdf_map.Sample(g_sampler_state, float2(cos_theta_v, a));
+
+	const float3 gloss = (float3)(1.0f - a);
 	const float3 fresnel = f0 + (max(gloss, f0) - f0) * pow(1.0 - cos_theta_v, 5.0);
-	return (1 - fresnel) * (1 - g_material_metallic) * irradiance * g_material_base_color;
+
+	const float3 specular_term = reflection * (fresnel * brdf.x + brdf.y);
+	const float3 diffuse_term = (1 - fresnel) * (1 - g_material_metallic) * irradiance * g_material_base_color;
+
+	return specular_term;
 }
 
 float masking_shadowing(float3 l_ts, float3 v_ts, float at, float ab, float cos_theta_d)
@@ -110,9 +124,7 @@ float masking_shadowing(float3 l_ts, float3 v_ts, float at, float ab, float cos_
 ps_output ps_main(in vs_output pixel)
 {
 	// roughness & anisotropic to at & ab
-	//const float a = g_material_roughness;
 	const float a = pow(g_material_roughness, 2);
-	//const float a = pow(g_material_roughness * 0.5f + 0.5f, 2);
 	float at = a;
 	float ab = a;
 	if (g_material_anisotropic < 0.0f)
@@ -138,14 +150,15 @@ ps_output ps_main(in vs_output pixel)
 	
 	// diffuse term
 	const float3 diffuse_term = (1 - g_material_metallic) * (1 - fresnel) * g_material_base_color / pi;
-	float3 final_color = ibl_result(pixel.n_ms, f0, cos_theta_v) + cos_theta_l * (diffuse_term + specular_term);
-	float3 temp = final_color;
+	//float3 final_color = ibl_result(pixel.n_ms, pixel.v_ms, f0, cos_theta_v) + cos_theta_l * (diffuse_term + specular_term);
+	float3 final_color = ibl_result(pixel.n_ms, pixel.v_ms, f0, cos_theta_v);
+	float3 tmp = final_color;
 	// tonemapping & gamma correct
 	final_color = final_color / (final_color + 1.0);
 	final_color = pow(final_color, 1.0 / 2.2);
 
 	ps_output o;
 	o.rt_color_0 = float4(final_color, 1);
-	o.rt_color_1 = float4(g_tex_brdf_map.Sample(g_sampler_state, pixel.uv).rgb,  1);
+	o.rt_color_1 = float4(tmp, 1);
 	return o;
 }

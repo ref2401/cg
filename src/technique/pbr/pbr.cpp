@@ -84,7 +84,11 @@ cube_envmap_pass::cube_envmap_pass(ID3D11Device* device, ID3D11DeviceContext* de
 	tex_desc.MipLevels = UINT(cube_envmap_pass::reflection_mip_level_count);
 	hr = device->CreateTexture2D(&tex_desc, nullptr, &tex_reflection_map_.ptr);
 	assert(hr == S_OK);
-	hr = device->CreateShaderResourceView(tex_reflection_map_, nullptr, &tex_reflection_map_srv_.ptr);
+	D3D11_SHADER_RESOURCE_VIEW_DESC reflection_srv_desc = {};
+	reflection_srv_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	reflection_srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+	reflection_srv_desc.TextureCube.MipLevels = UINT(cube_envmap_pass::reflection_mip_level_count);											 
+	hr = device->CreateShaderResourceView(tex_reflection_map_, &reflection_srv_desc, &tex_reflection_map_srv_.ptr);
 	assert(hr == S_OK);
 
 	init_pipeline_state();
@@ -280,6 +284,8 @@ void cube_envmap_pass::init_cube_maps(const char* envmap_filename, size_t cube_s
 	// generate tex_reflection_map:
 	//
 	{
+		com_ptr<ID3D11Buffer> ps_constant_buffer = cg::rnd::dx11::constant_buffer(device_, sizeof(float4));
+
 		// shader
 		auto shader_desc = cg::rnd::dx11::load_hlsl_shader_set_desc("../../data/pbr/gen_reflection_map.hlsl");
 		shader_desc.vertex_shader_entry_point = "vs_main";
@@ -288,6 +294,7 @@ void cube_envmap_pass::init_cube_maps(const char* envmap_filename, size_t cube_s
 		device_ctx_->VSSetShader(shader.vertex_shader, nullptr, 0);
 		device_ctx_->VSSetConstantBuffers(0, 1, &constant_buffer_.ptr);
 		device_ctx_->PSSetShader(shader.pixel_shader, nullptr, 0);
+		device_ctx_->PSSetConstantBuffers(0, 1, &ps_constant_buffer.ptr);
 		device_ctx_->PSSetShaderResources(0, 1, &tex_cube_envmap_srv_.ptr);
 		device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 
@@ -302,6 +309,8 @@ void cube_envmap_pass::init_cube_maps(const char* envmap_filename, size_t cube_s
 			viewport.MaxDepth = 1.0f;
 			device_ctx_->RSSetViewports(1, &viewport);
 
+			const float roughness = float(mip) / (cube_envmap_pass::reflection_mip_level_count - 1);
+			device_ctx_->UpdateSubresource(ps_constant_buffer, 0, nullptr, &roughness, 0, 0);
 			for (size_t i = 0; i < face_count; ++i) {
 				// render target view
 				com_ptr<ID3D11RenderTargetView> rtv;
@@ -491,6 +500,7 @@ void pbr::init_pipeline_state()
 
 	D3D11_SAMPLER_DESC sampler_desc = {};
 	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler_desc.MaxLOD = float(cube_envmap_pass::reflection_mip_level_count);
 	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -534,6 +544,8 @@ void pbr::on_window_resize()
 
 void pbr::render(float interpolation_factor)
 {
+	//cube_envmap_pass cube_envmap_pass_(device_, device_ctx_, debug_, "../../data/hdr/winter_forest/WinterForest_Ref.hdr", 512, 32, 128);
+
 	auto viewpoint = lerp(curr_viewpoint_, prev_viewpoint_, interpolation_factor);
 	viewpoint.up = normalize(viewpoint.up);
 	update_cb_vertex_shader(viewpoint);
@@ -558,11 +570,12 @@ void pbr::render(float interpolation_factor)
 	device_ctx_->VSSetShader(shader_.vertex_shader, nullptr, 0);
 	device_ctx_->VSSetConstantBuffers(0, 1, &cb_vertex_shader_.ptr);
 	device_ctx_->PSSetShader(shader_.pixel_shader, nullptr, 0);
-	ID3D11ShaderResourceView* srv_list[2] = {
+	ID3D11ShaderResourceView* srv_list[3] = {
 		cube_envmap_pass_.tex_irradiance_map_srv(),
+		cube_envmap_pass_.tex_reflection_map_srv(),
 		cube_envmap_pass_.tex_brdf_map_srv()
 	};
-	device_ctx_->PSSetShaderResources(0, 2, srv_list);
+	device_ctx_->PSSetShaderResources(0, 3, srv_list);
 	device_ctx_->PSSetSamplers(0, 1, &sampler_state_.ptr);
 	HRESULT hr = debug_->ValidateContext(device_ctx_);
 	assert(hr == S_OK);
@@ -607,23 +620,25 @@ void pbr::update(float dt_msec)
 
 void pbr::update_cb_vertex_shader(const cg::Viewpoint& viewpoint)
 {
-	static const float3 light_dir_to_ws = normalize(float3(0, 0, 10));
+	static const float3 light_dir_to_ws = normalize(float3(10, 0, 10));
 	const float4x4 model_matrix = trs_matrix(model_position_, model_rotation_, model_scale_);
+	const float4x4 model_matrix_inv = inverse(model_matrix);
 	const float4x4 normal_matrix = rotation_matrix<float4x4>(model_rotation_);
 	const float4x4 pvm_matrix = projection_matrix_ * view_matrix(viewpoint) * model_matrix;
 
 	float arr[pbr::cb_vertex_shader_component_count];
 	to_array_column_major_order(pvm_matrix, arr);
 	to_array_column_major_order(model_matrix, arr + 16);
-	to_array_column_major_order(normal_matrix, arr + 32);
-	arr[48] = light_dir_to_ws.x;
-	arr[49] = light_dir_to_ws.y;
-	arr[50] = light_dir_to_ws.z;
-	arr[51] = 0;
-	arr[52] = viewpoint.position.x;
-	arr[53] = viewpoint.position.y;
-	arr[54] = viewpoint.position.z;
-	arr[55] = 0;
+	to_array_column_major_order(model_matrix_inv, arr + 32);
+	to_array_column_major_order(normal_matrix, arr + 48);
+	arr[64] = light_dir_to_ws.x;
+	arr[65] = light_dir_to_ws.y;
+	arr[66] = light_dir_to_ws.z;
+	arr[67] = 0;
+	arr[68] = viewpoint.position.x;
+	arr[69] = viewpoint.position.y;
+	arr[70] = viewpoint.position.z;
+	arr[71] = 0;
 	device_ctx_->UpdateSubresource(cb_vertex_shader_, 0, nullptr, arr, 0, 0);
 }
 
