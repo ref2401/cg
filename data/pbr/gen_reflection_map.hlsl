@@ -56,7 +56,7 @@ static const uint sample_count = 1024;
 
 float2 hammersley(uint i, uint count)
 {
-	uint bits = count;
+	uint bits = i;
 	bits = (bits << 16u) | (bits >> 16u);
 	bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
 	bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);

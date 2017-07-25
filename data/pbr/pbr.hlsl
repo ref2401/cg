@@ -63,7 +63,7 @@ static const float pi = 3.1415926535f;
 //static const float3 g_material_base_color = float3(0.955f, 0.637f, 0.538f);
 //static const float3 g_material_fresnel0 = float3(0.32267f, 0.32267f, 0.32267f);
 // plastic
-static const float g_material_roughness = 0.9f; // [0.03, 1.0]
+static const float g_material_roughness = 0.7f; // [0.03, 1.0]
 static const float g_material_anisotropic = 0.0f;
 static const float g_material_metallic = 0.0;
 static const float3 g_material_base_color = float3(0, 0, 1);
